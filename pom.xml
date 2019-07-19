@@ -14,5 +14,6 @@
 
   <modules>
     <module>framework.orm</module>
+    <module>framework.example</module>
   </modules>
 </project>

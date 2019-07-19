@@ -14,10 +14,10 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
+    <spring-jdbc.version>5.1.8.RELEASE</spring-jdbc.version>
     <lombok.version>1.18.8</lombok.version>
     <slf4j.version>1.7.26</slf4j.version>
     <junit.version>4.12</junit.version>
-    <spring-jdbc.version>5.1.8.RELEASE</spring-jdbc.version>
   </properties>
 
   <dependencies>
@@ -42,6 +42,14 @@
       <artifactId>slf4j-api</artifactId>
       <version>1.7.26</version>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.9.3</version>
+    </dependency>
+
 
     <!-- https://mvnrepository.com/artifact/junit/junit -->
     <dependency>

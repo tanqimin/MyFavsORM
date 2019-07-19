@@ -1,15 +1,14 @@
 package work.myfavs.framework.orm.util;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import work.myfavs.framework.orm.util.exception.UnexpectedNewInstanceException;
 
 @SuppressWarnings("unchecked")
 public class ReflectUtil {
@@ -152,6 +151,34 @@ public class ReflectUtil {
     return caseSensitive && !retVal.name().equals(name)
         ? null
         : retVal;
+  }
+
+  /**
+   * 使用反射创建实例
+   *
+   * @param clazz 类型
+   * @param <T>   类型泛型
+   *
+   * @return 实例对象
+   */
+  public static <T> T newInstance(Class<T> clazz) {
+
+    try {
+      Constructor<T> ct = clazz.getDeclaredConstructor();
+      ct.setAccessible(true);
+      return ct.newInstance();
+    } catch (InvocationTargetException e) {
+      Throwable t = e.getTargetException();
+      if (t instanceof RuntimeException) {
+        throw ((RuntimeException) t);
+      } else {
+        throw new UnexpectedNewInstanceException(e);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new UnexpectedNewInstanceException(e);
+    }
   }
 
 }

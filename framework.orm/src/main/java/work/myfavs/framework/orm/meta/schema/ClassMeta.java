@@ -1,8 +1,9 @@
 package work.myfavs.framework.orm.meta.schema;
 
 import java.lang.reflect.Field;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.Data;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.Table;
@@ -16,9 +17,9 @@ public class ClassMeta {
   private String         tableName;
   private GenerationType strategy;
 
-  private AttributeMeta       primaryKey;
-  private List<AttributeMeta> updateAttributes = new LinkedList<>();
-  private List<AttributeMeta> queryAttributes  = new LinkedList<>();
+  private AttributeMeta              primaryKey;
+  private Map<String, AttributeMeta> updateAttributes = new ConcurrentHashMap<>();
+  private Map<String, AttributeMeta> queryAttributes  = new ConcurrentHashMap<>();
 
   private ClassMeta() {
 
@@ -33,8 +34,12 @@ public class ClassMeta {
    */
   public static ClassMeta createInstance(Class<?> clazz) {
 
-    Table     table     = clazz.getAnnotation(Table.class);
-    ClassMeta classMeta = new ClassMeta();
+    Table       table;
+    ClassMeta   classMeta;
+    List<Field> fields;
+
+    table = clazz.getAnnotation(Table.class);
+    classMeta = new ClassMeta();
 
     if (table != null) {
       classMeta.setClassName(clazz.getName());
@@ -44,16 +49,19 @@ public class ClassMeta {
                                  : table.value());
     }
 
-    List<Field> fields = ReflectUtil.fieldsOf(clazz, Column.class);
+    fields = ReflectUtil.fieldsOf(clazz, Column.class);
 
     for (Field field : fields) {
       AttributeMeta attributeMeta = AttributeMeta.createInstance(field);
-      classMeta.queryAttributes.add(attributeMeta);
+      classMeta.queryAttributes.put(attributeMeta.getColumnName(), attributeMeta);
+      if (attributeMeta.isReadonly()) {
+        continue;
+      }
       if (attributeMeta.isPrimaryKey()) {
         classMeta.setPrimaryKey(attributeMeta);
         continue;
       }
-      classMeta.updateAttributes.add(attributeMeta);
+      classMeta.updateAttributes.put(attributeMeta.getColumnName(), attributeMeta);
     }
 
     return classMeta;
