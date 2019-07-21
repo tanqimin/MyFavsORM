@@ -14,18 +14,24 @@ import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 @Slf4j
-public class QueryRepository {
+public class Query
+    extends AbstractRepository {
 
-  private DBTemplate dbTemplate;
 
-  private QueryRepository() {}
+  public Query(DBTemplate dbTemplate) {
 
-  public QueryRepository(DBTemplate dbTemplate) {
-
-    this.dbTemplate = dbTemplate;
+    super(dbTemplate);
   }
 
-  public <TModel> List<TModel> find(Class<TModel> modelClass, String sql, Object[] params) {
+  public <TModel> List<TModel> find(Class<TModel> modelClass,
+                                    String sql) {
+
+    return this.find(modelClass, sql, null);
+  }
+
+  public <TModel> List<TModel> find(Class<TModel> modelClass,
+                                    String sql,
+                                    Object[] params) {
 
     Metadata.get(modelClass);
 
@@ -45,7 +51,15 @@ public class QueryRepository {
     }
   }
 
-  public <TModel> TModel get(Class<TModel> modelClass, String sql, Object[] params) {
+  public <TModel> TModel get(Class<TModel> modelClass,
+                             String sql) {
+
+    return this.get(modelClass, sql, null);
+  }
+
+  public <TModel> TModel get(Class<TModel> modelClass,
+                             String sql,
+                             Object[] params) {
 
     List<TModel> list = this.find(modelClass, sql, params);
 

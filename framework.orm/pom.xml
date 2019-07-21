@@ -15,6 +15,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
     <spring-jdbc.version>5.1.8.RELEASE</spring-jdbc.version>
+    <hutool-core.version>4.5.17</hutool-core.version>
+    <commons-beanutils.version>1.9.3</commons-beanutils.version>
     <lombok.version>1.18.8</lombok.version>
     <slf4j.version>1.7.26</slf4j.version>
     <junit.version>4.12</junit.version>
@@ -40,16 +42,22 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.26</version>
+      <version>${slf4j.version}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
-      <version>1.9.3</version>
+      <version>${commons-beanutils.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-core -->
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-core</artifactId>
+      <version>${hutool-core.version}</version>
+    </dependency>
 
     <!-- https://mvnrepository.com/artifact/junit/junit -->
     <dependency>
