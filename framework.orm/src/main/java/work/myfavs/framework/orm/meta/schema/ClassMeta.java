@@ -10,6 +10,9 @@ import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.ReflectUtil;
 
+/**
+ * 类元数据
+ */
 @Data
 public class ClassMeta {
 

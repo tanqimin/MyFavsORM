@@ -7,6 +7,8 @@ import javax.sql.DataSource;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import work.myfavs.framework.orm.meta.dialect.DialectFactory;
+import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 import work.myfavs.framework.orm.repository.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.DBUtil;
@@ -18,6 +20,8 @@ public class DBTemplate
 
   //数据源
   private DataSource dataSource;
+  //数据库方言
+  private IDialect   dialect;
   //数据库类型
   private String     dbType       = "sqlserver";
   //一次批量插入数据的数量
@@ -108,6 +112,14 @@ public class DBTemplate
   public void release(Connection connection) {
 
     DataSourceUtils.releaseConnection(connection, this.getDataSource());
+  }
+
+  public IDialect getDialect() {
+
+    if (this.dialect == null) {
+      this.dialect = DialectFactory.getInstance(this.dbType);
+    }
+    return this.dialect;
   }
 
 }

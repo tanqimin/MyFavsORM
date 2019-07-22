@@ -4,6 +4,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 元数据构建
+ */
 @Slf4j
 public class Metadata {
 
