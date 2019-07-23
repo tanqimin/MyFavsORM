@@ -1,9 +1,10 @@
 package work.myfavs.framework.orm.meta.schema;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.Data;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.Table;
@@ -21,8 +22,8 @@ public class ClassMeta {
   private GenerationType strategy;
 
   private AttributeMeta              primaryKey;
-  private Map<String, AttributeMeta> updateAttributes = new ConcurrentHashMap<>();
-  private Map<String, AttributeMeta> queryAttributes  = new ConcurrentHashMap<>();
+  private List<AttributeMeta>        updateAttributes = new LinkedList<>();
+  private Map<String, AttributeMeta> queryAttributes  = new HashMap<>();
 
   private ClassMeta() {
 
@@ -56,7 +57,7 @@ public class ClassMeta {
 
     for (Field field : fields) {
       AttributeMeta attributeMeta = AttributeMeta.createInstance(field);
-      classMeta.queryAttributes.put(attributeMeta.getColumnName(), attributeMeta);
+      classMeta.queryAttributes.put(attributeMeta.getColumnName().toUpperCase(), attributeMeta);
       if (attributeMeta.isReadonly()) {
         continue;
       }
@@ -64,10 +65,11 @@ public class ClassMeta {
         classMeta.setPrimaryKey(attributeMeta);
         continue;
       }
-      classMeta.updateAttributes.put(attributeMeta.getColumnName(), attributeMeta);
+      classMeta.updateAttributes.add(attributeMeta);
     }
 
     return classMeta;
   }
+
 
 }

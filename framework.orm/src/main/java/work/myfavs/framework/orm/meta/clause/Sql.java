@@ -44,7 +44,7 @@ public class Sql
    * @param sql    SQL 语句
    * @param params 参数
    */
-  public Sql(String sql, List params) {
+  public Sql(String sql, List<Object> params) {
 
     super(sql, params);
   }
@@ -101,7 +101,7 @@ public class Sql
    *
    * @return 拼接后的 SQL
    */
-  public Sql append(String sql, List params) {
+  public Sql append(String sql, List<Object> params) {
 
     this.sql.append(sql);
     this.params.addAll(params);
@@ -386,6 +386,18 @@ public class Sql
   }
 
   /**
+   * 拼接 WHERE {cond} 语句
+   *
+   * @param cond Cond
+   *
+   * @return SQL
+   */
+  public Sql where(Cond cond) {
+
+    return this.append(StrUtil.format(" WHERE {}", cond.sql), cond.params);
+  }
+
+  /**
    * 拼接 WHERE {sql} 语句
    *
    * @param sql SQL语句
@@ -405,7 +417,7 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql where(String sql, List params) {
+  public Sql where(String sql, List<Object> params) {
 
     return this.append(StrUtil.format(" WHERE {}", sql), params);
   }
@@ -531,7 +543,7 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql having(String sql, List params) {
+  public Sql having(String sql, List<Object> params) {
 
     return this.append(StrUtil.format(" HAVING {}", sql), params);
   }

@@ -55,7 +55,7 @@ public abstract class DefaultDialect
     ClassMeta                  classMeta;
     String                     tableName;
     AttributeMeta              primaryKey;
-    Map<String, AttributeMeta> updateAttributes;
+    List<AttributeMeta> updateAttributes;
 
     Sql insertSql;
     Sql valuesSql;
@@ -73,9 +73,44 @@ public abstract class DefaultDialect
     }
 
     if (updateAttributes.size() > 0) {
-      for (AttributeMeta attributeMeta : updateAttributes.values()) {
+      for (AttributeMeta attributeMeta : updateAttributes) {
         insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
         valuesSql.append(StrUtil.format("?,"), BeanUtil.getFieldValue(model, attributeMeta.getFieldName()));
+      }
+      insertSql.getSql().deleteCharAt(insertSql.getSql().lastIndexOf(","));
+      valuesSql.getSql().deleteCharAt(valuesSql.getSql().lastIndexOf(","));
+    }
+
+    return insertSql.append(")").append(valuesSql).append(")");
+  }
+
+  @Override
+  public <TModel> Sql insert(Class<TModel> clazz) {
+
+    ClassMeta                  classMeta;
+    String                     tableName;
+    AttributeMeta              primaryKey;
+    List<AttributeMeta> updateAttributes;
+
+    Sql insertSql;
+    Sql valuesSql;
+
+    classMeta = Metadata.get(clazz);
+    tableName = classMeta.getTableName();
+    primaryKey = classMeta.getPrimaryKey();
+    updateAttributes = classMeta.getUpdateAttributes();
+
+    insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
+    valuesSql = new Sql(StrUtil.format(" VALUES ("));
+    if (classMeta.getStrategy() != GenerationType.IDENTITY) {
+      insertSql.append(StrUtil.format("{},", primaryKey.getColumnName()));
+      valuesSql.append(StrUtil.format("?,"));
+    }
+
+    if (updateAttributes.size() > 0) {
+      for (AttributeMeta attributeMeta : updateAttributes) {
+        insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
+        valuesSql.append(StrUtil.format("?,"));
       }
       insertSql.getSql().deleteCharAt(insertSql.getSql().lastIndexOf(","));
       valuesSql.getSql().deleteCharAt(valuesSql.getSql().lastIndexOf(","));
@@ -90,7 +125,7 @@ public abstract class DefaultDialect
     ClassMeta                  classMeta;
     String                     tableName;
     AttributeMeta              primaryKey;
-    Map<String, AttributeMeta> updateAttributes;
+    List<AttributeMeta> updateAttributes;
 
     Sql sql;
 
@@ -102,7 +137,7 @@ public abstract class DefaultDialect
     sql = Sql.Update(tableName).append(" SET");
 
     if (updateAttributes.size() > 0) {
-      for (AttributeMeta attributeMeta : updateAttributes.values()) {
+      for (AttributeMeta attributeMeta : updateAttributes) {
         sql.append(StrUtil.format(" {} = ?,", attributeMeta.getColumnName()), BeanUtil.getFieldValue(model, attributeMeta.getFieldName()));
       }
       sql.getSql().deleteCharAt(sql.getSql().lastIndexOf(","));

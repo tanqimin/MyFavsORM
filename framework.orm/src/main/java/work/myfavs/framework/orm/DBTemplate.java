@@ -1,5 +1,7 @@
 package work.myfavs.framework.orm;
 
+import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.util.IdUtil;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -18,18 +20,23 @@ import work.myfavs.framework.orm.util.DBUtil;
 public class DBTemplate
     implements Cloneable, AutoCloseable {
 
+  private static Snowflake  snowflake    = null;
   //数据源
-  private DataSource dataSource;
+  private        DataSource dataSource;
   //数据库方言
-  private IDialect   dialect;
+  private        IDialect   dialect;
   //数据库类型
-  private String     dbType       = "sqlserver";
+  private        String     dbType       = "sqlserver";
   //一次批量插入数据的数量
-  private int        batchSize    = 1000;
+  private        int        batchSize    = 1000;
   //查询每次抓取数据的数量
-  private int        fetchSize    = 500;
+  private        int        fetchSize    = 500;
   //查询超时时间，单位：秒
-  private int        queryTimeout = 60;
+  private        int        queryTimeout = 60;
+  //终端ID(雪花算法生成主键用)
+  private        long       workerId     = 1L;
+  //数据中心ID(雪花算法生成主键用)
+  private        long       dataCenterId = 1L;
 
   @Override
   public void close()
@@ -52,6 +59,29 @@ public class DBTemplate
   public DBTemplate(DataSource dataSource) {
 
     this.dataSource = dataSource;
+  }
+
+  /**
+   * 获取雪花主键值
+   *
+   * @return 雪花主键值
+   */
+  public long nextSnowFakeId() {
+
+    if (snowflake == null) {
+      snowflake = IdUtil.createSnowflake(workerId, dataCenterId);
+    }
+    return snowflake.nextId();
+  }
+
+  /**
+   * 获取UUID主键值
+   *
+   * @return UUID主键值
+   */
+  public String nextUUID() {
+
+    return IdUtil.randomUUID();
   }
 
   /**

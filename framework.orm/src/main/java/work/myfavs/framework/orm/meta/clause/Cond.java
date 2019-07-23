@@ -259,7 +259,7 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond in(String field, List params) {
+  public static Cond in(String field, List<Object> params) {
 
     return in(field, params, true);
   }
@@ -277,12 +277,12 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond in(String field, List params, boolean ignoreEmptyParams) {
+  public static Cond in(String field, List<Object> params, boolean ignoreEmptyParams) {
 
-    Sql    inClauseSql;
-    String sql;
-    List   sqlParams;
-    int    paramCnt;
+    Sql          inClauseSql;
+    String       sql;
+    List<Object> sqlParams;
+    int          paramCnt;
 
     inClauseSql = createInClauseParams(params);
     sql = inClauseSql.sql.toString();
@@ -326,7 +326,7 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond notIn(String field, List params) {
+  public static Cond notIn(String field, List<Object> params) {
 
     return notIn(field, params, true);
   }
@@ -344,12 +344,12 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond notIn(String field, List params, boolean ignoreEmptyParams) {
+  public static Cond notIn(String field, List<Object> params, boolean ignoreEmptyParams) {
 
-    Sql    inClauseSql;
-    String sql;
-    List   sqlParams;
-    int    paramCnt;
+    Sql          inClauseSql;
+    String       sql;
+    List<Object> sqlParams;
+    int          paramCnt;
 
     inClauseSql = createInClauseParams(params);
     sql = inClauseSql.sql.toString();
@@ -382,14 +382,14 @@ public class Cond
     return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params.toArray());
   }
 
-  private static Sql createInClauseParams(List params) {
+  private static Sql createInClauseParams(List<Object> params) {
 
     Sql           sql;
     StringBuilder sqlBuilder;
-    List          sqlParams;
+    List<Object>  sqlParams;
 
     sqlBuilder = new StringBuilder();
-    sqlParams = new ArrayList();
+    sqlParams = new ArrayList<>();
     if (params != null && params.size() > 0) {
       for (Object param : params) {
         if (param == null) {

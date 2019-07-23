@@ -61,7 +61,7 @@ public class DBConvert {
              i <= colCount;
              i++) {
           colName = rsmd.getColumnLabel(i);
-          attributeMeta = attrMetas.get(colName);
+          attributeMeta = attrMetas.get(colName.toUpperCase());
           if (attributeMeta == null) {
             continue;
           }

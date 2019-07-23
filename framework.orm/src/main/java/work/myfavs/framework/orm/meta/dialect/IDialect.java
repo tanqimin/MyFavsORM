@@ -18,7 +18,7 @@ public interface IDialect {
   String getDialectName();
 
   /**
-   * 获取插入语句
+   * 获取插入语句（带参数）
    *
    * @param clazz    实体类Class
    * @param entity   实体类对象
@@ -28,6 +28,15 @@ public interface IDialect {
    */
   <TModel> Sql insert(Class<TModel> clazz, TModel entity);
 
+  /**
+   * 获取插入语句（不带参数）
+   *
+   * @param clazz    实体类Class
+   * @param <TModel> 实体类类型
+   *
+   * @return Sql对象
+   */
+  <TModel> Sql insert(Class<TModel> clazz);
 //  /**
 //   * 获取插入语句
 //   *
@@ -37,7 +46,7 @@ public interface IDialect {
 //   *
 //   * @return Sql语句
 //   */
-//  <TModel> String insert(Class<TModel> clazz, List<AttributeMeta> columns);
+//  <TModel> String create(Class<TModel> clazz, List<AttributeMeta> columns);
 
   /**
    * 获取所有记录语句
