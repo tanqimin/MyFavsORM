@@ -10,10 +10,10 @@ import work.myfavs.framework.orm.repository.handler.PropertyHandler;
  * Created by tanqimin on 2016/1/29.
  */
 public class TimePropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Time> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Time convert(ResultSet rs, String columnName, Class<Time> clazz)
       throws SQLException {
 
     Time i = rs.getTime(columnName);
@@ -23,10 +23,10 @@ public class TimePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Time param)
       throws SQLException {
 
-    ps.setTime(paramIndex, (Time) param);
+    ps.setTime(paramIndex, param);
   }
 
 }

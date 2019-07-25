@@ -22,10 +22,10 @@ import java.sql.SQLException;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 
 public class LongPropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Long> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Long convert(ResultSet rs, String columnName, Class<Long> clazz)
       throws SQLException {
 
     long i = rs.getLong(columnName);
@@ -35,10 +35,10 @@ public class LongPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Long param)
       throws SQLException {
 
-    ps.setLong(paramIndex, (Long) param);
+    ps.setLong(paramIndex, param);
   }
 
 }

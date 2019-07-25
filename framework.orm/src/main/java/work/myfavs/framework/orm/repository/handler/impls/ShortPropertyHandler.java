@@ -22,11 +22,11 @@ import java.sql.SQLException;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 
 public class ShortPropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Short> {
 
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Short convert(ResultSet rs, String columnName, Class<Short> clazz)
       throws SQLException {
 
     short i = rs.getShort(columnName);
@@ -36,10 +36,10 @@ public class ShortPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Short param)
       throws SQLException {
 
-    ps.setShort(paramIndex, (Short) param);
+    ps.setShort(paramIndex, param);
   }
 
 }

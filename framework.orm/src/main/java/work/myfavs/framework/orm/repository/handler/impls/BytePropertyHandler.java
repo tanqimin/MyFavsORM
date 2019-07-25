@@ -9,11 +9,11 @@ import work.myfavs.framework.orm.repository.handler.PropertyHandler;
  * Created by tanqimin on 2016/1/29.
  */
 public class BytePropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Byte> {
 
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Byte convert(ResultSet rs, String columnName, Class<Byte> clazz)
       throws SQLException {
 
     byte i = rs.getByte(columnName);
@@ -23,10 +23,10 @@ public class BytePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Byte param)
       throws SQLException {
 
-    ps.setByte(paramIndex, (Byte) param);
+    ps.setByte(paramIndex, param);
   }
 
 }

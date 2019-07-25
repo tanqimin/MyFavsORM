@@ -9,13 +9,16 @@ import work.myfavs.framework.orm.repository.handler.PropertyHandler;
  * Created by tanqimin on 2016/1/29.
  */
 public class ObjectPropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Object> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Object convert(ResultSet rs, String columnName, Class<Object> clazz)
       throws SQLException {
 
-    return rs.getObject(columnName);
+    Object val = rs.getObject(columnName);
+    return rs.wasNull()
+        ? null
+        : val;
   }
 
   @Override

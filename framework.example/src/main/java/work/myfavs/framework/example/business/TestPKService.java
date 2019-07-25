@@ -1,5 +1,6 @@
 package work.myfavs.framework.example.business;
 
+import cn.hutool.core.util.StrUtil;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,6 +15,7 @@ import work.myfavs.framework.example.domain.enums.TypeEnum;
 import work.myfavs.framework.example.repository.IdentityRepository;
 import work.myfavs.framework.example.repository.SnowFakeRepository;
 import work.myfavs.framework.example.repository.UUIDRepository;
+import work.myfavs.framework.example.util.exts.Config;
 
 @Service
 public class TestPKService {
@@ -74,9 +76,12 @@ public class TestPKService {
   public int createSnowFake() {
 
     List<TestSnowFake> list = new ArrayList<>();
+    Config             config;
     for (int i = 0;
          i < BITCH_SIZE;
          i++) {
+      config = new Config();
+
       TestSnowFake entity = new TestSnowFake();
       entity.setName("NAME_" + i);
       entity.setCreated(new Date());
@@ -85,6 +90,11 @@ public class TestPKService {
       entity.setType(i % 2 == 0
                          ? TypeEnum.FOOD
                          : TypeEnum.DRINK);
+
+      config.setUrl(StrUtil.format("http://www.baidu.com/{}", i));
+      config.setUsername(entity.getName());
+      config.setPassword("123456");
+      entity.setConfig(config);
       list.add(entity);
 //      snowFakeRepository.create(entity);
     }

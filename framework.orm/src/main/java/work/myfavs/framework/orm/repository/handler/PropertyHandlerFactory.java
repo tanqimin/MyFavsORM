@@ -11,9 +11,9 @@ import work.myfavs.framework.orm.repository.handler.impls.*;
 
 public class PropertyHandlerFactory {
 
-  private final static Map<String, PropertyHandler> HANDLER_MAP             = new HashMap<>();
-  private final static EnumPropertyHandler          ENUM_PROPERTY_HANDLER   = new EnumPropertyHandler();
-  private final static ObjectPropertyHandler        OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
+  private final static Map<String, PropertyHandler<?>> HANDLER_MAP             = new HashMap<>();
+  private final static EnumPropertyHandler             ENUM_PROPERTY_HANDLER   = new EnumPropertyHandler();
+  private final static ObjectPropertyHandler           OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
 
   static {
     HANDLER_MAP.put(String.class.getName(), new StringPropertyHandler());

@@ -22,11 +22,11 @@ import java.sql.SQLException;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 
 public class IntegerPropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Integer> {
 
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Integer convert(ResultSet rs, String columnName, Class<Integer> clazz)
       throws SQLException {
 
     int i = rs.getInt(columnName);
@@ -36,10 +36,10 @@ public class IntegerPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Integer param)
       throws SQLException {
 
-    ps.setInt(paramIndex, (Integer) param);
+    ps.setInt(paramIndex, param);
   }
 
 }

@@ -20,13 +20,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
-import work.myfavs.framework.orm.util.StringUtil;
 
 public class StringPropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<String> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public String convert(ResultSet rs, String columnName, Class<String> clazz)
       throws SQLException {
 
     return rs.wasNull()
@@ -35,10 +34,10 @@ public class StringPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, String param)
       throws SQLException {
 
-    ps.setString(paramIndex, StringUtil.toStr(param));
+    ps.setString(paramIndex, param);
   }
 
 }

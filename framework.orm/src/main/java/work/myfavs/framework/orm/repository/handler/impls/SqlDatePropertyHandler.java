@@ -10,10 +10,10 @@ import work.myfavs.framework.orm.repository.handler.PropertyHandler;
  * Created by tanqimin on 2016/1/29.
  */
 public class SqlDatePropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Date> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Date convert(ResultSet rs, String columnName, Class<Date> clazz)
       throws SQLException {
 
     Date i = rs.getDate(columnName);
@@ -23,10 +23,10 @@ public class SqlDatePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Date param)
       throws SQLException {
 
-    ps.setDate(paramIndex, (Date) param);
+    ps.setDate(paramIndex, param);
   }
 
 }

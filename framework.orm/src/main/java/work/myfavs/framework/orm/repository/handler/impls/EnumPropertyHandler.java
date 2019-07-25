@@ -11,7 +11,7 @@ import work.myfavs.framework.orm.util.StringUtil;
  * Created by tanqimin on 2016/1/29.
  */
 public class EnumPropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Object> {
 
   @Override
   public Object convert(ResultSet rs, String columnName, Class clazz)

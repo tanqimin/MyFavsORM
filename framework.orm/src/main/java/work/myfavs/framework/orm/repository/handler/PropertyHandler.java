@@ -6,9 +6,11 @@ import java.sql.SQLException;
 
 /**
  * 类型处理接口
+ * 此处为了兼容枚举类型
+ * <p>
  * Created by tanqimin on 2016/1/29.
  */
-public interface PropertyHandler {
+public abstract class PropertyHandler<T> {
 
 
   /**
@@ -22,7 +24,7 @@ public interface PropertyHandler {
    *
    * @throws SQLException SQLException
    */
-  abstract public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  abstract public T convert(ResultSet rs, String columnName, Class<T> clazz)
       throws SQLException;
 
   /**
@@ -34,7 +36,7 @@ public interface PropertyHandler {
    *
    * @throws SQLException SQLException
    */
-  abstract public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  abstract public void addParameter(PreparedStatement ps, int paramIndex, T param)
       throws SQLException;
 
 }

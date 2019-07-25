@@ -9,10 +9,10 @@ import work.myfavs.framework.orm.repository.handler.PropertyHandler;
  * Created by tanqimin on 2016/1/29.
  */
 public class BooleanPropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Boolean> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Boolean convert(ResultSet rs, String columnName, Class<Boolean> clazz)
       throws SQLException {
 
     boolean i = rs.getBoolean(columnName);
@@ -22,10 +22,10 @@ public class BooleanPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Boolean param)
       throws SQLException {
 
-    ps.setBoolean(paramIndex, (Boolean) param);
+    ps.setBoolean(paramIndex, param);
   }
 
 }

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 import work.myfavs.framework.example.domain.enums.TypeEnum;
+import work.myfavs.framework.example.util.exts.Config;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
@@ -28,5 +29,7 @@ public class TestSnowFake
   private BigDecimal price = BigDecimal.ZERO;
   @Column
   private TypeEnum   type;
+  @Column
+  private Config     config;
 
 }

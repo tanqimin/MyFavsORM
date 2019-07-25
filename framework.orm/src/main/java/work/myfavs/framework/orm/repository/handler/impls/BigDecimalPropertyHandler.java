@@ -10,10 +10,10 @@ import work.myfavs.framework.orm.repository.handler.PropertyHandler;
  * Created by tanqimin on 2016/1/29.
  */
 public class BigDecimalPropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<BigDecimal> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public BigDecimal convert(ResultSet rs, String columnName, Class<BigDecimal> clazz)
       throws SQLException {
 
     BigDecimal i = rs.getBigDecimal(columnName);
@@ -23,10 +23,10 @@ public class BigDecimalPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, BigDecimal param)
       throws SQLException {
 
-    ps.setBigDecimal(paramIndex, (BigDecimal) param);
+    ps.setBigDecimal(paramIndex, param);
   }
 
 }

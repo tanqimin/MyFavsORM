@@ -23,10 +23,10 @@ import java.sql.Timestamp;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 
 public class TimestampPropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Timestamp> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Timestamp convert(ResultSet rs, String columnName, Class<Timestamp> clazz)
       throws SQLException {
 
     Timestamp i = rs.getTimestamp(columnName);
@@ -36,10 +36,10 @@ public class TimestampPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Timestamp param)
       throws SQLException {
 
-    ps.setTimestamp(paramIndex, (Timestamp) param);
+    ps.setTimestamp(paramIndex, param);
   }
 
 }

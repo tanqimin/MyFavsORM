@@ -22,10 +22,10 @@ import java.sql.SQLException;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 
 public class FloatPropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Float> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Float convert(ResultSet rs, String columnName, Class<Float> clazz)
       throws SQLException {
 
     float i = rs.getFloat(columnName);
@@ -35,10 +35,10 @@ public class FloatPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Float param)
       throws SQLException {
 
-    ps.setFloat(paramIndex, (Float) param);
+    ps.setFloat(paramIndex, param);
   }
 
 }

@@ -22,10 +22,10 @@ import java.sql.SQLException;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 
 public class DoublePropertyHandler
-    implements PropertyHandler {
+    extends PropertyHandler<Double> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<?> clazz)
+  public Double convert(ResultSet rs, String columnName, Class<Double> clazz)
       throws SQLException {
 
     double i = rs.getDouble(columnName);
@@ -35,10 +35,10 @@ public class DoublePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Double param)
       throws SQLException {
 
-    ps.setDouble(paramIndex, (Double) param);
+    ps.setDouble(paramIndex, param);
   }
 
 }
