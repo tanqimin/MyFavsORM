@@ -16,7 +16,6 @@ import work.myfavs.framework.orm.repository.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.DBUtil;
 
 @Slf4j
-@Data
 public class DBTemplate
     implements Cloneable, AutoCloseable {
 
@@ -150,6 +149,76 @@ public class DBTemplate
       this.dialect = DialectFactory.getInstance(this.dbType);
     }
     return this.dialect;
+  }
+
+  public DataSource getDataSource() {
+
+    return dataSource;
+  }
+
+  public void setDataSource(DataSource dataSource) {
+
+    this.dataSource = dataSource;
+  }
+
+  public String getDbType() {
+
+    return dbType;
+  }
+
+  public void setDbType(String dbType) {
+
+    this.dbType = dbType;
+  }
+
+  public int getBatchSize() {
+
+    return batchSize;
+  }
+
+  public void setBatchSize(int batchSize) {
+
+    this.batchSize = batchSize;
+  }
+
+  public int getFetchSize() {
+
+    return fetchSize;
+  }
+
+  public void setFetchSize(int fetchSize) {
+
+    this.fetchSize = fetchSize;
+  }
+
+  public int getQueryTimeout() {
+
+    return queryTimeout;
+  }
+
+  public void setQueryTimeout(int queryTimeout) {
+
+    this.queryTimeout = queryTimeout;
+  }
+
+  public long getWorkerId() {
+
+    return workerId;
+  }
+
+  public void setWorkerId(long workerId) {
+
+    this.workerId = workerId;
+  }
+
+  public long getDataCenterId() {
+
+    return dataCenterId;
+  }
+
+  public void setDataCenterId(long dataCenterId) {
+
+    this.dataCenterId = dataCenterId;
   }
 
 }

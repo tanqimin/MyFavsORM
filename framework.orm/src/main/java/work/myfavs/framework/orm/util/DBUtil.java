@@ -144,6 +144,7 @@ public class DBUtil {
       pst.addBatch();
       if (++i % batchSize == 0) {
         pst.executeBatch();
+        pst.clearBatch();
       }
     }
     return pst;

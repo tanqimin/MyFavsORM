@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.util;
 
-import java.lang.reflect.InvocationTargetException;
+import cn.hutool.core.bean.BeanUtil;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
 import work.myfavs.framework.orm.meta.schema.AttributeMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.repository.handler.PropertyHandlerFactory;
@@ -54,24 +53,20 @@ public class DBConvert {
 
     AttributeMeta attributeMeta;
     Object        columnValue;
-    try {
-      while (rs.next()) {
-        TModel model = ReflectUtil.newInstance(modelClass);
-        for (int i = 1;
-             i <= colCount;
-             i++) {
-          colName = rsmd.getColumnLabel(i);
-          attributeMeta = attrMetas.get(colName.toUpperCase());
-          if (attributeMeta == null) {
-            continue;
-          }
-          columnValue = PropertyHandlerFactory.convert(rs, colName, attributeMeta.getFieldType());
-          BeanUtils.setProperty(model, attributeMeta.getFieldName(), columnValue);
+    while (rs.next()) {
+      TModel model = ReflectUtil.newInstance(modelClass);
+      for (int i = 1;
+           i <= colCount;
+           i++) {
+        colName = rsmd.getColumnLabel(i);
+        attributeMeta = attrMetas.get(colName.toUpperCase());
+        if (attributeMeta == null) {
+          continue;
         }
-        result.add(model);
+        columnValue = PropertyHandlerFactory.convert(rs, colName, attributeMeta.getFieldType());
+        BeanUtil.setFieldValue(model, attributeMeta.getFieldName(), columnValue);
       }
-    } catch (IllegalAccessException | InvocationTargetException e) {
-      log.error(e.getMessage(), e);
+      result.add(model);
     }
 
     return result;

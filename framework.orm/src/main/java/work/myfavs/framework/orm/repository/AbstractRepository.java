@@ -1,15 +1,20 @@
 package work.myfavs.framework.orm.repository;
 
+import cn.hutool.core.util.StrUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import org.springframework.util.StopWatch;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.meta.schema.Metadata;
+import work.myfavs.framework.orm.repository.monitor.SqlAnalysis;
+import work.myfavs.framework.orm.repository.monitor.SqlExecutedContext;
+import work.myfavs.framework.orm.repository.monitor.SqlExecutingContext;
 import work.myfavs.framework.orm.util.DBConvert;
 import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
@@ -45,20 +50,54 @@ abstract public class AbstractRepository {
     Connection        conn  = null;
     PreparedStatement pstmt = null;
     ResultSet         rs    = null;
+    List<TView>       result;
+
+    SqlAnalysis         sqlAnalysis         = new SqlAnalysis();
+    StopWatch           stopWatch           = new StopWatch();
+    SqlExecutingContext sqlExecutingContext = new SqlExecutingContext(new Sql(sql, params));
+    this.beforeQuery(sqlExecutingContext);
 
     try {
+      stopWatch.start(StrUtil.format("[{}]SQL QUERY", getThreadInfo()));
+
       conn = this.dbTemplate.createConnection();
       pstmt = params == null || params.size() == 0
           ? DBUtil.getPs(conn, sql)
           : DBUtil.getPs(conn, sql, params);
       rs = pstmt.executeQuery();
-      return DBConvert.toList(viewClass, rs);
+
+      stopWatch.stop();
+      sqlAnalysis.setElapsed(stopWatch.getLastTaskTimeMillis());
+      stopWatch.start(StrUtil.format("[{}]CONVERT TO ENTITY", getThreadInfo()));
+
+      result = DBConvert.toList(viewClass, rs);
+
+      stopWatch.stop();
+      sqlAnalysis.setMappingElapsed(stopWatch.getLastTaskTimeMillis());
+      sqlAnalysis.setAffectedRows(result.size());
+      return result;
     } catch (SQLException e) {
+      sqlAnalysis.setHasError(true);
+      sqlAnalysis.setThrowable(e);
+
       throw new DBException(e);
     } finally {
       this.dbTemplate.release(conn, pstmt, rs);
+
+      if (stopWatch.isRunning()) {
+        stopWatch.stop();
+      }
+      this.afterQuery(new SqlExecutedContext(sqlExecutingContext.getSql(), sqlAnalysis));
     }
   }
+
+  protected void afterQuery(SqlExecutedContext context)     {}
+
+  protected void beforeQuery(SqlExecutingContext context)   {}
+
+  protected void afterExecute(SqlExecutedContext context)   {}
+
+  protected void beforeExecute(SqlExecutingContext context) {}
 
   /**
    * 执行SQL，返回多行记录
@@ -162,6 +201,17 @@ abstract public class AbstractRepository {
   protected long count(Sql sql) {
 
     return this.count(sql.getSql().toString(), sql.getParams());
+  }
+
+  /**
+   * 获取线程信息
+   *
+   * @return
+   */
+  protected String getThreadInfo() {
+
+    Thread currentThread = Thread.currentThread();
+    return StrUtil.format("{} - {}", currentThread.getName(), currentThread.getId());
   }
 
 }

@@ -1,0 +1,80 @@
+logging:
+  config: classpath:logback-spring.xml
+server:
+  port: 9527
+  tomcat:
+    uri-encoding: utf-8
+  servlet:
+    context-path: /
+spring:
+  application:
+    name: myfavs-test
+  jmx:
+    default-domain: ${spring.application.name}
+  datasource:
+    druid:
+      validation-query: select 1
+      transaction-query-timeout: 60
+      initial-size: 10
+      min-idle: 10
+      max-active: 200
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 50
+      use-global-data-source-stat: true
+      filter:
+        stat:
+          enabled: true
+          db-type: sqlserver
+          slow-sql-millis: 5000
+        slf4j:
+          enabled: true
+        config:
+          enabled: true
+        wall:
+          enabled: false
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: "*.js,*.woff,*.woff2,*.ttf,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*"
+        session-stat-enable: false
+        session-stat-max-count: 1000
+        principal-session-name: ${spring.application.name}.druid.user
+        principal-cookie-name: ${spring.application.name}.druid.user
+        profile-enable: true
+      stat-view-servlet:
+        enabled: true                       #是否启用StatViewServlet默认值true
+        url-pattern: /druid/*
+        reset-enable: true
+        login-username: admin
+        login-password: admin
+        allow:
+        deny:
+  profiles:
+    active: dev
+  session:
+    store-type: none
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+  output:
+    ansi:
+      enabled: detect
+  messages:
+    encoding: UTF-8
+    basename: messages
+    cache-duration: -1
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss

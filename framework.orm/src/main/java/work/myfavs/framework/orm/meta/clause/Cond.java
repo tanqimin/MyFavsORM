@@ -45,6 +45,12 @@ public class Cond
     }
   }
 
+  private Cond(String sql, List<Object> params) {
+
+    super(sql);
+    super.params.addAll(params);
+  }
+
   /**
    * 创建 = 条件，如 field = param，如果 param 为 null，
    * 则忽略当前条件
@@ -299,7 +305,7 @@ public class Cond
     if (paramCnt == 1) {
       return eq(field, sqlParams.get(0));
     }
-    return new Cond(StrUtil.format(" {} IN ({})", field, sql), sqlParams.toArray());
+    return new Cond(StrUtil.format(" {} IN ({})", field, sql), sqlParams);
   }
 
   /**

@@ -394,7 +394,7 @@ public class Sql
    */
   public Sql where(Cond cond) {
 
-    return this.append(StrUtil.format(" WHERE {}", cond.sql), cond.params);
+    return this.append(StrUtil.format(" WHERE{}", cond.sql), cond.params);
   }
 
   /**
@@ -431,7 +431,7 @@ public class Sql
    */
   public Sql and(Cond cond) {
 
-    return this.append(StrUtil.format(" AND {}", cond.sql), cond.params);
+    return this.append(StrUtil.format(" AND{}", cond.sql), cond.params);
   }
 
   /**
@@ -456,7 +456,7 @@ public class Sql
    */
   public Sql or(Cond cond) {
 
-    return this.append(StrUtil.format(" OR {}", cond.sql), cond.params);
+    return this.append(StrUtil.format(" OR{}", cond.sql), cond.params);
   }
 
   /**
