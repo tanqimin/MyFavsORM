@@ -1,9 +1,8 @@
 package work.myfavs.framework.example.business;
 
-import cn.hutool.core.util.StrUtil;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import work.myfavs.framework.example.domain.enums.TypeEnum;
 import work.myfavs.framework.example.repository.IdentityRepository;
 import work.myfavs.framework.example.repository.SnowFakeRepository;
 import work.myfavs.framework.example.repository.UUIDRepository;
-import work.myfavs.framework.example.util.exts.Config;
 
 @Service
 public class TestPKService {
@@ -38,7 +36,7 @@ public class TestPKService {
          i++) {
       TestUUID entity = new TestUUID();
       entity.setName("NAME_" + i);
-      entity.setCreated(new Date());
+      entity.setCreated(LocalDateTime.now());
       entity.setDisable(i % 2 == 0);
       entity.setPrice(new BigDecimal(199.99));
       entity.setType(i % 2 == 0
@@ -58,7 +56,7 @@ public class TestPKService {
          i++) {
       TestIdentity entity = new TestIdentity();
       entity.setName("NAME_" + i);
-      entity.setCreated(new Date());
+      entity.setCreated(LocalDateTime.now());
       entity.setDisable(i % 2 == 0);
       entity.setPrice(new BigDecimal(199.99));
       entity.setType(i % 2 == 0
@@ -76,37 +74,34 @@ public class TestPKService {
   public int createSnowFake() {
 
     List<TestSnowFake> list = new ArrayList<>();
-    Config             config;
+
     for (int i = 0;
          i < BITCH_SIZE;
          i++) {
-      config = new Config();
-
       TestSnowFake entity = new TestSnowFake();
       entity.setName("NAME_" + i);
-      entity.setCreated(new Date());
+      entity.setCreated(LocalDateTime.now());
       entity.setDisable(i % 2 == 0);
       entity.setPrice(new BigDecimal(199.99));
       entity.setType(i % 2 == 0
                          ? TypeEnum.FOOD
                          : TypeEnum.DRINK);
 
-      config.setUrl(StrUtil.format("http://www.baidu.com/{}", i));
-      config.setUsername(entity.getName());
-      config.setPassword("123456");
-      entity.setConfig(config);
+//      Config config = new Config();
+//      config.setUrl(StrUtil.format("http://www.baidu.com/{}", i));
+//      config.setUsername(entity.getName());
+//      config.setPassword("123456");
+//      entity.setConfig(config);
       list.add(entity);
-//      snowFakeRepository.create(entity);
     }
     return snowFakeRepository.create(list);
-//    return list.size();
   }
 
   @Transactional
   public int updateCreated() {
 
     List<TestUUID> drinks = uuidRepository.findAllDrink();
-    drinks.forEach(d -> d.setCreated(new Date()));
+    drinks.forEach(d -> d.setCreated(LocalDateTime.now()));
     return uuidRepository.update(drinks, new String[]{"created"});
   }
 

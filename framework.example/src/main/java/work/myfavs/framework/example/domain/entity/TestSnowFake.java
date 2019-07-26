@@ -2,10 +2,9 @@ package work.myfavs.framework.example.domain.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.Data;
 import work.myfavs.framework.example.domain.enums.TypeEnum;
-import work.myfavs.framework.example.util.exts.Config;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
@@ -18,18 +17,16 @@ public class TestSnowFake
 
   @PrimaryKey
   @Column
-  private Long       id;
+  private Long          id;
   @Column
-  private Date       created;
+  private LocalDateTime created;
   @Column
-  private String     name;
+  private String        name;
   @Column
-  private boolean    disable;
+  private boolean       disable;
   @Column
-  private BigDecimal price = BigDecimal.ZERO;
+  private BigDecimal    price = BigDecimal.ZERO;
   @Column
-  private TypeEnum   type;
-  @Column
-  private Config     config;
+  private TypeEnum      type;
 
 }

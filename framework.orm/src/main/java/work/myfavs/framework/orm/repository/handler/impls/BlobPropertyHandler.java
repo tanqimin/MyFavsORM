@@ -1,32 +1,33 @@
 package work.myfavs.framework.orm.repository.handler.impls;
 
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 
 /**
  * Created by tanqimin on 2016/1/29.
  */
-public class TimePropertyHandler
-    extends PropertyHandler<Time> {
+public class BlobPropertyHandler
+    extends PropertyHandler<Blob> {
+
 
   @Override
-  public Time convert(ResultSet rs, String columnName, Class<Time> clazz)
+  public Blob convert(ResultSet rs, String columnName, Class<Blob> clazz)
       throws SQLException {
 
-    Time i = rs.getTime(columnName);
+    Blob i = rs.getBlob(columnName);
     return rs.wasNull()
         ? null
         : i;
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Time param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Blob param)
       throws SQLException {
 
-    ps.setTime(paramIndex, param);
+    ps.setBlob(paramIndex, param);
   }
 
 }

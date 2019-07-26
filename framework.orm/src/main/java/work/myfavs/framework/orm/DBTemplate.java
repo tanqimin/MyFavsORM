@@ -4,9 +4,9 @@ import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import work.myfavs.framework.orm.meta.dialect.DialectFactory;
@@ -14,6 +14,7 @@ import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 import work.myfavs.framework.orm.repository.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.DBUtil;
+
 
 @Slf4j
 public class DBTemplate
@@ -46,7 +47,7 @@ public class DBTemplate
   /**
    * 构造方法
    */
-  public DBTemplate() {
+  private DBTemplate() {
 
   }
 
@@ -55,9 +56,19 @@ public class DBTemplate
    *
    * @param dataSource DataSource
    */
-  public DBTemplate(DataSource dataSource) {
+  private DBTemplate(DataSource dataSource) {
 
     this.dataSource = dataSource;
+  }
+
+  public static DBTemplate build() {
+
+    return new DBTemplate();
+  }
+
+  public static DBTemplate build(DataSource dataSource) {
+
+    return new DBTemplate(dataSource);
   }
 
   /**
@@ -84,7 +95,7 @@ public class DBTemplate
   }
 
   /**
-   * 注册属性类型转换器
+   * 注册PropertyHandler
    *
    * @param clazz           属性类型
    * @param propertyHandler 属性类型转换器
@@ -98,13 +109,30 @@ public class DBTemplate
   }
 
   /**
+   * 注册默认的PropertyHandler
+   *
+   * @return DBTemplate
+   */
+  public DBTemplate registerDefaultPropertyHandler() {
+
+    PropertyHandlerFactory.registerDefault();
+    return this;
+  }
+
+  /**
    * 获取数据库链接
    *
    * @return Connection
    */
   public Connection createConnection() {
 
-    return DBUtil.createConnection(this.getDataSource());
+    Connection connection = DBUtil.createConnection(this.getDataSource());
+    try {
+      log.info("AUTO COMMIT:{}", connection.getAutoCommit());
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return connection;
   }
 
   /**
@@ -156,9 +184,10 @@ public class DBTemplate
     return dataSource;
   }
 
-  public void setDataSource(DataSource dataSource) {
+  public DBTemplate setDataSource(DataSource dataSource) {
 
     this.dataSource = dataSource;
+    return this;
   }
 
   public String getDbType() {
@@ -166,9 +195,10 @@ public class DBTemplate
     return dbType;
   }
 
-  public void setDbType(String dbType) {
+  public DBTemplate setDbType(String dbType) {
 
     this.dbType = dbType;
+    return this;
   }
 
   public int getBatchSize() {
@@ -176,9 +206,10 @@ public class DBTemplate
     return batchSize;
   }
 
-  public void setBatchSize(int batchSize) {
+  public DBTemplate setBatchSize(int batchSize) {
 
     this.batchSize = batchSize;
+    return this;
   }
 
   public int getFetchSize() {
@@ -186,9 +217,10 @@ public class DBTemplate
     return fetchSize;
   }
 
-  public void setFetchSize(int fetchSize) {
+  public DBTemplate setFetchSize(int fetchSize) {
 
     this.fetchSize = fetchSize;
+    return this;
   }
 
   public int getQueryTimeout() {
@@ -196,9 +228,10 @@ public class DBTemplate
     return queryTimeout;
   }
 
-  public void setQueryTimeout(int queryTimeout) {
+  public DBTemplate setQueryTimeout(int queryTimeout) {
 
     this.queryTimeout = queryTimeout;
+    return this;
   }
 
   public long getWorkerId() {
@@ -206,9 +239,10 @@ public class DBTemplate
     return workerId;
   }
 
-  public void setWorkerId(long workerId) {
+  public DBTemplate setWorkerId(long workerId) {
 
     this.workerId = workerId;
+    return this;
   }
 
   public long getDataCenterId() {
@@ -216,9 +250,10 @@ public class DBTemplate
     return dataCenterId;
   }
 
-  public void setDataCenterId(long dataCenterId) {
+  public DBTemplate setDataCenterId(long dataCenterId) {
 
     this.dataCenterId = dataCenterId;
+    return this;
   }
 
 }

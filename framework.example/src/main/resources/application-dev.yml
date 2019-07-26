@@ -6,11 +6,11 @@ spring:
   datasource:
     primary:
       db-type: mysql #sqlserver
-      driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
-      username: root
-      password: root
 #      driver-class-name: com.mysql.jdbc.Driver
-#      url: jdbc:mysql://192.168.8.252:3307/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+#      url: jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
 #      username: root
-#      password: 9527
+#      password: root
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://192.168.8.34:13307/sstest?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+      username: root
+      password: 9527

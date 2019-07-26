@@ -1,12 +1,14 @@
 package work.myfavs.framework.orm.repository.handler;
 
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 import work.myfavs.framework.orm.repository.handler.impls.*;
 
 public class PropertyHandlerFactory {
@@ -15,32 +17,40 @@ public class PropertyHandlerFactory {
   private final static EnumPropertyHandler             ENUM_PROPERTY_HANDLER   = new EnumPropertyHandler();
   private final static ObjectPropertyHandler           OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
 
-  static {
-    HANDLER_MAP.put(String.class.getName(), new StringPropertyHandler());
-    HANDLER_MAP.put(java.util.Date.class.getName(), new DatePropertyHandler());
-    HANDLER_MAP.put(java.sql.Date.class.getName(), new SqlDatePropertyHandler());
-    HANDLER_MAP.put(java.sql.Time.class.getName(), new TimePropertyHandler());
-    HANDLER_MAP.put(java.sql.Timestamp.class.getName(), new TimestampPropertyHandler());
-    HANDLER_MAP.put(BigDecimal.class.getName(), new BigDecimalPropertyHandler());
-
-    HANDLER_MAP.put(Boolean.class.getName(), new BooleanPropertyHandler());
-    HANDLER_MAP.put(Boolean.TYPE.getName(), new BooleanPropertyHandler());
-    HANDLER_MAP.put(Integer.class.getName(), new IntegerPropertyHandler());
-    HANDLER_MAP.put(Integer.TYPE.getName(), new IntegerPropertyHandler());
-    HANDLER_MAP.put(Long.class.getName(), new LongPropertyHandler());
-    HANDLER_MAP.put(Long.TYPE.getName(), new LongPropertyHandler());
-    HANDLER_MAP.put(Short.class.getName(), new ShortPropertyHandler());
-    HANDLER_MAP.put(Short.TYPE.getName(), new ShortPropertyHandler());
-    HANDLER_MAP.put(Double.class.getName(), new DoublePropertyHandler());
-    HANDLER_MAP.put(Double.TYPE.getName(), new DoublePropertyHandler());
-    HANDLER_MAP.put(Float.class.getName(), new FloatPropertyHandler());
-    HANDLER_MAP.put(Float.TYPE.getName(), new FloatPropertyHandler());
-    HANDLER_MAP.put(Byte.class.getName(), new BytePropertyHandler());
-    HANDLER_MAP.put(Byte.TYPE.getName(), new BytePropertyHandler());
-  }
-
   private PropertyHandlerFactory() {
 
+  }
+
+  /**
+   * 注册默认的PropertyHandler
+   */
+  public static void registerDefault() {
+
+    register(String.class, new StringPropertyHandler());
+    register(java.util.Date.class, new DatePropertyHandler());
+    register(LocalDateTime.class, new LocalDateTimePropertyHandler());
+    register(LocalDate.class, new LocalDatePropertyHandler());
+    register(LocalTime.class, new LocalTimePropertyHandler());
+    register(BigDecimal.class, new BigDecimalPropertyHandler());
+    register(Boolean.class, new BooleanPropertyHandler());
+    register(Boolean.TYPE, new BooleanPropertyHandler());
+    register(Integer.class, new IntegerPropertyHandler());
+    register(Integer.TYPE, new IntegerPropertyHandler());
+    register(Long.class, new LongPropertyHandler());
+    register(Long.TYPE, new LongPropertyHandler());
+    register(UUID.class, new UUIDPropertyHandler());
+    register(Short.class, new ShortPropertyHandler());
+    register(Short.TYPE, new ShortPropertyHandler());
+    register(Double.class, new DoublePropertyHandler());
+    register(Double.TYPE, new DoublePropertyHandler());
+    register(Float.class, new FloatPropertyHandler());
+    register(Float.TYPE, new FloatPropertyHandler());
+    register(Byte.class, new BytePropertyHandler());
+    register(Byte.TYPE, new BytePropertyHandler());
+    register(byte[].class, new ByteArrayPropertyHandler());
+    register(Byte[].class, new ByteArrayPropertyHandler());
+    register(Blob.class, new BlobPropertyHandler());
+    register(Clob.class, new ClobPropertyHandler());
   }
 
   /**

@@ -11,7 +11,7 @@
   <properties>
     <druid.version>1.1.18</druid.version>
     <mysql.version>5.1.47</mysql.version>
-    <myfavs-orm.version>0.0.1</myfavs-orm.version>
+    <myfavs-orm.version>0.1.1.RELEASE</myfavs-orm.version>
     <lombok.version>1.18.8</lombok.version>
   </properties>
 

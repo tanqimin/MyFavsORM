@@ -1,32 +1,33 @@
 package work.myfavs.framework.orm.repository.handler.impls;
 
+import java.sql.Clob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 
 /**
  * Created by tanqimin on 2016/1/29.
  */
-public class DatePropertyHandler
-    extends PropertyHandler<Date> {
+public class ClobPropertyHandler
+    extends PropertyHandler<Clob> {
+
 
   @Override
-  public Date convert(ResultSet rs, String columnName, Class<Date> clazz)
+  public Clob convert(ResultSet rs, String columnName, Class<Clob> clazz)
       throws SQLException {
 
-    Date date = rs.getDate(columnName);
+    Clob i = rs.getClob(columnName);
     return rs.wasNull()
         ? null
-        : new Date(date.getTime());
+        : i;
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Date param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Clob param)
       throws SQLException {
 
-    ps.setDate(paramIndex, new java.sql.Date(param.getTime()));
+    ps.setClob(paramIndex, param);
   }
 
 }

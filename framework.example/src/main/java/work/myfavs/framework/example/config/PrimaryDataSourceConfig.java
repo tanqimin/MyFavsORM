@@ -2,6 +2,8 @@ package work.myfavs.framework.example.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +12,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import work.myfavs.framework.example.util.exts.Config;
 import work.myfavs.framework.example.util.exts.ConfigPropertyHandler;
 import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.repository.handler.impls.*;
 
 @Configuration
 public class PrimaryDataSourceConfig {
@@ -32,16 +35,19 @@ public class PrimaryDataSourceConfig {
   @Bean(name = "primaryDBTemplate", destroyMethod = "close")
   public DBTemplate dbTemplate() {
 
-    DruidDataSource druidDataSource = primaryDataSource();
-    DBTemplate      dbTemplate      = new DBTemplate(druidDataSource);
-    dbTemplate.setDbType(druidDataSource.getDbType());
-    dbTemplate.setBatchSize(50);
-    dbTemplate.setFetchSize(100);
-    dbTemplate.setQueryTimeout(30);
-    dbTemplate.setDataCenterId(1);
-    dbTemplate.setWorkerId(1);
-    dbTemplate.registerPropertyHandler(Config.class, new ConfigPropertyHandler());
-    return dbTemplate;
+    return DBTemplate.build(primaryDataSource())
+                     .registerPropertyHandler(String.class, new StringPropertyHandler())
+                     .registerPropertyHandler(BigDecimal.class, new BigDecimalPropertyHandler())
+                     .registerPropertyHandler(Long.class, new LongPropertyHandler())
+                     .registerPropertyHandler(Boolean.class, new BooleanPropertyHandler())
+                     .registerPropertyHandler(LocalDateTime.class, new LocalDateTimePropertyHandler())
+                     .registerPropertyHandler(Config.class, new ConfigPropertyHandler())
+                     .setDbType("mysql")
+                     .setBatchSize(50)
+                     .setFetchSize(100)
+                     .setQueryTimeout(120)
+                     .setDataCenterId(1)
+                     .setWorkerId(1);
   }
 
 }
