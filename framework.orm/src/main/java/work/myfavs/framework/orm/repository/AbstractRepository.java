@@ -1,12 +1,10 @@
 package work.myfavs.framework.orm.repository;
 
 import cn.hutool.core.util.StrUtil;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Iterator;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StopWatch;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -19,10 +17,13 @@ import work.myfavs.framework.orm.util.DBConvert;
 import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
+@Slf4j
 abstract public class AbstractRepository {
 
   protected IDialect   dialect;
   protected DBTemplate dbTemplate;
+  private   boolean    showSql;
+  private   boolean    showResult;
 
   private AbstractRepository() {}
 
@@ -30,6 +31,8 @@ abstract public class AbstractRepository {
 
     this.dbTemplate = dbTemplate;
     dialect = dbTemplate.getDialect();
+    showSql = dbTemplate.getShowSql();
+    showResult = dbTemplate.getShowResult();
   }
 
 
@@ -58,6 +61,7 @@ abstract public class AbstractRepository {
     this.beforeQuery(sqlExecutingContext);
 
     try {
+      this.showSql(sql, params);
       stopWatch.start(StrUtil.format("[{}]SQL QUERY", getThreadInfo()));
 
       conn = this.dbTemplate.createConnection();
@@ -75,6 +79,7 @@ abstract public class AbstractRepository {
       stopWatch.stop();
       sqlAnalysis.setMappingElapsed(stopWatch.getLastTaskTimeMillis());
       sqlAnalysis.setAffectedRows(result.size());
+      this.showResult(rs);
       return result;
     } catch (SQLException e) {
       sqlAnalysis.setHasError(true);
@@ -103,7 +108,7 @@ abstract public class AbstractRepository {
    * 执行SQL，返回多行记录
    *
    * @param viewClass 结果集类型
-   * @param sql       SQL语句
+   * @param sql       SQL
    * @param <TView>   结果集类型泛型
    *
    * @return 结果集
@@ -212,6 +217,100 @@ abstract public class AbstractRepository {
 
     Thread currentThread = Thread.currentThread();
     return StrUtil.format("{} - {}", currentThread.getName(), currentThread.getId());
+  }
+
+  void showSql(String sql, List<Object> params) {
+
+    if (showSql && log.isInfoEnabled()) {
+      StringBuilder logStr = new StringBuilder();
+      logStr.append(System.lineSeparator());
+      logStr.append(StrUtil.format("          SQL: {}", sql));
+      logStr.append(System.lineSeparator());
+      logStr.append(StrUtil.format("   PARAMETERS: {}", showParams(params)));
+      logStr.append(System.lineSeparator());
+      log.info(logStr.toString());
+    }
+  }
+
+  private static String showParams(List<Object> params) {
+
+    StringBuilder stringBuilder;
+    stringBuilder = new StringBuilder();
+    if (params == null || params.size() == 0) {
+      return stringBuilder.toString();
+    }
+    for (Object param : params) {
+      stringBuilder.append(StrUtil.toString(param)).append(", ");
+    }
+    stringBuilder.deleteCharAt(stringBuilder.lastIndexOf(","));
+    return stringBuilder.toString();
+  }
+
+  void showBatchSql(String sql, List<List<Object>> paramsList) {
+
+    if (showSql && log.isInfoEnabled()) {
+      StringBuilder logStr = new StringBuilder(System.lineSeparator());
+      logStr.append("          SQL: ").append(sql);
+      if (paramsList != null && paramsList.size() > 0) {
+        logStr.append(System.lineSeparator()).append("   PARAMETERS: ").append(System.lineSeparator());
+        int i = 0;
+        for (List<Object> params : paramsList) {
+          logStr.append("PARAM[").append(i++).append("]: ");
+          logStr.append(StrUtil.format("{}", showParams(params)));
+          logStr.append(System.lineSeparator());
+        }
+      }
+      logStr.append(System.lineSeparator());
+      log.info(logStr.toString());
+    }
+  }
+
+  void showAffectedRows(int result) {
+
+    if (showSql && log.isInfoEnabled()) {
+      log.info("AFFECTED ROWS: {}", result);
+    }
+  }
+
+  private void showResult(ResultSet rs)
+      throws SQLException {
+
+    if (showResult && log.isInfoEnabled()) {
+      ResultSetMetaData metaData;
+      StringBuilder     logStr;
+      int               columnCount;
+      String            columnLabel;
+      Object            columnVal;
+      int               rows = 0;
+
+      metaData = rs.getMetaData();
+      columnCount = metaData.getColumnCount();
+
+      logStr = new StringBuilder(System.lineSeparator());
+      logStr.append(" QUERY RESULT:");
+      logStr.append(System.lineSeparator());
+
+      rs.beforeFirst();
+      while (rs.next()) {
+        rows++;
+        logStr.append(StrUtil.format("ROW[{}]: {", rs.getRow()));
+        for (int i = 1;
+             i <= columnCount;
+             i++) {
+          columnLabel = metaData.getColumnLabel(i);
+          columnVal = rs.getObject(i);
+          if (rs.wasNull()) {
+            logStr.append(StrUtil.format("\"{}\":null, ", columnLabel));
+          } else {
+            logStr.append(StrUtil.format("\"{}\":\"{}\", ", columnLabel, columnVal));
+          }
+        }
+        logStr.deleteCharAt(logStr.lastIndexOf(", ")).append("}").append(System.lineSeparator());
+      }
+      logStr.append(StrUtil.format("TOTAL RECORDS: {}", rows));
+      logStr.append(System.lineSeparator());
+      log.info(logStr.toString());
+    }
   }
 
 }

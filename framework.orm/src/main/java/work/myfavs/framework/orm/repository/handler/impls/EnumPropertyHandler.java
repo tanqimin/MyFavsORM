@@ -1,11 +1,11 @@
 package work.myfavs.framework.orm.repository.handler.impls;
 
+import cn.hutool.core.util.StrUtil;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 import work.myfavs.framework.orm.util.ReflectUtil;
-import work.myfavs.framework.orm.util.StringUtil;
 
 /**
  * Created by tanqimin on 2016/1/29.
@@ -24,7 +24,7 @@ public class EnumPropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, Object param)
       throws SQLException {
 
-    ps.setString(paramIndex, StringUtil.toStr(param));
+    ps.setString(paramIndex, StrUtil.toString(param));
   }
 
 }

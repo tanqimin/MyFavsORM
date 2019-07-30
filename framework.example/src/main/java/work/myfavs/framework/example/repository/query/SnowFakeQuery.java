@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import work.myfavs.framework.example.domain.entity.TestSnowFake;
 import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
 
@@ -24,8 +25,15 @@ public class SnowFakeQuery
   }
 
   public PageLite<TestSnowFake> findPageLite(long currentPage, long pageSize) {
+
     Sql querySql = new Sql("SELECT * FROM tb_snowfake").orderBy("id DESC", "created ASC");
     return this.findPageLite(TestSnowFake.class, querySql, true, currentPage, pageSize);
+  }
+
+  public PageLite<Record> findRecordPageLite(long currentPage, long pageSize) {
+
+    Sql querySql = new Sql("SELECT id, created, name, price, type FROM tb_snowfake").orderBy("id DESC", "created ASC");
+    return this.findPageLite(Record.class, querySql, true, currentPage, pageSize);
   }
 
 }

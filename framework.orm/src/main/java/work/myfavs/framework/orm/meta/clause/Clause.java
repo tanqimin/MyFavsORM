@@ -28,7 +28,9 @@ abstract public class Clause {
   public Clause(String sql, List params) {
 
     this(sql);
-    this.params.addAll(params);
+    if (params != null && params.size() > 0) {
+      this.params.addAll(params);
+    }
   }
 
 }

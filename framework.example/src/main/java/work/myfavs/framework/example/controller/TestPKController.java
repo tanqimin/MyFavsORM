@@ -13,6 +13,7 @@ import work.myfavs.framework.example.domain.entity.TestUUID;
 import work.myfavs.framework.example.repository.query.IdentityQuery;
 import work.myfavs.framework.example.repository.query.SnowFakeQuery;
 import work.myfavs.framework.example.repository.query.UUIDQuery;
+import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
 
@@ -52,6 +53,13 @@ public class TestPKController {
                                                                  @PathVariable("pageSize") long pageSize) {
 
     return new ResponseEntity<>(snowFakeQuery.findPageLite(currentPage, pageSize), HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/snow-fake/record-list-page-lite-{currentPage}-{pageSize}")
+  public ResponseEntity<PageLite<Record>> snowFakeRecordPageLite(@PathVariable("currentPage") long currentPage,
+                                                                 @PathVariable("pageSize") long pageSize) {
+
+    return new ResponseEntity<>(snowFakeQuery.findRecordPageLite(currentPage, pageSize), HttpStatus.OK);
   }
 
   @RequestMapping(value = "/uuid/list-page-{currentPage}-{pageSize}")

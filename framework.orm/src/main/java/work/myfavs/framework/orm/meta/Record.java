@@ -1,3 +1,8 @@
 package work.myfavs.framework.orm.meta;
 
-public class Record {}
+import java.util.TreeMap;
+
+public class Record
+    extends TreeMap<String, Object> {
+
+}

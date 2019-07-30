@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import work.myfavs.framework.example.util.exts.Config;
-import work.myfavs.framework.example.util.exts.ConfigPropertyHandler;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.repository.handler.impls.*;
 
@@ -41,10 +39,12 @@ public class PrimaryDataSourceConfig {
                      .registerPropertyHandler(Long.class, new LongPropertyHandler())
                      .registerPropertyHandler(Boolean.class, new BooleanPropertyHandler())
                      .registerPropertyHandler(LocalDateTime.class, new LocalDateTimePropertyHandler())
-                     .registerPropertyHandler(Config.class, new ConfigPropertyHandler())
                      .setDbType("mysql")
-                     .setBatchSize(50)
+                     .setShowSql(true)
+                     .setShowResult(true)
+                     .setBatchSize(200)
                      .setFetchSize(100)
+                     .setMaxPageSize(100)
                      .setQueryTimeout(120)
                      .setDataCenterId(1)
                      .setWorkerId(1);

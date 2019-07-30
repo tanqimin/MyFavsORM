@@ -86,12 +86,6 @@ public class TestPKService {
       entity.setType(i % 2 == 0
                          ? TypeEnum.FOOD
                          : TypeEnum.DRINK);
-
-//      Config config = new Config();
-//      config.setUrl(StrUtil.format("http://www.baidu.com/{}", i));
-//      config.setUsername(entity.getName());
-//      config.setPassword("123456");
-//      entity.setConfig(config);
       list.add(entity);
     }
     return snowFakeRepository.create(list);
