@@ -30,7 +30,7 @@ public class DBTemplate
   //一次批量插入数据的数量
   private        int        batchSize    = 200;
   //查询每次抓取数据的数量
-  private        int        fetchSize    = 100;
+  private        int        fetchSize    = 1000;
   //查询超时时间，单位：秒
   private        int        queryTimeout = 60;
   //终端ID(雪花算法生成主键用)

@@ -22,6 +22,7 @@ abstract public class AbstractRepository {
 
   protected IDialect   dialect;
   protected DBTemplate dbTemplate;
+  private   int        fetchSize;
   private   boolean    showSql;
   private   boolean    showResult;
 
@@ -30,9 +31,10 @@ abstract public class AbstractRepository {
   public AbstractRepository(DBTemplate dbTemplate) {
 
     this.dbTemplate = dbTemplate;
-    dialect = dbTemplate.getDialect();
-    showSql = dbTemplate.getShowSql();
-    showResult = dbTemplate.getShowResult();
+    this.dialect = dbTemplate.getDialect();
+    this.showSql = dbTemplate.getShowSql();
+    this.showResult = dbTemplate.getShowResult();
+    this.fetchSize = dbTemplate.getFetchSize();
   }
 
 
@@ -68,6 +70,7 @@ abstract public class AbstractRepository {
       pstmt = params == null || params.size() == 0
           ? DBUtil.getPs(conn, sql)
           : DBUtil.getPs(conn, sql, params);
+      pstmt.setFetchSize(fetchSize);
       rs = pstmt.executeQuery();
 
       stopWatch.stop();

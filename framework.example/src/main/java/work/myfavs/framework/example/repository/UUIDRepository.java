@@ -25,7 +25,6 @@ public class UUIDRepository
   }
 
   public List<TestUUID> findAllDrink() {
-
     return super.findByField("type", TypeEnum.DRINK);
   }
 

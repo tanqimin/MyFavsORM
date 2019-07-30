@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.repository.handler.impls.*;
 
 @Configuration
@@ -39,7 +40,7 @@ public class PrimaryDataSourceConfig {
                      .registerPropertyHandler(Long.class, new LongPropertyHandler())
                      .registerPropertyHandler(Boolean.class, new BooleanPropertyHandler())
                      .registerPropertyHandler(LocalDateTime.class, new LocalDateTimePropertyHandler())
-                     .setDbType("mysql")
+                     .setDbType(DbType.MYSQL)
                      .setShowSql(true)
                      .setShowResult(true)
                      .setBatchSize(200)
