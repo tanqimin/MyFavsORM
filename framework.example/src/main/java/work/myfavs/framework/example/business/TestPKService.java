@@ -70,7 +70,7 @@ public class TestPKService {
   }
 
 
-  @Transactional
+  @Transactional(rollbackFor = Exception.class)
   public int createSnowFake() {
 
     List<TestSnowFake> list = new ArrayList<>();

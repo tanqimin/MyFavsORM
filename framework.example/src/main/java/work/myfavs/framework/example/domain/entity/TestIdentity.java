@@ -3,7 +3,6 @@ package work.myfavs.framework.example.domain.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 import lombok.Data;
 import work.myfavs.framework.example.domain.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.annotation.Column;

@@ -141,15 +141,10 @@ public class DBTemplate
    *
    * @return Connection
    */
-  public Connection createConnection() {
+  public Connection createConnection()
+      throws SQLException {
 
-    Connection connection = DBUtil.createConnection(this.getDataSource());
-    try {
-      log.info("AUTO COMMIT:{}", connection.getAutoCommit());
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-    return connection;
+    return DBUtil.createConnection(this.getDataSource());
   }
 
   /**

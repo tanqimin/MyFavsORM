@@ -21,9 +21,14 @@ public class DBUtil {
    *
    * @return Connection
    */
-  public static Connection createConnection(DataSource dataSource) {
+  public static Connection createConnection(DataSource dataSource)
+      throws SQLException {
 
-    return DataSourceUtils.getConnection(dataSource);
+    Connection connection = DataSourceUtils.getConnection(dataSource);
+    if (connection.getAutoCommit()) {
+      connection.setAutoCommit(false);
+    }
+    return connection;
   }
 
   /**

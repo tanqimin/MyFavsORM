@@ -8,7 +8,7 @@
 public class DataSourceConfig {
     @Bean
     public DataSource datesource(){
-        ....
+        //创建DataSource
     }
 
     @Bean
@@ -87,6 +87,16 @@ public class LocalDateTimePropertyHandler extends PropertyHandler<LocalDateTime>
 
 ## Entity Class
 ```java
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import lombok.Data;
+import work.myfavs.framework.example.domain.enums.TypeEnum;
+import work.myfavs.framework.orm.meta.annotation.Column;
+import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
+import work.myfavs.framework.orm.meta.annotation.Table;
+import work.myfavs.framework.orm.meta.enumeration.GenerationType;
+
 @Data
 @Table(value = "tb_product", strategy = GenerationType.SNOW_FLAKE)
 public class Product implements Serializable {
@@ -137,13 +147,13 @@ public class ProductRepository extends Repository<Product> {
 ```
 ### Query Usage
 此处引入一个SQL构建器类：work.myfavs.framework.orm.meta.clause.Sql
-```java
+```
 Sql sql = new Sql("SELECT * FROM tb_product");
 //或者
 Sql sql = Sql.Select("*").from("tb_product");
 ```
 大多数的查询功能，都会根据前端用户空间选择的值作为筛选条件，当用户没有选择指定的属性时，会忽略此条件
-```java
+```
 String param = "%cake%";
 Sql sql = new Sql("SELECT * FROM tb_product").where().and(Cond.like("name", param));
 //此处生成的SQL为: SELECT * FROM tb_product WHERE 1 = 1 AND name LIKE '%cake%'
@@ -155,7 +165,8 @@ Sql sql = new Sql("SELECT * FROM tb_product").where().and(Cond.like("name", para
 ```java
 @org.springframework.stereotype.Repository
 public class ProductQuery extends Query {
-    ......
+    //此处省略部分代码    
+
     public List<Product> findByName(String name){
         //此处需要注意所有条件值被忽略时造成的性能问题
         Sql sql = new Sql("SELECT * FROM tb_product").where().and(Cond.like("name",name));
@@ -168,12 +179,33 @@ public class ProductQuery extends Query {
 ```java
 @org.springframework.stereotype.Repository
 public class ProductQuery extends Query {
-    ......
-    public Page<Product> findByName(String name, long currentPage, long pageSize){
+    //此处省略部分代码   
+    public Page<Product> findPageByName(String name, long currentPage, long pageSize){
         //此处需要注意所有条件值被忽略时造成的性能问题
         Sql sql = new Sql("SELECT * FROM tb_product").where().and(Cond.like("name",name));
         return findPage(Product.class, sql, true, currentPage, pageSize);
     }
+}
+```
+##### Use Record Class
+在开发一些小项目的时候，可以使用 Record 作为返回类型，避免创建大量的 VO 对象
+```java
+@org.springframework.stereotype.Repository
+public class ProductQuery extends Query {
+    //此处省略部分代码    
+
+    public List<Record> findRecordsByName(String name){
+        //此处需要注意所有条件值被忽略时造成的性能问题
+        Sql sql = new Sql("SELECT * FROM tb_product").where().and(Cond.like("name",name));
+        return find(Record.class, sql);
+    }
+
+    public Page<Record> findRecordsPageByName(String name, long currentPage, long pageSize){
+        //此处需要注意所有条件值被忽略时造成的性能问题
+        Sql sql = new Sql("SELECT * FROM tb_product").where().and(Cond.like("name",name));
+        return findPage(Record.class, sql, true, currentPage, pageSize);
+    }
+
 }
 ```
 ### Repository Usage
