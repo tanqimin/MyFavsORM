@@ -20,11 +20,30 @@ public class DBUtil {
    * @param dataSource DataSource
    *
    * @return Connection
+   *
+   * @throws SQLException SQLException
    */
   public static Connection createConnection(DataSource dataSource)
       throws SQLException {
 
+    return createConnection(dataSource, Connection.TRANSACTION_READ_UNCOMMITTED);
+  }
+
+  /**
+   * 创建数据库链接
+   *
+   * @param dataSource DataSource
+   * @param isolation  数据库隔离级别
+   *
+   * @return Connection
+   *
+   * @throws SQLException SQLException
+   */
+  public static Connection createConnection(DataSource dataSource, int isolation)
+      throws SQLException {
+
     Connection connection = DataSourceUtils.getConnection(dataSource);
+    connection.setTransactionIsolation(isolation);
     if (connection.getAutoCommit()) {
       connection.setAutoCommit(false);
     }
@@ -176,6 +195,42 @@ public class DBUtil {
       }
     }
     return preparedStatement;
+  }
+
+  public static int executeUpdate(PreparedStatement preparedStatement)
+      throws SQLException {
+
+    int        result;
+    Connection connection;
+
+    connection = preparedStatement.getConnection();
+    result = preparedStatement.executeUpdate();
+    if (!connection.getAutoCommit()) {
+      connection.commit();
+    }
+
+    return result;
+  }
+
+  public static int executeBatch(PreparedStatement preparedStatement)
+      throws SQLException {
+
+    int        result = 0;
+    Connection connection;
+
+    connection = preparedStatement.getConnection();
+    int[] res = preparedStatement.executeBatch();
+    preparedStatement.clearBatch();
+
+    if (!connection.getAutoCommit()) {
+      connection.commit();
+    }
+
+    for (int i : res) {
+      result += i;
+    }
+
+    return result;
   }
 
   /**

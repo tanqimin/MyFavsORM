@@ -2,20 +2,19 @@ package work.myfavs.framework.orm.repository;
 
 import cn.hutool.core.util.StrUtil;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StopWatch;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-import work.myfavs.framework.orm.repository.monitor.SqlAnalysis;
 import work.myfavs.framework.orm.repository.monitor.SqlExecutedContext;
 import work.myfavs.framework.orm.repository.monitor.SqlExecutingContext;
+import work.myfavs.framework.orm.repository.monitor.SqlMonitor;
 import work.myfavs.framework.orm.util.DBConvert;
 import work.myfavs.framework.orm.util.DBUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
 
 @Slf4j
 abstract public class AbstractRepository {
@@ -52,19 +51,16 @@ abstract public class AbstractRepository {
 
     Metadata.get(viewClass);
 
-    Connection        conn  = null;
-    PreparedStatement pstmt = null;
-    ResultSet         rs    = null;
-    List<TView>       result;
+    Connection        conn   = null;
+    PreparedStatement pstmt  = null;
+    ResultSet         rs     = null;
+    List<TView>       result = new ArrayList<>();
 
-    SqlAnalysis         sqlAnalysis         = new SqlAnalysis();
-    StopWatch           stopWatch           = new StopWatch();
-    SqlExecutingContext sqlExecutingContext = new SqlExecutingContext(new Sql(sql, params));
-    this.beforeQuery(sqlExecutingContext);
+    SqlMonitor sqlMonitor = SqlMonitor.createInstance();
 
     try {
       this.showSql(sql, params);
-      stopWatch.start(StrUtil.format("[{}]SQL QUERY", getThreadInfo()));
+      this.beforeQuery(sqlMonitor.start(sql, params));
 
       conn = this.dbTemplate.createConnection();
       pstmt = params == null || params.size() == 0
@@ -73,29 +69,17 @@ abstract public class AbstractRepository {
       pstmt.setFetchSize(fetchSize);
       rs = pstmt.executeQuery();
 
-      stopWatch.stop();
-      sqlAnalysis.setElapsed(stopWatch.getLastTaskTimeMillis());
-      stopWatch.start(StrUtil.format("[{}]CONVERT TO ENTITY", getThreadInfo()));
+      sqlMonitor.restart();
 
       result = DBConvert.toList(viewClass, rs);
 
-      stopWatch.stop();
-      sqlAnalysis.setMappingElapsed(stopWatch.getLastTaskTimeMillis());
-      sqlAnalysis.setAffectedRows(result.size());
       this.showResult(rs);
       return result;
     } catch (SQLException e) {
-      sqlAnalysis.setHasError(true);
-      sqlAnalysis.setThrowable(e);
-
-      throw new DBException(e);
+      throw sqlMonitor.error(e);
     } finally {
       this.dbTemplate.release(conn, pstmt, rs);
-
-      if (stopWatch.isRunning()) {
-        stopWatch.stop();
-      }
-      this.afterQuery(new SqlExecutedContext(sqlExecutingContext.getSql(), sqlAnalysis));
+      this.afterQuery(sqlMonitor.stopQuery(result.size()));
     }
   }
 
@@ -270,7 +254,7 @@ abstract public class AbstractRepository {
 
   void showAffectedRows(int result) {
 
-    if (showSql && log.isInfoEnabled()) {
+    if (showResult && log.isInfoEnabled()) {
       log.info("AFFECTED ROWS: {}", result);
     }
   }

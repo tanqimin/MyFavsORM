@@ -12,6 +12,10 @@ public class SqlExecutingContext {
   private Sql                 sql;
   private Map<String, Object> context = new HashMap<>();
 
+  public SqlExecutingContext() {
+
+  }
+
   public SqlExecutingContext(Sql sql) {
 
     this.sql = sql;

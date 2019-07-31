@@ -11,6 +11,11 @@ public class SqlExecutedContext
 
   private SqlAnalysis analysis;
 
+  public SqlExecutedContext(SqlAnalysis analysis) {
+
+    this.analysis = analysis;
+  }
+
   public SqlExecutedContext(Sql sql, SqlAnalysis analysis) {
 
     super(sql);

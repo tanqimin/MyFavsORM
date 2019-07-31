@@ -3,6 +3,7 @@ package work.myfavs.framework.example.config;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +42,7 @@ public class PrimaryDataSourceConfig {
                      .registerPropertyHandler(Boolean.class, new BooleanPropertyHandler())
                      .registerPropertyHandler(LocalDateTime.class, new LocalDateTimePropertyHandler())
                      .setDbType(DbType.MYSQL)
+                     .setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED)
 //                     .setShowSql(true)
 //                     .setShowResult(true)
                      .setBatchSize(200)
