@@ -116,9 +116,9 @@ abstract public class AbstractRepository {
    *
    * @return 结果集
    */
-  protected <TView> List<TView> findTop(Class<TView> viewClass, long top, String sql, List<Object> params) {
+  protected <TView> List<TView> findTop(Class<TView> viewClass, int top, String sql, List<Object> params) {
 
-    Sql querySql = this.dialect.selectTop(1L, top, sql, params);
+    Sql querySql = this.dialect.selectTop(1, top, sql, params);
     return this.find(viewClass, querySql);
   }
 
@@ -132,7 +132,7 @@ abstract public class AbstractRepository {
    *
    * @return 结果集
    */
-  protected <TView> List<TView> findTop(Class<TView> viewClass, long top, Sql sql) {
+  protected <TView> List<TView> findTop(Class<TView> viewClass, int top, Sql sql) {
 
     return this.findTop(viewClass, top, sql.getSql().toString(), sql.getParams());
   }
@@ -149,7 +149,7 @@ abstract public class AbstractRepository {
    */
   protected <TView> TView get(Class<TView> viewClass, String sql, List<Object> params) {
 
-    Iterator<TView> iterator = this.findTop(viewClass, 1L, sql, params).iterator();
+    Iterator<TView> iterator = this.findTop(viewClass, 1, sql, params).iterator();
     if (iterator.hasNext()) {
       return iterator.next();
     }
@@ -193,17 +193,6 @@ abstract public class AbstractRepository {
   protected long count(Sql sql) {
 
     return this.count(sql.getSql().toString(), sql.getParams());
-  }
-
-  /**
-   * 获取线程信息
-   *
-   * @return
-   */
-  protected String getThreadInfo() {
-
-    Thread currentThread = Thread.currentThread();
-    return StrUtil.format("{} - {}", currentThread.getName(), currentThread.getId());
   }
 
   void showSql(String sql, List<Object> params) {

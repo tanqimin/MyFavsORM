@@ -25,6 +25,7 @@ public class BaseQuery
   protected void afterQuery(SqlExecutedContext context) {
     SqlAnalysis analysis = context.getAnalysis();
     log.info("            SQL: {}", context.getSql().getSql().toString());
+    log.info("  AFFECTED ROWS: {}", analysis.getAffectedRows());
     log.info("  QUERY ELAPSED: {}", analysis.getElapsed());
     log.info("MAPPING ELAPSED: {}", analysis.getMappingElapsed());
   }

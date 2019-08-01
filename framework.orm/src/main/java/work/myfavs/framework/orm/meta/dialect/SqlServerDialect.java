@@ -19,20 +19,20 @@ public class SqlServerDialect
   }
 
   @Override
-  public Sql selectTop(long currentPage, long pageSize, String sql, List<Object> params) {
+  public Sql selectTop(int currentPage, int pageSize, String sql, List<Object> params) {
 
-    if (currentPage == 1L && pageSize == 1L) {
+    if (currentPage == 1 && pageSize == 1) {
       //如果sql本身只返回一个结果
       if (selectSinglePattern.matcher(sql).find()) {
         return new Sql(sql, params);
       }
     }
 
-    if (pageSize == -1L) {
+    if (pageSize == -1) {
       return new Sql(sql, params);
     }
 
-    long offset = pageSize * (currentPage - 1L);
+    int offset = pageSize * (currentPage - 1);
 
     String  orderBys = null;
     Matcher om       = orderPattern.matcher(sql);

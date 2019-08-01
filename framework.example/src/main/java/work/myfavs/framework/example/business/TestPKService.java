@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import work.myfavs.framework.example.domain.entity.TestIdentity;
 import work.myfavs.framework.example.domain.entity.TestSnowFake;
@@ -70,7 +71,7 @@ public class TestPKService {
   }
 
 
-  @Transactional(rollbackFor = Exception.class)
+  @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_UNCOMMITTED)
   public int createSnowFake() {
 
     List<TestSnowFake> list = new ArrayList<>();

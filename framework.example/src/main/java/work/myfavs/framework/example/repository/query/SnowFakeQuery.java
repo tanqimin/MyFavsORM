@@ -24,13 +24,13 @@ public class SnowFakeQuery
     super(dbTemplate);
   }
 
-  public PageLite<TestSnowFake> findPageLite(long currentPage, long pageSize) {
+  public PageLite<TestSnowFake> findPageLite(int currentPage, int pageSize) {
 
     Sql querySql = new Sql("SELECT * FROM tb_snowfake").orderBy("id DESC", "created ASC");
     return this.findPageLite(TestSnowFake.class, querySql, true, currentPage, pageSize);
   }
 
-  public PageLite<Record> findRecordPageLite(long currentPage, long pageSize) {
+  public PageLite<Record> findRecordPageLite(int currentPage, int pageSize) {
 
     Sql querySql = new Sql("SELECT id, created, name, price, type FROM tb_snowfake").orderBy("id DESC", "created ASC");
     return this.findPageLite(Record.class, querySql, true, currentPage, pageSize);

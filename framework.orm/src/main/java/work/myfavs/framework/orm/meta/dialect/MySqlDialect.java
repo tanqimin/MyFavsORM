@@ -18,22 +18,22 @@ public class MySqlDialect
   }
 
   @Override
-  public Sql selectTop(long currentPage, long pageSize, String sql, List<Object> params) {
+  public Sql selectTop(int currentPage, int pageSize, String sql, List<Object> params) {
 
     Sql querySql;
     querySql = new Sql(sql, params);
-    if (currentPage == 1L && pageSize == 1L) {
+    if (currentPage == 1 && pageSize == 1) {
       //如果sql本身只返回一个结果
       if (selectSinglePattern.matcher(sql).find()) {
         return querySql;
       }
     }
 
-    if (pageSize == -1L) {
+    if (pageSize == -1) {
       return querySql;
     }
 
-    long offset = pageSize * (currentPage - 1L);
+    int offset = pageSize * (currentPage - 1);
     return querySql.append(" LIMIT ? OFFSET ?", pageSize, offset);
   }
 

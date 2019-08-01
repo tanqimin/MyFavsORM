@@ -28,14 +28,14 @@ public class UUIDQuery
   }
 
   @Transactional(readOnly = true)
-  public Page<TestUUID> findPage(long currentPage, long pageSize) {
+  public Page<TestUUID> findPage(int currentPage, int pageSize) {
 
     Sql querySql = new Sql("SELECT * FROM tb_uuid").where(Cond.eq("type", TypeEnum.FOOD)).orderBy("id DESC", "created ASC");
     return this.findPage(TestUUID.class, querySql, true, currentPage, pageSize);
   }
 
   @Transactional(readOnly = true)
-  public PageLite<TestUUID> findPageLite(long currentPage, long pageSize) {
+  public PageLite<TestUUID> findPageLite(int currentPage, int pageSize) {
 
     Sql querySql = new Sql("SELECT * FROM tb_uuid").orderBy("id DESC", "created ASC");
     return this.findPageLite(TestUUID.class, querySql, true, currentPage, pageSize);

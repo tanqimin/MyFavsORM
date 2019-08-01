@@ -35,7 +35,6 @@ DBTemplate 参数：
 * maxPageSize: 分页查询时，每页最大记录数，设置小于0时，不限制；
 * workerId: 终端ID(雪花算法生成主键用)；
 * dataCenterId: 数据中心ID(雪花算法生成主键用)；
-* transactionIsolation: 事务隔离级别，默认为 Connection.TRANSACTION_READ_UNCOMMITTED
 
 registerPropertyHandler 内置注册的实体属性类型解析器：
 ```

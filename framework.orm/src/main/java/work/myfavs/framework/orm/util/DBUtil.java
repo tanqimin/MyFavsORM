@@ -26,24 +26,7 @@ public class DBUtil {
   public static Connection createConnection(DataSource dataSource)
       throws SQLException {
 
-    return createConnection(dataSource, Connection.TRANSACTION_READ_UNCOMMITTED);
-  }
-
-  /**
-   * 创建数据库链接
-   *
-   * @param dataSource DataSource
-   * @param isolation  数据库隔离级别
-   *
-   * @return Connection
-   *
-   * @throws SQLException SQLException
-   */
-  public static Connection createConnection(DataSource dataSource, int isolation)
-      throws SQLException {
-
     Connection connection = DataSourceUtils.getConnection(dataSource);
-    connection.setTransactionIsolation(isolation);
     if (connection.getAutoCommit()) {
       connection.setAutoCommit(false);
     }

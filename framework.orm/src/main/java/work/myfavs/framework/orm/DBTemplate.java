@@ -20,31 +20,29 @@ import work.myfavs.framework.orm.util.DBUtil;
 public class DBTemplate
     implements Cloneable, AutoCloseable {
 
-  private static Snowflake  snowflake            = null;
+  private static Snowflake  snowflake    = null;
   //数据源
   private        DataSource dataSource;
   //数据库方言
   private        IDialect   dialect;
   //数据库类型
-  private        String     dbType               = "mysql";
+  private        String     dbType       = "mysql";
   //一次批量插入数据的数量
-  private        int        batchSize            = 200;
+  private        int        batchSize    = 200;
   //查询每次抓取数据的数量
-  private        int        fetchSize            = 1000;
+  private        int        fetchSize    = 1000;
   //查询超时时间，单位：秒
-  private        int        queryTimeout         = 60;
+  private        int        queryTimeout = 60;
   //终端ID(雪花算法生成主键用)
-  private        long       workerId             = 1L;
+  private        long       workerId     = 1L;
   //数据中心ID(雪花算法生成主键用)
-  private        long       dataCenterId         = 1L;
+  private        long       dataCenterId = 1L;
   //是否显示SQL
-  private        boolean    showSql              = false;
+  private        boolean    showSql      = false;
   //是否显示查询结果
-  private        boolean    showResult           = false;
+  private        boolean    showResult   = false;
   //每页最大记录数
-  private        long       maxPageSize          = -1;
-  //事务级别
-  private        int        transactionIsolation = Connection.TRANSACTION_READ_UNCOMMITTED;
+  private        int       maxPageSize  = -1;
 
   @Override
   public void close() {
@@ -146,7 +144,7 @@ public class DBTemplate
   public Connection createConnection()
       throws SQLException {
 
-    return DBUtil.createConnection(this.getDataSource(), this.transactionIsolation);
+    return DBUtil.createConnection(this.getDataSource());
   }
 
   /**
@@ -400,30 +398,9 @@ public class DBTemplate
    *
    * @param maxPageSize 分页时每页最大记录数
    */
-  public DBTemplate setMaxPageSize(long maxPageSize) {
+  public DBTemplate setMaxPageSize(int maxPageSize) {
 
     this.maxPageSize = maxPageSize;
-    return this;
-  }
-
-  /**
-   * 获取事务隔离级别，默认为：Connection.TRANSACTION_READ_UNCOMMITTED
-   *
-   * @return 事务隔离级别
-   */
-  public int getTransactionIsolation() {
-
-    return transactionIsolation;
-  }
-
-  /**
-   * 设置事务隔离级别
-   *
-   * @param transactionIsolation 设置事务隔离级别
-   */
-  public DBTemplate setTransactionIsolation(int transactionIsolation) {
-
-    this.transactionIsolation = transactionIsolation;
     return this;
   }
 

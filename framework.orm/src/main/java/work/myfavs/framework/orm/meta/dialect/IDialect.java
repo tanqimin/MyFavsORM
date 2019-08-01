@@ -79,7 +79,7 @@ public interface IDialect {
    *
    * @return Sql对象
    */
-  Sql selectTop(long currentPage, long pageSize, String sql, List<Object> params);
+  Sql selectTop(int currentPage, int pageSize, String sql, List<Object> params);
 
   /**
    * 获取更新语句

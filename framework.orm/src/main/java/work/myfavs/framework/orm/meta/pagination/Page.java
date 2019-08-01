@@ -15,8 +15,8 @@ public class Page<TModel>
     implements Serializable {
 
   private List<TModel> data         = new ArrayList<>();
-  private long         currentPage  = 1;
-  private long         pageSize     = 20;
+  private int          currentPage  = 1;
+  private int          pageSize     = 20;
   private long         totalPages   = 1L;
   private long         totalRecords = 0L;
 
@@ -48,7 +48,7 @@ public class Page<TModel>
    *
    * @return 分页对象
    */
-  public static <TModel> Page<TModel> createInstance(List<TModel> data, long currentPage, long pageSize, long totalPages,
+  public static <TModel> Page<TModel> createInstance(List<TModel> data, int currentPage, int pageSize, long totalPages,
                                                      long totalRecords) {
 
     Page<TModel> instance = new Page<>();

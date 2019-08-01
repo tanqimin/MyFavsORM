@@ -49,28 +49,28 @@ public class TestPKController {
   }
 
   @RequestMapping(value = "/snow-fake/list-page-lite-{currentPage}-{pageSize}")
-  public ResponseEntity<PageLite<TestSnowFake>> snowFakePageLite(@PathVariable("currentPage") long currentPage,
-                                                                 @PathVariable("pageSize") long pageSize) {
+  public ResponseEntity<PageLite<TestSnowFake>> snowFakePageLite(@PathVariable("currentPage") int currentPage,
+                                                                 @PathVariable("pageSize") int pageSize) {
 
     return new ResponseEntity<>(snowFakeQuery.findPageLite(currentPage, pageSize), HttpStatus.OK);
   }
 
   @RequestMapping(value = "/snow-fake/record-list-page-lite-{currentPage}-{pageSize}")
-  public ResponseEntity<PageLite<Record>> snowFakeRecordPageLite(@PathVariable("currentPage") long currentPage,
-                                                                 @PathVariable("pageSize") long pageSize) {
+  public ResponseEntity<PageLite<Record>> snowFakeRecordPageLite(@PathVariable("currentPage") int currentPage,
+                                                                 @PathVariable("pageSize") int pageSize) {
 
     return new ResponseEntity<>(snowFakeQuery.findRecordPageLite(currentPage, pageSize), HttpStatus.OK);
   }
 
   @RequestMapping(value = "/uuid/list-page-{currentPage}-{pageSize}")
-  public ResponseEntity<Page<TestUUID>> uuidPage(@PathVariable("currentPage") long currentPage, @PathVariable("pageSize") long pageSize) {
+  public ResponseEntity<Page<TestUUID>> uuidPage(@PathVariable("currentPage") int currentPage, @PathVariable("pageSize") int pageSize) {
 
     return new ResponseEntity<>(uuidQuery.findPage(currentPage, pageSize), HttpStatus.OK);
   }
 
   @RequestMapping(value = "/uuid/list-page-lite-{currentPage}-{pageSize}")
-  public ResponseEntity<PageLite<TestUUID>> uuidPageLite(@PathVariable("currentPage") long currentPage,
-                                                         @PathVariable("pageSize") long pageSize) {
+  public ResponseEntity<PageLite<TestUUID>> uuidPageLite(@PathVariable("currentPage") int currentPage,
+                                                         @PathVariable("pageSize") int pageSize) {
 
     return new ResponseEntity<>(uuidQuery.findPageLite(currentPage, pageSize), HttpStatus.OK);
   }

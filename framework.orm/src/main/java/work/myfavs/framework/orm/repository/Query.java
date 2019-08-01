@@ -107,7 +107,7 @@ public class Query
    *
    * @return 结果集
    */
-  public <TView> List<TView> findTop(Class<TView> viewClass, long top, String sql, List<Object> params) {
+  public <TView> List<TView> findTop(Class<TView> viewClass, int top, String sql, List<Object> params) {
 
     return super.findTop(viewClass, top, sql, params);
   }
@@ -122,7 +122,7 @@ public class Query
    *
    * @return 结果集
    */
-  public <TView> List<TView> findTop(Class<TView> viewClass, long top, Sql sql) {
+  public <TView> List<TView> findTop(Class<TView> viewClass, int top, Sql sql) {
 
     return super.findTop(viewClass, top, sql);
   }
@@ -136,7 +136,7 @@ public class Query
    *
    * @return 结果集
    */
-  public List<Record> findTopRecords(long top, String sql, List<Object> params) {
+  public List<Record> findTopRecords(int top, String sql, List<Object> params) {
 
     return this.findTop(Record.class, top, sql, params);
   }
@@ -149,7 +149,7 @@ public class Query
    *
    * @return 结果集
    */
-  public List<Record> findTopRecords(long top, Sql sql) {
+  public List<Record> findTopRecords(int top, Sql sql) {
 
     return this.findTop(Record.class, top, sql);
   }
@@ -260,10 +260,10 @@ public class Query
    *
    * @return 简单分页结果集
    */
-  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, String sql, List<Object> params, boolean enablePage, long currentPage,
-                                              long pageSize) {
+  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, String sql, List<Object> params, boolean enablePage, int currentPage,
+                                              int pageSize) {
 
-    long        pagSize;
+    int         pagSize;
     Sql         querySql;
     List<TView> data;
 
@@ -274,7 +274,7 @@ public class Query
         throw new DBException(StrUtil.format("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize));
       }
     } else {
-      pagSize = -1L;
+      pagSize = -1;
     }
 
     querySql = this.dialect.selectTop(currentPage, pagSize, sql, params);
@@ -296,7 +296,7 @@ public class Query
    *
    * @return 简单分页结果集
    */
-  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, boolean enablePage, long currentPage, long pageSize) {
+  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPageLite(viewClass, sql.getSql().toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
@@ -312,7 +312,7 @@ public class Query
    *
    * @return 简单分页结果集
    */
-  public PageLite<Record> findRecordsPageLite(String sql, List<Object> params, boolean enablePage, long currentPage, long pageSize) {
+  public PageLite<Record> findRecordsPageLite(String sql, List<Object> params, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPageLite(Record.class, sql, params, enablePage, currentPage, pageSize);
   }
@@ -327,7 +327,7 @@ public class Query
    *
    * @return 简单分页结果集
    */
-  public PageLite<Record> findRecordsPageLite(Sql sql, boolean enablePage, long currentPage, long pageSize) {
+  public PageLite<Record> findRecordsPageLite(Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPageLite(Record.class, sql, enablePage, currentPage, pageSize);
   }
@@ -345,10 +345,10 @@ public class Query
    *
    * @return 分页结果集
    */
-  public <TView> Page<TView> findPage(Class<TView> viewClass, String sql, List<Object> params, boolean enablePage, long currentPage,
-                                      long pageSize) {
+  public <TView> Page<TView> findPage(Class<TView> viewClass, String sql, List<Object> params, boolean enablePage, int currentPage,
+                                      int pageSize) {
 
-    long        pagSize;
+    int         pagSize;
     long        totalPages;
     long        totalRecords;
     Sql         querySql;
@@ -362,7 +362,7 @@ public class Query
         throw new DBException(StrUtil.format("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize));
       }
     } else {
-      pagSize = -1L;
+      pagSize = -1;
     }
 
     querySql = this.dialect.selectTop(currentPage, pagSize, sql, params);
@@ -370,7 +370,7 @@ public class Query
 
     if (!enablePage) {
       totalRecords = data.size();
-      totalPages = 1L;
+      totalPages = 1;
     } else {
       totalRecords = this.count(sql, params);
       totalPages = totalRecords / pagSize;
@@ -399,7 +399,7 @@ public class Query
    *
    * @return 分页结果集
    */
-  public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, boolean enablePage, long currentPage, long pageSize) {
+  public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return findPage(viewClass, sql.getSql().toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
@@ -415,7 +415,7 @@ public class Query
    *
    * @return 分页结果集
    */
-  public Page<Record> findRecordsPage(String sql, List<Object> params, boolean enablePage, long currentPage, long pageSize) {
+  public Page<Record> findRecordsPage(String sql, List<Object> params, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPage(Record.class, sql, params, enablePage, currentPage, pageSize);
   }
@@ -430,7 +430,7 @@ public class Query
    *
    * @return 分页结果集
    */
-  public Page<Record> findPage(Sql sql, boolean enablePage, long currentPage, long pageSize) {
+  public Page<Record> findPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPage(Record.class, sql, enablePage, currentPage, pageSize);
   }
