@@ -188,9 +188,6 @@ public class DBUtil {
 
     connection = preparedStatement.getConnection();
     result = preparedStatement.executeUpdate();
-    if (!connection.getAutoCommit()) {
-      connection.commit();
-    }
 
     return result;
   }
@@ -204,11 +201,7 @@ public class DBUtil {
     connection = preparedStatement.getConnection();
     int[] res = preparedStatement.executeBatch();
     preparedStatement.clearBatch();
-
-    if (!connection.getAutoCommit()) {
-      connection.commit();
-    }
-
+    
     for (int i : res) {
       result += i;
     }
