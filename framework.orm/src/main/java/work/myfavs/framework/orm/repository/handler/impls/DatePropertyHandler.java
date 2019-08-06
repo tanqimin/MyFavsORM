@@ -3,6 +3,7 @@ package work.myfavs.framework.orm.repository.handler.impls;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 
@@ -16,7 +17,7 @@ public class DatePropertyHandler
   public Date convert(ResultSet rs, String columnName, Class<Date> clazz)
       throws SQLException {
 
-    Date date = rs.getDate(columnName);
+    Timestamp date = rs.getTimestamp(columnName);
     return rs.wasNull()
         ? null
         : new Date(date.getTime());
@@ -26,7 +27,7 @@ public class DatePropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, Date param)
       throws SQLException {
 
-    ps.setDate(paramIndex, new java.sql.Date(param.getTime()));
+    ps.setTimestamp(paramIndex, new Timestamp(param.getTime()));
   }
 
 }

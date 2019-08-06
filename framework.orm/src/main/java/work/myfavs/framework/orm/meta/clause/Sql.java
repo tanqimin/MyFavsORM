@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import cn.hutool.core.util.StrUtil;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import work.myfavs.framework.orm.util.StringUtil;
 
 /**
  * SQL 语句构建
@@ -118,10 +118,10 @@ public class Sql
    */
   public static Sql Select(String field, String... fields) {
 
-    Sql sql = new Sql(StrUtil.format("SELECT {}", field));
+    Sql sql = new Sql(StringUtil.format("SELECT {}", field));
     if (fields != null && fields.length > 0) {
       for (String s : fields) {
-        sql.append(StrUtil.format(",{}", s));
+        sql.append(StringUtil.format(",{}", s));
       }
     }
     return sql;
@@ -137,10 +137,10 @@ public class Sql
    */
   public Sql select(String field, String... fields) {
 
-    this.append(StrUtil.format(" SELECT {}", field));
+    this.append(StringUtil.format(" SELECT {}", field));
     if (fields != null && fields.length > 0) {
       for (String s : fields) {
-        this.append(StrUtil.format(",{}", s));
+        this.append(StringUtil.format(",{}", s));
       }
     }
     return this;
@@ -155,7 +155,7 @@ public class Sql
    */
   public Sql from(String tableName) {
 
-    return this.append(StrUtil.format(" FROM {}", tableName));
+    return this.append(StringUtil.format(" FROM {}", tableName));
   }
 
   /**
@@ -168,7 +168,7 @@ public class Sql
    */
   public Sql from(String tableName, String alias) {
 
-    return this.append(StrUtil.format(" FROM {} {}", tableName, alias));
+    return this.append(StringUtil.format(" FROM {} {}", tableName, alias));
   }
 
   /**
@@ -181,7 +181,7 @@ public class Sql
    */
   public Sql from(Sql sql, String alias) {
 
-    return this.append(StrUtil.format(" FROM ({}) {}", sql.sql, alias), sql.params);
+    return this.append(StringUtil.format(" FROM ({}) {}", sql.sql, alias), sql.params);
   }
 
   /**
@@ -199,12 +199,12 @@ public class Sql
 
   private Sql join(String tableName, String alias, String onClause) {
 
-    return this.append(StrUtil.format(" JOIN {} {} ON {}", tableName, alias, onClause));
+    return this.append(StringUtil.format(" JOIN {} {} ON {}", tableName, alias, onClause));
   }
 
   private Sql join(Sql sql, String alias, String onClause) {
 
-    return this.append(StrUtil.format(" JOIN ({}) {} ON {}", sql.sql, alias, onClause), sql.params);
+    return this.append(StringUtil.format(" JOIN ({}) {} ON {}", sql.sql, alias, onClause), sql.params);
   }
 
   /**
@@ -394,7 +394,7 @@ public class Sql
    */
   public Sql where(Cond cond) {
 
-    return this.append(StrUtil.format(" WHERE{}", cond.sql), cond.params);
+    return this.append(StringUtil.format(" WHERE{}", cond.sql), cond.params);
   }
 
   /**
@@ -406,7 +406,7 @@ public class Sql
    */
   public Sql where(String sql) {
 
-    return this.append(StrUtil.format(" WHERE {}", sql));
+    return this.append(StringUtil.format(" WHERE {}", sql));
   }
 
   /**
@@ -419,7 +419,7 @@ public class Sql
    */
   public Sql where(String sql, List<Object> params) {
 
-    return this.append(StrUtil.format(" WHERE {}", sql), params);
+    return this.append(StringUtil.format(" WHERE {}", sql), params);
   }
 
   /**
@@ -431,7 +431,7 @@ public class Sql
    */
   public Sql and(Cond cond) {
 
-    return this.append(StrUtil.format(" AND{}", cond.sql), cond.params);
+    return this.append(StringUtil.format(" AND{}", cond.sql), cond.params);
   }
 
   /**
@@ -444,7 +444,7 @@ public class Sql
   public Sql and(Supplier<Cond> supplier) {
 
     Cond cond = supplier.get();
-    return this.append(StrUtil.format(" AND ({})", cond.sql), cond.params);
+    return this.append(StringUtil.format(" AND ({})", cond.sql), cond.params);
   }
 
   /**
@@ -456,7 +456,7 @@ public class Sql
    */
   public Sql or(Cond cond) {
 
-    return this.append(StrUtil.format(" OR{}", cond.sql), cond.params);
+    return this.append(StringUtil.format(" OR{}", cond.sql), cond.params);
   }
 
   /**
@@ -469,7 +469,7 @@ public class Sql
   public Sql or(Supplier<Cond> supplier) {
 
     Cond cond = supplier.get();
-    return this.append(StrUtil.format(" OR ({})", cond.sql), cond.params);
+    return this.append(StringUtil.format(" OR ({})", cond.sql), cond.params);
   }
 
   /**
@@ -502,12 +502,12 @@ public class Sql
    */
   public Sql groupBy(String field, String... fields) {
 
-    this.append(StrUtil.format(" GROUP BY {}", field));
+    this.append(StringUtil.format(" GROUP BY {}", field));
     if (fields != null && fields.length > 0) {
       for (int i = 0;
            i < fields.length;
            i++) {
-        this.append(StrUtil.format(",{}", fields[i]));
+        this.append(StringUtil.format(",{}", fields[i]));
       }
     }
     return this;
@@ -532,7 +532,7 @@ public class Sql
    */
   public Sql having(String sql) {
 
-    return this.append(StrUtil.format(" HAVING {}", sql));
+    return this.append(StringUtil.format(" HAVING {}", sql));
   }
 
   /**
@@ -545,7 +545,7 @@ public class Sql
    */
   public Sql having(String sql, List<Object> params) {
 
-    return this.append(StrUtil.format(" HAVING {}", sql), params);
+    return this.append(StringUtil.format(" HAVING {}", sql), params);
   }
 
   /**
@@ -558,12 +558,12 @@ public class Sql
    */
   public Sql orderBy(String field, String... fields) {
 
-    this.append(StrUtil.format(" ORDER BY {}", field));
+    this.append(StringUtil.format(" ORDER BY {}", field));
     if (fields != null && fields.length > 0) {
       for (int i = 0;
            i < fields.length;
            i++) {
-        this.append(StrUtil.format(",{}", fields[i]));
+        this.append(StringUtil.format(",{}", fields[i]));
       }
     }
     return this;
@@ -578,7 +578,7 @@ public class Sql
    */
   public Sql limit(int row) {
 
-    return this.append(StrUtil.format(" LIMIT {}", row));
+    return this.append(StringUtil.format(" LIMIT {}", row));
   }
 
   /**
@@ -591,7 +591,7 @@ public class Sql
    */
   public Sql limit(int offset, int row) {
 
-    return this.append(StrUtil.format(" LIMIT {},{}", offset, row));
+    return this.append(StringUtil.format(" LIMIT {},{}", offset, row));
   }
 
   /**
@@ -605,12 +605,12 @@ public class Sql
    */
   public static Sql Insert(String table, String field, String... fields) {
 
-    Sql sql = new Sql(StrUtil.format("INSERT INTO {} ({}", table, field));
+    Sql sql = new Sql(StringUtil.format("INSERT INTO {} ({}", table, field));
     if (fields != null && fields.length > 0) {
       for (int i = 0;
            i < fields.length;
            i++) {
-        sql.append(StrUtil.format(",{}", fields[i]));
+        sql.append(StringUtil.format(",{}", fields[i]));
       }
     }
     return sql.append(")");
@@ -628,11 +628,11 @@ public class Sql
 
     Sql insertSql;
     Sql valuesSql;
-    insertSql = new Sql(StrUtil.format("INSERT INTO {} (", table));
-    valuesSql = new Sql(StrUtil.format(" VALUES ("));
+    insertSql = new Sql(StringUtil.format("INSERT INTO {} (", table));
+    valuesSql = new Sql(StringUtil.format(" VALUES ("));
     if (map != null && map.size() > 0) {
       for (Entry<String, Object> param : map.entrySet()) {
-        insertSql.append(StrUtil.format("{},", param.getKey()));
+        insertSql.append(StringUtil.format("{},", param.getKey()));
         valuesSql.append("?,", param.getValue());
       }
       insertSql.sql.deleteCharAt(insertSql.sql.lastIndexOf(","));
@@ -651,11 +651,11 @@ public class Sql
    */
   public Sql values(Object param, Object... params) {
 
-    this.append(StrUtil.format(" VALUES (?"), param);
+    this.append(StringUtil.format(" VALUES (?"), param);
     if (params != null && params.length > 0) {
       for (Object o : params) {
 
-        this.append(StrUtil.format(",?"), o);
+        this.append(StringUtil.format(",?"), o);
       }
     }
     return this.append(")");
@@ -670,7 +670,7 @@ public class Sql
    */
   public static Sql Update(String table) {
 
-    return new Sql(StrUtil.format("UPDATE {}", table));
+    return new Sql(StringUtil.format("UPDATE {}", table));
   }
 
   /**
@@ -683,7 +683,7 @@ public class Sql
    */
   public Sql set(String field, Object param) {
 
-    return this.append(StrUtil.format(" SET {} = ?", field), param);
+    return this.append(StringUtil.format(" SET {} = ?", field), param);
   }
 
   /**
@@ -701,7 +701,7 @@ public class Sql
 
     this.sql.append(" SET");
     for (Entry<String, Object> param : map.entrySet()) {
-      this.sql.append(StrUtil.format(" {} = ?,", param.getKey()));
+      this.sql.append(StringUtil.format(" {} = ?,", param.getKey()));
       this.params.add(param.getValue());
     }
 
@@ -718,7 +718,7 @@ public class Sql
    */
   public static Sql Delete(String table) {
 
-    return new Sql(StrUtil.format("DELETE FROM {}", table));
+    return new Sql(StringUtil.format("DELETE FROM {}", table));
   }
 
   /**
@@ -731,7 +731,7 @@ public class Sql
    */
   public static Sql Delete(String table, String alias) {
 
-    return new Sql(StrUtil.format("DELETE {} FROM {} {}", alias, table, alias));
+    return new Sql(StringUtil.format("DELETE {} FROM {} {}", alias, table, alias));
   }
 
 }

@@ -4,19 +4,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
+/**
+ * SQL 执行后事件
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SqlExecutedContext
-    extends SqlExecutingContext {
+public class SqlExecutedEvent
+    extends SqlExecutingEvent {
 
   private SqlAnalysis analysis;
 
-  public SqlExecutedContext(SqlAnalysis analysis) {
+  public SqlExecutedEvent(SqlAnalysis analysis) {
 
     this.analysis = analysis;
   }
 
-  public SqlExecutedContext(Sql sql, SqlAnalysis analysis) {
+  public SqlExecutedEvent(Sql sql, SqlAnalysis analysis) {
 
     super(sql);
     this.analysis = analysis;

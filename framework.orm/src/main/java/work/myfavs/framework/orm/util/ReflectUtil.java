@@ -8,10 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import work.myfavs.framework.orm.util.exception.DBException;
 import work.myfavs.framework.orm.util.exception.UnexpectedNewInstanceException;
 
 @SuppressWarnings("unchecked")
 public class ReflectUtil {
+
+  private final static Map<Class<?>, List<Field>>                    FIELDS_CACHE = new ConcurrentHashMap<>();
+  private final static Map<Class<? extends Enum>, Map<String, Enum>> ENUM_CACHE   = new ConcurrentHashMap<>();
 
   /**
    * 获取指定类型的泛型参数
@@ -39,6 +43,152 @@ public class ReflectUtil {
   public static Type getActualTypeArg(Class<?> clazz, int index) {
 
     return ((ParameterizedType) clazz.getGenericSuperclass()).getActualTypeArguments()[index];
+  }
+
+  /**
+   * 把字符串转换为枚举
+   *
+   * @param enumClass 枚举类
+   * @param name      枚举值的名字. `name` 不区分大小写
+   * @param <T>       枚举类型
+   *
+   * @return 返回对应的枚举值，如果枚举值不存在，则返回null
+   */
+  public static <T extends Enum<T>> T asEnum(final Class<T> enumClass, final String name) {
+
+    return asEnum(enumClass, name, false);
+  }
+
+  /**
+   * 把字符串转换为枚举
+   *
+   * @param enumClass     枚举类
+   * @param name          枚举值的名字. `name` 不区分大小写
+   * @param caseSensitive 是否区分大小写
+   * @param <T>           枚举类型
+   *
+   * @return 返回对应的枚举值，如果枚举值不存在，则返回null
+   */
+  public static <T extends Enum<T>> T asEnum(final Class<T> enumClass, final String name, final boolean caseSensitive) {
+
+    if (name == null || name.length() == 0) {
+      return null;
+    }
+    Map<String, Enum> map = ENUM_CACHE.get(enumClass);
+    if (null == map) {
+      T[] values = enumClass.getEnumConstants();
+      map = new HashMap<>(values.length * 2);
+      for (T value : values) {
+        map.put(value.name().toUpperCase(), value);
+      }
+      ENUM_CACHE.putIfAbsent(enumClass, map);
+    }
+    String key    = name.toUpperCase();
+    T      retVal = (T) map.get(key);
+    return caseSensitive && !retVal.name().equals(name)
+        ? null
+        : retVal;
+  }
+
+  /**
+   * 使用反射创建实例
+   *
+   * @param clazz 类型
+   * @param <T>   类型泛型
+   *
+   * @return 实例对象
+   */
+  public static <T> T newInstance(Class<T> clazz) {
+
+    try {
+      Constructor<T> ct = clazz.getDeclaredConstructor();
+      ct.setAccessible(true);
+      return ct.newInstance();
+    } catch (InvocationTargetException e) {
+      Throwable t = e.getTargetException();
+      if (t instanceof RuntimeException) {
+        throw ((RuntimeException) t);
+      } else {
+        throw new UnexpectedNewInstanceException(e);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new UnexpectedNewInstanceException(e);
+    }
+  }
+
+  public static Object getFieldValue(Object obj, String fieldName) {
+
+    if (obj == null || fieldName == null) {
+      return null;
+    }
+    Field field = fieldOf(obj.getClass(), fieldName);
+
+    if (field == null) {
+      return null;
+    }
+    field.setAccessible(true);
+    Object result = null;
+    try {
+      result = field.get(obj);
+    } catch (IllegalAccessException e) {
+      throw new DBException(e);
+    }
+    return result;
+  }
+
+  public static void setFieldValue(Object obj, String fieldName, Object val) {
+
+    ValidUtil.notNull(obj);
+    ValidUtil.notEmpty(fieldName);
+
+    Field field = fieldOf(obj.getClass(), fieldName);
+
+    ValidUtil.notNull(field);
+
+    field.setAccessible(true);
+    try {
+      field.set(obj, val);
+    } catch (IllegalAccessException e) {
+      throw new DBException(e);
+    }
+  }
+
+  public static Field fieldOf(Class<?> c, String fieldName) {
+
+    final List<Field> fields = fieldsOf(c);
+    if (fields != null && fields.size() > 0) {
+      for (Field field : fields) {
+        if (fieldName.equals(field.getName())) {
+          return field;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 获得一个类中所有字段列表，包括其父类中的字段
+   *
+   * @param beanClass 类
+   *
+   * @return 字段列表
+   *
+   * @throws SecurityException 安全检查异常
+   */
+  public static List<Field> fieldsOf(Class<?> beanClass)
+      throws SecurityException {
+
+    List<Field> allFields = FIELDS_CACHE.get(beanClass);
+    if (null != allFields) {
+      return allFields;
+    }
+
+    allFields = new ArrayList<>();
+    addFieldsToList(allFields, beanClass, Object.class, null);
+    FIELDS_CACHE.put(beanClass, allFields);
+    return allFields;
   }
 
   /**
@@ -85,12 +235,20 @@ public class ReflectUtil {
     return fields;
   }
 
-  private static void addFieldsToList(List<Field> list, Class<?> clazz, Class<?> rootClass, Function<Field, Boolean> filter) {
 
-    if (clazz.isInterface()) {
+  public static List<Field> fieldsOf(Class<?> c, Function<Class<?>, Boolean> classFilter, Function<Field, Boolean> fieldFilter) {
+
+    List<Field> fields = new ArrayList<Field>();
+    addFieldsToList(fields, c, classFilter, fieldFilter);
+    return fields;
+  }
+
+  private static void addFieldsToList(List<Field> list, Class<?> c, Class<?> rootClass, Function<Field, Boolean> filter) {
+
+    if (c.isInterface()) {
       return;
     }
-    Field[] fields = clazz.getDeclaredFields();
+    Field[] fields = c.getDeclaredFields();
     for (Field field : fields) {
       if (null != filter && !filter.apply(field)) {
         continue;
@@ -98,86 +256,33 @@ public class ReflectUtil {
       field.setAccessible(true);
       list.add(field);
     }
-    if (clazz != rootClass) {
-      clazz = clazz.getSuperclass();
-      if (null != clazz) {
-        addFieldsToList(list, clazz, rootClass, filter);
+    if (c != rootClass) {
+      c = c.getSuperclass();
+      if (null != c) {
+        addFieldsToList(list, c, rootClass, filter);
       }
     }
   }
 
-  private static ConcurrentHashMap<Class<? extends Enum>, Map<String, Enum>> enumLookup = new ConcurrentHashMap<>();
+  private static void addFieldsToList(List<Field> list, Class<?> c, Function<Class<?>, Boolean> classFilter,
+                                      Function<Field, Boolean> fieldFilter) {
 
-  /**
-   * 把字符串转换为枚举
-   *
-   * @param enumClass 枚举类
-   * @param name      枚举值的名字. `name` 不区分大小写
-   * @param <T>       枚举类型
-   *
-   * @return 返回对应的枚举值，如果枚举值不存在，则返回null
-   */
-  public static <T extends Enum<T>> T asEnum(final Class<T> enumClass, final String name) {
-
-    return asEnum(enumClass, name, false);
-  }
-
-  /**
-   * 把字符串转换为枚举
-   *
-   * @param enumClass     枚举类
-   * @param name          枚举值的名字. `name` 不区分大小写
-   * @param caseSensitive 是否区分大小写
-   * @param <T>           枚举类型
-   *
-   * @return 返回对应的枚举值，如果枚举值不存在，则返回null
-   */
-  public static <T extends Enum<T>> T asEnum(final Class<T> enumClass, final String name, final boolean caseSensitive) {
-
-    if (name == null || name.length() == 0) {
-      return null;
+    if (c.isInterface()) {
+      return;
     }
-    Map<String, Enum> map = enumLookup.get(enumClass);
-    if (null == map) {
-      T[] values = enumClass.getEnumConstants();
-      map = new HashMap<>(values.length * 2);
-      for (T value : values) {
-        map.put(value.name().toUpperCase(), value);
+    Field[] fields = c.getDeclaredFields();
+    for (Field field : fields) {
+      if (null != fieldFilter && !fieldFilter.apply(field)) {
+        continue;
       }
-      enumLookup.putIfAbsent(enumClass, map);
+      field.setAccessible(true);
+      list.add(field);
     }
-    String key    = name.toUpperCase();
-    T      retVal = (T) map.get(key);
-    return caseSensitive && !retVal.name().equals(name)
-        ? null
-        : retVal;
-  }
-
-  /**
-   * 使用反射创建实例
-   *
-   * @param clazz 类型
-   * @param <T>   类型泛型
-   *
-   * @return 实例对象
-   */
-  public static <T> T newInstance(Class<T> clazz) {
-
-    try {
-      Constructor<T> ct = clazz.getDeclaredConstructor();
-      ct.setAccessible(true);
-      return ct.newInstance();
-    } catch (InvocationTargetException e) {
-      Throwable t = e.getTargetException();
-      if (t instanceof RuntimeException) {
-        throw ((RuntimeException) t);
-      } else {
-        throw new UnexpectedNewInstanceException(e);
+    if (null != classFilter) {
+      c = c.getSuperclass();
+      if (null != c && classFilter.apply(c)) {
+        addFieldsToList(list, c, classFilter, fieldFilter);
       }
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new UnexpectedNewInstanceException(e);
     }
   }
 

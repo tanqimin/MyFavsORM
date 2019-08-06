@@ -1,8 +1,5 @@
 package work.myfavs.framework.orm.meta.dialect;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +11,8 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.schema.AttributeMeta;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
+import work.myfavs.framework.orm.util.ReflectUtil;
+import work.myfavs.framework.orm.util.StringUtil;
 
 
 /**
@@ -52,9 +51,9 @@ public abstract class DefaultDialect
   @Override
   public <TModel> Sql insert(Class<TModel> clazz, TModel model) {
 
-    ClassMeta                  classMeta;
-    String                     tableName;
-    AttributeMeta              primaryKey;
+    ClassMeta           classMeta;
+    String              tableName;
+    AttributeMeta       primaryKey;
     List<AttributeMeta> updateAttributes;
 
     Sql insertSql;
@@ -65,17 +64,17 @@ public abstract class DefaultDialect
     primaryKey = classMeta.getPrimaryKey();
     updateAttributes = classMeta.getUpdateAttributes();
 
-    insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
-    valuesSql = new Sql(StrUtil.format(" VALUES ("));
+    insertSql = new Sql(StringUtil.format("INSERT INTO {} (", tableName));
+    valuesSql = new Sql(StringUtil.format(" VALUES ("));
     if (classMeta.getStrategy() != GenerationType.IDENTITY) {
-      insertSql.append(StrUtil.format("{},", primaryKey.getColumnName()));
-      valuesSql.append(StrUtil.format("?,"), BeanUtil.getFieldValue(model, primaryKey.getFieldName()));
+      insertSql.append(StringUtil.format("{},", primaryKey.getColumnName()));
+      valuesSql.append(StringUtil.format("?,"), ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
     }
 
     if (updateAttributes.size() > 0) {
       for (AttributeMeta attributeMeta : updateAttributes) {
-        insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
-        valuesSql.append(StrUtil.format("?,"), BeanUtil.getFieldValue(model, attributeMeta.getFieldName()));
+        insertSql.append(StringUtil.format("{},", attributeMeta.getColumnName()));
+        valuesSql.append(StringUtil.format("?,"), ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
       }
       insertSql.getSql().deleteCharAt(insertSql.getSql().lastIndexOf(","));
       valuesSql.getSql().deleteCharAt(valuesSql.getSql().lastIndexOf(","));
@@ -87,9 +86,9 @@ public abstract class DefaultDialect
   @Override
   public <TModel> Sql insert(Class<TModel> clazz) {
 
-    ClassMeta                  classMeta;
-    String                     tableName;
-    AttributeMeta              primaryKey;
+    ClassMeta           classMeta;
+    String              tableName;
+    AttributeMeta       primaryKey;
     List<AttributeMeta> updateAttributes;
 
     Sql insertSql;
@@ -100,17 +99,17 @@ public abstract class DefaultDialect
     primaryKey = classMeta.getPrimaryKey();
     updateAttributes = classMeta.getUpdateAttributes();
 
-    insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
-    valuesSql = new Sql(StrUtil.format(" VALUES ("));
+    insertSql = new Sql(StringUtil.format("INSERT INTO {} (", tableName));
+    valuesSql = new Sql(StringUtil.format(" VALUES ("));
     if (classMeta.getStrategy() != GenerationType.IDENTITY) {
-      insertSql.append(StrUtil.format("{},", primaryKey.getColumnName()));
-      valuesSql.append(StrUtil.format("?,"));
+      insertSql.append(StringUtil.format("{},", primaryKey.getColumnName()));
+      valuesSql.append(StringUtil.format("?,"));
     }
 
     if (updateAttributes.size() > 0) {
       for (AttributeMeta attributeMeta : updateAttributes) {
-        insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
-        valuesSql.append(StrUtil.format("?,"));
+        insertSql.append(StringUtil.format("{},", attributeMeta.getColumnName()));
+        valuesSql.append(StringUtil.format("?,"));
       }
       insertSql.getSql().deleteCharAt(insertSql.getSql().lastIndexOf(","));
       valuesSql.getSql().deleteCharAt(valuesSql.getSql().lastIndexOf(","));
@@ -122,9 +121,9 @@ public abstract class DefaultDialect
   @Override
   public <TModel> Sql update(Class<TModel> clazz, TModel model) {
 
-    ClassMeta                  classMeta;
-    String                     tableName;
-    AttributeMeta              primaryKey;
+    ClassMeta           classMeta;
+    String              tableName;
+    AttributeMeta       primaryKey;
     List<AttributeMeta> updateAttributes;
 
     Sql sql;
@@ -138,11 +137,12 @@ public abstract class DefaultDialect
 
     if (updateAttributes.size() > 0) {
       for (AttributeMeta attributeMeta : updateAttributes) {
-        sql.append(StrUtil.format(" {} = ?,", attributeMeta.getColumnName()), BeanUtil.getFieldValue(model, attributeMeta.getFieldName()));
+        sql.append(StringUtil.format(" {} = ?,", attributeMeta.getColumnName()),
+                   ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
       }
       sql.getSql().deleteCharAt(sql.getSql().lastIndexOf(","));
     }
-    sql.append(StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()), BeanUtil.getFieldValue(model, primaryKey.getFieldName()));
+    sql.append(StringUtil.format(" WHERE {} = ?", primaryKey.getColumnName()), ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
 
     return sql;
   }
@@ -162,13 +162,13 @@ public abstract class DefaultDialect
       sql = sql.substring(0, om.start());
     }
 
-    return new Sql(StrUtil.format("SELECT COUNT(1) FROM ({}) count_alias", sql), params);
+    return new Sql(StringUtil.format("SELECT COUNT(1) FROM ({}) count_alias", sql), params);
   }
 
   @Override
   public <TModel> Sql select(Class<TModel> clazz) {
 
-    return new Sql(StrUtil.format("SELECT * FROM {}", getTableName(clazz)));
+    return new Sql(StringUtil.format("SELECT * FROM {}", getTableName(clazz)));
   }
 
 }

@@ -3,6 +3,7 @@ package work.myfavs.framework.example.business;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,7 +82,7 @@ public class TestPKService {
          i++) {
       TestSnowFake entity = new TestSnowFake();
       entity.setName("NAME_" + i);
-      entity.setCreated(LocalDateTime.now());
+      entity.setCreated(new Date());
       entity.setDisable(i % 2 == 0);
       entity.setPrice(new BigDecimal(199.99));
       entity.setType(i % 2 == 0

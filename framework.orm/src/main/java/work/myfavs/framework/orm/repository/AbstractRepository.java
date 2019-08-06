@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.repository;
 
-import cn.hutool.core.util.StrUtil;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,12 +9,16 @@ import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-import work.myfavs.framework.orm.repository.monitor.SqlExecutedContext;
-import work.myfavs.framework.orm.repository.monitor.SqlExecutingContext;
+import work.myfavs.framework.orm.repository.monitor.SqlExecutedEvent;
+import work.myfavs.framework.orm.repository.monitor.SqlExecutingEvent;
 import work.myfavs.framework.orm.repository.monitor.SqlMonitor;
 import work.myfavs.framework.orm.util.DBConvert;
 import work.myfavs.framework.orm.util.DBUtil;
+import work.myfavs.framework.orm.util.StringUtil;
 
+/**
+ * 仓储基类
+ */
 @Slf4j
 abstract public class AbstractRepository {
 
@@ -83,13 +86,13 @@ abstract public class AbstractRepository {
     }
   }
 
-  protected void afterQuery(SqlExecutedContext context)     {}
+  protected void afterQuery(SqlExecutedEvent context)     {}
 
-  protected void beforeQuery(SqlExecutingContext context)   {}
+  protected void beforeQuery(SqlExecutingEvent context)   {}
 
-  protected void afterExecute(SqlExecutedContext context)   {}
+  protected void afterExecute(SqlExecutedEvent context)   {}
 
-  protected void beforeExecute(SqlExecutingContext context) {}
+  protected void beforeExecute(SqlExecutingEvent context) {}
 
   /**
    * 执行SQL，返回多行记录
@@ -200,9 +203,9 @@ abstract public class AbstractRepository {
     if (showSql && log.isInfoEnabled()) {
       StringBuilder logStr = new StringBuilder();
       logStr.append(System.lineSeparator());
-      logStr.append(StrUtil.format("          SQL: {}", sql));
+      logStr.append(StringUtil.format("          SQL: {}", sql));
       logStr.append(System.lineSeparator());
-      logStr.append(StrUtil.format("   PARAMETERS: {}", showParams(params)));
+      logStr.append(StringUtil.format("   PARAMETERS: {}", showParams(params)));
       logStr.append(System.lineSeparator());
       log.info(logStr.toString());
     }
@@ -216,7 +219,7 @@ abstract public class AbstractRepository {
       return stringBuilder.toString();
     }
     for (Object param : params) {
-      stringBuilder.append(StrUtil.toString(param)).append(", ");
+      stringBuilder.append(StringUtil.toStr(param)).append(", ");
     }
     stringBuilder.deleteCharAt(stringBuilder.lastIndexOf(","));
     return stringBuilder.toString();
@@ -232,7 +235,7 @@ abstract public class AbstractRepository {
         int i = 0;
         for (List<Object> params : paramsList) {
           logStr.append("PARAM[").append(i++).append("]: ");
-          logStr.append(StrUtil.format("{}", showParams(params)));
+          logStr.append(StringUtil.format("{}", showParams(params)));
           logStr.append(System.lineSeparator());
         }
       }
@@ -269,21 +272,21 @@ abstract public class AbstractRepository {
       rs.beforeFirst();
       while (rs.next()) {
         rows++;
-        logStr.append(StrUtil.format("ROW[{}]: {", rs.getRow()));
+        logStr.append(StringUtil.format("ROW[{}]: {", rs.getRow()));
         for (int i = 1;
              i <= columnCount;
              i++) {
           columnLabel = metaData.getColumnLabel(i);
           columnVal = rs.getObject(i);
           if (rs.wasNull()) {
-            logStr.append(StrUtil.format("\"{}\":null, ", columnLabel));
+            logStr.append(StringUtil.format("\"{}\":null, ", columnLabel));
           } else {
-            logStr.append(StrUtil.format("\"{}\":\"{}\", ", columnLabel, columnVal));
+            logStr.append(StringUtil.format("\"{}\":\"{}\", ", columnLabel, columnVal));
           }
         }
         logStr.deleteCharAt(logStr.lastIndexOf(", ")).append("}").append(System.lineSeparator());
       }
-      logStr.append(StrUtil.format("TOTAL RECORDS: {}", rows));
+      logStr.append(StringUtil.format("TOTAL RECORDS: {}", rows));
       logStr.append(System.lineSeparator());
       log.info(logStr.toString());
     }

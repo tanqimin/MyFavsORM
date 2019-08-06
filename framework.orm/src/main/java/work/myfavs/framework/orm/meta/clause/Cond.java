@@ -1,10 +1,10 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import cn.hutool.core.util.StrUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+import work.myfavs.framework.orm.util.StringUtil;
 
 /**
  * SQL 条件构建
@@ -82,7 +82,7 @@ public class Cond
           ? new Cond()
           : isNull(field);
     }
-    return new Cond(StrUtil.format(" {} = ?", field), param);
+    return new Cond(StringUtil.format(" {} = ?", field), param);
   }
 
   /**
@@ -116,7 +116,7 @@ public class Cond
           ? new Cond()
           : isNotNull(field);
     }
-    return new Cond(StrUtil.format(" {} <> ?", field), param);
+    return new Cond(StringUtil.format(" {} <> ?", field), param);
   }
 
   /**
@@ -128,7 +128,7 @@ public class Cond
    */
   public static Cond isNull(String field) {
 
-    return new Cond(StrUtil.format(" {} IS NULL", field));
+    return new Cond(StringUtil.format(" {} IS NULL", field));
   }
 
   /**
@@ -140,7 +140,7 @@ public class Cond
    */
   public static Cond isNotNull(String field) {
 
-    return new Cond(StrUtil.format(" {} IS NOT NULL", field));
+    return new Cond(StringUtil.format(" {} IS NOT NULL", field));
   }
 
   /**
@@ -156,7 +156,7 @@ public class Cond
     if (param == null) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} > ?", field), param);
+    return new Cond(StringUtil.format(" {} > ?", field), param);
   }
 
   /**
@@ -172,7 +172,7 @@ public class Cond
     if (param == null) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} >= ?", field), param);
+    return new Cond(StringUtil.format(" {} >= ?", field), param);
   }
 
   /**
@@ -188,7 +188,7 @@ public class Cond
     if (param == null) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} < ?", field), param);
+    return new Cond(StringUtil.format(" {} < ?", field), param);
   }
 
   /**
@@ -204,7 +204,7 @@ public class Cond
     if (param == null) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} <= ?", field), param);
+    return new Cond(StringUtil.format(" {} <= ?", field), param);
   }
 
   /**
@@ -223,7 +223,7 @@ public class Cond
     }
 
     if (param.toString().contains("%") || param.toString().contains("_")) {
-      return new Cond(StrUtil.format(" {} LIKE ?", field), param);
+      return new Cond(StringUtil.format(" {} LIKE ?", field), param);
     }
 
     return eq(field, param);
@@ -251,7 +251,7 @@ public class Cond
     if (param1 == null) {
       return le(field, param2);
     }
-    return new Cond(StrUtil.format(" {} BETWEEN ? AND ?", field), param1, param2);
+    return new Cond(StringUtil.format(" {} BETWEEN ? AND ?", field), param1, param2);
   }
 
   /**
@@ -299,13 +299,13 @@ public class Cond
     if (paramCnt == 0) {
       return ignoreEmptyParams
           ? new Cond()
-          : new Cond(StrUtil.format(" 1 > 2"));
+          : new Cond(StringUtil.format(" 1 > 2"));
     }
 
     if (paramCnt == 1) {
       return eq(field, sqlParams.get(0));
     }
-    return new Cond(StrUtil.format(" {} IN ({})", field, sql), sqlParams);
+    return new Cond(StringUtil.format(" {} IN ({})", field, sql), sqlParams);
   }
 
   /**
@@ -318,7 +318,7 @@ public class Cond
    */
   public static Cond in(String field, Sql sql) {
 
-    return new Cond(StrUtil.format(" {} IN ({})", field, sql.sql), sql.params.toArray());
+    return new Cond(StringUtil.format(" {} IN ({})", field, sql.sql), sql.params.toArray());
   }
 
   /**
@@ -366,13 +366,13 @@ public class Cond
     if (paramCnt == 0) {
       return ignoreEmptyParams
           ? new Cond()
-          : new Cond(StrUtil.format(" 1 > 2"));
+          : new Cond(StringUtil.format(" 1 > 2"));
     }
 
     if (paramCnt == 1) {
       return ne(field, sqlParams.get(0));
     }
-    return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql), sqlParams.toArray());
+    return new Cond(StringUtil.format(" {} NOT IN ({})", field, sql), sqlParams.toArray());
   }
 
   /**
@@ -385,7 +385,7 @@ public class Cond
    */
   public static Cond notIn(String field, Sql sql) {
 
-    return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params.toArray());
+    return new Cond(StringUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params.toArray());
   }
 
   private static Sql createInClauseParams(List<Object> params) {
@@ -421,7 +421,7 @@ public class Cond
    */
   public static Cond exists(Sql subSql) {
 
-    return new Cond(StrUtil.format(" EXISTS ({})", subSql.sql), subSql.params.toArray());
+    return new Cond(StringUtil.format(" EXISTS ({})", subSql.sql), subSql.params.toArray());
   }
 
   /**
@@ -445,7 +445,7 @@ public class Cond
    */
   public static Cond notExists(Sql subSql) {
 
-    return new Cond(StrUtil.format(" NOT EXISTS ({})", subSql.sql), subSql.params.toArray());
+    return new Cond(StringUtil.format(" NOT EXISTS ({})", subSql.sql), subSql.params.toArray());
   }
 
   /**
@@ -469,7 +469,7 @@ public class Cond
    */
   public Cond and(Cond cond) {
 
-    this.sql.append(StrUtil.format(" AND {}", cond.sql));
+    this.sql.append(StringUtil.format(" AND {}", cond.sql));
     this.params.addAll(cond.params);
     return this;
   }
@@ -483,7 +483,7 @@ public class Cond
    */
   public Cond or(Cond cond) {
 
-    this.sql.append(StrUtil.format(" OR {}", cond.sql));
+    this.sql.append(StringUtil.format(" OR {}", cond.sql));
     this.params.addAll(cond.params);
     return this;
   }

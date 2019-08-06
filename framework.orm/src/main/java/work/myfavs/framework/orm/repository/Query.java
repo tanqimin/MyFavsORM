@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.repository;
 
-import cn.hutool.core.util.StrUtil;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.DBTemplate;
@@ -8,6 +7,7 @@ import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
+import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
@@ -271,7 +271,7 @@ public class Query
     if (enablePage) {
       long maxPageSize = this.dbTemplate.getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
-        throw new DBException(StrUtil.format("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize));
+        throw new DBException(StringUtil.format("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize));
       }
     } else {
       pagSize = -1;
@@ -359,7 +359,7 @@ public class Query
     if (enablePage) {
       long maxPageSize = this.dbTemplate.getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
-        throw new DBException(StrUtil.format("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize));
+        throw new DBException(StringUtil.format("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize));
       }
     } else {
       pagSize = -1;

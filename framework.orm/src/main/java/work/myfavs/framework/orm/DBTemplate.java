@@ -1,7 +1,6 @@
 package work.myfavs.framework.orm;
 
-import cn.hutool.core.lang.Snowflake;
-import cn.hutool.core.util.IdUtil;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +13,8 @@ import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.repository.handler.PropertyHandler;
 import work.myfavs.framework.orm.repository.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.DBUtil;
+import work.myfavs.framework.orm.util.IdUtil;
+import work.myfavs.framework.orm.util.Snowflake;
 
 
 @Slf4j

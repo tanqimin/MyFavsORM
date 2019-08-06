@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.repository.Repository;
 import work.myfavs.framework.orm.repository.monitor.SqlAnalysis;
-import work.myfavs.framework.orm.repository.monitor.SqlExecutedContext;
-import work.myfavs.framework.orm.repository.monitor.SqlExecutingContext;
+import work.myfavs.framework.orm.repository.monitor.SqlExecutedEvent;
+import work.myfavs.framework.orm.repository.monitor.SqlExecutingEvent;
 
 @Slf4j
 public class BaseRepository<TModel>
@@ -23,7 +23,7 @@ public class BaseRepository<TModel>
 
 
   @Override
-  protected void afterQuery(SqlExecutedContext context) {
+  protected void afterQuery(SqlExecutedEvent context) {
 
     SqlAnalysis analysis = context.getAnalysis();
     log.info("            SQL: {}", context.getSql().getSql().toString());
@@ -32,12 +32,12 @@ public class BaseRepository<TModel>
   }
 
   @Override
-  protected void beforeQuery(SqlExecutingContext context) {
+  protected void beforeQuery(SqlExecutingEvent context) {
 
   }
 
   @Override
-  protected void afterExecute(SqlExecutedContext context) {
+  protected void afterExecute(SqlExecutedEvent context) {
 
     SqlAnalysis analysis = context.getAnalysis();
     log.info("            SQL: {}", context.getSql().getSql().toString());
@@ -46,7 +46,7 @@ public class BaseRepository<TModel>
   }
 
   @Override
-  protected void beforeExecute(SqlExecutingContext context) {
+  protected void beforeExecute(SqlExecutingEvent context) {
 
   }
 

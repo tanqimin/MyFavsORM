@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.util;
 
-import cn.hutool.core.bean.BeanUtil;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -76,7 +75,8 @@ public class DBConvert {
           continue;
         }
         columnValue = PropertyHandlerFactory.convert(rs, colName, attributeMeta.getFieldType());
-        BeanUtil.setFieldValue(model, attributeMeta.getFieldName(), columnValue);
+//        BeanUtil.setFieldValue(model, attributeMeta.getFieldName(), columnValue);
+        ReflectUtil.setFieldValue(model, attributeMeta.getFieldName(), columnValue);
       }
       result.add(model);
     }

@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.repository.Query;
 import work.myfavs.framework.orm.repository.monitor.SqlAnalysis;
-import work.myfavs.framework.orm.repository.monitor.SqlExecutedContext;
-import work.myfavs.framework.orm.repository.monitor.SqlExecutingContext;
+import work.myfavs.framework.orm.repository.monitor.SqlExecutedEvent;
+import work.myfavs.framework.orm.repository.monitor.SqlExecutingEvent;
 
 @Slf4j
 public class BaseQuery
@@ -22,7 +22,7 @@ public class BaseQuery
   }
 
   @Override
-  protected void afterQuery(SqlExecutedContext context) {
+  protected void afterQuery(SqlExecutedEvent context) {
     SqlAnalysis analysis = context.getAnalysis();
     log.info("            SQL: {}", context.getSql().getSql().toString());
     log.info("  AFFECTED ROWS: {}", analysis.getAffectedRows());
@@ -31,7 +31,7 @@ public class BaseQuery
   }
 
   @Override
-  protected void beforeQuery(SqlExecutingContext context) {
+  protected void beforeQuery(SqlExecutingEvent context) {
 
   }
 

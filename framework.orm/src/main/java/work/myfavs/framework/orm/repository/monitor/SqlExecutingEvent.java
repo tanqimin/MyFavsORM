@@ -6,22 +6,25 @@ import java.util.Map;
 import lombok.Data;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
+/**
+ * SQL 执行前事件
+ */
 @Data
-public class SqlExecutingContext {
+public class SqlExecutingEvent {
 
   private Sql                 sql;
   private Map<String, Object> context = new HashMap<>();
 
-  public SqlExecutingContext() {
+  public SqlExecutingEvent() {
 
   }
 
-  public SqlExecutingContext(Sql sql) {
+  public SqlExecutingEvent(Sql sql) {
 
     this.sql = sql;
   }
 
-  public SqlExecutingContext(String sql, List<Object> params) {
+  public SqlExecutingEvent(String sql, List<Object> params) {
 
     this.sql = new Sql(sql, params);
   }

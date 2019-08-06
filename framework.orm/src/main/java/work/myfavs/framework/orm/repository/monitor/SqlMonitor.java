@@ -10,15 +10,15 @@ import work.myfavs.framework.orm.util.exception.DBException;
  */
 public class SqlMonitor {
 
-  private StopWatch           stopWatch;
-  private SqlExecutingContext sqlExecutingContext;
-  private SqlExecutedContext  sqlExecutedContext;
+  private StopWatch         stopWatch;
+  private SqlExecutingEvent sqlExecutingEvent;
+  private SqlExecutedEvent  sqlExecutedEvent;
 
   private SqlMonitor() {
 
     stopWatch = new StopWatch();
-    sqlExecutingContext = new SqlExecutingContext();
-    sqlExecutedContext = new SqlExecutedContext(new SqlAnalysis());
+    sqlExecutingEvent = new SqlExecutingEvent();
+    sqlExecutedEvent = new SqlExecutedEvent(new SqlAnalysis());
   }
 
   /**
@@ -39,12 +39,12 @@ public class SqlMonitor {
    *
    * @return SqlExecutingContext
    */
-  public SqlExecutingContext start(String sql, List<Object> params) {
+  public SqlExecutingEvent start(String sql, List<Object> params) {
 
-    sqlExecutingContext.setSql(new Sql(sql, params));
-    sqlExecutedContext.setSql(new Sql(sql, params));
+    sqlExecutingEvent.setSql(new Sql(sql, params));
+    sqlExecutedEvent.setSql(new Sql(sql, params));
     stopWatch.start();
-    return sqlExecutingContext;
+    return sqlExecutingEvent;
   }
 
   /**
@@ -53,7 +53,7 @@ public class SqlMonitor {
   public void restart() {
 
     stopWatch.stop();
-    sqlExecutedContext.getAnalysis().setElapsed(stopWatch.getLastTaskTimeMillis());
+    sqlExecutedEvent.getAnalysis().setElapsed(stopWatch.getLastTaskTimeMillis());
     stopWatch.start();
   }
 
@@ -64,14 +64,14 @@ public class SqlMonitor {
    *
    * @return SqlExecutedContext
    */
-  public SqlExecutedContext stopQuery(int affectedRows) {
+  public SqlExecutedEvent stopQuery(int affectedRows) {
 
     if (stopWatch.isRunning()) {
       stopWatch.stop();
     }
-    sqlExecutedContext.getAnalysis().setMappingElapsed(stopWatch.getLastTaskTimeMillis());
-    sqlExecutedContext.getAnalysis().setAffectedRows(affectedRows);
-    return sqlExecutedContext;
+    sqlExecutedEvent.getAnalysis().setMappingElapsed(stopWatch.getLastTaskTimeMillis());
+    sqlExecutedEvent.getAnalysis().setAffectedRows(affectedRows);
+    return sqlExecutedEvent;
   }
 
   /**
@@ -81,14 +81,14 @@ public class SqlMonitor {
    *
    * @return SqlExecutedContext
    */
-  public SqlExecutedContext stopExec(int affectedRows) {
+  public SqlExecutedEvent stopExec(int affectedRows) {
 
     if (stopWatch.isRunning()) {
       stopWatch.stop();
     }
-    sqlExecutedContext.getAnalysis().setElapsed(stopWatch.getLastTaskTimeMillis());
-    sqlExecutedContext.getAnalysis().setAffectedRows(affectedRows);
-    return sqlExecutedContext;
+    sqlExecutedEvent.getAnalysis().setElapsed(stopWatch.getLastTaskTimeMillis());
+    sqlExecutedEvent.getAnalysis().setAffectedRows(affectedRows);
+    return sqlExecutedEvent;
   }
 
   /**
@@ -103,8 +103,8 @@ public class SqlMonitor {
     if (stopWatch.isRunning()) {
       stopWatch.stop();
     }
-    sqlExecutedContext.getAnalysis().setHasError(true);
-    sqlExecutedContext.getAnalysis().setThrowable(throwable);
+    sqlExecutedEvent.getAnalysis().setHasError(true);
+    sqlExecutedEvent.getAnalysis().setThrowable(throwable);
     return new DBException(throwable);
   }
 

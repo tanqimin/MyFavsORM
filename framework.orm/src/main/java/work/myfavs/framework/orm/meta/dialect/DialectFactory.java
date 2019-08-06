@@ -1,9 +1,9 @@
 package work.myfavs.framework.orm.meta.dialect;
 
-import cn.hutool.core.util.StrUtil;
 import java.util.HashMap;
 import java.util.Map;
 import work.myfavs.framework.orm.meta.DbType;
+import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 
@@ -38,7 +38,7 @@ public class DialectFactory {
 
     IDialect iDialect = map.get(dbType);
     if (iDialect == null) {
-      throw new DBException(StrUtil.format("暂不支持 {} 数据库！", dbType));
+      throw new DBException(StringUtil.format("暂不支持 {} 数据库！", dbType));
     }
     return iDialect;
   }
