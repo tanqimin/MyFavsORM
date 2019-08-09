@@ -118,6 +118,14 @@ public class ReflectUtil {
     }
   }
 
+  /**
+   * 获取字段的值
+   *
+   * @param obj       对象
+   * @param fieldName 字段名
+   *
+   * @return 字段值
+   */
   public static Object getFieldValue(Object obj, String fieldName) {
 
     if (obj == null || fieldName == null) {
@@ -138,6 +146,13 @@ public class ReflectUtil {
     return result;
   }
 
+  /**
+   * 设置字段值
+   *
+   * @param obj       对象
+   * @param fieldName 字段名
+   * @param val       字段值
+   */
   public static void setFieldValue(Object obj, String fieldName, Object val) {
 
     ValidUtil.notNull(obj);
@@ -155,9 +170,9 @@ public class ReflectUtil {
     }
   }
 
-  public static Field fieldOf(Class<?> c, String fieldName) {
+  public static Field fieldOf(Class<?> clazz, String fieldName) {
 
-    final List<Field> fields = fieldsOf(c);
+    final List<Field> fields = fieldsOf(clazz);
     if (fields != null && fields.size() > 0) {
       for (Field field : fields) {
         if (fieldName.equals(field.getName())) {
@@ -171,23 +186,23 @@ public class ReflectUtil {
   /**
    * 获得一个类中所有字段列表，包括其父类中的字段
    *
-   * @param beanClass 类
+   * @param clazz 类
    *
    * @return 字段列表
    *
    * @throws SecurityException 安全检查异常
    */
-  public static List<Field> fieldsOf(Class<?> beanClass)
+  public static List<Field> fieldsOf(Class<?> clazz)
       throws SecurityException {
 
-    List<Field> allFields = FIELDS_CACHE.get(beanClass);
+    List<Field> allFields = FIELDS_CACHE.get(clazz);
     if (null != allFields) {
       return allFields;
     }
 
     allFields = new ArrayList<>();
-    addFieldsToList(allFields, beanClass, Object.class, null);
-    FIELDS_CACHE.put(beanClass, allFields);
+    addFieldsToList(allFields, clazz, Object.class, null);
+    FIELDS_CACHE.put(clazz, allFields);
     return allFields;
   }
 
@@ -236,19 +251,26 @@ public class ReflectUtil {
   }
 
 
-  public static List<Field> fieldsOf(Class<?> c, Function<Class<?>, Boolean> classFilter, Function<Field, Boolean> fieldFilter) {
+  /**
+   * 返回指定类得所有Field，包括所有父级Field，直至父级为rootClass为止
+   * @param clazz the class
+   * @param classFilter 类筛选器
+   * @param fieldFilter 筛选条件，如果结果不为'null'值，则返回该字段
+   * @return
+   */
+  public static List<Field> fieldsOf(Class<?> clazz, Function<Class<?>, Boolean> classFilter, Function<Field, Boolean> fieldFilter) {
 
     List<Field> fields = new ArrayList<Field>();
-    addFieldsToList(fields, c, classFilter, fieldFilter);
+    addFieldsToList(fields, clazz, classFilter, fieldFilter);
     return fields;
   }
 
-  private static void addFieldsToList(List<Field> list, Class<?> c, Class<?> rootClass, Function<Field, Boolean> filter) {
+  private static void addFieldsToList(List<Field> list, Class<?> clazz, Class<?> rootClass, Function<Field, Boolean> filter) {
 
-    if (c.isInterface()) {
+    if (clazz.isInterface()) {
       return;
     }
-    Field[] fields = c.getDeclaredFields();
+    Field[] fields = clazz.getDeclaredFields();
     for (Field field : fields) {
       if (null != filter && !filter.apply(field)) {
         continue;
@@ -256,21 +278,21 @@ public class ReflectUtil {
       field.setAccessible(true);
       list.add(field);
     }
-    if (c != rootClass) {
-      c = c.getSuperclass();
-      if (null != c) {
-        addFieldsToList(list, c, rootClass, filter);
+    if (clazz != rootClass) {
+      clazz = clazz.getSuperclass();
+      if (null != clazz) {
+        addFieldsToList(list, clazz, rootClass, filter);
       }
     }
   }
 
-  private static void addFieldsToList(List<Field> list, Class<?> c, Function<Class<?>, Boolean> classFilter,
+  private static void addFieldsToList(List<Field> list, Class<?> clazz, Function<Class<?>, Boolean> classFilter,
                                       Function<Field, Boolean> fieldFilter) {
 
-    if (c.isInterface()) {
+    if (clazz.isInterface()) {
       return;
     }
-    Field[] fields = c.getDeclaredFields();
+    Field[] fields = clazz.getDeclaredFields();
     for (Field field : fields) {
       if (null != fieldFilter && !fieldFilter.apply(field)) {
         continue;
@@ -279,9 +301,9 @@ public class ReflectUtil {
       list.add(field);
     }
     if (null != classFilter) {
-      c = c.getSuperclass();
-      if (null != c && classFilter.apply(c)) {
-        addFieldsToList(list, c, classFilter, fieldFilter);
+      clazz = clazz.getSuperclass();
+      if (null != clazz && classFilter.apply(clazz)) {
+        addFieldsToList(list, clazz, classFilter, fieldFilter);
       }
     }
   }
