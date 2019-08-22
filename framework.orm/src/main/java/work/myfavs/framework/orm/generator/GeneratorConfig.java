@@ -2,7 +2,8 @@ package work.myfavs.framework.orm.generator;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Builder;
+import java.util.Set;
+import java.util.TreeSet;
 import lombok.Data;
 import work.myfavs.framework.orm.generator.meta.TypeDefinition;
 
@@ -15,7 +16,7 @@ public class GeneratorConfig {
   private String jdbcUser;
   private String jdbcPwd;
 
-  private String rootPath;
+  private String rootPath = "";
 
   private boolean genEntities           = true;
   private boolean coverEntitiesIfExists = true;
@@ -24,5 +25,14 @@ public class GeneratorConfig {
   private boolean genRepositories           = false;
   private boolean coverRepositoriesIfExists = false;
   private String  repositoriesPackage       = "";
+
+  public Set<String> getImportList() {
+
+    Set<String> importsList = new TreeSet<>();
+    for (TypeDefinition typeDefinition : typeMapper.values()) {
+      importsList.add(typeDefinition.getName());
+    }
+    return importsList;
+  }
 
 }

@@ -265,7 +265,7 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond in(String field, List<Object> params) {
+  public static Cond in(String field, List params) {
 
     return in(field, params, true);
   }
@@ -283,7 +283,7 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond in(String field, List<Object> params, boolean ignoreEmptyParams) {
+  public static Cond in(String field, List params, boolean ignoreEmptyParams) {
 
     Sql          inClauseSql;
     String       sql;
@@ -332,7 +332,7 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond notIn(String field, List<Object> params) {
+  public static Cond notIn(String field, List params) {
 
     return notIn(field, params, true);
   }
@@ -350,7 +350,7 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond notIn(String field, List<Object> params, boolean ignoreEmptyParams) {
+  public static Cond notIn(String field, List params, boolean ignoreEmptyParams) {
 
     Sql          inClauseSql;
     String       sql;
@@ -388,7 +388,7 @@ public class Cond
     return new Cond(StringUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params.toArray());
   }
 
-  private static Sql createInClauseParams(List<Object> params) {
+  private static Sql createInClauseParams(List params) {
 
     Sql           sql;
     StringBuilder sqlBuilder;

@@ -2,7 +2,13 @@ package ${package};
 
 import java.io.Serializable;
 import lombok.Data;
-import work.myfavs.framework.example.domain.enums.TypeEnum;
+<% for(imp in imports){ %>
+  <% for(col in columns){ %>
+    <% if(imp == col.typeDefinition.name) {%>
+import ${imp};
+    <% break;} %>
+  <% } %>
+<% } %>
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
@@ -11,15 +17,20 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 @Data
 @Table(value = "${table}", strategy = GenerationType.IDENTITY)
 public class ${class} implements Serializable {
-<% for(schemaColumn in schemaColumns){ %>
+<% for(col in columns){ %>
     /**
-     * ${schemaColumn.comment}
+     * ${col.comment}
      */
-   <% if(schemaColumn.primaryKey) { %>
+    @Column(value = "${col.column}")
+  <% if(col.primaryKey) { %>
     @PrimaryKey
-   <% } %>
-    @Column(value = "${schemaColumn.schemaColumn}")
-    private ${schemaColumn.javaType} ${schemaColumn.fieldName};
-
+    private ${col.typeDefinition.simpleName} ${col.fieldName} = null;
+  <% } else { %>
+    <% if(col.nullable) { %>
+    private ${col.typeDefinition.simpleName} ${col.fieldName}<% if(col.typeDefinition.defValue != null) { %> = ${col.typeDefinition.defValue}; <% } else { %> = null; <% } %>
+    <% } else { %>
+    private ${col.typeDefinition.valueType} ${col.fieldName} = ${col.typeDefinition.defValue};
+    <% } %>
+  <% } %>
 <% } %>
 }

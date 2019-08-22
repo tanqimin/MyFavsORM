@@ -21,6 +21,10 @@ public class TypeDefinition {
    * 值类型，如：long
    */
   private String valueType;
+  /**
+   * 默认值
+   */
+  private String defValue;
 
   private TypeDefinition() {
 
@@ -28,16 +32,25 @@ public class TypeDefinition {
 
   public TypeDefinition(@NonNull String name) {
 
-    this(name, name);
+    this(name, null);
   }
 
-  public TypeDefinition(@NonNull String name, String valueType) {
+  public TypeDefinition(@NonNull String name,
+                        String defValue) {
+
+    this(name, name, defValue);
+  }
+
+  public TypeDefinition(@NonNull String name,
+                        String valueType,
+                        String defValue) {
 
     this.name = name;
     this.valueType = valueType;
+    this.defValue = defValue;
 
     if (name.contains(".")) {
-      String[] s = name.split(".");
+      String[] s = name.split("\\.");
       this.simpleName = s[s.length - 1];
     } else {
       this.simpleName = name;

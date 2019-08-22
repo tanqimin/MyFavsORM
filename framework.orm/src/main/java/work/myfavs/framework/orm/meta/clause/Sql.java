@@ -444,7 +444,7 @@ public class Sql
   public Sql and(Supplier<Cond> supplier) {
 
     Cond cond = supplier.get();
-    return this.append(StringUtil.format(" AND ({})", cond.sql), cond.params);
+    return this.and(cond);
   }
 
   /**
@@ -469,7 +469,7 @@ public class Sql
   public Sql or(Supplier<Cond> supplier) {
 
     Cond cond = supplier.get();
-    return this.append(StringUtil.format(" OR ({})", cond.sql), cond.params);
+    return this.or(cond);
   }
 
   /**
