@@ -5,7 +5,7 @@
   <groupId>work.myfavs</groupId>
 
   <artifactId>framework.orm</artifactId>
-  <version>0.1.8.RELEASE</version>
+  <version>0.2.0.RELEASE</version>
   <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>
 
@@ -29,7 +29,9 @@
     <spring-jdbc.version>5.1.8.RELEASE</spring-jdbc.version>
     <lombok.version>1.18.8</lombok.version>
     <slf4j.version>1.7.26</slf4j.version>
+    <beetl.version>3.0.10.RELEASE</beetl.version>
     <junit.version>4.12</junit.version>
+    <mysql.version>5.1.48</mysql.version>
   </properties>
 
   <dependencies>
@@ -55,11 +57,25 @@
       <version>${slf4j.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.ibeetl/beetl -->
+    <dependency>
+      <groupId>com.ibeetl</groupId>
+      <artifactId>beetl</artifactId>
+      <version>${beetl.version}</version>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/junit/junit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>${mysql.version}</version>
       <scope>test</scope>
     </dependency>
 

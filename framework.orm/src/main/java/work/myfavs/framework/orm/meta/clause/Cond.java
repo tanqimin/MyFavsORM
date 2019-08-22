@@ -77,7 +77,7 @@ public class Cond
    */
   public static Cond eq(String field, Object param, boolean ignoreNull) {
 
-    if (param == null) {
+    if (StringUtil.nullOrEmpty(param)) {
       return ignoreNull
           ? new Cond()
           : isNull(field);
@@ -111,7 +111,7 @@ public class Cond
    */
   public static Cond ne(String field, Object param, boolean ignoreNull) {
 
-    if (param == null) {
+    if (StringUtil.nullOrEmpty(param)) {
       return ignoreNull
           ? new Cond()
           : isNotNull(field);
@@ -153,7 +153,7 @@ public class Cond
    */
   public static Cond gt(String field, Object param) {
 
-    if (param == null) {
+    if (StringUtil.nullOrEmpty(param)) {
       return new Cond();
     }
     return new Cond(StringUtil.format(" {} > ?", field), param);
@@ -169,7 +169,7 @@ public class Cond
    */
   public static Cond ge(String field, Object param) {
 
-    if (param == null) {
+    if (StringUtil.nullOrEmpty(param)) {
       return new Cond();
     }
     return new Cond(StringUtil.format(" {} >= ?", field), param);
@@ -185,7 +185,7 @@ public class Cond
    */
   public static Cond lt(String field, Object param) {
 
-    if (param == null) {
+    if (StringUtil.nullOrEmpty(param)) {
       return new Cond();
     }
     return new Cond(StringUtil.format(" {} < ?", field), param);
@@ -201,7 +201,7 @@ public class Cond
    */
   public static Cond le(String field, Object param) {
 
-    if (param == null) {
+    if (StringUtil.nullOrEmpty(param)) {
       return new Cond();
     }
     return new Cond(StringUtil.format(" {} <= ?", field), param);
@@ -218,7 +218,7 @@ public class Cond
    */
   public static Cond like(String field, Object param) {
 
-    if (param == null) {
+    if (StringUtil.nullOrEmpty(param)) {
       return new Cond();
     }
 
@@ -398,7 +398,7 @@ public class Cond
     sqlParams = new ArrayList<>();
     if (params != null && params.size() > 0) {
       for (Object param : params) {
-        if (param == null) {
+        if (StringUtil.nullOrEmpty(param)) {
           continue;
         }
         sqlBuilder.append("?,");
@@ -486,6 +486,12 @@ public class Cond
     this.sql.append(StringUtil.format(" OR {}", cond.sql));
     this.params.addAll(cond.params);
     return this;
+  }
+
+  @Override
+  public String toString() {
+
+    return this.sql.toString();
   }
 
 }

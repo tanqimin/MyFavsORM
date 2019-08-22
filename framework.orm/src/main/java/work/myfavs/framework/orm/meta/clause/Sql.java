@@ -734,4 +734,10 @@ public class Sql
     return new Sql(StringUtil.format("DELETE {} FROM {} {}", alias, table, alias));
   }
 
+  @Override
+  public String toString() {
+
+    return this.getSql().toString();
+  }
+
 }

@@ -1,0 +1,25 @@
+package ${package};
+
+import java.io.Serializable;
+import lombok.Data;
+import work.myfavs.framework.example.domain.enums.TypeEnum;
+import work.myfavs.framework.orm.meta.annotation.Column;
+import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
+import work.myfavs.framework.orm.meta.annotation.Table;
+import work.myfavs.framework.orm.meta.enumeration.GenerationType;
+
+@Data
+@Table(value = "${table}", strategy = GenerationType.IDENTITY)
+public class ${class} implements Serializable {
+<% for(schemaColumn in schemaColumns){ %>
+    /**
+     * ${schemaColumn.comment}
+     */
+   <% if(schemaColumn.primaryKey) { %>
+    @PrimaryKey
+   <% } %>
+    @Column(value = "${schemaColumn.schemaColumn}")
+    private ${schemaColumn.javaType} ${schemaColumn.fieldName};
+
+<% } %>
+}

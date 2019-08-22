@@ -10,6 +10,8 @@ spring:
       url: jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
       username: root
       password: root
+    druid:
+      default-auto-commit: true
 #      url: jdbc:mysql://192.168.8.34:13307/sstest?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true&cachePrepStmts=true&prepStmtCacheSize=250&prepStmtCacheSqlLimit=2048&useServerPrepStmts=true&useLocalSessionState=true&rewriteBatchedStatements=true&cacheResultSetMetadata=true&cacheServerConfiguration=true&elideSetAutoCommits=true&maintainTimeStats=false
 #      username: root
 #      password: 9527
