@@ -469,6 +469,9 @@ public class Cond
    */
   public Cond and(Cond cond) {
 
+    if (StringUtil.nullOrEmpty(cond.sql)) {
+      return this;
+    }
     this.sql.append(StringUtil.format(" AND {}", cond.sql));
     this.params.addAll(cond.params);
     return this;
@@ -483,6 +486,9 @@ public class Cond
    */
   public Cond or(Cond cond) {
 
+    if (StringUtil.nullOrEmpty(cond.sql)) {
+      return this;
+    }
     this.sql.append(StringUtil.format(" OR {}", cond.sql));
     this.params.addAll(cond.params);
     return this;

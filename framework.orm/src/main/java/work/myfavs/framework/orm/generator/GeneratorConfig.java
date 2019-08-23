@@ -12,6 +12,7 @@ public class GeneratorConfig {
 
   private Map<String, TypeDefinition> typeMapper = new HashMap<>();
 
+  private String dbType;
   private String jdbcUrl;
   private String jdbcUser;
   private String jdbcPwd;

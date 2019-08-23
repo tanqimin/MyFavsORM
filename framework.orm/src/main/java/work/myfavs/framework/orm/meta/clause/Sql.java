@@ -49,6 +49,11 @@ public class Sql
     super(sql, params);
   }
 
+  public static Sql New(String sql) {
+
+    return new Sql(sql);
+  }
+
   /**
    * 追加拼接 SQL
    *
@@ -431,7 +436,11 @@ public class Sql
    */
   public Sql and(Cond cond) {
 
-    return this.append(StringUtil.format(" AND{}", cond.sql), cond.params);
+    if (StringUtil.nullOrEmpty(cond.sql)) {
+      return this;
+    }
+    this.append(StringUtil.format(" AND{}", cond.sql), cond.params);
+    return this;
   }
 
   /**
@@ -444,7 +453,11 @@ public class Sql
   public Sql and(Supplier<Cond> supplier) {
 
     Cond cond = supplier.get();
-    return this.and(cond);
+    if (StringUtil.nullOrEmpty(cond.sql)) {
+      return this;
+    }
+    this.append(StringUtil.format(" AND ({})", cond.sql), cond.params);
+    return this;
   }
 
   /**
@@ -456,7 +469,11 @@ public class Sql
    */
   public Sql or(Cond cond) {
 
-    return this.append(StringUtil.format(" OR{}", cond.sql), cond.params);
+    if (StringUtil.nullOrEmpty(cond.sql)) {
+      return this;
+    }
+    this.append(StringUtil.format(" OR{}", cond.sql), cond.params);
+    return this;
   }
 
   /**
@@ -469,7 +486,11 @@ public class Sql
   public Sql or(Supplier<Cond> supplier) {
 
     Cond cond = supplier.get();
-    return this.or(cond);
+    if (StringUtil.nullOrEmpty(cond.sql)) {
+      return this;
+    }
+    this.append(StringUtil.format(" OR ({})", cond.sql), cond.params);
+    return this;
   }
 
   /**

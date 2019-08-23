@@ -1,11 +1,13 @@
-package work.myfavs.framework.orm.generator.meta;
+package work.myfavs.framework.orm.generator.meta.column;
 
 import java.io.Serializable;
 import lombok.Data;
+import work.myfavs.framework.orm.generator.meta.TypeDefinition;
+import work.myfavs.framework.orm.generator.util.GeneratorUtil;
 import work.myfavs.framework.orm.util.StringUtil;
 
 @Data
-public class SchemaColumn
+public class ColumnDefinition
     implements Serializable {
 
   /**
@@ -43,11 +45,7 @@ public class SchemaColumn
 
   public String getClassName() {
 
-    if (table == null) {
-      return null;
-    }
-    String className = StringUtil.camel(table);
-    return StringUtil.upperCaseFirst(className);
+    return GeneratorUtil.toClass(table);
   }
 
   public String getFieldName() {
