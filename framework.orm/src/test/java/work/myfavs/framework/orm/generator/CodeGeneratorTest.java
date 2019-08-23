@@ -1,5 +1,6 @@
 package work.myfavs.framework.orm.generator;
 
+import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,27 +20,30 @@ public class CodeGeneratorTest {
     String user     = "root";
     String password = "root";
 
-    GeneratorConfig config = new GeneratorConfig();
-    config.setDbType(DbType.MYSQL);
-    config.setJdbcUrl(url);
-    config.setJdbcUser(user);
-    config.setJdbcPwd(password);
-    config.setRootPath("D:");
+    GeneratorConfig             config     = new GeneratorConfig();
+    Map<String, TypeDefinition> typeMapper = config.getTypeMapper();
 
-    config.setGenEntities(true);
-    config.setCoverEntitiesIfExists(true);
-    config.setEntitiesPackage("work.myfavs.erp.domain.entity");
+    config.setDbType(DbType.MYSQL);                                       //数据库类型
+    config.setJdbcUrl(url);                                               //数据库URL
+    config.setJdbcUser(user);                                             //数据库用户
+    config.setJdbcPwd(password);                                          //数据库密码
+    config.setRootPath("D:");                                             //代码输出根目录
 
-    config.setGenRepositories(true);
-    config.setCoverRepositoriesIfExists(false);
-    config.setRepositoriesPackage("work.myfavs.erp.repository");
+    config.setGenEntities(true);                                          //是否生成实体
+    config.setCoverEntitiesIfExists(true);                                //实体存在时是否覆盖？
+    config.setEntitiesPackage("work.myfavs.erp.domain.entity");           //实体Package名称
 
-    config.getTypeMapper().put("varchar", new TypeDefinition("java.lang.String"));
-    config.getTypeMapper().put("datetime", new TypeDefinition("java.util.Date"));
-    config.getTypeMapper().put("decimal", new TypeDefinition("java.math.BigDecimal", "BigDecimal.ZERO"));
-    config.getTypeMapper().put("bigint", new TypeDefinition("java.lang.Long", "long", "0L"));
-    config.getTypeMapper().put("int", new TypeDefinition("java.lang.Integer", "int", "0"));
-    config.getTypeMapper().put("bit", new TypeDefinition("java.lang.Boolean", "boolean", "false"));
+    config.setGenRepositories(true);                                      //是否生成Repository
+    config.setCoverRepositoriesIfExists(false);                           //Repository存在时是否覆盖？
+    config.setRepositoriesPackage("work.myfavs.erp.repository");          //Repository Package名称
+
+    //注册生成器类型
+    typeMapper.put("varchar", new TypeDefinition("java.lang.String"));
+    typeMapper.put("datetime", new TypeDefinition("java.util.Date"));
+    typeMapper.put("decimal", new TypeDefinition("java.math.BigDecimal", "BigDecimal.ZERO"));
+    typeMapper.put("bigint", new TypeDefinition("java.lang.Long", "long", "0L"));
+    typeMapper.put("int", new TypeDefinition("java.lang.Integer", "int", "0"));
+    typeMapper.put("bit", new TypeDefinition("java.lang.Boolean", "boolean", "false"));
 
     codeGenerator = new CodeGenerator(config);
   }
