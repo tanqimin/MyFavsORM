@@ -250,14 +250,16 @@ public class GeneratorTest{
     config.setJdbcUser(user);                                             //数据库用户
     config.setJdbcPwd(password);                                          //数据库密码
     config.setRootPath("D:");                                             //代码输出根目录
-    
+
+    config.setPrefix("tb_");                                              //忽略的表前缀    
+
     config.setGenEntities(true);                                          //是否生成实体
     config.setCoverEntitiesIfExists(true);                                //实体存在时是否覆盖？
-    config.setEntitiesPackage("work.myfavs.erp.domain.entity");           //实体Package名称
+    config.setEntitiesPackage("work.myfavs.framework.example.domain.entity");           //实体Package名称
     
     config.setGenRepositories(true);                                      //是否生成Repository
     config.setCoverRepositoriesIfExists(false);                           //Repository存在时是否覆盖？
-    config.setRepositoriesPackage("work.myfavs.erp.repository");          //Repository Package名称
+    config.setRepositoriesPackage("work.myfavs.framework.example.repository");          //Repository Package名称
     
     //注册生成器类型
     typeMapper.put("varchar", new TypeDefinition("java.lang.String"));
@@ -272,4 +274,9 @@ public class GeneratorTest{
     codeGenerator.genRepositories();
   }
 }
+```
+
+如果数据表对应类型使用的是枚举类，需要在数据表注释（#字符）后指定枚举类全类名（枚举类需手动创建）：
+```
+数据字段注释#work.myfavs.framework.example.domain.enums.TypeEnum
 ```

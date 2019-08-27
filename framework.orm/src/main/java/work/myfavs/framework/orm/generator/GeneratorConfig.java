@@ -19,6 +19,8 @@ public class GeneratorConfig {
 
   private String rootPath = "";
 
+  private String prefix = "";
+
   private boolean genEntities           = true;
   private boolean coverEntitiesIfExists = true;
   private String  entitiesPackage       = "";

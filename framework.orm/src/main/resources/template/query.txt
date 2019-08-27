@@ -2,7 +2,6 @@ package ${queryPackage};
 
 import ${repositoriesPackage}.BaseQuery;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import work.myfavs.framework.orm.DBTemplate;
 
@@ -14,7 +13,7 @@ public class ${class}Query extends BaseQuery {
    * @param dbTemplate DBTemplate
    */
   @Autowired
-  public ${class}Query(@Qualifier DBTemplate dbTemplate) {
+  public ${class}Query(DBTemplate dbTemplate) {
 
     super(dbTemplate);
   }

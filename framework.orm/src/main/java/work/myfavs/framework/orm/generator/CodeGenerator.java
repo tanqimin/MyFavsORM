@@ -57,7 +57,8 @@ public class CodeGenerator {
   private void outputEntity(@NonNull String tableName, @NonNull List<ColumnDefinition> columns) {
 
     String entitiesPackage = generatorConfig.getEntitiesPackage();            //实体Package
-    String className       = GeneratorUtil.toClass(tableName);                //实体类名称
+    String prefix          = generatorConfig.getPrefix();                     //忽略数据表前缀
+    String className       = GeneratorUtil.toClass(tableName, prefix);        //实体类名称
 
     Map<String, Object> params = new HashMap<>();                             //模板参数
 
@@ -82,12 +83,16 @@ public class CodeGenerator {
    */
   private String getFilePath(String packageName, String fileName) {
 
-    return generatorConfig.getRootPath()
-                          .concat("/src/main/java/")
-                          .concat(PathUtil.toPath(packageName))
-                          .concat("/")
-                          .concat(fileName)
-                          .concat(".java");
+    StringBuilder res      = new StringBuilder();
+    String        rootPath = generatorConfig.getRootPath();
+    if (rootPath != null && rootPath.length() > 0) {
+      res.append(rootPath);
+      if (!rootPath.endsWith("/")) {
+        res.append("/");
+      }
+    }
+
+    return res.append("src/main/java/").append(PathUtil.toPath(packageName)).append("/").append(fileName).append(".java").toString();
   }
 
   /**

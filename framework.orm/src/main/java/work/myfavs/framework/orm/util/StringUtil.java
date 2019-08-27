@@ -2,6 +2,7 @@ package work.myfavs.framework.orm.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.NonNull;
 
 public class StringUtil {
 
@@ -178,4 +179,8 @@ public class StringUtil {
     return new String(chars);
   }
 
+  public static boolean startWith(@NonNull String str, @NonNull String prefix){
+
+    return str.toLowerCase().startsWith(prefix.toLowerCase());
+  }
 }
