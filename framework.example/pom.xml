@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework.example</artifactId>
-  <version>${reversion}</version>
+  <version>0.2.5.RELEASE</version>
 
   <properties>
     <druid.version>1.1.18</druid.version>
@@ -52,13 +52,13 @@
     <dependency>
       <groupId>work.myfavs</groupId>
       <artifactId>framework.orm</artifactId>
-      <version>${reversion}</version>
+      <version>0.2.5.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>work.myfavs</groupId>
       <artifactId>framework.orm-generator</artifactId>
-      <version>${reversion}</version>
+      <version>0.2.5.RELEASE</version>
     </dependency>
   </dependencies>
 </project>

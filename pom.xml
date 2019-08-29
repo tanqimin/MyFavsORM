@@ -6,11 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework</artifactId>
-  <version>${reversion}</version>
-
-  <properties>
-    <reversion>0.2.4.RELEASE</reversion>
-  </properties>
+  <version>0.2.5.RELEASE</version>
 
   <build>
     <plugins>

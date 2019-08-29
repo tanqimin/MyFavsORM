@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework.orm-generator</artifactId>
-  <version>${reversion}</version>
+  <version>0.2.5.RELEASE</version>
   <packaging>jar</packaging>
 
   <!--私服仓库-->
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>work.myfavs</groupId>
       <artifactId>framework.orm</artifactId>
-      <version>${reversion}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
@@ -52,6 +52,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/com.ibeetl/beetl -->
@@ -59,6 +60,7 @@
       <groupId>com.ibeetl</groupId>
       <artifactId>beetl</artifactId>
       <version>${beetl.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/junit/junit -->

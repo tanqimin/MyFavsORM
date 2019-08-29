@@ -1,0 +1,2 @@
+Library-Name: myfavs.orm-generator
+Library-Description: Easy database query library
