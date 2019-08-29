@@ -15,7 +15,7 @@ import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 @Data
-@Table(value = "${table}", strategy = GenerationType.IDENTITY)
+@Table(value = "${table}", strategy = ${generationType})
 public class ${class} implements Serializable {
 <% for(col in columns){ %>
     /**

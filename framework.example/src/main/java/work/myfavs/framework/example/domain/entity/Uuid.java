@@ -13,7 +13,7 @@ import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 @Data
-@Table(value = "tb_uuid", strategy = GenerationType.IDENTITY)
+@Table(value = "tb_uuid", strategy = GenerationType.UUID)
 public class Uuid implements Serializable {
     /**
      * ID

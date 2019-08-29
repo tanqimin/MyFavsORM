@@ -13,6 +13,7 @@ import work.myfavs.framework.orm.generator.meta.column.GeneratorMetaFactory;
 import work.myfavs.framework.orm.generator.util.FileUtil;
 import work.myfavs.framework.orm.generator.util.GeneratorUtil;
 import work.myfavs.framework.orm.generator.util.PathUtil;
+import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
@@ -56,9 +57,10 @@ public class CodeGenerator {
    */
   private void outputEntity(@NonNull String tableName, @NonNull List<ColumnDefinition> columns) {
 
-    String entitiesPackage = generatorConfig.getEntitiesPackage();            //实体Package
-    String prefix          = generatorConfig.getPrefix();                     //忽略数据表前缀
-    String className       = GeneratorUtil.toClass(tableName, prefix);        //实体类名称
+    String         entitiesPackage = generatorConfig.getEntitiesPackage();            //实体Package
+    String         prefix          = generatorConfig.getPrefix();                     //忽略数据表前缀
+    String         className       = GeneratorUtil.toClass(tableName, prefix);        //实体类名称
+    GenerationType generationType  = generatorConfig.getGenerationType();
 
     Map<String, Object> params = new HashMap<>();                             //模板参数
 
@@ -66,6 +68,7 @@ public class CodeGenerator {
     params.put("table", tableName);
     params.put("class", className);
     params.put("columns", columns);
+    params.put("generationType", generationType.getName());
     params.put("imports", generatorConfig.getImportList());                   //Import类列表
 
     String render = generatorTemplate.render("/entities.txt", params);

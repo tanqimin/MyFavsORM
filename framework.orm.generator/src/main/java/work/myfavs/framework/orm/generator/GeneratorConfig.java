@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import lombok.Data;
 import work.myfavs.framework.orm.generator.meta.TypeDefinition;
+import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 @Data
 public class GeneratorConfig {
@@ -25,9 +26,10 @@ public class GeneratorConfig {
   private boolean coverEntitiesIfExists = true;
   private String  entitiesPackage       = "";
 
-  private boolean genRepositories           = false;
-  private boolean coverRepositoriesIfExists = false;
-  private String  repositoriesPackage       = "";
+  private boolean        genRepositories           = false;
+  private boolean        coverRepositoriesIfExists = false;
+  private String         repositoriesPackage       = "";
+  private GenerationType generationType            = GenerationType.SNOW_FLAKE;
 
   public Set<String> getImportList() {
 

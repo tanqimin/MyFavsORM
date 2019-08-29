@@ -6,10 +6,9 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework.example</artifactId>
-  <version>0.0.1</version>
+  <version>${reversion}</version>
 
   <properties>
-    <myfavs-orm.version>0.2.3.RELEASE</myfavs-orm.version>
     <druid.version>1.1.18</druid.version>
     <mysql.version>5.1.48</mysql.version>
     <lombok.version>1.18.8</lombok.version>
@@ -53,7 +52,13 @@
     <dependency>
       <groupId>work.myfavs</groupId>
       <artifactId>framework.orm</artifactId>
-      <version>${myfavs-orm.version}</version>
+      <version>${reversion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>work.myfavs</groupId>
+      <artifactId>framework.orm-generator</artifactId>
+      <version>${reversion}</version>
     </dependency>
   </dependencies>
 </project>

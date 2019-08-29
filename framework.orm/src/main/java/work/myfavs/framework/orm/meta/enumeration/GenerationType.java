@@ -1,6 +1,8 @@
 package work.myfavs.framework.orm.meta.enumeration;
 
-public enum  GenerationType {
+import work.myfavs.framework.orm.util.exception.DBException;
+
+public enum GenerationType {
   /**
    * UUID，值由系统字段生成
    */
@@ -17,4 +19,20 @@ public enum  GenerationType {
    * 自然主键，值由用户自定义
    */
   ASSIGNED;
+
+  public String getName() {
+
+    switch (this) {
+      case UUID:
+        return "GenerationType.UUID";
+      case SNOW_FLAKE:
+        return "GenerationType.SNOW_FLAKE";
+      case IDENTITY:
+        return "GenerationType.IDENTITY";
+      case ASSIGNED:
+        return "GenerationType.ASSIGNED";
+      default:
+        throw new DBException("Unknow primary key generation type");
+    }
+  }
 }

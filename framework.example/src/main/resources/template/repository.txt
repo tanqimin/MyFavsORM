@@ -1,0 +1,25 @@
+package ${repositoryPackage};
+
+import ${repositoriesPackage}.BaseRepository;
+import ${entitiesPackage}.${class};
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import work.myfavs.framework.orm.DBTemplate;
+
+/**
+ * ${class} Repository
+ */
+@Repository
+public class ${class}Repository extends BaseRepository<${class}> {
+
+  /**
+   * 构造方法
+   *
+   * @param dbTemplate DBTemplate
+   */
+  @Autowired
+  public ${class}Repository(DBTemplate dbTemplate) {
+
+    super(dbTemplate);
+  }
+}

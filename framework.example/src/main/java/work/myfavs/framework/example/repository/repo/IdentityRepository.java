@@ -6,8 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import work.myfavs.framework.orm.DBTemplate;
 
+/**
+ * Identity Repository
+ */
 @Repository
 public class IdentityRepository extends BaseRepository<Identity> {
+
   /**
    * 构造方法
    *

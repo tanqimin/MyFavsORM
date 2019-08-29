@@ -1,7 +1,7 @@
 debug: true
 logging:
   level:
-    ROOT: info
+    ROOT: debug
 spring:
   datasource:
     primary:
@@ -11,7 +11,7 @@ spring:
       username: root
       password: root
     druid:
-      default-auto-commit: true
+      default-auto-commit: false
 #      url: jdbc:mysql://192.168.8.34:13307/sstest?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true&cachePrepStmts=true&prepStmtCacheSize=250&prepStmtCacheSqlLimit=2048&useServerPrepStmts=true&useLocalSessionState=true&rewriteBatchedStatements=true&cacheResultSetMetadata=true&cacheServerConfiguration=true&elideSetAutoCommits=true&maintainTimeStats=false
 #      username: root
 #      password: 9527

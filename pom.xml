@@ -6,7 +6,12 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework</artifactId>
-  <version>0.1.1.RELEASE</version>
+  <version>${reversion}</version>
+
+  <properties>
+    <reversion>0.2.4.RELEASE</reversion>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -21,11 +26,10 @@
   </build>
   <packaging>pom</packaging>
 
-  <properties>
-  </properties>
-
   <modules>
     <module>framework.orm</module>
+    <module>framework.orm.generator</module>
+    <module>framework.orm.spring-boot-starter</module>
     <module>framework.example</module>
   </modules>
 </project>

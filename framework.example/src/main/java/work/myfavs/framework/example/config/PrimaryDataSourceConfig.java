@@ -4,11 +4,13 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import java.math.BigDecimal;
 import java.util.Date;
+import javax.sql.DataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.repository.handler.impls.*;
@@ -16,12 +18,14 @@ import work.myfavs.framework.orm.repository.handler.impls.*;
 @Configuration
 public class PrimaryDataSourceConfig {
 
-  @Bean(name = "primaryDataSource", destroyMethod = "close")
+  @Bean(name = "primaryDataSource")
   @Primary
   @ConfigurationProperties("spring.datasource.primary")
-  public DruidDataSource primaryDataSource() {
+  public DataSource primaryDataSource() {
 
-    return DruidDataSourceBuilder.create().build();
+    DruidDataSource datasource = DruidDataSourceBuilder.create().build();
+    datasource.setDefaultAutoCommit(false);
+    return datasource;
   }
 
   @Bean(name = "primaryTransactionManager")

@@ -5,6 +5,7 @@ import work.myfavs.framework.orm.generator.CodeGenerator;
 import work.myfavs.framework.orm.generator.GeneratorConfig;
 import work.myfavs.framework.orm.generator.meta.TypeDefinition;
 import work.myfavs.framework.orm.meta.DbType;
+import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 public class Gen {
 
@@ -25,6 +26,7 @@ public class Gen {
 
     config.setPrefix("tb_");
 
+    config.setGenerationType(GenerationType.SNOW_FLAKE);
     config.setGenEntities(true);                                          //是否生成实体
     config.setCoverEntitiesIfExists(false);                                //实体存在时是否覆盖？
     config.setEntitiesPackage("work.myfavs.framework.example.domain.entity");           //实体Package名称

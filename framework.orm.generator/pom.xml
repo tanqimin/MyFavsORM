@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <groupId>work.myfavs</groupId>
+  <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>framework.orm</artifactId>
+  <groupId>work.myfavs</groupId>
+  <artifactId>framework.orm-generator</artifactId>
   <version>${reversion}</version>
   <packaging>jar</packaging>
-  <modelVersion>4.0.0</modelVersion>
 
   <!--私服仓库-->
   <distributionManagement>
@@ -26,7 +26,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
-    <spring-jdbc.version>5.1.8.RELEASE</spring-jdbc.version>
     <lombok.version>1.18.8</lombok.version>
     <slf4j.version>1.7.26</slf4j.version>
     <beetl.version>3.0.10.RELEASE</beetl.version>
@@ -34,19 +33,18 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>work.myfavs</groupId>
+      <artifactId>framework.orm</artifactId>
+      <version>${reversion}</version>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>${lombok.version}</version>
       <scope>provided</scope>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jdbc</artifactId>
-      <version>${spring-jdbc.version}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
@@ -70,9 +68,7 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
