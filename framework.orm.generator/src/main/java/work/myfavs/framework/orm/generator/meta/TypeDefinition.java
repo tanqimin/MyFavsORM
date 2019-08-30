@@ -35,15 +35,12 @@ public class TypeDefinition {
     this(name, null);
   }
 
-  public TypeDefinition(@NonNull String name,
-                        String defValue) {
+  public TypeDefinition(@NonNull String name, String defValue) {
 
     this(name, name, defValue);
   }
 
-  public TypeDefinition(@NonNull String name,
-                        String valueType,
-                        String defValue) {
+  public TypeDefinition(@NonNull String name, String valueType, String defValue) {
 
     this.name = name;
     this.valueType = valueType;

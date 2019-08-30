@@ -1,6 +1,7 @@
 package work.myfavs.framework.orm.util.exception;
 
-public class NotImplementedException extends RuntimeException {
+public class NotImplementedException
+    extends RuntimeException {
 
   public NotImplementedException() {
 

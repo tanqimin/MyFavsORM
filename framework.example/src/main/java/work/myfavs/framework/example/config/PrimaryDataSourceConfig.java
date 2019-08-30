@@ -10,10 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.repository.handler.impls.*;
+import work.myfavs.framework.orm.meta.handler.impls.*;
 
 @Configuration
 public class PrimaryDataSourceConfig {
@@ -50,9 +49,7 @@ public class PrimaryDataSourceConfig {
                      .setBatchSize(200)
                      .setFetchSize(100)
 //                     .setMaxPageSize(100)
-                     .setQueryTimeout(120)
-                     .setDataCenterId(1)
-                     .setWorkerId(1);
+                     .setQueryTimeout(120);
   }
 
 }

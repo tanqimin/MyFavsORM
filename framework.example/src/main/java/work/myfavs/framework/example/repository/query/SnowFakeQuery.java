@@ -22,6 +22,7 @@ public class SnowFakeQuery
   }
 
   public Snowfake get() {
+
     return super.get(Snowfake.class, "SELECT * FROM tb_snowfake");
   }
 

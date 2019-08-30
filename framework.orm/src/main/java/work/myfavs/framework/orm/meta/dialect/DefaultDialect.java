@@ -96,7 +96,7 @@ public abstract class DefaultDialect
 
     classMeta = Metadata.get(clazz);
     tableName = classMeta.getTableName();
-    primaryKey = classMeta.getPrimaryKey();
+    primaryKey = classMeta.checkPrimaryKey();
     updateAttributes = classMeta.getUpdateAttributes();
 
     insertSql = new Sql(StringUtil.format("INSERT INTO {} (", tableName));
@@ -130,7 +130,7 @@ public abstract class DefaultDialect
 
     classMeta = Metadata.get(clazz);
     tableName = classMeta.getTableName();
-    primaryKey = classMeta.getPrimaryKey();
+    primaryKey = classMeta.checkPrimaryKey();
     updateAttributes = classMeta.getUpdateAttributes();
 
     sql = Sql.Update(tableName).append(" SET");

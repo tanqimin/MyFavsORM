@@ -9,9 +9,7 @@ import java.lang.annotation.RetentionPolicy;
  * Created by tanqimin on 2015/10/28.
  */
 @java.lang.annotation.Inherited
-@java.lang.annotation.Target({
-    ElementType.FIELD
-})
+@java.lang.annotation.Target({ElementType.FIELD})
 @java.lang.annotation.Retention(RetentionPolicy.RUNTIME)
 @java.lang.annotation.Documented
 public @interface PrimaryKey {

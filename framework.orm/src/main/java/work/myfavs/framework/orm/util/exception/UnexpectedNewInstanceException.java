@@ -1,6 +1,7 @@
 package work.myfavs.framework.orm.util.exception;
 
-public class UnexpectedNewInstanceException extends RuntimeException {
+public class UnexpectedNewInstanceException
+    extends RuntimeException {
 
   public UnexpectedNewInstanceException() {
 

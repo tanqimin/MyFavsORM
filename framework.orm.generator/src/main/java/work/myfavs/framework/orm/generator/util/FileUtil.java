@@ -18,9 +18,7 @@ public class FileUtil {
    * @param content  文件内容
    * @param oper     操作类型，0：如果文件存在，则跳过，1：如果文件存在，则覆盖；
    */
-  public static void TextToFile(final String fileName,
-                                final String content,
-                                int oper)
+  public static void TextToFile(final String fileName, final String content, int oper)
       throws IOException {
 
     Path filePath = Paths.get(fileName);

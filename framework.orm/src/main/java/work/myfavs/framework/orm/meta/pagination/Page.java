@@ -48,8 +48,7 @@ public class Page<TModel>
    *
    * @return 分页对象
    */
-  public static <TModel> Page<TModel> createInstance(List<TModel> data, int currentPage, int pageSize, long totalPages,
-                                                     long totalRecords) {
+  public static <TModel> Page<TModel> createInstance(List<TModel> data, int currentPage, int pageSize, long totalPages, long totalRecords) {
 
     Page<TModel> instance = new Page<>();
     instance.setData(data);

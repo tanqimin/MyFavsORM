@@ -179,8 +179,9 @@ public class StringUtil {
     return new String(chars);
   }
 
-  public static boolean startWith(@NonNull String str, @NonNull String prefix){
+  public static boolean startWith(@NonNull String str, @NonNull String prefix) {
 
     return str.toLowerCase().startsWith(prefix.toLowerCase());
   }
+
 }

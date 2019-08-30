@@ -253,9 +253,11 @@ public class ReflectUtil {
 
   /**
    * 返回指定类得所有Field，包括所有父级Field，直至父级为rootClass为止
-   * @param clazz the class
+   *
+   * @param clazz       the class
    * @param classFilter 类筛选器
    * @param fieldFilter 筛选条件，如果结果不为'null'值，则返回该字段
+   *
    * @return
    */
   public static List<Field> fieldsOf(Class<?> clazz, Function<Class<?>, Boolean> classFilter, Function<Field, Boolean> fieldFilter) {

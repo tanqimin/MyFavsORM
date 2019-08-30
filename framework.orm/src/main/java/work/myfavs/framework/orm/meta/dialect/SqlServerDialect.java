@@ -37,7 +37,7 @@ public class SqlServerDialect
     String  orderBys = null;
     Matcher om       = orderPattern.matcher(sql);
     if (om.find()) {
-      orderBys = sql.substring(om.end(), sql.length());
+      orderBys = sql.substring(om.end());
       sql = sql.substring(0, om.start());
     }
 

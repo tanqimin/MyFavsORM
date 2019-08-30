@@ -46,7 +46,7 @@ public class TestPKService {
     snowfake.setConfig("");
 
     uuidRepository.create(uuid);
-//    throwException();
+    throwException();
     snowfakeRepository.create(snowfake);
   }
 

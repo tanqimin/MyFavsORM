@@ -2,9 +2,9 @@ package ${repositoriesPackage};
 
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.repository.Repository;
-import work.myfavs.framework.orm.repository.monitor.SqlAnalysis;
-import work.myfavs.framework.orm.repository.monitor.SqlExecutedEvent;
-import work.myfavs.framework.orm.repository.monitor.SqlExecutingEvent;
+import work.myfavs.framework.orm.monitor.SqlAnalysis;
+import work.myfavs.framework.orm.monitor.SqlExecutedEvent;
+import work.myfavs.framework.orm.monitor.SqlExecutingEvent;
 
 public class BaseRepository<TModel> extends Repository<TModel> {
   /**

@@ -10,6 +10,8 @@ import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.ReflectUtil;
+import work.myfavs.framework.orm.util.StringUtil;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
  * 类元数据
@@ -71,5 +73,17 @@ public class ClassMeta {
     return classMeta;
   }
 
+  /**
+   * 检查主键，如果不为 null，则返回主键
+   *
+   * @return 主键
+   */
+  public AttributeMeta checkPrimaryKey() {
+
+    if (primaryKey == null) {
+      throw new DBException(StringUtil.format("The view class [{}] could not contain primary key", getClassName()));
+    }
+    return primaryKey;
+  }
 
 }
