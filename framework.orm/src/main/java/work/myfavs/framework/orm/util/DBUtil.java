@@ -4,7 +4,6 @@ import java.sql.*;
 import java.util.Iterator;
 import java.util.List;
 import javax.sql.DataSource;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.exception.DBException;
@@ -26,11 +25,7 @@ public class DBUtil {
   public static Connection createConnection(DataSource dataSource)
       throws SQLException {
 
-    Connection connection = DataSourceUtils.getConnection(dataSource);
-    if (connection.getAutoCommit()) {
-      connection.setAutoCommit(false);
-    }
-    return connection;
+    return dataSource.getConnection();
   }
 
   /**

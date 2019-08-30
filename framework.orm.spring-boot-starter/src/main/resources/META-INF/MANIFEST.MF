@@ -1,0 +1,2 @@
+Library-Name: myfavs.orm-spring-starter
+Library-Description: Easy database query library

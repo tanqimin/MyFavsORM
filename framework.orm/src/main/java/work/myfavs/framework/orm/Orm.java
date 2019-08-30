@@ -122,7 +122,7 @@ public class Orm
     java.sql.Connection connection = jdbcConnectionHolder.get();
     if (connection == null) {
       try {
-        connection = this.getDataSource().getConnection();
+        connection = DBUtil.createConnection(dataSource);
       } catch (SQLException e) {
         throw new DBException("Could not get datasource, error message: ", e);
       }
