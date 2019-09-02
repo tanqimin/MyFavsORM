@@ -1,8 +1,32 @@
 [![GitHub release](https://img.shields.io/github/stars/tanqimin/myfavs.framework?style=flat-square)](https://github.com/tanqimin/myfavs.framework)
 # MyFavs ORM
-##### A simple ORM Framework base on Spring Framework
+##### A light-weight ORM Framework
 如果您厌倦了MyBatis复杂的 XML 语法，并且擅长 SQL 的编写，可以试试 MyFavs ORM。
-## Framework configuration
+## Quick Start
+```java
+public class MyDao {
+
+  private static Orm orm;
+
+  static {
+    orm = Orm.build(getDataSource());
+  }
+  
+  public List<Record> findRecord() {
+    try (Database db = orm.open()) {
+      Sql sql = new Sql("SELECT * FROM tb_snowfake");
+      return db.find(sql);
+    }
+  }
+
+
+  private static DataSource getDataSource() {
+    // 获取数据源
+    // ...
+  }
+}
+```
+
 ```java
 @Configuration
 public class DataSourceConfig {

@@ -8,7 +8,7 @@ import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 public class DBTemplate
     extends Orm {
 
-  public DBTemplate() {
+  protected DBTemplate() {
 
   }
 
@@ -36,7 +36,7 @@ public class DBTemplate
   }
 
   @Override
-  public Connection createConnection() {
+  public Connection getCurrentConnection() {
 
     return DataSourceUtils.getConnection(this.getDataSource());
   }
@@ -44,7 +44,7 @@ public class DBTemplate
   @Override
   public void release() {
 
-    DataSourceUtils.releaseConnection(createConnection(), getDataSource());
+    DataSourceUtils.releaseConnection(getCurrentConnection(), getDataSource());
   }
 
   @Override
@@ -124,6 +124,13 @@ public class DBTemplate
   public DBTemplate setMaxPageSize(int maxPageSize) {
 
     super.setMaxPageSize(maxPageSize);
+    return this;
+  }
+
+  @Override
+  public Orm setDefaultIsolation(int defaultIsolation) {
+
+    super.setDefaultIsolation(defaultIsolation);
     return this;
   }
 

@@ -1,9 +1,8 @@
 package work.myfavs.framework.orm;
 
 
-import java.sql.ResultSet;
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.meta.DbType;
@@ -11,6 +10,7 @@ import work.myfavs.framework.orm.meta.dialect.DialectFactory;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
+import work.myfavs.framework.orm.transaction.TransactionDeep;
 import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
@@ -19,28 +19,30 @@ import work.myfavs.framework.orm.util.exception.DBException;
 public class Orm
     implements Cloneable, AutoCloseable {
 
-  private final ThreadLocal<Database>            connectionHolder      = new ThreadLocal<>();
-  private final ThreadLocal<java.sql.Connection> jdbcConnectionHolder  = new ThreadLocal<>();
-  private final ThreadLocal<Integer>             transactionDeepHolder = new ThreadLocal<>();
+  private final ThreadLocal<Database>        databaseHolder        = new ThreadLocal<>();
+  private final ThreadLocal<Connection>      connectionHolder      = new ThreadLocal<>();     //保证当前线程获取同一个链接
+  private final ThreadLocal<TransactionDeep> transactionDeepHolder = new ThreadLocal<>();     //记录当前事务深度
 
   //数据源
   protected DataSource dataSource;
   //数据库方言
   protected IDialect   dialect;
   //数据库类型
-  protected String     dbType       = DbType.MYSQL;
+  protected String     dbType           = DbType.MYSQL;
   //一次批量插入数据的数量
-  protected int        batchSize    = 200;
+  protected int        batchSize        = 200;
   //查询每次抓取数据的数量
-  protected int        fetchSize    = 1000;
+  protected int        fetchSize        = 1000;
   //查询超时时间，单位：秒
-  protected int        queryTimeout = 60;
+  protected int        queryTimeout     = 60;
   //是否显示SQL
-  protected boolean    showSql      = false;
+  protected boolean    showSql          = false;
   //是否显示查询结果
-  protected boolean    showResult   = false;
+  protected boolean    showResult       = false;
   //每页最大记录数
-  protected int        maxPageSize  = -1;
+  protected int        maxPageSize      = -1;
+  //默认事务级别
+  protected int        defaultIsolation = Connection.TRANSACTION_READ_COMMITTED;
 
   @Override
   public void close() {
@@ -98,17 +100,66 @@ public class Orm
     return this;
   }
 
+  /**
+   * 创建 Database 对象
+   *
+   * @return Database
+   */
   public Database open() {
 
-    Database database = connectionHolder.get();
+    Database        database               = databaseHolder.get();
+    TransactionDeep transactionDeep;
+    int             currentTransactionDeep = 1;
+
     if (database == null) {
       database = new Database(this);
-      connectionHolder.set(database);
-      transactionDeepHolder.set(1);
+      databaseHolder.set(database);
+      transactionDeep = new TransactionDeep();
     } else {
-      transactionDeepHolder.set(transactionDeepHolder.get() + 1);
+      transactionDeep = transactionDeepHolder.get();
+      currentTransactionDeep = transactionDeep.getCurrentTransactionDeep() + 1;
     }
+    transactionDeep.log(currentTransactionDeep, this.defaultIsolation);
+    transactionDeepHolder.set(transactionDeep);
 
+    return database;
+  }
+
+  /**
+   * 创建 Database 对象，并开启事务
+   *
+   * @return Database
+   */
+  public Database beginTransaction() {
+
+    Database database = open();
+    try {
+      database.getConnection().setAutoCommit(false);
+    } catch (SQLException e) {
+      throw new DBException("Could not start the transaction, error message: ", e);
+    }
+    return database;
+  }
+
+  /**
+   * 创建 Database 对象，并开启事务
+   *
+   * @param transactionIsolation 事务隔离级别
+   *
+   * @return Database
+   */
+  public Database beginTransaction(int transactionIsolation) {
+
+    Database database = open();
+    try {
+      final TransactionDeep transactionDeep        = transactionDeepHolder.get();
+      final int             currentTransactionDeep = transactionDeep.getCurrentTransactionDeep();
+      transactionDeep.log(currentTransactionDeep, transactionIsolation);
+      database.getConnection().setTransactionIsolation(transactionIsolation);
+      database.getConnection().setAutoCommit(false);
+    } catch (SQLException e) {
+      throw new DBException("Could not start the transaction, error message: ", e);
+    }
     return database;
   }
 
@@ -117,45 +168,19 @@ public class Orm
    *
    * @return Connection
    */
-  public java.sql.Connection createConnection() {
+  public Connection getCurrentConnection() {
 
-    java.sql.Connection connection = jdbcConnectionHolder.get();
+    Connection connection = connectionHolder.get();
     if (connection == null) {
       try {
         connection = DBUtil.createConnection(dataSource);
       } catch (SQLException e) {
         throw new DBException("Could not get datasource, error message: ", e);
       }
-      jdbcConnectionHolder.set(connection);
+      connectionHolder.set(connection);
     }
 
     return connection;
-  }
-
-  /**
-   * 关闭 ResultSet、Statement 并且释放数据库连接
-   *
-   * @param connection Connection
-   * @param statement  Statement
-   * @param resultSet  ResultSet
-   */
-  public void release(java.sql.Connection connection, Statement statement, ResultSet resultSet) {
-
-    DBUtil.close(resultSet);
-    DBUtil.close(statement);
-    this.release();
-  }
-
-  /**
-   * 关闭 Statement 并且释放数据库连接
-   *
-   * @param connection Connection
-   * @param statement  Statement
-   */
-  public void release(java.sql.Connection connection, Statement statement) {
-
-    DBUtil.close(statement);
-    this.release();
   }
 
   /**
@@ -163,14 +188,27 @@ public class Orm
    */
   public void release() {
 
-    if (transactionDeepHolder.get() == 1) {
-      java.sql.Connection connection = jdbcConnectionHolder.get();
+    Connection            connection      = connectionHolder.get();
+    final TransactionDeep transactionDeep = transactionDeepHolder.get();
+
+    if (transactionDeep.getCurrentTransactionDeep() == 1) {
       DBUtil.close(connection);
-      jdbcConnectionHolder.remove();
       connectionHolder.remove();
+      databaseHolder.remove();
       transactionDeepHolder.remove();
     } else {
-      transactionDeepHolder.set(transactionDeepHolder.get() - 1);
+      final int currentTransactionDeep = transactionDeep.getCurrentTransactionDeep() - 1;
+      transactionDeep.setCurrentTransactionDeep(currentTransactionDeep);
+      this.setTransactionIsolation(connection, transactionDeep.getIsolation(currentTransactionDeep));
+    }
+  }
+
+  private void setTransactionIsolation(Connection conn, int isolation) {
+
+    try {
+      conn.setTransactionIsolation(isolation);
+    } catch (SQLException e) {
+      throw new DBException("Could not set the transaction isolation, error message: ", e);
     }
   }
 
@@ -369,11 +407,57 @@ public class Orm
     return this;
   }
 
+  /**
+   * 获取默认事务隔离级别
+   *
+   * @return int
+   */
+  public int getDefaultIsolation() {
+
+    return this.defaultIsolation;
+  }
+
+  /**
+   * 设置默认事务隔离级别
+   *
+   * @param defaultIsolation 事务隔离级别
+   *
+   * @return Orm
+   */
+  public Orm setDefaultIsolation(int defaultIsolation) {
+
+    this.defaultIsolation = defaultIsolation;
+    return this;
+  }
+
+  /**
+   * 改变当前事务隔离级别
+   *
+   * @param transactionIsolation 事务隔离级别
+   */
+  public void changeIsolation(int transactionIsolation) {
+
+    setTransactionIsolation(getCurrentConnection(), transactionIsolation);
+  }
+
+  /**
+   * 重置当前事务深度的默认事务隔离级别
+   */
+  public void resetIsolation() {
+
+    final TransactionDeep transactionDeep = transactionDeepHolder.get();
+    if (transactionDeep != null) {
+      final int currentTransactionDeep = transactionDeep.getCurrentTransactionDeep();
+      setTransactionIsolation(getCurrentConnection(), transactionDeep.getIsolation(currentTransactionDeep));
+    }
+  }
+
   public void commit() {
 
-    final java.sql.Connection connection = createConnection();
+    final Connection connection = getCurrentConnection();
     try {
-      if (transactionDeepHolder.get() == 1) {
+      final TransactionDeep transactionDeep = transactionDeepHolder.get();
+      if (transactionDeep.getCurrentTransactionDeep() == 1) {
         if (!connection.isReadOnly() && !connection.getAutoCommit()) {
           connection.commit();
         }
@@ -386,9 +470,10 @@ public class Orm
 
   public void rollback() {
 
-    final java.sql.Connection connection = createConnection();
+    final Connection connection = getCurrentConnection();
     try {
-      if (transactionDeepHolder.get() == 1) {
+      final TransactionDeep transactionDeep = transactionDeepHolder.get();
+      if (transactionDeep.getCurrentTransactionDeep() == 1) {
         if (!connection.isReadOnly() && !connection.getAutoCommit()) {
           connection.rollback();
         }

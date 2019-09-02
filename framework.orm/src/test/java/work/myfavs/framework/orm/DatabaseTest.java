@@ -3,6 +3,7 @@ package work.myfavs.framework.orm;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
 import javax.sql.DataSource;
@@ -44,6 +45,29 @@ public class DatabaseTest {
       List<Snowfake> snowfakes = database.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
       Assert.assertNotNull(snowfakes);
       Assert.assertTrue(snowfakes.size() > 0);
+    }
+  }
+
+  @Test
+  public void testTransaction() {
+
+    try (Database db1 = this.orm.beginTransaction()) {
+      List<Snowfake> s1 = db1.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
+      try (Database db2 = this.orm.beginTransaction(Connection.TRANSACTION_READ_UNCOMMITTED)) {
+        List<Snowfake> s2 = db2.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
+        try (Database db3 = this.orm.beginTransaction(Connection.TRANSACTION_SERIALIZABLE)) {
+          Snowfake s3 = new Snowfake();
+          s3.setCreated(new Date());
+          s3.setName("s3");
+          s3.setDisable(false);
+          s3.setPrice(new BigDecimal(100));
+          s3.setType(TypeEnum.DRINK);
+          db3.create(Snowfake.class, s3);
+          db3.commit();
+        }
+      }
+      List<Snowfake> s4 = db1.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
+      db1.commit();
     }
   }
 
