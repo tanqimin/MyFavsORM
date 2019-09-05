@@ -28,11 +28,11 @@ public class Gen {
 
     config.setGenerationType(GenerationType.SNOW_FLAKE);
     config.setGenEntities(true);                                          //是否生成实体
-    config.setCoverEntitiesIfExists(false);                                //实体存在时是否覆盖？
+    config.setCoverEntitiesIfExists(true);                                //实体存在时是否覆盖？
     config.setEntitiesPackage("work.myfavs.framework.example.domain.entity");           //实体Package名称
 
     config.setGenRepositories(true);                                      //是否生成Repository
-    config.setCoverRepositoriesIfExists(true);                           //Repository存在时是否覆盖？
+    config.setCoverRepositoriesIfExists(false);                           //Repository存在时是否覆盖？
     config.setRepositoriesPackage("work.myfavs.framework.example.repository");          //Repository Package名称
 
     //注册生成器类型

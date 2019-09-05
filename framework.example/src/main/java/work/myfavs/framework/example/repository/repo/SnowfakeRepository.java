@@ -5,7 +5,6 @@ import work.myfavs.framework.example.domain.entity.Snowfake;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import work.myfavs.framework.orm.DBTemplate;
-import work.myfavs.framework.orm.Orm;
 
 /**
  * Snowfake Repository

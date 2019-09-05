@@ -15,13 +15,25 @@ import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 @Data
-@Table(value = "${table}", strategy = ${generationType})
+@Table(value = ${class}.META.TABLE, strategy = ${generationType})
 public class ${class} implements Serializable {
+
+    public enum META {
+      ;
+      public static final String TABLE = "${table}";
+
+      public interface COLUMNS {
+<% for(col in columns){ %>
+        String ${col.fieldName} = "${col.column}";
+<% } %>
+      }
+    }
+
 <% for(col in columns){ %>
     /**
      * ${col.comment}
      */
-    @Column(value = "${col.column}")
+    @Column(value = ${class}.META.COLUMNS.${col.fieldName})
   <% if(col.primaryKey) { %>
     @PrimaryKey
     private ${col.typeDefinition.simpleName} ${col.fieldName} = null;
