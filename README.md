@@ -27,7 +27,18 @@ public class MyDao {
 }
 ```
 
-```java
+## 使用实体映射
+如果需要使用实体映射，需要在创建Orm对象的时候，对其进行配置
+```
+  Orm orm = Orm.build(getDataSource())
+                //设置使用的数据库类型
+                .setDbType(DbType.MYSQL)     
+                //注册实体属性类型解析器，可自定义扩展
+                .registerPropertyHandler(String.class, new StringPropertyHandler())
+                .registerPropertyHandler(BigDecimal.class, new BigDecimalPropertyHandler())
+                .registerPropertyHandler(Long.class, new LongPropertyHandler())
+                .registerPropertyHandler(Boolean.class, new BooleanPropertyHandler())
+                .registerPropertyHandler(LocalDateTime.class, new LocalDateTimePropertyHandler());
 @Configuration
 public class DataSourceConfig {
     @Bean

@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
@@ -13,6 +14,7 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.DialectFactory;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
+import work.myfavs.framework.orm.meta.pagination.IPageable;
 import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
 import work.myfavs.framework.orm.meta.schema.AttributeMeta;
@@ -555,9 +557,41 @@ public class Database
    *
    * @return 分页结果集
    */
-  public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public <TView> Page<TView> findPage(Class<TView> viewClass, @NonNull Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return findPage(viewClass, sql.getSql().toString(), sql.getParams(), enablePage, currentPage, pageSize);
+  }
+
+  /**
+   * 执行 SQL 语句，返回分页结果集
+   *
+   * @param viewClass 返回的数据类型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param pageable  可分页对象
+   * @param <TView>   结果类型泛型
+   *
+   * @return 分页结果集
+   */
+  public <TView> Page<TView> findPage(Class<TView> viewClass, String sql, List<Object> params, @NonNull IPageable pageable) {
+
+    return findPage(viewClass, sql, params, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
+  }
+
+  /**
+   * 执行 SQL 语句，返回分页结果集
+   *
+   * @param viewClass 返回的数据类型
+   * @param sql       SQL
+   * @param pageable  可分页对象
+   * @param <TView>   结果类型泛型
+   *
+   * @return 分页结果集
+   */
+  public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, @NonNull IPageable pageable) {
+
+    return findPage(viewClass, sql.getSql().toString(), sql.getParams(), pageable.getEnablePage(), pageable.getCurrentPage(),
+                    pageable.getPageSize());
   }
 
   /**
@@ -589,6 +623,33 @@ public class Database
   public Page<Record> findPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPage(Record.class, sql, enablePage, currentPage, pageSize);
+  }
+
+  /**
+   * 执行 SQL 语句，返回分页结果集
+   *
+   * @param sql      SQL语句
+   * @param params   参数
+   * @param pageable 可分页对象
+   *
+   * @return 分页结果集
+   */
+  public Page<Record> findPage(String sql, List<Object> params, @NonNull IPageable pageable) {
+
+    return this.findPage(Record.class, sql, params, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
+  }
+
+  /**
+   * 执行 SQL 语句，返回分页结果集
+   *
+   * @param sql      SQL
+   * @param pageable 可分页对象
+   *
+   * @return 分页结果集
+   */
+  public Page<Record> findPage(Sql sql, @NonNull IPageable pageable) {
+
+    return this.findPage(Record.class, sql, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
 
   /**
