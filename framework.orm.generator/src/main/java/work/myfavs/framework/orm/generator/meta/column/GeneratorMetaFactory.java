@@ -43,7 +43,7 @@ public abstract class GeneratorMetaFactory {
 
   private void handlePrefix() {
 
-    String prefix = generatorConfig.getPrefix();
+    String prefix = generatorConfig.getTablePrefix();
     if (prefix == null || prefix.length() == 0) {
       return;
     }

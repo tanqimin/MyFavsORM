@@ -8,6 +8,7 @@ import work.myfavs.framework.orm.DBTemplate;
 
 /**
  * Identity Repository
+ * PS: 此文件通过代码生成器生成
  */
 @Repository
 public class IdentityRepository extends BaseRepository<Identity> {

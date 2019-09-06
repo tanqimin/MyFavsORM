@@ -8,6 +8,7 @@ import work.myfavs.framework.orm.DBTemplate;
 
 /**
  * Snowfake Repository
+ * PS: 此文件通过代码生成器生成
  */
 @Repository
 public class SnowfakeRepository extends BaseRepository<Snowfake> {

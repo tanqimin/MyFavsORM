@@ -15,7 +15,6 @@ import work.myfavs.framework.example.repository.repo.UuidRepository;
 public class TestPKService {
 
   private final UuidRepository uuidRepository;
-
   private final SnowfakeRepository snowfakeRepository;
 
   @Autowired
@@ -44,7 +43,6 @@ public class TestPKService {
     snowfake.setPrice(new BigDecimal(199));
     snowfake.setType(TypeEnum.DRINK);
     snowfake.setConfig("");
-
     uuidRepository.create(uuid);
     throwException();
     snowfakeRepository.create(snowfake);

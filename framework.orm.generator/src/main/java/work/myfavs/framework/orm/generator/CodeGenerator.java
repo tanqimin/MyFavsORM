@@ -41,7 +41,7 @@ public class CodeGenerator {
    */
   public void genEntities() {
 
-    if (generatorConfig.isGenEntities()) {
+    if (generatorConfig.isGenEntity()) {
       for (TableDefinition tableDefinition : generatorMeta.getTableDefinitions()) {
         outputEntity(tableDefinition.getTableName(), tableDefinition.getColumns());
       }
@@ -57,10 +57,11 @@ public class CodeGenerator {
    */
   private void outputEntity(@NonNull String tableName, @NonNull List<ColumnDefinition> columns) {
 
-    String         entitiesPackage = generatorConfig.getEntitiesPackage();            //实体Package
-    String         prefix          = generatorConfig.getPrefix();                     //忽略数据表前缀
+    String         entitiesPackage = generatorConfig.getEntityPackage();            //实体Package
+    String         prefix          = generatorConfig.getTablePrefix();                     //忽略数据表前缀
     String         className       = GeneratorUtil.toClass(tableName, prefix);        //实体类名称
     GenerationType generationType  = generatorConfig.getGenerationType();
+    boolean        coverIfExist    = generatorConfig.isCoverEntityIfExists();
 
     Map<String, Object> params = new HashMap<>();                             //模板参数
 
@@ -71,9 +72,9 @@ public class CodeGenerator {
     params.put("generationType", generationType.getName());
     params.put("imports", generatorConfig.getImportList());                   //Import类列表
 
-    String render = generatorTemplate.render("/entities.txt", params);
+    String render = generatorTemplate.render("/entity.txt", params);
 
-    outputFile(getFilePath(entitiesPackage, className), render);
+    outputFile(getFilePath(entitiesPackage, className), render, coverIfExist);
   }
 
   /**
@@ -87,7 +88,7 @@ public class CodeGenerator {
   private String getFilePath(String packageName, String fileName) {
 
     StringBuilder res      = new StringBuilder();
-    String        rootPath = generatorConfig.getRootPath();
+    String        rootPath = generatorConfig.getTemplateDir();
     if (rootPath != null && rootPath.length() > 0) {
       res.append(rootPath);
       if (!rootPath.endsWith("/")) {
@@ -104,10 +105,10 @@ public class CodeGenerator {
    * @param filePath 文件路径
    * @param context  文件内容
    */
-  private void outputFile(String filePath, String context) {
+  private void outputFile(String filePath, String context, boolean isCover) {
 
     try {
-      int oper = generatorConfig.isCoverEntitiesIfExists()
+      int oper = isCover
           ? FileUtil.OVERWRITE
           : FileUtil.IGNORE;
       FileUtil.TextToFile(filePath, context, oper);
@@ -122,36 +123,39 @@ public class CodeGenerator {
    */
   public void genRepositories() {
 
-    if (!generatorConfig.isGenRepositories()) {
+    if (!generatorConfig.isGenRepository()) {
       return;
     }
-    String repositoriesPackage = this.generatorConfig.getRepositoriesPackage();
-    String entitiesPackage     = generatorConfig.getEntitiesPackage();
+    String  repositoriesPackage = this.generatorConfig.getRepositoryPackage();
+    String  entitiesPackage     = this.generatorConfig.getEntityPackage();
+    boolean coverIfExist        = this.generatorConfig.isCoverRepositoryIfExists();
 
     String              queryPackage      = repositoriesPackage.concat(".query");
     String              repositoryPackage = repositoriesPackage.concat(".repo");
     Map<String, Object> params            = new HashMap<>();
+    params.put("entitiesPackage", entitiesPackage);
     params.put("repositoriesPackage", repositoriesPackage);
     params.put("queryPackage", queryPackage);
     params.put("repositoryPackage", repositoryPackage);
 
     String render = generatorTemplate.render("/baseQuery.txt", params);
-    outputFile(getFilePath(repositoriesPackage, "BaseQuery"), render);
+    outputFile(getFilePath(repositoriesPackage, "BaseQuery"), render, coverIfExist);
 
     render = generatorTemplate.render("/baseRepository.txt", params);
-    outputFile(getFilePath(repositoriesPackage, "BaseRepository"), render);
+    outputFile(getFilePath(repositoriesPackage, "BaseRepository"), render, coverIfExist);
 
-    for (String entity : generatorMeta.getEntities()) {
-
-      params.put("entitiesPackage", entitiesPackage);
+    for (TableDefinition tableDefinition : generatorMeta.getTableDefinitions()) {
+      final String entity = tableDefinition.getClassName();
       params.put("class", entity);
+      params.put("columns", tableDefinition.getColumns());
 
       render = generatorTemplate.render("/query.txt", params);
-      outputFile(getFilePath(queryPackage, entity + "Query"), render);
+      outputFile(getFilePath(queryPackage, entity + "Query"), render, coverIfExist);
 
       render = generatorTemplate.render("/repository.txt", params);
-      outputFile(getFilePath(repositoryPackage, entity + "Repository"), render);
+      outputFile(getFilePath(repositoryPackage, entity + "Repository"), render, coverIfExist);
     }
+
   }
 
 }

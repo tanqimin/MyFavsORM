@@ -6,7 +6,15 @@ import work.myfavs.framework.orm.monitor.SqlAnalysis;
 import work.myfavs.framework.orm.monitor.SqlExecutedEvent;
 import work.myfavs.framework.orm.monitor.SqlExecutingEvent;
 
-public class BaseRepository<TModel> extends Repository<TModel> {
+/**
+ * Repository 基类
+ * PS: 此文件通过代码生成器生成
+ *
+ * @param <TModel> 实体类泛型
+ */
+public class BaseRepository<TModel>
+    extends Repository<TModel> {
+
   /**
    * 构造方法
    *
@@ -15,26 +23,6 @@ public class BaseRepository<TModel> extends Repository<TModel> {
   public BaseRepository(DBTemplate dbTemplate) {
 
     super(dbTemplate);
-  }
-
-  @Override
-  protected void afterQuery(SqlExecutedEvent context) {
-
-  }
-
-  @Override
-  protected void beforeQuery(SqlExecutingEvent context) {
-
-  }
-
-  @Override
-  protected void afterExecute(SqlExecutedEvent context) {
-
-  }
-
-  @Override
-  protected void beforeExecute(SqlExecutingEvent context) {
-
   }
 
 }

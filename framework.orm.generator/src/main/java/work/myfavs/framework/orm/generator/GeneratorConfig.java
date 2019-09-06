@@ -18,18 +18,17 @@ public class GeneratorConfig {
   private String jdbcUser;
   private String jdbcPwd;
 
-  private String rootPath = "";
+  private String templateDir = "";                                                      //模板路径
+  private String tablePrefix = "";                                                      //忽略的表前缀
 
-  private String prefix = "";
+  private boolean genEntity           = true;
+  private boolean coverEntityIfExists = true;
+  private String  entityPackage       = "";
 
-  private boolean genEntities           = true;
-  private boolean coverEntitiesIfExists = true;
-  private String  entitiesPackage       = "";
-
-  private boolean        genRepositories           = false;
-  private boolean        coverRepositoriesIfExists = false;
-  private String         repositoriesPackage       = "";
-  private GenerationType generationType            = GenerationType.SNOW_FLAKE;
+  private boolean        genRepository           = false;
+  private boolean        coverRepositoryIfExists = false;
+  private String         repositoryPackage       = "";
+  private GenerationType generationType          = GenerationType.SNOW_FLAKE;
 
   public Set<String> getImportList() {
 
