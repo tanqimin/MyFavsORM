@@ -462,6 +462,39 @@ public class Database
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
+   * @param viewClass 返回的数据类型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param pageable  分页对象
+   * @param <TView>   结果类型泛型
+   *
+   * @return 简单分页结果集
+   */
+  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, String sql, List<Object> params, IPageable pageable) {
+
+    return this.findPageLite(viewClass, sql, params, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
+  }
+
+  /**
+   * 执行 SQL 语句，返回简单分页结果集
+   *
+   * @param viewClass 返回的数据类型
+   * @param sql       SQL
+   * @param pageable  分页对象
+   * @param <TView>   结果类型泛型
+   *
+   * @return 简单分页结果集
+   */
+  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, IPageable pageable) {
+
+    return this.findPageLite(viewClass, sql.getSql().toString(), sql.getParams(), pageable.getEnablePage(), pageable.getCurrentPage(),
+                             pageable.getPageSize());
+  }
+
+
+  /**
+   * 执行 SQL 语句，返回简单分页结果集
+   *
    * @param sql         SQL语句
    * @param params      参数
    * @param enablePage  是否启用分页
@@ -488,6 +521,33 @@ public class Database
   public PageLite<Record> findPageLite(Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPageLite(Record.class, sql, enablePage, currentPage, pageSize);
+  }
+
+  /**
+   * 执行 SQL 语句，返回简单分页结果集
+   *
+   * @param sql      SQL语句
+   * @param params   参数
+   * @param pageable 分页对象
+   *
+   * @return 简单分页结果集
+   */
+  public PageLite<Record> findPageLite(String sql, List<Object> params, IPageable pageable) {
+
+    return this.findPageLite(Record.class, sql, params, pageable);
+  }
+
+  /**
+   * 执行 SQL 语句，返回简单分页结果集
+   *
+   * @param sql      SQL
+   * @param pageable 分页对象
+   *
+   * @return 简单分页结果集
+   */
+  public PageLite<Record> findPageLite(Sql sql, IPageable pageable) {
+
+    return this.findPageLite(Record.class, sql, pageable);
   }
 
   /**

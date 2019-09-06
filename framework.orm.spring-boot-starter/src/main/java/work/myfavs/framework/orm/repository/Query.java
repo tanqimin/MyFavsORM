@@ -6,6 +6,7 @@ import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
+import work.myfavs.framework.orm.meta.pagination.IPageable;
 import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
 
@@ -249,6 +250,41 @@ public class Query
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
+   * @param viewClass 返回的数据类型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param pageable  分页对象
+   * @param <TView>   结果类型泛型
+   *
+   * @return 简单分页结果集
+   */
+  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, String sql, List<Object> params, IPageable pageable) {
+
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.findPageLite(viewClass, sql, params, pageable);
+    }
+  }
+
+  /**
+   * 执行 SQL 语句，返回简单分页结果集
+   *
+   * @param viewClass 返回的数据类型
+   * @param sql       SQL
+   * @param pageable  分页对象
+   * @param <TView>   结果类型泛型
+   *
+   * @return 简单分页结果集
+   */
+  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, IPageable pageable) {
+
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.findPageLite(viewClass, sql, pageable);
+    }
+  }
+
+  /**
+   * 执行 SQL 语句，返回简单分页结果集
+   *
    * @param viewClass   返回的数据类型
    * @param sql         SQL语句
    * @param params      参数
@@ -316,6 +352,33 @@ public class Query
   }
 
   /**
+   * 执行 SQL 语句，返回简单分页结果集
+   *
+   * @param sql      SQL语句
+   * @param params   参数
+   * @param pageable 分页对象
+   *
+   * @return 简单分页结果集
+   */
+  public PageLite<Record> findRecordPageLite(String sql, List<Object> params, IPageable pageable) {
+
+    return this.findPageLite(Record.class, sql, params, pageable);
+  }
+
+  /**
+   * 执行 SQL 语句，返回简单分页结果集
+   *
+   * @param sql      SQL
+   * @param pageable 分页对象
+   *
+   * @return 简单分页结果集
+   */
+  public PageLite<Record> findRecordPageLite(Sql sql, IPageable pageable) {
+
+    return this.findPageLite(Record.class, sql, pageable);
+  }
+
+  /**
    * 执行 SQL 语句，返回分页结果集
    *
    * @param viewClass   返回的数据类型
@@ -356,6 +419,41 @@ public class Query
   /**
    * 执行 SQL 语句，返回分页结果集
    *
+   * @param viewClass 返回的数据类型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param pageable  是否启用分页
+   * @param <TView>   结果类型泛型
+   *
+   * @return 分页结果集
+   */
+  public <TView> Page<TView> findPage(Class<TView> viewClass, String sql, List<Object> params, IPageable pageable) {
+
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.findPage(viewClass, sql, params, pageable);
+    }
+  }
+
+  /**
+   * 执行 SQL 语句，返回分页结果集
+   *
+   * @param viewClass 返回的数据类型
+   * @param sql       SQL
+   * @param pageable  是否启用分页
+   * @param <TView>   结果类型泛型
+   *
+   * @return 分页结果集
+   */
+  public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, IPageable pageable) {
+
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.findPage(viewClass, sql, pageable);
+    }
+  }
+
+  /**
+   * 执行 SQL 语句，返回分页结果集
+   *
    * @param sql         SQL语句
    * @param params      参数
    * @param enablePage  是否启用分页
@@ -383,5 +481,33 @@ public class Query
 
     return this.findPage(Record.class, sql, enablePage, currentPage, pageSize);
   }
+
+  /**
+   * 执行 SQL 语句，返回分页结果集
+   *
+   * @param sql      SQL语句
+   * @param params   参数
+   * @param pageable 分页对象
+   *
+   * @return 分页结果集
+   */
+  public Page<Record> findRecordPage(String sql, List<Object> params, IPageable pageable) {
+
+    return this.findPage(Record.class, sql, params, pageable);
+  }
+
+  /**
+   * 执行 SQL 语句，返回分页结果集
+   *
+   * @param sql      SQL
+   * @param pageable 分页对象
+   *
+   * @return 分页结果集
+   */
+  public Page<Record> findRecordPage(Sql sql, IPageable pageable) {
+
+    return this.findPage(Record.class, sql, pageable);
+  }
+
 
 }
