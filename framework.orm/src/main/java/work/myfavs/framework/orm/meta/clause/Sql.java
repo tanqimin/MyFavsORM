@@ -114,6 +114,16 @@ public class Sql
   }
 
   /**
+   * 创建 SELECT * 语句
+   *
+   * @return SQL
+   */
+  public static Sql SelectAll() {
+
+    return new Sql("SELECT *");
+  }
+
+  /**
    * 创建 SELECT {field}, {fields[1]}... 语句
    *
    * @param field  字段
@@ -130,6 +140,17 @@ public class Sql
       }
     }
     return sql;
+  }
+
+  /**
+   * 拼接 SELECT *
+   *
+   * @return SQL
+   */
+  public Sql selectAll() {
+
+    this.append(" ").append(SelectAll());
+    return this;
   }
 
   /**

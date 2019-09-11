@@ -1,11 +1,14 @@
 package work.myfavs.framework.orm;
 
 import java.io.Closeable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.meta.Record;
@@ -31,67 +34,49 @@ public class Database
     implements AutoCloseable, Closeable {
 
 
-  private Orm      orm;
+  private DBTemplate dbTemplate;
   //数据库方言
-  private IDialect dialect;
+  private IDialect   dialect;
   //SQL日志
-  private SqlLog   sqlLog;
+  private SqlLog     sqlLog;
 
-  public Database(Orm orm) {
+  private DataSource dataSource;
 
-    this.orm = orm;
-    this.dialect = DialectFactory.getInstance(getOrm().getDbType());
-    this.sqlLog = new SqlLog(getOrm().getShowSql(), getOrm().getShowResult());
+  private ConnectionFactory connectionFactory;
+
+  public Database(DBTemplate dbTemplate) {
+
+    this.dbTemplate = dbTemplate;
+    this.dataSource = this.dbTemplate.getDataSource();
+    this.connectionFactory = createConnectionFactoryInstance(this.dataSource);
+    this.dialect = DialectFactory.getInstance(this.dbTemplate.getDbType());
+    this.sqlLog = new SqlLog(this.dbTemplate.getShowSql(), this.dbTemplate.getShowResult());
   }
 
-  /**
-   * 修改当前事务深度的事务隔离级别
-   *
-   * @param transactionIsolation 事务隔离级别
-   */
-  public void changeIsolation(int transactionIsolation) {
+  private ConnectionFactory createConnectionFactoryInstance(DataSource dataSource) {
 
-    getOrm().changeIsolation(transactionIsolation);
+    final Constructor<? extends ConnectionFactory> constructor;
+    try {
+      constructor = this.dbTemplate.getConnectionFactoryClass().getConstructor(DataSource.class);
+      return constructor.newInstance(dataSource);
+    } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+      throw new DBException("Fail to create ConnectionFactory instance, error message:", e);
+    }
   }
 
-  /**
-   * 重置当前事务深度的默认事务隔离级别
-   */
-  public void resetIsolation() {
+  public Connection open() {
 
-    getOrm().resetIsolation();
+    log.debug("============================================open database");
+    return this.connectionFactory.openConnection();
   }
 
-  /**
-   * 提交当前事务深度的事务
-   */
-  public void commit() {
-
-    getOrm().commit();
-  }
-
-  /**
-   * 回滚当前事务深度的事务
-   */
-  public void rollback() {
-
-    getOrm().rollback();
-  }
 
   @Override
   public void close() {
 
-    getOrm().release();
-  }
-
-  /**
-   * 获取当前数据库链接
-   *
-   * @return Connection 数据库链接
-   */
-  public Connection getConnection() {
-
-    return getOrm().getCurrentConnection();
+    log.debug("============================================close database");
+    Connection connection = this.connectionFactory.getCurrentConnection();
+    this.connectionFactory.closeConnection(connection);
   }
 
   /**
@@ -116,11 +101,11 @@ public class Database
     try {
       getSqlLog().showSql(sql, params);
 
-      conn = getConnection();
+      conn = this.open();
       pstmt = params == null || params.size() == 0
           ? DBUtil.getPs(conn, sql)
           : DBUtil.getPs(conn, sql, params);
-      pstmt.setFetchSize(getOrm().getFetchSize());
+      pstmt.setFetchSize(this.dbTemplate.getFetchSize());
       rs = pstmt.executeQuery();
 
       result = DBConvert.toList(viewClass, rs);
@@ -131,6 +116,7 @@ public class Database
       throw new DBException(e);
     } finally {
       DBUtil.close(pstmt, rs);
+      this.close();
     }
   }
 
@@ -427,7 +413,7 @@ public class Database
 
     pagSize = pageSize;
     if (enablePage) {
-      long maxPageSize = getOrm().getMaxPageSize();
+      long maxPageSize = this.dbTemplate.getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
         throw new DBException(StringUtil.format("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize));
       }
@@ -575,7 +561,7 @@ public class Database
     pagSize = pageSize;
 
     if (enablePage) {
-      long maxPageSize = getOrm().getMaxPageSize();
+      long maxPageSize = this.dbTemplate.getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
         throw new DBException(StringUtil.format("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize));
       }
@@ -729,7 +715,7 @@ public class Database
     try {
       getSqlLog().showSql(sql, params);
 
-      conn = getConnection();
+      conn = this.open();
 
       pstmt = params != null && params.size() > 0
           ? DBUtil.getPs(conn, false, sql, params)
@@ -742,6 +728,7 @@ public class Database
       throw new DBException(ex);
     } finally {
       DBUtil.close(pstmt);
+      this.close();
     }
 
     return result;
@@ -835,7 +822,7 @@ public class Database
     try {
       getSqlLog().showSql(sql.getSql().toString(), sql.getParams());
 
-      conn = getConnection();
+      conn = this.open();
       pstmt = DBUtil.getPs(conn, autoGeneratedPK, sql);
       result = DBUtil.executeUpdate(pstmt);
 
@@ -851,6 +838,7 @@ public class Database
       throw new DBException(ex);
     } finally {
       DBUtil.close(pstmt, rs);
+      this.close();
     }
 
     return result;
@@ -936,8 +924,8 @@ public class Database
     try {
       getSqlLog().showBatchSql(sql.getSql().toString(), paramsList);
 
-      conn = getConnection();
-      pstmt = DBUtil.getPsForUpdate(conn, autoGeneratedPK, sql.getSql().toString(), paramsList, getOrm().getBatchSize());
+      conn = this.open();
+      pstmt = DBUtil.getPsForUpdate(conn, autoGeneratedPK, sql.getSql().toString(), paramsList, this.dbTemplate.getBatchSize());
 
       result = DBUtil.executeBatch(pstmt);
 
@@ -957,6 +945,7 @@ public class Database
       throw new DBException(e);
     } finally {
       DBUtil.close(pstmt, rs);
+      this.close();
     }
 
     return result;
@@ -1074,8 +1063,8 @@ public class Database
 
       getSqlLog().showBatchSql(sql.getSql().toString(), paramsList);
 
-      conn = getConnection();
-      pstmt = DBUtil.getPsForUpdate(conn, false, sql.getSql().toString(), paramsList, getOrm().getBatchSize());
+      conn = this.open();
+      pstmt = DBUtil.getPsForUpdate(conn, false, sql.getSql().toString(), paramsList, this.dbTemplate.getBatchSize());
 
       result = DBUtil.executeBatch(pstmt);
 
@@ -1084,6 +1073,7 @@ public class Database
       throw new DBException(e);
     } finally {
       DBUtil.close(pstmt);
+      this.close();
     }
 
     return result;
@@ -1210,11 +1200,6 @@ public class Database
   private SqlLog getSqlLog() {
 
     return this.sqlLog;
-  }
-
-  private Orm getOrm() {
-
-    return this.orm;
   }
 
 }

@@ -2,9 +2,6 @@ package work.myfavs.framework.example.repository;
 
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.repository.Query;
-import work.myfavs.framework.orm.monitor.SqlAnalysis;
-import work.myfavs.framework.orm.monitor.SqlExecutedEvent;
-import work.myfavs.framework.orm.monitor.SqlExecutingEvent;
 
 /**
  * Query 基类

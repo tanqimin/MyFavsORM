@@ -21,7 +21,7 @@ public class DatabaseTest {
   String user     = "root";
   String password = "root";
 
-  private Orm orm;
+  private DBTemplate DBTemplate;
 
   @Before
   public void setUp()
@@ -35,13 +35,13 @@ public class DatabaseTest {
     configuration.setAutoCommit(false);
     DataSource dataSource = new HikariDataSource(configuration);
 
-    this.orm = Orm.build(dataSource);
+    this.DBTemplate = DBTemplate.build(dataSource);
   }
 
   @Test
   public void find() {
 
-    try (Database database = this.orm.open()) {
+    try (Database database = this.DBTemplate.open()) {
       List<Snowfake> snowfakes = database.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
       Assert.assertNotNull(snowfakes);
       Assert.assertTrue(snowfakes.size() > 0);
@@ -51,11 +51,11 @@ public class DatabaseTest {
   @Test
   public void testTransaction() {
 
-    try (Database db1 = this.orm.beginTransaction()) {
+    try (Database db1 = this.DBTemplate.beginTransaction()) {
       List<Snowfake> s1 = db1.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
-      try (Database db2 = this.orm.beginTransaction(Connection.TRANSACTION_READ_UNCOMMITTED)) {
+      try (Database db2 = this.DBTemplate.beginTransaction(Connection.TRANSACTION_READ_UNCOMMITTED)) {
         List<Snowfake> s2 = db2.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
-        try (Database db3 = this.orm.beginTransaction(Connection.TRANSACTION_SERIALIZABLE)) {
+        try (Database db3 = this.DBTemplate.beginTransaction(Connection.TRANSACTION_SERIALIZABLE)) {
           Snowfake s3 = new Snowfake();
           s3.setCreated(new Date());
           s3.setName("s3");
@@ -63,11 +63,9 @@ public class DatabaseTest {
           s3.setPrice(new BigDecimal(100));
           s3.setType(TypeEnum.DRINK);
           db3.create(Snowfake.class, s3);
-          db3.commit();
         }
       }
       List<Snowfake> s4 = db1.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
-      db1.commit();
     }
   }
 
@@ -227,9 +225,8 @@ public class DatabaseTest {
     snowfake.setType(TypeEnum.DRINK);
     snowfake.setConfig("");
 
-    try (Database db = orm.open()) {
+    try (Database db = DBTemplate.open()) {
       db.create(Snowfake.class, snowfake);
-      db.commit();
     }
 
   }

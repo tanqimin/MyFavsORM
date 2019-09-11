@@ -21,4 +21,17 @@ public class SqlTest {
 
   }
 
+  @Test
+  public void selectAll() {
+
+    Sql sql1 = Sql.SelectAll()
+                 .from("TABLE");
+
+    Sql sql2 = new Sql();
+    sql2.append("SELECT * FROM TABLE T"
+                    + "LEFT JOIN TABLE2 T2 ON T.t2_id = T2.id"
+                    + "WHERE T.id = ?", 1);
+
+  }
+
 }

@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.SpringConnectionFactory;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.handler.impls.*;
 
@@ -38,6 +39,7 @@ public class PrimaryDataSourceConfig {
   public DBTemplate dbTemplate() {
 
     return DBTemplate.build(primaryDataSource())
+                     .setConnectionFactoryClass(SpringConnectionFactory.class)
                      .registerPropertyHandler(String.class, new StringPropertyHandler())
                      .registerPropertyHandler(BigDecimal.class, new BigDecimalPropertyHandler())
                      .registerPropertyHandler(Long.class, new LongPropertyHandler())

@@ -5,20 +5,20 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.util.List;
 import javax.sql.DataSource;
 import work.myfavs.framework.orm.Database;
-import work.myfavs.framework.orm.Orm;
+import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
 public class MyDao {
 
-  private static Orm orm;
+  private static DBTemplate DBTemplate;
 
   static {
-    orm = Orm.build(getDataSource());
+    DBTemplate = DBTemplate.build(getDataSource());
   }
 
   public List<Record> findRecord() {
-    try (Database db = orm.open()) {
+    try (Database db = DBTemplate.open()) {
       Sql sql = new Sql("SELECT * FROM tb_snowfake");
       return db.find(sql);
     }

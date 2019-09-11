@@ -2,13 +2,14 @@ package work.myfavs.framework.example.repository.query;
 
 import static work.myfavs.framework.example.domain.entity.Snowfake.META;
 
-import work.myfavs.framework.example.domain.entity.Snowfake;
-import work.myfavs.framework.example.repository.BaseQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import work.myfavs.framework.example.domain.entity.Snowfake;
+import work.myfavs.framework.example.repository.BaseQuery;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
+import work.myfavs.framework.orm.meta.pagination.Page;
 
 /**
  * Snowfake Query
@@ -41,4 +42,10 @@ public class SnowfakeQuery
     Sql sql = Sql.Select("*").from(META.TABLE).where(Cond.eq(META.COLUMNS.id, id));
     return super.get(Snowfake.class, sql);
   }
+
+  public Page<Snowfake> findPage() {
+
+    return super.findPage(Snowfake.class, Sql.Select("*").from(META.TABLE), true, 1, 1);
+  }
+
 }

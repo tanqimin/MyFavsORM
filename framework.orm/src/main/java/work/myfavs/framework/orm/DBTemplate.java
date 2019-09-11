@@ -3,6 +3,7 @@ package work.myfavs.framework.orm;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.function.Consumer;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.meta.DbType;
@@ -10,18 +11,12 @@ import work.myfavs.framework.orm.meta.dialect.DialectFactory;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
-import work.myfavs.framework.orm.transaction.TransactionDeep;
-import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 
 @Slf4j
-public class Orm
+public class DBTemplate
     implements Cloneable, AutoCloseable {
-
-  private final ThreadLocal<Database>        databaseHolder        = new ThreadLocal<>();
-  private final ThreadLocal<Connection>      connectionHolder      = new ThreadLocal<>();     //保证当前线程获取同一个链接
-  private final ThreadLocal<TransactionDeep> transactionDeepHolder = new ThreadLocal<>();     //记录当前事务深度
 
   //数据源
   protected DataSource dataSource;
@@ -44,23 +39,17 @@ public class Orm
   //默认事务级别
   protected int        defaultIsolation = Connection.TRANSACTION_READ_COMMITTED;
 
-  @Override
-  public void close() {
-
-  }
-
-  protected Orm() {
-
-  }
+  protected Class<? extends ConnectionFactory> connectionFactoryClass = null;
 
   /**
    * 构造方法
    *
    * @param dataSource DataSource
    */
-  protected Orm(DataSource dataSource) {
+  protected DBTemplate(DataSource dataSource) {
 
-    this.dataSource = dataSource;
+    this.setDataSource(dataSource);
+    this.setConnectionFactoryClass(ConnectionFactory.class);
   }
 
   /**
@@ -70,9 +59,9 @@ public class Orm
    *
    * @return DBTemplate 实例
    */
-  public static Orm build(DataSource dataSource) {
+  public static DBTemplate build(DataSource dataSource) {
 
-    return new Orm(dataSource);
+    return new DBTemplate(dataSource);
   }
 
   /**
@@ -83,7 +72,7 @@ public class Orm
    *
    * @return DBTemplate
    */
-  public Orm registerPropertyHandler(Class<?> clazz, PropertyHandler propertyHandler) {
+  public DBTemplate registerPropertyHandler(Class<?> clazz, PropertyHandler propertyHandler) {
 
     PropertyHandlerFactory.register(clazz, propertyHandler);
     return this;
@@ -94,7 +83,7 @@ public class Orm
    *
    * @return DBTemplate
    */
-  public Orm registerDefaultPropertyHandler() {
+  public DBTemplate registerDefaultPropertyHandler() {
 
     PropertyHandlerFactory.registerDefault();
     return this;
@@ -107,23 +96,25 @@ public class Orm
    */
   public Database open() {
 
-    Database        database               = databaseHolder.get();
-    TransactionDeep transactionDeep;
-    int             currentTransactionDeep = 1;
-
-    if (database == null) {
-      database = new Database(this);
-      databaseHolder.set(database);
-      transactionDeep = new TransactionDeep();
-    } else {
-      transactionDeep = transactionDeepHolder.get();
-      currentTransactionDeep = transactionDeep.getCurrentTransactionDeep() + 1;
-    }
-    transactionDeep.log(currentTransactionDeep, this.defaultIsolation);
-    transactionDeepHolder.set(transactionDeep);
+    Database database = new Database(this);
+    database.open();
 
     return database;
   }
+
+  private Database open(Consumer<Connection> consumer) {
+
+    Database database = new Database(this);
+    database.open();
+
+    return database;
+  }
+
+  @Override
+  public void close() {
+
+  }
+
 
   /**
    * 创建 Database 对象，并开启事务
@@ -132,13 +123,13 @@ public class Orm
    */
   public Database beginTransaction() {
 
-    Database database = open();
-    try {
-      database.getConnection().setAutoCommit(false);
-    } catch (SQLException e) {
-      throw new DBException("Could not start the transaction, error message: ", e);
-    }
-    return database;
+    return this.open(connection -> {
+      try {
+        connection.setAutoCommit(false);
+      } catch (SQLException e) {
+        throw new DBException("Could not start the transaction, error message: ", e);
+      }
+    });
   }
 
   /**
@@ -150,57 +141,14 @@ public class Orm
    */
   public Database beginTransaction(int transactionIsolation) {
 
-    Database database = open();
-    try {
-      final TransactionDeep transactionDeep        = transactionDeepHolder.get();
-      final int             currentTransactionDeep = transactionDeep.getCurrentTransactionDeep();
-      transactionDeep.log(currentTransactionDeep, transactionIsolation);
-      database.getConnection().setTransactionIsolation(transactionIsolation);
-      database.getConnection().setAutoCommit(false);
-    } catch (SQLException e) {
-      throw new DBException("Could not start the transaction, error message: ", e);
-    }
-    return database;
-  }
-
-  /**
-   * 获取数据库链接
-   *
-   * @return Connection
-   */
-  public Connection getCurrentConnection() {
-
-    Connection connection = connectionHolder.get();
-    if (connection == null) {
+    return this.open(connection -> {
       try {
-        connection = DBUtil.createConnection(dataSource);
+        connection.setAutoCommit(false);
+        connection.setTransactionIsolation(transactionIsolation);
       } catch (SQLException e) {
-        throw new DBException("Could not get datasource, error message: ", e);
+        throw new DBException("Could not start the transaction, error message: ", e);
       }
-      connectionHolder.set(connection);
-    }
-
-    return connection;
-  }
-
-  /**
-   * 释放数据库连接
-   */
-  public void release() {
-
-    Connection            connection      = connectionHolder.get();
-    final TransactionDeep transactionDeep = transactionDeepHolder.get();
-
-    if (transactionDeep.getCurrentTransactionDeep() == 1) {
-      DBUtil.close(connection);
-      connectionHolder.remove();
-      databaseHolder.remove();
-      transactionDeepHolder.remove();
-    } else {
-      final int currentTransactionDeep = transactionDeep.getCurrentTransactionDeep() - 1;
-      transactionDeep.setCurrentTransactionDeep(currentTransactionDeep);
-      this.setTransactionIsolation(connection, transactionDeep.getIsolation(currentTransactionDeep));
-    }
+    });
   }
 
   private void setTransactionIsolation(Connection conn, int isolation) {
@@ -242,7 +190,7 @@ public class Orm
    *
    * @return DBTemplate
    */
-  public Orm setDataSource(DataSource dataSource) {
+  public DBTemplate setDataSource(DataSource dataSource) {
 
     this.dataSource = dataSource;
     return this;
@@ -265,7 +213,7 @@ public class Orm
    *
    * @return DBTemplate
    */
-  public Orm setDbType(String dbType) {
+  public DBTemplate setDbType(String dbType) {
 
     this.dbType = dbType;
     return this;
@@ -288,7 +236,7 @@ public class Orm
    *
    * @return DBTemplate
    */
-  public Orm setBatchSize(int batchSize) {
+  public DBTemplate setBatchSize(int batchSize) {
 
     this.batchSize = batchSize;
     return this;
@@ -311,7 +259,7 @@ public class Orm
    *
    * @return DBTemplate
    */
-  public Orm setFetchSize(int fetchSize) {
+  public DBTemplate setFetchSize(int fetchSize) {
 
     this.fetchSize = fetchSize;
     return this;
@@ -334,7 +282,7 @@ public class Orm
    *
    * @return DBTemplate
    */
-  public Orm setQueryTimeout(int queryTimeout) {
+  public DBTemplate setQueryTimeout(int queryTimeout) {
 
     this.queryTimeout = queryTimeout;
     return this;
@@ -357,7 +305,7 @@ public class Orm
    *
    * @return DBTemplate
    */
-  public Orm setShowSql(boolean showSql) {
+  public DBTemplate setShowSql(boolean showSql) {
 
     this.showSql = showSql;
     return this;
@@ -380,7 +328,7 @@ public class Orm
    *
    * @return DBTemplate
    */
-  public Orm setShowResult(boolean showResult) {
+  public DBTemplate setShowResult(boolean showResult) {
 
     this.showResult = showResult;
     return this;
@@ -401,7 +349,7 @@ public class Orm
    *
    * @param maxPageSize 分页时每页最大记录数
    */
-  public Orm setMaxPageSize(int maxPageSize) {
+  public DBTemplate setMaxPageSize(int maxPageSize) {
 
     this.maxPageSize = maxPageSize;
     return this;
@@ -424,64 +372,21 @@ public class Orm
    *
    * @return Orm
    */
-  public Orm setDefaultIsolation(int defaultIsolation) {
+  public DBTemplate setDefaultIsolation(int defaultIsolation) {
 
     this.defaultIsolation = defaultIsolation;
     return this;
   }
 
-  /**
-   * 改变当前事务隔离级别
-   *
-   * @param transactionIsolation 事务隔离级别
-   */
-  public void changeIsolation(int transactionIsolation) {
+  public Class<? extends ConnectionFactory> getConnectionFactoryClass() {
 
-    setTransactionIsolation(getCurrentConnection(), transactionIsolation);
+    return connectionFactoryClass;
   }
 
-  /**
-   * 重置当前事务深度的默认事务隔离级别
-   */
-  public void resetIsolation() {
+  public DBTemplate setConnectionFactoryClass(Class<? extends ConnectionFactory> connectionFactoryClass) {
 
-    final TransactionDeep transactionDeep = transactionDeepHolder.get();
-    if (transactionDeep != null) {
-      final int currentTransactionDeep = transactionDeep.getCurrentTransactionDeep();
-      setTransactionIsolation(getCurrentConnection(), transactionDeep.getIsolation(currentTransactionDeep));
-    }
-  }
-
-  public void commit() {
-
-    final Connection connection = getCurrentConnection();
-    try {
-      final TransactionDeep transactionDeep = transactionDeepHolder.get();
-      if (transactionDeep.getCurrentTransactionDeep() == 1) {
-        if (!connection.isReadOnly() && !connection.getAutoCommit()) {
-          connection.commit();
-        }
-      }
-    } catch (SQLException e) {
-      throw new DBException(e);
-    }
-
-  }
-
-  public void rollback() {
-
-    final Connection connection = getCurrentConnection();
-    try {
-      final TransactionDeep transactionDeep = transactionDeepHolder.get();
-      if (transactionDeep.getCurrentTransactionDeep() == 1) {
-        if (!connection.isReadOnly() && !connection.getAutoCommit()) {
-          connection.rollback();
-        }
-      }
-    } catch (SQLException e) {
-      throw new DBException(e);
-    }
-
+    this.connectionFactoryClass = connectionFactoryClass;
+    return this;
   }
 
 }
