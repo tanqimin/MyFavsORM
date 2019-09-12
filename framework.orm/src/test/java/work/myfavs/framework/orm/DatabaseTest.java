@@ -3,7 +3,6 @@ package work.myfavs.framework.orm;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
 import javax.sql.DataSource;
@@ -13,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import work.myfavs.framework.orm.entity.Snowfake;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
+import work.myfavs.framework.orm.meta.clause.Sql;
 
 @Slf4j
 public class DatabaseTest {
@@ -21,7 +21,7 @@ public class DatabaseTest {
   String user     = "root";
   String password = "root";
 
-  private DBTemplate DBTemplate;
+  private DBTemplate dbTemplate;
 
   @Before
   public void setUp()
@@ -35,13 +35,13 @@ public class DatabaseTest {
     configuration.setAutoCommit(false);
     DataSource dataSource = new HikariDataSource(configuration);
 
-    this.DBTemplate = DBTemplate.build(dataSource);
+    this.dbTemplate = dbTemplate.build(dataSource).setShowSql(true).setShowResult(true);
   }
 
   @Test
   public void find() {
 
-    try (Database database = this.DBTemplate.open()) {
+    try (Database database = this.dbTemplate.open()) {
       List<Snowfake> snowfakes = database.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
       Assert.assertNotNull(snowfakes);
       Assert.assertTrue(snowfakes.size() > 0);
@@ -51,22 +51,23 @@ public class DatabaseTest {
   @Test
   public void testTransaction() {
 
-    try (Database db1 = this.DBTemplate.beginTransaction()) {
-      List<Snowfake> s1 = db1.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
-      try (Database db2 = this.DBTemplate.beginTransaction(Connection.TRANSACTION_READ_UNCOMMITTED)) {
-        List<Snowfake> s2 = db2.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
-        try (Database db3 = this.DBTemplate.beginTransaction(Connection.TRANSACTION_SERIALIZABLE)) {
-          Snowfake s3 = new Snowfake();
-          s3.setCreated(new Date());
-          s3.setName("s3");
-          s3.setDisable(false);
-          s3.setPrice(new BigDecimal(100));
-          s3.setType(TypeEnum.DRINK);
-          db3.create(Snowfake.class, s3);
-        }
-      }
-      List<Snowfake> s4 = db1.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
+    try (Database db = this.dbTemplate.open()) {
+      long     count    = getCount(db);
+      Snowfake snowfake = new Snowfake();
+      snowfake.setCreated(new Date());
+      snowfake.setName("snowfake");
+      snowfake.setDisable(false);
+      snowfake.setPrice(new BigDecimal(100));
+      snowfake.setType(TypeEnum.DRINK);
+      db.create(Snowfake.class, snowfake);
+
+      Assert.assertEquals(++count, getCount(db));
     }
+  }
+
+  private long getCount(Database db) {
+
+    return db.count(new Sql("SELECT * FROM tb_snowfake"));
   }
 
   @Test
@@ -225,7 +226,7 @@ public class DatabaseTest {
     snowfake.setType(TypeEnum.DRINK);
     snowfake.setConfig("");
 
-    try (Database db = DBTemplate.open()) {
+    try (Database db = dbTemplate.open()) {
       db.create(Snowfake.class, snowfake);
     }
 

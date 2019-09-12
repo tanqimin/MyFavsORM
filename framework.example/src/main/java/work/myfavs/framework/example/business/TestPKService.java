@@ -44,7 +44,7 @@ public class TestPKService {
     snowfake.setType(TypeEnum.DRINK);
     snowfake.setConfig("");
     uuidRepository.create(uuid);
-    throwException();
+//    throwException();
     snowfakeRepository.create(snowfake);
   }
 

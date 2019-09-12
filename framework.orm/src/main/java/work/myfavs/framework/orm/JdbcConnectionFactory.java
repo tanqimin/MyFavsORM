@@ -22,52 +22,75 @@ public class JdbcConnectionFactory
   @Override
   public Connection openConnection() {
 
-    Connection connection = connectionHolder.get();
+    Connection connection = getCurrentConnection();
     if (connection == null) {
-      try {
-        connection = createConnection();
-      } catch (SQLException e) {
-        throw new DBException("Could not get datasource, error message: ", e);
-      }
+      log.debug("Could not found connection from thread local cache.");
+      log.debug("Create connection from datasource.");
+      connection = createConnection();
       connectionHolder.set(connection);
       connectionDeepHolder.set(1);
     } else {
-      connectionDeepHolder.set(connectionDeepHolder.get() + 1);
+      Integer connDeep = connectionDeepHolder.get();
+      connectionDeepHolder.set(connDeep + 1);
     }
 
+    log.debug("Current connection deep : {}", connectionDeepHolder.get());
     return connection;
   }
 
   @Override
   public Connection getCurrentConnection() {
 
+    log.debug("Get connection from thread local cache.");
     return connectionHolder.get();
   }
 
   @Override
   public void closeConnection(Connection connection) {
 
-    if (connectionDeepHolder.get() == 1) {
+    final Integer connDeep = connectionDeepHolder.get();
+    log.debug("Current connection deep : {}", connDeep);
+    if (connDeep == 1) {
+      log.debug("Release connection");
       Connection conn = connection == null
-          ? connectionHolder.get()
+          ? getCurrentConnection()
           : connection;
       releaseConnection(conn);
       connectionHolder.remove();
       connectionDeepHolder.remove();
     } else {
-      connectionDeepHolder.set(connectionDeepHolder.get() - 1);
+      log.debug("Reduce connection.");
+      connectionDeepHolder.set(connDeep - 1);
     }
 
   }
 
-  protected Connection createConnection()
-      throws SQLException {
+  /**
+   * 创建JDBC 数据库链接
+   *
+   * @return 数据库链接
+   */
+  protected Connection createConnection() {
 
-    return DBUtil.createConnection(dataSource);
+    try {
+      return DBUtil.createConnection(dataSource);
+    } catch (SQLException e) {
+      throw new DBException("Could not get connection from datasource, error message: ", e);
+    }
   }
 
+  /**
+   * 释放数据库链接
+   *
+   * @param conn 数据库链接
+   */
   protected void releaseConnection(Connection conn) {
 
+    try {
+      conn.commit();
+    } catch (SQLException e) {
+      throw new DBException("Fail to committed transaction, error message : ", e);
+    }
     DBUtil.close(conn);
   }
 

@@ -33,31 +33,34 @@ import work.myfavs.framework.orm.util.exception.DBException;
 public class Database
     implements AutoCloseable, Closeable {
 
-
-  private DBTemplate dbTemplate;
+  private static Constructor<? extends ConnectionFactory> constructor = null;
   //数据库方言
-  private IDialect   dialect;
+  private static IDialect                                 dialect     = null;
   //SQL日志
-  private SqlLog     sqlLog;
+  private static SqlLog                                   sqlLog      = null;
 
-  private DataSource dataSource;
-
+  private DBTemplate        dbTemplate;
   private ConnectionFactory connectionFactory;
 
   public Database(DBTemplate dbTemplate) {
 
     this.dbTemplate = dbTemplate;
-    this.dataSource = this.dbTemplate.getDataSource();
-    this.connectionFactory = createConnectionFactoryInstance(this.dataSource);
-    this.dialect = DialectFactory.getInstance(this.dbTemplate.getDbType());
-    this.sqlLog = new SqlLog(this.dbTemplate.getShowSql(), this.dbTemplate.getShowResult());
+    this.connectionFactory = createConnectionFactoryInstance(this.dbTemplate.getDataSource());
+    if (dialect == null) {
+      dialect = DialectFactory.getInstance(this.dbTemplate.getDbType());
+    }
+    if (sqlLog == null) {
+      sqlLog = new SqlLog(this.dbTemplate.getShowSql(), this.dbTemplate.getShowResult());
+    }
   }
 
   private ConnectionFactory createConnectionFactoryInstance(DataSource dataSource) {
 
-    final Constructor<? extends ConnectionFactory> constructor;
     try {
-      constructor = this.dbTemplate.getConnectionFactoryClass().getConstructor(DataSource.class);
+      if (constructor == null) {
+        final Class<? extends ConnectionFactory> connectionFactoryClass = this.dbTemplate.getConnectionFactoryClass();
+        constructor = connectionFactoryClass.getConstructor(DataSource.class);
+      }
       return constructor.newInstance(dataSource);
     } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
       throw new DBException("Fail to create ConnectionFactory instance, error message:", e);
@@ -66,17 +69,38 @@ public class Database
 
   public Connection open() {
 
-    log.debug("============================================open database");
     return this.connectionFactory.openConnection();
   }
-
 
   @Override
   public void close() {
 
-    log.debug("============================================close database");
     Connection connection = this.connectionFactory.getCurrentConnection();
     this.connectionFactory.closeConnection(connection);
+  }
+
+  public void commit() {
+
+    log.debug("Try to commit transaction.");
+    try {
+      this.connectionFactory.getCurrentConnection().commit();
+    } catch (SQLException e) {
+      throw new DBException("Fail to commit transaction, error message:", e);
+    }
+
+    log.debug("Transaction committed successfully.");
+  }
+
+  public void rollback() {
+
+    log.debug("Try to rollback transaction.");
+    try {
+      this.connectionFactory.getCurrentConnection().rollback();
+    } catch (SQLException e) {
+      throw new DBException("Fail to rollback transaction, error message:", e);
+    }
+
+    log.debug("The transaction rollback was successful.");
   }
 
   /**
@@ -186,7 +210,7 @@ public class Database
    */
   public <TView> List<TView> findTop(Class<TView> viewClass, int top, String sql, List<Object> params) {
 
-    Sql querySql = this.dialect.selectTop(1, top, sql, params);
+    Sql querySql = dialect.selectTop(1, top, sql, params);
     return this.find(viewClass, querySql);
   }
 
@@ -302,7 +326,7 @@ public class Database
   public <TView> TView getById(Class<TView> viewClass, Object id) {
 
     AttributeMeta primaryKey = Metadata.get(viewClass).checkPrimaryKey();
-    Sql           sql        = this.dialect.select(viewClass).where(Cond.eq(primaryKey.getColumnName(), id));
+    Sql           sql        = dialect.select(viewClass).where(Cond.eq(primaryKey.getColumnName(), id));
     return this.get(viewClass, sql);
   }
 
@@ -317,7 +341,7 @@ public class Database
    */
   public <TView> TView getByField(Class<TView> viewClass, String field, Object param) {
 
-    Sql sql = this.dialect.select(viewClass).where(Cond.eq(field, param));
+    Sql sql = dialect.select(viewClass).where(Cond.eq(field, param));
     return this.get(viewClass, sql);
   }
 
@@ -332,7 +356,7 @@ public class Database
   public <TView> List<TView> findByIds(Class<TView> viewClass, List ids) {
 
     AttributeMeta primaryKey = Metadata.get(viewClass).checkPrimaryKey();
-    Sql           sql        = this.dialect.select(viewClass).where(Cond.in(primaryKey.getColumnName(), ids, false));
+    Sql           sql        = dialect.select(viewClass).where(Cond.in(primaryKey.getColumnName(), ids, false));
     return this.find(viewClass, sql);
   }
 
@@ -347,7 +371,7 @@ public class Database
    */
   public <TView> List<TView> findByField(Class<TView> viewClass, String field, Object param) {
 
-    Sql sql = this.dialect.select(viewClass).where(Cond.eq(field, param));
+    Sql sql = dialect.select(viewClass).where(Cond.eq(field, param));
     return this.find(viewClass, sql);
   }
 
@@ -362,7 +386,7 @@ public class Database
    */
   public <TView> List<TView> findByField(Class<TView> viewClass, String field, List<Object> params) {
 
-    Sql sql = this.dialect.select(viewClass).where(Cond.in(field, params, false));
+    Sql sql = dialect.select(viewClass).where(Cond.in(field, params, false));
     return this.find(viewClass, sql);
   }
 
@@ -376,7 +400,7 @@ public class Database
    */
   public long count(String sql, List<Object> params) {
 
-    return this.get(Number.class, this.dialect.count(sql, params)).longValue();
+    return this.get(Number.class, dialect.count(sql, params)).longValue();
   }
 
   /**
@@ -421,7 +445,7 @@ public class Database
       pagSize = -1;
     }
 
-    querySql = this.dialect.selectTop(currentPage, pagSize, sql, params);
+    querySql = dialect.selectTop(currentPage, pagSize, sql, params);
     data = this.find(viewClass, querySql);
 
     return PageLite.createInstance(data, currentPage, pagSize);
@@ -569,7 +593,7 @@ public class Database
       pagSize = -1;
     }
 
-    querySql = this.dialect.selectTop(currentPage, pagSize, sql, params);
+    querySql = dialect.selectTop(currentPage, pagSize, sql, params);
     data = this.find(viewClass, querySql);
 
     if (!enablePage) {
@@ -817,7 +841,7 @@ public class Database
       }
     }
 
-    sql = this.dialect.insert(modelClass, entity);
+    sql = dialect.insert(modelClass, entity);
 
     try {
       getSqlLog().showSql(sql.getSql().toString(), sql.getParams());
@@ -875,7 +899,7 @@ public class Database
     pkFieldName = primaryKey.getFieldName();
     strategy = classMeta.getStrategy();
     updateAttributes = classMeta.getUpdateAttributes();
-    sql = this.dialect.insert(modelClass);
+    sql = dialect.insert(modelClass);
     paramsList = new LinkedList<>();
 
     if (strategy == GenerationType.IDENTITY) {
@@ -965,7 +989,7 @@ public class Database
     if (entity == null) {
       return 0;
     }
-    return execute(this.dialect.update(modelClass, entity));
+    return execute(dialect.update(modelClass, entity));
   }
 
   /**
@@ -1197,9 +1221,9 @@ public class Database
     return execute(sql);
   }
 
-  private SqlLog getSqlLog() {
+  private static SqlLog getSqlLog() {
 
-    return this.sqlLog;
+    return sqlLog;
   }
 
 }

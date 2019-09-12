@@ -49,7 +49,7 @@ public class DBTemplate
   protected DBTemplate(DataSource dataSource) {
 
     this.setDataSource(dataSource);
-    this.setConnectionFactoryClass(ConnectionFactory.class);
+    this.setConnectionFactoryClass(JdbcConnectionFactory.class);
   }
 
   /**
@@ -96,17 +96,16 @@ public class DBTemplate
    */
   public Database open() {
 
-    Database database = new Database(this);
-    database.open();
-
-    return database;
+    return this.open(null);
   }
 
   private Database open(Consumer<Connection> consumer) {
 
-    Database database = new Database(this);
-    database.open();
-
+    Database   database   = new Database(this);
+    Connection connection = database.open();
+    if (consumer != null) {
+      consumer.accept(connection);
+    }
     return database;
   }
 
@@ -123,13 +122,7 @@ public class DBTemplate
    */
   public Database beginTransaction() {
 
-    return this.open(connection -> {
-      try {
-        connection.setAutoCommit(false);
-      } catch (SQLException e) {
-        throw new DBException("Could not start the transaction, error message: ", e);
-      }
-    });
+    return this.beginTransaction(this.defaultIsolation);
   }
 
   /**

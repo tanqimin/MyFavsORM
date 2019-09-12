@@ -15,8 +15,8 @@ spring:
     druid:
       validation-query: select 1
       transaction-query-timeout: 60
-      initial-size: 10
-      min-idle: 10
+      initial-size: 50
+      min-idle: 50
       max-active: 200
       max-wait: 60000
       time-between-eviction-runs-millis: 60000

@@ -4,6 +4,7 @@ import static work.myfavs.framework.example.domain.entity.Snowfake.META;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import work.myfavs.framework.example.domain.entity.Snowfake;
 import work.myfavs.framework.example.repository.BaseQuery;
 import work.myfavs.framework.orm.DBTemplate;
@@ -43,6 +44,7 @@ public class SnowfakeQuery
     return super.get(Snowfake.class, sql);
   }
 
+  @Transactional(readOnly = true)
   public Page<Snowfake> findPage() {
 
     return super.findPage(Snowfake.class, Sql.Select("*").from(META.TABLE), true, 1, 1);

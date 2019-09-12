@@ -18,7 +18,7 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
  * PS: 此文件通过代码生成器生成，修改此文件会有被覆盖的风险
  */
 @Data
-@Table(value = Uuid.META.TABLE, strategy = GenerationType.SNOW_FLAKE)
+@Table(value = Uuid.META.TABLE, strategy = GenerationType.UUID)
 public class Uuid
     implements Serializable {
 

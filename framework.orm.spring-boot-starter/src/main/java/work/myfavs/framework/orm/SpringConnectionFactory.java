@@ -1,7 +1,6 @@
 package work.myfavs.framework.orm;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -16,13 +15,22 @@ public class SpringConnectionFactory
     super(dataSource);
   }
 
+  /**
+   * 由Spring 接管创建数据库链接
+   *
+   * @return 数据库链接
+   */
   @Override
-  protected Connection createConnection()
-      throws SQLException {
+  protected Connection createConnection() {
 
     return DataSourceUtils.getConnection(super.dataSource);
   }
 
+  /**
+   * 由Spring 接管释放数据库链接
+   *
+   * @param conn 数据库链接
+   */
   @Override
   protected void releaseConnection(Connection conn) {
 
