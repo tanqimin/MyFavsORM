@@ -1,7 +1,7 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Metadata {
 
-  private final static ConcurrentMap<String, ClassMeta> CLASS_META_CACHE = new ConcurrentHashMap<>();
+  private final static Map<String, ClassMeta> CLASS_META_CACHE = new HashMap<>();
 
   private Metadata() {
 

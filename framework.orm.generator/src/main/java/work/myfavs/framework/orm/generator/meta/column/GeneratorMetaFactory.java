@@ -5,7 +5,6 @@ import work.myfavs.framework.orm.generator.meta.GeneratorMeta;
 import work.myfavs.framework.orm.generator.meta.TableDefinition;
 import work.myfavs.framework.orm.generator.util.GeneratorUtil;
 import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 public abstract class GeneratorMetaFactory {
@@ -25,7 +24,7 @@ public abstract class GeneratorMetaFactory {
     if (DbType.MYSQL.equals(dbType)) {
       generatorMetaFactory = new MySQLGeneratorMetaFactory(generatorConfig);
     } else {
-      throw new DBException(StringUtil.format("暂不支持 {} 数据库！", dbType));
+      throw new DBException("{} database is not supported.", dbType);
     }
     generatorMetaFactory.generatorConfig = generatorConfig;
     return generatorMetaFactory;

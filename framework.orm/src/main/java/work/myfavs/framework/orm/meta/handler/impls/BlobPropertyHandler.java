@@ -1,9 +1,6 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import java.sql.Blob;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 /**
@@ -27,6 +24,10 @@ public class BlobPropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, Blob param)
       throws SQLException {
 
+    if (param == null) {
+      ps.setNull(paramIndex, Types.BLOB);
+      return;
+    }
     ps.setBlob(paramIndex, param);
   }
 

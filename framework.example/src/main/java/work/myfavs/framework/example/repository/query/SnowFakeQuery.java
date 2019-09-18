@@ -50,4 +50,9 @@ public class SnowfakeQuery
     return super.findPage(Snowfake.class, Sql.Select("*").from(META.TABLE), true, 1, 1);
   }
 
+  public Snowfake getFirst() {
+
+    return super.get(Snowfake.class, "select * from " + META.TABLE, null);
+  }
+
 }

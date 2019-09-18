@@ -1,9 +1,6 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
@@ -25,9 +22,11 @@ public class LocalDatePropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, LocalDate param)
       throws SQLException {
 
-    ps.setDate(paramIndex, param == null
-        ? null
-        : Date.valueOf(param));
+    if (param == null) {
+      ps.setNull(paramIndex, Types.DATE);
+      return;
+    }
+    ps.setDate(paramIndex, Date.valueOf(param));
   }
 
 }

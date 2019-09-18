@@ -24,15 +24,30 @@ import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 public class ShortPropertyHandler
     extends PropertyHandler<Short> {
 
+  private boolean isPrimitive;
+
+  public ShortPropertyHandler() {
+
+  }
+
+  public ShortPropertyHandler(boolean isPrimitive) {
+
+    this.isPrimitive = isPrimitive;
+  }
 
   @Override
   public Short convert(ResultSet rs, String columnName, Class<Short> clazz)
       throws SQLException {
 
     short i = rs.getShort(columnName);
-    return rs.wasNull()
-        ? null
-        : i;
+    if (rs.wasNull()) {
+      if (isPrimitive) {
+        return 0;
+      } else {
+        return null;
+      }
+    }
+    return i;
   }
 
   @Override

@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.util;
+package work.myfavs.framework.orm.generator.util;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

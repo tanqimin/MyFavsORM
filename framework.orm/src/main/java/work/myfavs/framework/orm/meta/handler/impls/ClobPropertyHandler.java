@@ -1,9 +1,6 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import java.sql.Clob;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 /**
@@ -27,6 +24,10 @@ public class ClobPropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, Clob param)
       throws SQLException {
 
+    if (param == null) {
+      ps.setNull(paramIndex, Types.CLOB);
+      return;
+    }
     ps.setClob(paramIndex, param);
   }
 

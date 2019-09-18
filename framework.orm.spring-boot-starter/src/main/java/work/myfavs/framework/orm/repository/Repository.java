@@ -1,12 +1,12 @@
 package work.myfavs.framework.orm.repository;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Sql;
-import work.myfavs.framework.orm.util.ReflectUtil;
 
 /**
  * 仓储基类
@@ -24,10 +24,11 @@ public class Repository<TModel>
    *
    * @param dbTemplate DBTemplate
    */
+  @SuppressWarnings("unchecked")
   public Repository(DBTemplate dbTemplate) {
 
     super(dbTemplate);
-    this.modelClass = ReflectUtil.getActualClassArg(this.getClass(), 0);
+    this.modelClass = (Class<TModel>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
   }
 
   /**

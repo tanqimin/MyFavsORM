@@ -19,26 +19,46 @@ package work.myfavs.framework.orm.meta.handler.impls;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 public class IntegerPropertyHandler
     extends PropertyHandler<Integer> {
 
+  private boolean isPrimitive;
+
+  public IntegerPropertyHandler() {
+
+  }
+
+  public IntegerPropertyHandler(boolean isPrimitive) {
+
+    this.isPrimitive = isPrimitive;
+  }
 
   @Override
   public Integer convert(ResultSet rs, String columnName, Class<Integer> clazz)
       throws SQLException {
 
     int i = rs.getInt(columnName);
-    return rs.wasNull()
-        ? null
-        : i;
+    if (rs.wasNull()) {
+      if (isPrimitive) {
+        return 0;
+      } else {
+        return null;
+      }
+    }
+    return i;
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Integer param)
       throws SQLException {
 
+    if (param == null) {
+      ps.setNull(paramIndex, Types.INTEGER);
+      return;
+    }
     ps.setInt(paramIndex, param);
   }
 

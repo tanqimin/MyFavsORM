@@ -8,12 +8,13 @@ import org.beetl.core.Template;
 import org.beetl.core.resource.ClasspathResourceLoader;
 import work.myfavs.framework.orm.util.exception.DBException;
 
+/**
+ * 生成器模板
+ */
 public class GeneratorTemplate {
 
   private ClasspathResourceLoader resourceLoader;
   private Configuration           configuration;
-  private GroupTemplate           groupTemplate;
-  private Template                template;
 
   public GeneratorTemplate() {
 
@@ -28,7 +29,7 @@ public class GeneratorTemplate {
   }
 
   /**
-   * 跟进模板渲染
+   * 根据模板渲染
    *
    * @param templateFile 模板路径如：/hello.txt
    * @param params       模板参数
@@ -37,8 +38,8 @@ public class GeneratorTemplate {
    */
   public String render(String templateFile, Map<String, Object> params) {
 
-    groupTemplate = new GroupTemplate(resourceLoader, configuration);
-    template = groupTemplate.getTemplate(templateFile);
+    GroupTemplate groupTemplate = new GroupTemplate(resourceLoader, configuration);
+    Template      template      = groupTemplate.getTemplate(templateFile);
     groupTemplate.setSharedVars(params);
     return template.render();
   }

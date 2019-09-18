@@ -1,9 +1,6 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDateTime;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
@@ -25,9 +22,11 @@ public class LocalDateTimePropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, LocalDateTime param)
       throws SQLException {
 
-    ps.setTimestamp(paramIndex, param == null
-        ? null
-        : Timestamp.valueOf(param));
+    if (param == null) {
+      ps.setNull(paramIndex, Types.TIMESTAMP);
+      return;
+    }
+    ps.setTimestamp(paramIndex, Timestamp.valueOf(param));
   }
 
 }

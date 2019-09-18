@@ -1,16 +1,14 @@
 package work.myfavs.framework.orm.meta.schema;
 
+import cn.hutool.core.util.ReflectUtil;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
-import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
-import work.myfavs.framework.orm.util.ReflectUtil;
-import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
@@ -23,9 +21,9 @@ public class ClassMeta {
   private String         tableName;
   private GenerationType strategy;
 
-  private AttributeMeta              primaryKey;
-  private List<AttributeMeta>        updateAttributes = new LinkedList<>();
-  private Map<String, AttributeMeta> queryAttributes  = new HashMap<>();
+  private AttributeMeta              primaryKey;                                  //主键
+  private List<AttributeMeta>        updateAttributes = new LinkedList<>();       //更新字段
+  private Map<String, AttributeMeta> queryAttributes  = new HashMap<>();          //查询字段
 
   private ClassMeta() {
 
@@ -40,9 +38,9 @@ public class ClassMeta {
    */
   public static ClassMeta createInstance(Class<?> clazz) {
 
-    Table       table;
-    ClassMeta   classMeta;
-    List<Field> fields;
+    Table     table;
+    ClassMeta classMeta;
+    Field[]   fields;
 
     table = clazz.getAnnotation(Table.class);
     classMeta = new ClassMeta();
@@ -55,19 +53,27 @@ public class ClassMeta {
                                  : table.value());
     }
 
-    fields = ReflectUtil.fieldsOf(clazz, Column.class);
+    fields = ReflectUtil.getFields(clazz);
 
     for (Field field : fields) {
-      AttributeMeta attributeMeta = AttributeMeta.createInstance(field);
-      classMeta.queryAttributes.put(attributeMeta.getColumnName().toUpperCase(), attributeMeta);
-      if (attributeMeta.isReadonly()) {
+      AttributeMeta attr = AttributeMeta.createInstance(field);
+      if (attr == null) {
         continue;
       }
-      if (attributeMeta.isPrimaryKey()) {
-        classMeta.setPrimaryKey(attributeMeta);
+
+      final String  queryKey   = attr.getColumnName().toUpperCase();
+      final boolean readonly   = attr.isReadonly();
+      final boolean primaryKey = attr.isPrimaryKey();
+
+      classMeta.queryAttributes.put(queryKey, attr);
+      if (readonly) {
         continue;
       }
-      classMeta.updateAttributes.add(attributeMeta);
+      if (primaryKey) {
+        classMeta.setPrimaryKey(attr);
+      } else {
+        classMeta.updateAttributes.add(attr);
+      }
     }
 
     return classMeta;
@@ -81,7 +87,7 @@ public class ClassMeta {
   public AttributeMeta checkPrimaryKey() {
 
     if (primaryKey == null) {
-      throw new DBException(StringUtil.format("The view class [{}] could not contain primary key", getClassName()));
+      throw new DBException("The view class [{}] could not contain primary key", getClassName());
     }
     return primaryKey;
   }

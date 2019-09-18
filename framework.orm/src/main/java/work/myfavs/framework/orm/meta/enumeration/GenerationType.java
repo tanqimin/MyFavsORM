@@ -23,16 +23,16 @@ public enum GenerationType {
   public String getName() {
 
     switch (this) {
-      case UUID:
-        return "GenerationType.UUID";
       case SNOW_FLAKE:
         return "GenerationType.SNOW_FLAKE";
       case IDENTITY:
         return "GenerationType.IDENTITY";
+      case UUID:
+        return "GenerationType.UUID";
       case ASSIGNED:
         return "GenerationType.ASSIGNED";
       default:
-        throw new DBException("Unknow primary key generation type");
+        throw new DBException("Unknow primary key generation type.");
     }
   }
 }

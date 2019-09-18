@@ -1,5 +1,7 @@
 package work.myfavs.framework.orm;
 
+import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import java.io.Closeable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -23,7 +25,10 @@ import work.myfavs.framework.orm.meta.pagination.PageLite;
 import work.myfavs.framework.orm.meta.schema.AttributeMeta;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-import work.myfavs.framework.orm.util.*;
+import work.myfavs.framework.orm.util.DBConvert;
+import work.myfavs.framework.orm.util.DBUtil;
+import work.myfavs.framework.orm.util.PKGenerator;
+import work.myfavs.framework.orm.util.SqlLog;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
@@ -63,7 +68,7 @@ public class Database
       }
       return constructor.newInstance(dataSource);
     } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-      throw new DBException("Fail to create ConnectionFactory instance, error message:", e);
+      throw new DBException(e, "Fail to create ConnectionFactory instance, error message:");
     }
   }
 
@@ -85,7 +90,7 @@ public class Database
     try {
       this.connectionFactory.getCurrentConnection().commit();
     } catch (SQLException e) {
-      throw new DBException("Fail to commit transaction, error message:", e);
+      throw new DBException(e, "Fail to commit transaction, error message:");
     }
 
     log.debug("Transaction committed successfully.");
@@ -97,7 +102,7 @@ public class Database
     try {
       this.connectionFactory.getCurrentConnection().rollback();
     } catch (SQLException e) {
-      throw new DBException("Fail to rollback transaction, error message:", e);
+      throw new DBException(e, "Fail to rollback transaction, error message:");
     }
 
     log.debug("The transaction rollback was successful.");
@@ -439,7 +444,7 @@ public class Database
     if (enablePage) {
       long maxPageSize = this.dbTemplate.getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
-        throw new DBException(StringUtil.format("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize));
+        throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
       }
     } else {
       pagSize = -1;
@@ -587,7 +592,7 @@ public class Database
     if (enablePage) {
       long maxPageSize = this.dbTemplate.getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
-        throw new DBException(StringUtil.format("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize));
+        throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
       }
     } else {
       pagSize = -1;
@@ -830,7 +835,7 @@ public class Database
       Object pkVal = ReflectUtil.getFieldValue(entity, pkFieldName);
       if (pkVal == null) {
         if (strategy == GenerationType.ASSIGNED) {
-          throw new DBException("Assigned ID can not be null");
+          throw new DBException("Assigned ID can not be null.");
         } else if (strategy == GenerationType.UUID) {
           pkVal = PKGenerator.nextUUID();
         } else if (strategy == GenerationType.SNOW_FLAKE) {
@@ -922,7 +927,7 @@ public class Database
 
         if (pkVal == null) {
           if (strategy == GenerationType.ASSIGNED) {
-            throw new DBException("Assigned ID can not be null");
+            throw new DBException("Assigned ID can not be null.");
           } else if (strategy == GenerationType.UUID) {
             pkVal = PKGenerator.nextUUID();
           } else if (strategy == GenerationType.SNOW_FLAKE) {
@@ -1058,15 +1063,15 @@ public class Database
     }
 
     if (updateAttributes.isEmpty()) {
-      throw new DBException("没有匹配到需要更新的Column");
+      throw new DBException("Could not match update attributes.");
     }
 
     sql = Sql.Update(classMeta.getTableName()).append(" SET ");
     for (AttributeMeta updateAttribute : updateAttributes) {
-      sql.append(StringUtil.format("{} = ?,", updateAttribute.getColumnName()));
+      sql.append(StrUtil.format("{} = ?,", updateAttribute.getColumnName()));
     }
     sql.getSql().deleteCharAt(sql.getSql().lastIndexOf(","));
-    sql.append(StringUtil.format(" WHERE {} = ?", primaryKey.getColumnName()));
+    sql.append(StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()));
 
     paramsList = new LinkedList<>();
 

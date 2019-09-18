@@ -1,5 +1,6 @@
 package work.myfavs.framework.orm.generator.meta.column;
 
+import cn.hutool.core.util.StrUtil;
 import java.sql.*;
 import java.util.List;
 import java.util.Map.Entry;
@@ -11,8 +12,7 @@ import work.myfavs.framework.orm.generator.util.GeneratorUtil;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.util.DBUtil;
-import work.myfavs.framework.orm.util.ResultSetUtil;
-import work.myfavs.framework.orm.util.StringUtil;
+import work.myfavs.framework.orm.generator.util.ResultSetUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 public class MySQLGeneratorMetaFactory
@@ -95,7 +95,7 @@ public class MySQLGeneratorMetaFactory
 
     TableDefinition tableDefinition = null;
     for (TableDefinition definition : tableDefinitions) {
-      if (StringUtil.eq(table, definition.getTableName(), true)) {
+      if (StrUtil.equalsIgnoreCase(table, definition.getTableName())) {
         tableDefinition = definition;
         break;
       }
@@ -147,12 +147,12 @@ public class MySQLGeneratorMetaFactory
     }
 
     for (Entry<String, TypeDefinition> entry : generatorConfig.getTypeMapper().entrySet()) {
-      if (StringUtil.eq(dataType, entry.getKey(), true)) {
+      if (StrUtil.equalsIgnoreCase(dataType, entry.getKey())) {
         return entry.getValue();
       }
     }
 
-    throw new DBException(StringUtil.format("未注册类型 {}", dataType));
+    throw new DBException("{} type is not registered.", dataType);
   }
 
 }

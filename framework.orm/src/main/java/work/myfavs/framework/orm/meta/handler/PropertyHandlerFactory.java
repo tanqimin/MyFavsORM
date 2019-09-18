@@ -32,19 +32,26 @@ public class PropertyHandlerFactory {
     register(LocalDate.class, new LocalDatePropertyHandler());
     register(LocalTime.class, new LocalTimePropertyHandler());
     register(BigDecimal.class, new BigDecimalPropertyHandler());
+    register(boolean.class, new BooleanPropertyHandler(true));
     register(Boolean.class, new BooleanPropertyHandler());
     register(Boolean.TYPE, new BooleanPropertyHandler());
+    register(int.class, new IntegerPropertyHandler(true));
     register(Integer.class, new IntegerPropertyHandler());
     register(Integer.TYPE, new IntegerPropertyHandler());
+    register(long.class, new LongPropertyHandler(true));
     register(Long.class, new LongPropertyHandler());
     register(Long.TYPE, new LongPropertyHandler());
     register(UUID.class, new UUIDPropertyHandler());
+    register(short.class, new ShortPropertyHandler(true));
     register(Short.class, new ShortPropertyHandler());
     register(Short.TYPE, new ShortPropertyHandler());
+    register(double.class, new DoublePropertyHandler(true));
     register(Double.class, new DoublePropertyHandler());
     register(Double.TYPE, new DoublePropertyHandler());
+    register(float.class, new FloatPropertyHandler(true));
     register(Float.class, new FloatPropertyHandler());
     register(Float.TYPE, new FloatPropertyHandler());
+    register(byte.class, new BytePropertyHandler(true));
     register(Byte.class, new BytePropertyHandler());
     register(Byte.TYPE, new BytePropertyHandler());
     register(byte[].class, new ByteArrayPropertyHandler());
@@ -76,12 +83,14 @@ public class PropertyHandlerFactory {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static <T> T convert(ResultSet rs, String columnName, Class<T> tClass)
       throws SQLException {
 
     return (T) getInstance(tClass).convert(rs, columnName, tClass);
   }
 
+  @SuppressWarnings("unchecked")
   public static void addParameter(PreparedStatement ps, int index, Object param)
       throws SQLException {
 

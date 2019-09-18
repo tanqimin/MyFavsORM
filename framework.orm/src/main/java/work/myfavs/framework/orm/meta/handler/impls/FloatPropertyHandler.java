@@ -19,25 +19,46 @@ package work.myfavs.framework.orm.meta.handler.impls;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 public class FloatPropertyHandler
     extends PropertyHandler<Float> {
+
+  private boolean isPrimitive;
+
+  public FloatPropertyHandler() {
+
+  }
+
+  public FloatPropertyHandler(boolean isPrimitive) {
+
+    this.isPrimitive = isPrimitive;
+  }
 
   @Override
   public Float convert(ResultSet rs, String columnName, Class<Float> clazz)
       throws SQLException {
 
     float i = rs.getFloat(columnName);
-    return rs.wasNull()
-        ? null
-        : i;
+    if (rs.wasNull()) {
+      if (isPrimitive) {
+        return 0.0f;
+      } else {
+        return null;
+      }
+    }
+    return i;
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Float param)
       throws SQLException {
 
+    if (param == null) {
+      ps.setNull(paramIndex, Types.FLOAT);
+      return;
+    }
     ps.setFloat(paramIndex, param);
   }
 

@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import work.myfavs.framework.example.business.TestPKService;
 import work.myfavs.framework.example.domain.entity.Snowfake;
+import work.myfavs.framework.example.domain.entity.Snowfake.META;
 import work.myfavs.framework.example.repository.query.SnowfakeQuery;
+import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.pagination.Page;
 
 @RequestMapping("/test-pk")
@@ -23,7 +25,7 @@ public class TestPKController {
   @RequestMapping(value = "/get", method = RequestMethod.GET)
   public ResponseEntity<Snowfake> get() {
 
-    return new ResponseEntity<>(snowfakeQuery.getById(1L), HttpStatus.OK);
+    return new ResponseEntity<>(snowfakeQuery.getFirst(), HttpStatus.OK);
   }
 
   @RequestMapping(value = "/create", method = RequestMethod.GET)

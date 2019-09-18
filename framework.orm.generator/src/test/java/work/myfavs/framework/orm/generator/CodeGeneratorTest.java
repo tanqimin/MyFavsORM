@@ -28,13 +28,14 @@ public class CodeGeneratorTest {
     config.setJdbcUser(user);                                             //数据库用户
     config.setJdbcPwd(password);                                          //数据库密码
     config.setTemplateDir("D:");                                             //代码输出根目录
+    config.setTablePrefix("tb_");
 
     config.setGenEntity(true);                                          //是否生成实体
     config.setCoverEntityIfExists(true);                                //实体存在时是否覆盖？
     config.setEntityPackage("work.myfavs.erp.domain.entity");           //实体Package名称
 
     config.setGenRepository(true);                                      //是否生成Repository
-    config.setCoverRepositoryIfExists(false);                           //Repository存在时是否覆盖？
+    config.setCoverRepositoryIfExists(true);                           //Repository存在时是否覆盖？
     config.setRepositoryPackage("work.myfavs.erp.repository");          //Repository Package名称
 
     //注册生成器类型

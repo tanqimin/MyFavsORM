@@ -75,7 +75,7 @@ public class JdbcConnectionFactory
     try {
       return DBUtil.createConnection(dataSource);
     } catch (SQLException e) {
-      throw new DBException("Could not get connection from datasource, error message: ", e);
+      throw new DBException(e, "Could not get connection from datasource, error message: ");
     }
   }
 
@@ -89,7 +89,7 @@ public class JdbcConnectionFactory
     try {
       conn.commit();
     } catch (SQLException e) {
-      throw new DBException("Fail to committed transaction, error message : ", e);
+      throw new DBException(e, "Fail to committed transaction, error message : ");
     }
     DBUtil.close(conn);
   }

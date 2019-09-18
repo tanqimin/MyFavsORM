@@ -2,9 +2,13 @@ package work.myfavs.framework.orm.meta.schema;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import lombok.Data;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
+import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 
 /**
  * 数据库列元数据
@@ -34,6 +38,8 @@ public class AttributeMeta
    */
   private boolean  primaryKey = false;
 
+  private PropertyHandler propertyHandler = null;
+
   private AttributeMeta() {}
 
   /**
@@ -43,22 +49,36 @@ public class AttributeMeta
    *
    * @return 属性元数据
    */
-  public static AttributeMeta createInstance(Field field) {
+  static AttributeMeta createInstance(Field field) {
 
-    Column     column     = field.getAnnotation(Column.class);
-    PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
-    String     fieldName  = field.getName();
+    AttributeMeta attributeMeta = null;
 
-    AttributeMeta attributeMeta = new AttributeMeta();
-    attributeMeta.setFieldName(fieldName);
-    attributeMeta.setFieldType(field.getType());
-    attributeMeta.setReadonly(column.readonly());
-    attributeMeta.setPrimaryKey(primaryKey != null);
-    attributeMeta.setColumnName(column.value().isEmpty()
-                                    ? fieldName
-                                    : column.value());
+    Column column = field.getAnnotation(Column.class);
+    if (column != null) {
+      attributeMeta = new AttributeMeta();
 
+      final PrimaryKey      primaryKey      = field.getAnnotation(PrimaryKey.class);
+      final String          fieldName       = field.getName();
+      final Class<?>        fieldType       = field.getType();
+      final PropertyHandler propertyHandler = PropertyHandlerFactory.getInstance(fieldType);
+      final String columnName = column.value().isEmpty()
+          ? fieldName
+          : column.value();
+
+      attributeMeta.setFieldName(fieldName);
+      attributeMeta.setFieldType(fieldType);
+      attributeMeta.setReadonly(column.readonly());
+      attributeMeta.setPrimaryKey(primaryKey != null);
+      attributeMeta.setColumnName(columnName);
+      attributeMeta.setPropertyHandler(propertyHandler);
+    }
     return attributeMeta;
+  }
+
+  public Object convert(ResultSet rs)
+      throws SQLException {
+
+    return this.propertyHandler.convert(rs, columnName, fieldType);
   }
 
 }

@@ -1,5 +1,6 @@
 package work.myfavs.framework.orm.util;
 
+import cn.hutool.core.util.ReflectUtil;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -69,13 +70,12 @@ public class DBConvert {
       for (int i = 1;
            i <= columnCount;
            i++) {
-        colName = metaData.getColumnLabel(i);
-        attributeMeta = attrMetas.get(colName.toUpperCase());
-        if (attributeMeta == null) {
+        colName = metaData.getColumnLabel(i).toUpperCase();
+        if (!attrMetas.containsKey(colName)) {
           continue;
         }
-        columnValue = PropertyHandlerFactory.convert(rs, colName, attributeMeta.getFieldType());
-//        BeanUtil.setFieldValue(model, attributeMeta.getFieldName(), columnValue);
+        attributeMeta = attrMetas.get(colName);
+        columnValue = attributeMeta.convert(rs);
         ReflectUtil.setFieldValue(model, attributeMeta.getFieldName(), columnValue);
       }
       result.add(model);
@@ -96,7 +96,7 @@ public class DBConvert {
     metaData = rs.getMetaData();
 
     while (rs.next()) {
-      colName = metaData.getColumnLabel(1);
+      colName = metaData.getColumnLabel(1).toUpperCase();
       result.add(PropertyHandlerFactory.convert(rs, colName, modelClass));
     }
     return result;

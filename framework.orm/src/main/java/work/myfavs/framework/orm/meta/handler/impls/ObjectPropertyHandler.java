@@ -3,6 +3,7 @@ package work.myfavs.framework.orm.meta.handler.impls;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 /**
@@ -25,6 +26,10 @@ public class ObjectPropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, Object param)
       throws SQLException {
 
+    if (param == null) {
+      ps.setNull(paramIndex, Types.SMALLINT);
+      return;
+    }
     ps.setObject(paramIndex, param);
   }
 

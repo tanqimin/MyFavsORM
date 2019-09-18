@@ -3,7 +3,6 @@ package work.myfavs.framework.orm.meta.dialect;
 import java.util.HashMap;
 import java.util.Map;
 import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 
@@ -21,6 +20,7 @@ public class DialectFactory {
     map.put(DbType.SQL_SERVER, new SqlServerDialect());
     map.put(DbType.SQL_SERVER_2012, new SqlServer2012Dialect());
     map.put(DbType.MYSQL, new MySqlDialect());
+    map.put(DbType.H2, new H2Dialect());
   }
 
   private DialectFactory() {
@@ -38,7 +38,7 @@ public class DialectFactory {
 
     IDialect iDialect = map.get(dbType);
     if (iDialect == null) {
-      throw new DBException(StringUtil.format("暂不支持 {} 数据库！", dbType));
+      throw new DBException("{} database is not supported.", dbType);
     }
     return iDialect;
   }

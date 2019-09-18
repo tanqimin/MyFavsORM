@@ -24,7 +24,7 @@ public class MySqlDialect
     querySql = new Sql(sql, params);
     if (currentPage == 1 && pageSize == 1) {
       //如果sql本身只返回一个结果
-      if (selectSinglePattern.matcher(sql).find()) {
+      if (P_SELECT_SINGLE.matcher(sql).find()) {
         return querySql;
       }
     }

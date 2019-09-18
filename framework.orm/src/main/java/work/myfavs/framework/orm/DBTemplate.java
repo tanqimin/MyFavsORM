@@ -139,7 +139,7 @@ public class DBTemplate
         connection.setAutoCommit(false);
         connection.setTransactionIsolation(transactionIsolation);
       } catch (SQLException e) {
-        throw new DBException("Could not start the transaction, error message: ", e);
+        throw new DBException(e, "Could not start the transaction, error message: ");
       }
     });
   }
@@ -149,7 +149,7 @@ public class DBTemplate
     try {
       conn.setTransactionIsolation(isolation);
     } catch (SQLException e) {
-      throw new DBException("Could not set the transaction isolation, error message: ", e);
+      throw new DBException(e, "Could not set the transaction isolation, error message: ");
     }
   }
 

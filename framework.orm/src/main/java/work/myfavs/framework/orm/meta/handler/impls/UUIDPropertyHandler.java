@@ -3,6 +3,7 @@ package work.myfavs.framework.orm.meta.handler.impls;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.UUID;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
@@ -24,9 +25,11 @@ public class UUIDPropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, UUID param)
       throws SQLException {
 
-    ps.setString(paramIndex, param == null
-        ? null
-        : param.toString());
+    if (param == null) {
+      ps.setNull(paramIndex, Types.VARCHAR);
+      return;
+    }
+    ps.setString(paramIndex, param.toString());
   }
 
 }

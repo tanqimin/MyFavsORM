@@ -1,6 +1,9 @@
 package work.myfavs.framework.orm.generator;
 
-import java.io.IOException;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.FileWriter;
+import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.StrUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +13,9 @@ import work.myfavs.framework.orm.generator.meta.GeneratorMeta;
 import work.myfavs.framework.orm.generator.meta.TableDefinition;
 import work.myfavs.framework.orm.generator.meta.column.ColumnDefinition;
 import work.myfavs.framework.orm.generator.meta.column.GeneratorMetaFactory;
-import work.myfavs.framework.orm.generator.util.FileUtil;
 import work.myfavs.framework.orm.generator.util.GeneratorUtil;
 import work.myfavs.framework.orm.generator.util.PathUtil;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
-import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
  * 代码生成器
@@ -59,6 +60,7 @@ public class CodeGenerator {
 
     String         entitiesPackage = generatorConfig.getEntityPackage();            //实体Package
     String         prefix          = generatorConfig.getTablePrefix();                     //忽略数据表前缀
+
     String         className       = GeneratorUtil.toClass(tableName, prefix);        //实体类名称
     GenerationType generationType  = generatorConfig.getGenerationType();
     boolean        coverIfExist    = generatorConfig.isCoverEntityIfExists();
@@ -89,13 +91,13 @@ public class CodeGenerator {
 
     StringBuilder res      = new StringBuilder();
     String        rootPath = generatorConfig.getTemplateDir();
+
     if (rootPath != null && rootPath.length() > 0) {
       res.append(rootPath);
       if (!rootPath.endsWith("/")) {
         res.append("/");
       }
     }
-
     return res.append("src/main/java/").append(PathUtil.toPath(packageName)).append("/").append(fileName).append(".java").toString();
   }
 
@@ -107,15 +109,11 @@ public class CodeGenerator {
    */
   private void outputFile(String filePath, String context, boolean isCover) {
 
-    try {
-      int oper = isCover
-          ? FileUtil.OVERWRITE
-          : FileUtil.IGNORE;
-      FileUtil.TextToFile(filePath, context, oper);
-    } catch (IOException e) {
-      throw new DBException(e);
+    if (FileUtil.exist(filePath) && !isCover) {
+      return;
     }
-
+    FileWriter fileWriter = new FileWriter(filePath, CharsetUtil.UTF_8);
+    fileWriter.write(context);
   }
 
   /**

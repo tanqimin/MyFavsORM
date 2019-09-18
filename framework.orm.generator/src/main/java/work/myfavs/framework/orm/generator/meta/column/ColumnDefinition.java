@@ -1,10 +1,10 @@
 package work.myfavs.framework.orm.generator.meta.column;
 
+import cn.hutool.core.util.StrUtil;
 import java.io.Serializable;
 import lombok.Data;
 import work.myfavs.framework.orm.generator.meta.TypeDefinition;
 import work.myfavs.framework.orm.generator.util.GeneratorUtil;
-import work.myfavs.framework.orm.util.StringUtil;
 
 @Data
 public class ColumnDefinition
@@ -53,7 +53,7 @@ public class ColumnDefinition
     if (column == null) {
       return null;
     }
-    return StringUtil.camel(column);
+    return StrUtil.toCamelCase(column);
   }
 
   public String getComment() {

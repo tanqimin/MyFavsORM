@@ -19,25 +19,46 @@ package work.myfavs.framework.orm.meta.handler.impls;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 public class LongPropertyHandler
     extends PropertyHandler<Long> {
+
+  private boolean isPrimitive;
+
+  public LongPropertyHandler() {
+
+  }
+
+  public LongPropertyHandler(boolean isPrimitive) {
+
+    this.isPrimitive = isPrimitive;
+  }
 
   @Override
   public Long convert(ResultSet rs, String columnName, Class<Long> clazz)
       throws SQLException {
 
     long i = rs.getLong(columnName);
-    return rs.wasNull()
-        ? null
-        : i;
+    if (rs.wasNull()) {
+      if (isPrimitive) {
+        return 0L;
+      } else {
+        return null;
+      }
+    }
+    return i;
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Long param)
       throws SQLException {
 
+    if (param == null) {
+      ps.setNull(paramIndex, Types.BIGINT);
+      return;
+    }
     ps.setLong(paramIndex, param);
   }
 

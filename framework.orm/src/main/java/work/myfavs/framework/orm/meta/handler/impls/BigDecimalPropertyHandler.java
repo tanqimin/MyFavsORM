@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 /**
@@ -26,6 +27,10 @@ public class BigDecimalPropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, BigDecimal param)
       throws SQLException {
 
+    if (param == null) {
+      ps.setNull(paramIndex, Types.DECIMAL);
+      return;
+    }
     ps.setBigDecimal(paramIndex, param);
   }
 

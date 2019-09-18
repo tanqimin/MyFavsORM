@@ -19,6 +19,7 @@ package work.myfavs.framework.orm.meta.handler.impls;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 public class StringPropertyHandler
@@ -37,6 +38,10 @@ public class StringPropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, String param)
       throws SQLException {
 
+    if (param == null) {
+      ps.setNull(paramIndex, Types.VARCHAR);
+      return;
+    }
     ps.setString(paramIndex, param);
   }
 

@@ -23,7 +23,7 @@ public class SqlServerDialect
 
     if (currentPage == 1 && pageSize == 1) {
       //如果sql本身只返回一个结果
-      if (selectSinglePattern.matcher(sql).find()) {
+      if (P_SELECT_SINGLE.matcher(sql).find()) {
         return new Sql(sql, params);
       }
     }
@@ -35,7 +35,7 @@ public class SqlServerDialect
     int offset = pageSize * (currentPage - 1);
 
     String  orderBys = null;
-    Matcher om       = orderPattern.matcher(sql);
+    Matcher om       = P_ORDER.matcher(sql);
     if (om.find()) {
       orderBys = sql.substring(om.end());
       sql = sql.substring(0, om.start());
@@ -51,7 +51,7 @@ public class SqlServerDialect
     querySql.append(orderBys);
     querySql.append(") rownumber,");
 
-    Matcher sm = selectPattern.matcher(sql);
+    Matcher sm = P_SELECT.matcher(sql);
     if (sm.find()) {
       querySql.append(sql.substring(sm.end()), params);
     } else {
@@ -59,9 +59,7 @@ public class SqlServerDialect
     }
 
     // T-SQL offset starts with 1, not like MySQL with 0;
-    querySql.append(") paginate_alias WHERE rownumber BETWEEN ? AND ?", offset + 1L, pageSize + offset);
-
-    return querySql;
+    return querySql.append(") paginate_alias WHERE rownumber BETWEEN ? AND ?", offset + 1L, pageSize + offset);
   }
 
 }

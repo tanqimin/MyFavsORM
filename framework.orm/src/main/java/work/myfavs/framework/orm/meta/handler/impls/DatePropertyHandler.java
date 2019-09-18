@@ -1,9 +1,6 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.Date;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
@@ -27,6 +24,10 @@ public class DatePropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, Date param)
       throws SQLException {
 
+    if (param == null) {
+      ps.setNull(paramIndex, Types.TIMESTAMP);
+      return;
+    }
     ps.setTimestamp(paramIndex, new Timestamp(param.getTime()));
   }
 

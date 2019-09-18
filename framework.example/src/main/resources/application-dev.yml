@@ -1,7 +1,7 @@
-debug: false
+debug: true
 logging:
   level:
-    ROOT: warn
+    ROOT: debug
 spring:
   datasource:
     primary:

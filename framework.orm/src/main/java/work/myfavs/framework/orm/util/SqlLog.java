@@ -1,5 +1,6 @@
 package work.myfavs.framework.orm.util;
 
+import cn.hutool.core.util.StrUtil;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -23,9 +24,9 @@ public class SqlLog {
     if (showSql && log.isDebugEnabled()) {
       StringBuilder logStr = new StringBuilder();
       logStr.append(System.lineSeparator());
-      logStr.append(StringUtil.format("          SQL: {}", sql));
+      logStr.append(StrUtil.format("          SQL: {}", sql));
       logStr.append(System.lineSeparator());
-      logStr.append(StringUtil.format("   PARAMETERS: {}", showParams(params)));
+      logStr.append(StrUtil.format("   PARAMETERS: {}", showParams(params)));
       logStr.append(System.lineSeparator());
       log.info(logStr.toString());
     }
@@ -39,7 +40,7 @@ public class SqlLog {
       return stringBuilder.toString();
     }
     for (Object param : params) {
-      stringBuilder.append(StringUtil.toStr(param)).append(", ");
+      stringBuilder.append(StrUtil.toString(param)).append(", ");
     }
     stringBuilder.deleteCharAt(stringBuilder.lastIndexOf(","));
     return stringBuilder.toString();
@@ -66,21 +67,21 @@ public class SqlLog {
       rs.beforeFirst();
       while (rs.next()) {
         rows++;
-        logStr.append(StringUtil.format("ROW[{}]: {", rs.getRow()));
+        logStr.append(StrUtil.format("ROW[{}]: {", rs.getRow()));
         for (int i = 1;
              i <= columnCount;
              i++) {
           columnLabel = metaData.getColumnLabel(i);
           columnVal = rs.getObject(i);
           if (rs.wasNull()) {
-            logStr.append(StringUtil.format("\"{}\":null, ", columnLabel));
+            logStr.append(StrUtil.format("\"{}\":null, ", columnLabel));
           } else {
-            logStr.append(StringUtil.format("\"{}\":\"{}\", ", columnLabel, columnVal));
+            logStr.append(StrUtil.format("\"{}\":\"{}\", ", columnLabel, columnVal));
           }
         }
         logStr.deleteCharAt(logStr.lastIndexOf(", ")).append("}").append(System.lineSeparator());
       }
-      logStr.append(StringUtil.format("TOTAL RECORDS: {}", rows));
+      logStr.append(StrUtil.format("TOTAL RECORDS: {}", rows));
       logStr.append(System.lineSeparator());
       log.info(logStr.toString());
     }
@@ -96,7 +97,7 @@ public class SqlLog {
         int i = 0;
         for (List params : paramsList) {
           logStr.append("PARAM[").append(i++).append("]: ");
-          logStr.append(StringUtil.format("{}", showParams(params)));
+          logStr.append(StrUtil.format("{}", showParams(params)));
           logStr.append(System.lineSeparator());
         }
       }

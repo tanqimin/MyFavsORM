@@ -3,6 +3,7 @@ package work.myfavs.framework.orm.meta.handler.impls;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 /**
@@ -10,7 +11,6 @@ import work.myfavs.framework.orm.meta.handler.PropertyHandler;
  */
 public class ByteArrayPropertyHandler
     extends PropertyHandler<byte[]> {
-
 
   @Override
   public byte[] convert(ResultSet rs, String columnName, Class<byte[]> clazz)
@@ -27,6 +27,10 @@ public class ByteArrayPropertyHandler
   public void addParameter(PreparedStatement ps, int paramIndex, byte[] param)
       throws SQLException {
 
+    if (param == null) {
+      ps.setNull(paramIndex, Types.VARBINARY);
+      return;
+    }
     ps.setBytes(paramIndex, param);
   }
 

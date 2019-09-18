@@ -1,5 +1,7 @@
 package work.myfavs.framework.orm.util;
 
+import cn.hutool.core.util.IdUtil;
+
 public class PKGenerator {
 
   /**
