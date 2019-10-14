@@ -350,6 +350,12 @@ public class Database
     return this.get(viewClass, sql);
   }
 
+  public <TModel> TModel getByCond(Class<TModel> viewClass, Cond cond) {
+
+    Sql sql = dialect.select(viewClass).where(cond);
+    return this.get(viewClass, sql);
+  }
+
   /**
    * 根据多个主键ID查询实体集合
    *
@@ -1230,5 +1236,6 @@ public class Database
 
     return sqlLog;
   }
+
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.Database;
+import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
 /**
@@ -57,6 +58,20 @@ public class Repository<TModel>
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.getByField(modelClass, field, param);
+    }
+  }
+
+  /**
+   * 根据条件获取记录
+   *
+   * @param cond 条件
+   *
+   * @return 记录
+   */
+  protected TModel getByCond(Cond cond) {
+
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.getByCond(modelClass, cond);
     }
   }
 

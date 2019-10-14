@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework.orm-spring-starter</artifactId>
-  <version>0.2.12.RELEASE</version>
+  <version>0.2.13.RELEASE</version>
   <packaging>jar</packaging>
 
   <!--私服仓库-->
