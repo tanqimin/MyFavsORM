@@ -1,10 +1,15 @@
 package work.myfavs.framework.orm.meta.clause;
 
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
+import work.myfavs.framework.orm.meta.annotation.Condition;
+import work.myfavs.framework.orm.meta.enumeration.Operator;
 
 /**
  * SQL 条件构建
@@ -492,6 +497,71 @@ public class Cond
     this.sql.append(StrUtil.format(" OR {}", cond.sql));
     this.params.addAll(cond.params);
     return this;
+  }
+
+  /**
+   * 根据@Condition 注解创建Cond
+   *
+   * @param object 包含@Condition注解Field的对象
+   *
+   * @return Cond
+   */
+  public static Cond create(Object object) {
+
+    Cond cond = null;
+
+    final List<Field> conditionFields = new ArrayList<>();
+
+    final Field[] fields = ReflectUtil.getFields(object.getClass());
+    for (Field field : fields) {
+      if (field.getAnnotation(Condition.class) != null) {
+        conditionFields.add(field);
+      }
+    }
+    conditionFields.sort(Comparator.comparingInt(o -> o.getAnnotation(Condition.class).order()));
+
+    for (Field field : conditionFields) {
+      Condition condAnn   = field.getAnnotation(Condition.class);
+      String    fieldName = condAnn.value();
+      if (StrUtil.isBlank(fieldName)) {
+        fieldName = field.getName();
+      }
+      Object paramVal = ReflectUtil.getFieldValue(object, fieldName);
+      if (cond == null) {
+        cond = createCondByOperator(condAnn.operator(), fieldName, paramVal);
+      } else {
+        cond.and(createCondByOperator(condAnn.operator(), fieldName, paramVal));
+      }
+    }
+    return cond;
+  }
+
+  private static Cond createCondByOperator(Operator operator, String fieldName, Object paramVal) {
+
+    switch (operator) {
+      case EQUALS:
+        return Cond.eq(fieldName, paramVal);
+      case NOT_EQUALS:
+        return Cond.ne(fieldName, paramVal);
+      case LIKE:
+        return Cond.like(fieldName, paramVal);
+      case IS_NULL:
+        return Cond.isNull(fieldName);
+      case IS_NOT_NULL:
+        return Cond.isNotNull(fieldName);
+      case GREATER_THAN:
+        return Cond.gt(fieldName, paramVal);
+      case BETWEEN_START:
+      case GREATER_THAN_OR_EQUALS:
+        return Cond.ge(fieldName, paramVal);
+      case LESS_THAN:
+        return Cond.lt(fieldName, paramVal);
+      case BETWEEN_END:
+      case LESS_THAN_OR_EQUALS:
+        return Cond.le(fieldName, paramVal);
+      default:
+        throw new IllegalArgumentException("The operator is not supported");
+    }
   }
 
   @Override

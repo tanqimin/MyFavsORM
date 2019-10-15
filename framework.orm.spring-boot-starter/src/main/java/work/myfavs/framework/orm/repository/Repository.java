@@ -8,6 +8,7 @@ import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
+import work.myfavs.framework.orm.meta.dialect.IDialect;
 
 /**
  * 仓储基类
@@ -19,6 +20,7 @@ public class Repository<TModel>
     extends Query {
 
   protected Class<TModel> modelClass;
+  protected IDialect      dialect;
 
   /**
    * 构造方法
@@ -29,6 +31,7 @@ public class Repository<TModel>
   public Repository(DBTemplate dbTemplate) {
 
     super(dbTemplate);
+    this.dialect = dbTemplate.getDialect();
     this.modelClass = (Class<TModel>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
   }
 
@@ -71,8 +74,21 @@ public class Repository<TModel>
   protected TModel getByCond(Cond cond) {
 
     try (Database conn = this.dbTemplate.open()) {
-      return conn.getByCond(modelClass, cond);
+      final Sql sql = dialect.select(modelClass).where(cond);
+      return conn.get(modelClass, sql);
     }
+  }
+
+  /**
+   * 根据@Condition注解生成的条件查询记录
+   *
+   * @param object 包含@Condition注解Field的对象
+   *
+   * @return 记录
+   */
+  public TModel getByCondition(Object object) {
+
+    return this.getByCond(Cond.create(object));
   }
 
   /**
@@ -154,6 +170,33 @@ public class Repository<TModel>
     try (Database conn = this.dbTemplate.open()) {
       return conn.findByField(modelClass, field, params);
     }
+  }
+
+  /**
+   * 根据条件查询实体集合
+   *
+   * @param cond 查询条件
+   *
+   * @return 实体集合
+   */
+  protected List<TModel> findByCond(Cond cond) {
+
+    try (Database conn = this.dbTemplate.open()) {
+      final Sql sql = dialect.select(modelClass).where(cond);
+      return conn.find(modelClass, sql);
+    }
+  }
+
+  /**
+   * 根据@Condition注解生成的条件查询实体集合
+   *
+   * @param object 包含@Condition注解Field的对象
+   *
+   * @return 实体集合
+   */
+  public List<TModel> findByCondition(Object object) {
+
+    return findByCond(Cond.create(object));
   }
 
   /**

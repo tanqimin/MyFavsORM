@@ -6,9 +6,11 @@ import java.util.Date;
 import lombok.Data;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.annotation.Column;
+import work.myfavs.framework.orm.meta.annotation.Condition;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
+import work.myfavs.framework.orm.meta.enumeration.Operator;
 
 @Data
 @Table(value = "tb_snowfake", strategy = GenerationType.SNOW_FLAKE)
@@ -30,6 +32,7 @@ public class Snowfake
    * 名称
    */
   @Column(value = "name")
+  @Condition(value = "name", operator = Operator.LIKE, order = 1)
   private String     name    = null;
   /**
    * 是否停用
@@ -45,6 +48,7 @@ public class Snowfake
    * 类型
    */
   @Column(value = "type")
+  @Condition(order = 2)
   private TypeEnum   type    = null;
   /**
    * 配置
