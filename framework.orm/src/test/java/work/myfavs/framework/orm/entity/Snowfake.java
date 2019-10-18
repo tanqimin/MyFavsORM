@@ -33,6 +33,7 @@ public class Snowfake
    */
   @Column(value = "name")
   @Condition(value = "name", operator = Operator.LIKE, order = 1)
+  @Condition(value = "name", operator = Operator.NOT_EQUALS, order = 1, group = "SNOW_DTO")
   private String     name    = null;
   /**
    * 是否停用

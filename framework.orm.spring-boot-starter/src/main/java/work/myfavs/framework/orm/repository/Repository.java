@@ -74,8 +74,7 @@ public class Repository<TModel>
   protected TModel getByCond(Cond cond) {
 
     try (Database conn = this.dbTemplate.open()) {
-      final Sql sql = dialect.select(modelClass).where(cond);
-      return conn.get(modelClass, sql);
+      return conn.getByCond(modelClass, cond);
     }
   }
 
@@ -88,7 +87,9 @@ public class Repository<TModel>
    */
   public TModel getByCondition(Object object) {
 
-    return this.getByCond(Cond.create(object));
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.getByCondition(modelClass, object);
+    }
   }
 
   /**
@@ -182,8 +183,7 @@ public class Repository<TModel>
   protected List<TModel> findByCond(Cond cond) {
 
     try (Database conn = this.dbTemplate.open()) {
-      final Sql sql = dialect.select(modelClass).where(cond);
-      return conn.find(modelClass, sql);
+      return conn.findByCond(modelClass, cond);
     }
   }
 
@@ -196,7 +196,9 @@ public class Repository<TModel>
    */
   public List<TModel> findByCondition(Object object) {
 
-    return findByCond(Cond.create(object));
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.findByCondition(modelClass, object);
+    }
   }
 
   /**
@@ -312,6 +314,20 @@ public class Repository<TModel>
   }
 
   /**
+   * 更新实体，忽略Null属性的字段
+   *
+   * @param entity 实体
+   *
+   * @return 影响行数
+   */
+  public int updateIgnoreNull(TModel entity) {
+
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.updateIgnoreNull(modelClass, entity);
+    }
+  }
+
+  /**
    * 更新实体
    *
    * @param entities 实体集合
@@ -377,6 +393,20 @@ public class Repository<TModel>
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.deleteById(modelClass, id);
+    }
+  }
+
+  /**
+   * 根据条件删除记录
+   *
+   * @param cond 条件值
+   *
+   * @return 影响行数
+   */
+  protected int deleteByCond(Cond cond) {
+
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.deleteByCond(modelClass, cond);
     }
   }
 

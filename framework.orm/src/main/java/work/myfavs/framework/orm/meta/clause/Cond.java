@@ -508,32 +508,61 @@ public class Cond
    */
   public static Cond create(Object object) {
 
-    Cond cond = null;
+    return create(object, "DEFAULT");
+  }
 
-    final List<Field> conditionFields = new ArrayList<>();
+  /**
+   * 根据@Condition 注解创建Cond
+   *
+   * @param object         包含@Condition注解Field的对象
+   * @param conditionGroup 条件组名
+   *
+   * @return Cond
+   */
+  public static Cond create(Object object, String conditionGroup) {
 
-    final Field[] fields = ReflectUtil.getFields(object.getClass());
+    Cond                   cond              = null;
+    List<ConditionMatcher> conditionMatchers = new ArrayList<>();
+    final Field[]          fields            = ReflectUtil.getFields(object.getClass());
     for (Field field : fields) {
-      if (field.getAnnotation(Condition.class) != null) {
-        conditionFields.add(field);
+      final Condition[] annotations = field.getAnnotationsByType(Condition.class);
+      if (annotations != null && annotations.length > 0) {
+        for (Condition annotation : annotations) {
+          if (!StrUtil.equalsIgnoreCase(conditionGroup, annotation.group())) {
+            continue;
+          }
+          ConditionMatcher conditionMatcher = new ConditionMatcher();
+          conditionMatcher.fieldName = StrUtil.isBlank(annotation.value())
+              ? field.getName()
+              : annotation.value();
+          conditionMatcher.fieldValue = ReflectUtil.getFieldValue(object, field);
+          conditionMatcher.operator = annotation.operator();
+          conditionMatcher.order = annotation.order();
+          conditionMatchers.add(conditionMatcher);
+        }
       }
     }
-    conditionFields.sort(Comparator.comparingInt(o -> o.getAnnotation(Condition.class).order()));
 
-    for (Field field : conditionFields) {
-      Condition condAnn   = field.getAnnotation(Condition.class);
-      String    fieldName = condAnn.value();
-      if (StrUtil.isBlank(fieldName)) {
-        fieldName = field.getName();
-      }
-      Object paramVal = ReflectUtil.getFieldValue(object, fieldName);
+    conditionMatchers.sort(Comparator.comparingInt(o -> o.order));
+
+    for (ConditionMatcher condMat : conditionMatchers) {
       if (cond == null) {
-        cond = createCondByOperator(condAnn.operator(), fieldName, paramVal);
+        cond = createCondByOperator(condMat.operator, condMat.fieldName, condMat.fieldValue);
       } else {
-        cond.and(createCondByOperator(condAnn.operator(), fieldName, paramVal));
+        cond.and(createCondByOperator(condMat.operator, condMat.fieldName, condMat.fieldValue));
       }
     }
+
     return cond;
+  }
+
+  static class ConditionMatcher {
+
+    String   fieldName;
+    Object   fieldValue;
+    Operator operator;
+    int      order;
+
   }
 
   private static Cond createCondByOperator(Operator operator, String fieldName, Object paramVal) {

@@ -84,13 +84,14 @@ public interface IDialect {
   /**
    * 获取更新语句
    *
-   * @param clazz    实体类Class
-   * @param model    实体类对象
-   * @param <TModel> 实体类类型
+   * @param clazz           实体类Class
+   * @param model           实体类对象
+   * @param ignoreNullValue 忽略空字段的值
+   * @param <TModel>        实体类类型
    *
    * @return Sql对象
    */
-  <TModel> Sql update(Class<TModel> clazz, TModel model);
+  <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue);
 
   /**
    * 获取删除实体语句

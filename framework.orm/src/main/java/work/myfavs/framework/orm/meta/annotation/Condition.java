@@ -1,6 +1,7 @@
 package work.myfavs.framework.orm.meta.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.RetentionPolicy;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 
@@ -11,6 +12,7 @@ import work.myfavs.framework.orm.meta.enumeration.Operator;
 @java.lang.annotation.Target({ElementType.FIELD})
 @java.lang.annotation.Retention(RetentionPolicy.RUNTIME)
 @java.lang.annotation.Documented
+@Repeatable(value = Conditions.class)
 public @interface Condition {
 
   /**
@@ -33,5 +35,12 @@ public @interface Condition {
    * @return 条件顺序
    */
   int order() default 1;
+
+  /**
+   * 组名，默认DEFAULT，用于区分不同场景的条件
+   *
+   * @return 组名
+   */
+  String group() default "DEFAULT";
 
 }

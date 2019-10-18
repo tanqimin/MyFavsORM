@@ -49,6 +49,22 @@ public class DatabaseTest {
   }
 
   @Test
+  public void getByCondition() {
+
+    Snowfake snowfake = new Snowfake();
+    snowfake.setName("UUI%");
+    snowfake.setType(TypeEnum.DRINK);
+
+    try (Database database = this.dbTemplate.open()) {
+      Snowfake res = database.getByCondition(Snowfake.class, snowfake);
+      Assert.assertNotNull(res);
+
+      List<Snowfake> ress = database.findByCondition(Snowfake.class, snowfake, "SNOW_DTO");
+      Assert.assertNotNull(ress);
+    }
+  }
+
+  @Test
   public void testTransaction() {
 
     try (Database db = this.dbTemplate.open()) {

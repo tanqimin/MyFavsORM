@@ -355,6 +355,46 @@ public class Database
     return this.get(viewClass, sql);
   }
 
+  /**
+   * 根据条件获取记录
+   *
+   * @param viewClass 结果类型
+   * @param cond      条件
+   *
+   * @return 记录
+   */
+  public <TView> TView getByCond(Class<TView> viewClass, Cond cond) {
+
+    Sql sql = dialect.select(viewClass).where(cond);
+    return this.get(viewClass, sql);
+  }
+
+  /**
+   * 根据@Condition注解生成的条件查询记录
+   *
+   * @param viewClass 结果类型
+   * @param object    包含@Condition注解Field的对象
+   *
+   * @return 记录
+   */
+  public <TView> TView getByCondition(Class<TView> viewClass, Object object) {
+
+    return this.getByCond(viewClass, Cond.create(object));
+  }
+
+  /**
+   * 根据@Condition注解生成的条件查询记录
+   *
+   * @param viewClass      结果类型
+   * @param object         包含@Condition注解Field的对象
+   * @param conditionGroup 条件组名
+   *
+   * @return 记录
+   */
+  public <TView> TView getByCondition(Class<TView> viewClass, Object object, String conditionGroup) {
+
+    return this.getByCond(viewClass, Cond.create(object, conditionGroup));
+  }
 
   /**
    * 根据多个主键ID查询实体集合
@@ -399,6 +439,47 @@ public class Database
 
     Sql sql = dialect.select(viewClass).where(Cond.in(field, params, false));
     return this.find(viewClass, sql);
+  }
+
+  /**
+   * 根据条件查询实体集合
+   *
+   * @param viewClass 结果类型
+   * @param cond      查询条件
+   *
+   * @return 实体集合
+   */
+  public <TView> List<TView> findByCond(Class<TView> viewClass, Cond cond) {
+
+    Sql sql = dialect.select(viewClass).where(cond);
+    return this.find(viewClass, sql);
+  }
+
+  /**
+   * 根据@Condition注解生成的条件查询实体集合
+   *
+   * @param viewClass 结果类型
+   * @param object    包含@Condition注解Field的对象
+   *
+   * @return 实体集合
+   */
+  public <TView> List<TView> findByCondition(Class<TView> viewClass, Object object) {
+
+    return findByCond(viewClass, Cond.create(object));
+  }
+
+  /**
+   * 根据@Condition注解生成的条件查询实体集合
+   *
+   * @param viewClass      结果类型
+   * @param object         包含@Condition注解Field的对象
+   * @param conditionGroup 条件组名
+   *
+   * @return 实体集合
+   */
+  public <TView> List<TView> findByCondition(Class<TView> viewClass, Object object, String conditionGroup) {
+
+    return findByCond(viewClass, Cond.create(object, conditionGroup));
   }
 
   /**
@@ -1000,7 +1081,24 @@ public class Database
     if (entity == null) {
       return 0;
     }
-    return execute(dialect.update(modelClass, entity));
+    return execute(dialect.update(modelClass, entity, false));
+  }
+
+  /**
+   * 更新实体，忽略Null属性的字段
+   *
+   * @param modelClass 实体类型
+   * @param entity     实体
+   * @param <TModel>   实体类型泛型
+   *
+   * @return 影响行数
+   */
+  public <TModel> int updateIgnoreNull(Class<TModel> modelClass, TModel entity) {
+
+    if (entity == null) {
+      return 0;
+    }
+    return execute(dialect.update(modelClass, entity, true));
   }
 
   /**
@@ -1229,6 +1327,26 @@ public class Database
     AttributeMeta primaryKey   = classMeta.checkPrimaryKey();
     String        pkColumnName = primaryKey.getColumnName();
     Sql           sql          = Sql.Delete(classMeta.getTableName()).where(Cond.eq(pkColumnName, id));
+    return execute(sql);
+  }
+
+  /**
+   * 根据条件删除记录
+   *
+   * @param modelClass 实体类型
+   * @param cond       条件值
+   * @param <TModel>   实体类型泛型
+   *
+   * @return 影响行数
+   */
+  public <TModel> int deleteByCond(Class<TModel> modelClass, Cond cond) {
+
+    if (cond == null) {
+      return 0;
+    }
+
+    ClassMeta classMeta = Metadata.get(modelClass);
+    Sql       sql       = Sql.Delete(classMeta.getTableName()).where(cond);
     return execute(sql);
   }
 

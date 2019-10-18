@@ -113,7 +113,7 @@ public abstract class DefaultDialect
   }
 
   @Override
-  public <TModel> Sql update(Class<TModel> clazz, TModel model) {
+  public <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue) {
 
     ClassMeta           classMeta;
     String              tableName;
@@ -131,8 +131,12 @@ public abstract class DefaultDialect
 
     if (updateAttributes.size() > 0) {
       for (AttributeMeta attributeMeta : updateAttributes) {
-        sql.append(StrUtil.format(" {} = ?,", attributeMeta.getColumnName()),
-                   ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
+        final Object fieldValue = ReflectUtil.getFieldValue(model, attributeMeta.getFieldName());
+        //忽略属性为null的字段生成
+        if (fieldValue == null && ignoreNullValue) {
+          continue;
+        }
+        sql.append(StrUtil.format(" {} = ?,", attributeMeta.getColumnName()), fieldValue);
       }
       sql.getSql().deleteCharAt(sql.getSql().lastIndexOf(","));
     }
