@@ -1,8 +1,11 @@
 package work.myfavs.framework.orm.util;
 
+import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 
 public class PKGenerator {
+
+  private static Snowflake snowflake = null;
 
   /**
    * 获取 UUID 主键值
@@ -24,7 +27,10 @@ public class PKGenerator {
    */
   public static long nextSnowFakeId(long workerId, long dataCenterId) {
 
-    return IdUtil.createSnowflake(workerId, dataCenterId).nextId();
+    if (snowflake == null) {
+      snowflake = IdUtil.createSnowflake(workerId, dataCenterId);
+    }
+    return snowflake.nextId();
   }
 
 }
