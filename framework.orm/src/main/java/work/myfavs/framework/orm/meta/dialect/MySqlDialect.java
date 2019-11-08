@@ -29,7 +29,7 @@ public class MySqlDialect
       }
     }
 
-    if (pageSize == -1) {
+    if (currentPage < 1 || pageSize < 1) {
       return querySql;
     }
 

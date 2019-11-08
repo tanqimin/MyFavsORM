@@ -529,6 +529,14 @@ public class Database
 
     pagSize = pageSize;
     if (enablePage) {
+      if (currentPage < 1) {
+        throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
+      }
+
+      if (pageSize < 1) {
+        throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
+      }
+
       long maxPageSize = this.dbTemplate.getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
         throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
@@ -677,6 +685,14 @@ public class Database
     pagSize = pageSize;
 
     if (enablePage) {
+      if (currentPage < 1) {
+        throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
+      }
+
+      if (pageSize < 1) {
+        throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
+      }
+
       long maxPageSize = this.dbTemplate.getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
         throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);

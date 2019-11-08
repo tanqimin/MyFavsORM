@@ -28,7 +28,7 @@ public class SqlServerDialect
       }
     }
 
-    if (pageSize == -1) {
+    if (currentPage < 1 || pageSize < 1) {
       return new Sql(sql, params);
     }
 

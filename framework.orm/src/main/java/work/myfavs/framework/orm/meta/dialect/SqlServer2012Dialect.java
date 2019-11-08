@@ -21,15 +21,16 @@ public class SqlServer2012Dialect
   public Sql selectTop(int currentPage, int pageSize, String sql, List<Object> params) {
 
     Sql querySql = new Sql(sql, params);
-    if (pageSize == -1) {
-      return querySql;
-    }
 
     if (currentPage == 1 && pageSize == 1) {
       //如果sql本身只返回一个结果
       if (P_SELECT_SINGLE.matcher(sql).find()) {
         return querySql;
       }
+    }
+
+    if (currentPage < 1 || pageSize < 1) {
+      return querySql;
     }
 
     int offset = pageSize * (currentPage - 1);
