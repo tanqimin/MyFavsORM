@@ -942,7 +942,7 @@ public class Database
         } else if (strategy == GenerationType.UUID) {
           pkVal = PKGenerator.nextUUID();
         } else if (strategy == GenerationType.SNOW_FLAKE) {
-          pkVal = PKGenerator.nextSnowFakeId(1L, 1L);
+          pkVal = PKGenerator.nextSnowFakeId(this.dbTemplate.getWorkerId(), this.dbTemplate.getDataCenterId());
         }
 
         ReflectUtil.setFieldValue(entity, pkFieldName, pkVal);
@@ -1034,7 +1034,7 @@ public class Database
           } else if (strategy == GenerationType.UUID) {
             pkVal = PKGenerator.nextUUID();
           } else if (strategy == GenerationType.SNOW_FLAKE) {
-            pkVal = PKGenerator.nextSnowFakeId(1L, 1L);
+            pkVal = PKGenerator.nextSnowFakeId(this.dbTemplate.getWorkerId(), this.dbTemplate.getDataCenterId());
           }
 
           ReflectUtil.setFieldValue(entity, pkFieldName, pkVal);

@@ -38,6 +38,10 @@ public class DBTemplate
   protected int        maxPageSize      = -1;
   //默认事务级别
   protected int        defaultIsolation = Connection.TRANSACTION_READ_COMMITTED;
+  //终端ID
+  protected long       workerId         = 1L;
+  //数据中心ID
+  protected long       dataCenterId     = 1L;
 
   protected Class<? extends ConnectionFactory> connectionFactoryClass = null;
 
@@ -341,6 +345,8 @@ public class DBTemplate
    * 设置分页时每页最大记录数(小于 0 为不限制)
    *
    * @param maxPageSize 分页时每页最大记录数
+   *
+   * @return DBTemplate
    */
   public DBTemplate setMaxPageSize(int maxPageSize) {
 
@@ -363,11 +369,57 @@ public class DBTemplate
    *
    * @param defaultIsolation 事务隔离级别
    *
-   * @return Orm
+   * @return DBTemplate
    */
   public DBTemplate setDefaultIsolation(int defaultIsolation) {
 
     this.defaultIsolation = defaultIsolation;
+    return this;
+  }
+
+  /**
+   * 获取终端ID
+   *
+   * @return 终端ID
+   */
+  public long getWorkerId() {
+
+    return workerId;
+  }
+
+  /**
+   * 设置终端ID
+   *
+   * @param workerId 终端ID
+   *
+   * @return DBTemplate
+   */
+  public DBTemplate setWorkerId(long workerId) {
+
+    this.workerId = workerId;
+    return this;
+  }
+
+  /**
+   * 获取数据中心ID
+   *
+   * @return 数据中心ID
+   */
+  public long getDataCenterId() {
+
+    return dataCenterId;
+  }
+
+  /**
+   * 设置数据中心ID
+   *
+   * @param dataCenterId 数据中心ID
+   *
+   * @return DBTemplate
+   */
+  public DBTemplate setDataCenterId(long dataCenterId) {
+
+    this.dataCenterId = dataCenterId;
     return this;
   }
 

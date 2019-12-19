@@ -53,7 +53,9 @@ public class PrimaryDataSourceConfig {
                      .setBatchSize(200)
                      .setFetchSize(100)
 //                     .setMaxPageSize(100)
-                     .setQueryTimeout(120);
+                     .setQueryTimeout(120)
+                     .setDataCenterId(1L)
+                     .setWorkerId(1L);
   }
 
 }
