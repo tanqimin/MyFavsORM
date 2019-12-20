@@ -21,6 +21,7 @@ public class DialectFactory {
     map.put(DbType.SQL_SERVER_2012, new SqlServer2012Dialect());
     map.put(DbType.MYSQL, new MySqlDialect());
     map.put(DbType.H2, new H2Dialect());
+    map.put(DbType.POSTGRE_SQL, new PostgreSQLDialect());
   }
 
   private DialectFactory() {
