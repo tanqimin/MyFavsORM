@@ -1,5 +1,6 @@
 package work.myfavs.framework.orm.meta.clause;
 
+import cn.hutool.core.util.StrUtil;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -12,6 +13,11 @@ abstract public class Clause {
 
   protected StringBuilder sql;
   protected List<Object>  params;
+
+  public String getSqlString() {
+
+    return StrUtil.toString(sql);
+  }
 
   public Clause() {
 

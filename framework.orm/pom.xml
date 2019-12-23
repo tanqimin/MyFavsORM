@@ -5,7 +5,7 @@
   <groupId>work.myfavs</groupId>
 
   <artifactId>framework.orm</artifactId>
-  <version>0.2.19.RELEASE</version>
+  <version>0.2.20.RELEASE</version>
   <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,7 +27,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
     <lombok.version>1.18.8</lombok.version>
-    <hutool-core.version>4.6.5</hutool-core.version>
+    <hutool-core.version>5.1.0</hutool-core.version>
     <slf4j.version>1.7.26</slf4j.version>
     <logback.version>1.2.3</logback.version>
     <junit.version>4.12</junit.version>
@@ -48,6 +48,12 @@
     <dependency>
       <groupId>cn.hutool</groupId>
       <artifactId>hutool-core</artifactId>
+      <version>${hutool-core.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-json</artifactId>
       <version>${hutool-core.version}</version>
     </dependency>
 

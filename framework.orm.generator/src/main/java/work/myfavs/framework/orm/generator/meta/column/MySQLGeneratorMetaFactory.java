@@ -44,7 +44,7 @@ public class MySQLGeneratorMetaFactory
       conn = DriverManager.getConnection(url, user, pwd);
       String dbName = conn.getCatalog();
       Sql    sql    = getSql(dbName);
-      ps = DBUtil.getPs(conn, sql.getSql().toString(), sql.getParams());
+      ps = DBUtil.getPsForQuery(conn, sql.getSqlString(), sql.getParams());
       rs = ps.executeQuery();
 
       while (rs.next()) {

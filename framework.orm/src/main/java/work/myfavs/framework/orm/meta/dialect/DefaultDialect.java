@@ -70,8 +70,8 @@ public abstract class DefaultDialect
         insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
         valuesSql.append(StrUtil.format("?,"), ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
       }
-      insertSql.getSql().deleteCharAt(insertSql.getSql().lastIndexOf(","));
-      valuesSql.getSql().deleteCharAt(valuesSql.getSql().lastIndexOf(","));
+      insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
+      valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
     }
 
     return insertSql.append(")").append(valuesSql).append(")");
@@ -105,8 +105,8 @@ public abstract class DefaultDialect
         insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
         valuesSql.append(StrUtil.format("?,"));
       }
-      insertSql.getSql().deleteCharAt(insertSql.getSql().lastIndexOf(","));
-      valuesSql.getSql().deleteCharAt(valuesSql.getSql().lastIndexOf(","));
+      insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
+      valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
     }
 
     return insertSql.append(")").append(valuesSql).append(")");

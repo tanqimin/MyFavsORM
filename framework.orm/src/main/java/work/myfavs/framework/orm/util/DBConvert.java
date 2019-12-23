@@ -33,8 +33,6 @@ public class DBConvert {
 
     final Map<String, AttributeMeta> attrMetas;
 
-    rs.beforeFirst();
-
     if (modelClass == Record.class) {
       return toRecordList(modelClass, rs);
     }

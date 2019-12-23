@@ -317,7 +317,7 @@ public class Query
    */
   public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
-    return this.findPageLite(viewClass, sql.getSql().toString(), sql.getParams(), enablePage, currentPage, pageSize);
+    return this.findPageLite(viewClass, sql.getSqlString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
   /**
@@ -413,7 +413,7 @@ public class Query
    */
   public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
-    return findPage(viewClass, sql.getSql().toString(), sql.getParams(), enablePage, currentPage, pageSize);
+    return findPage(viewClass, sql.getSqlString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
   /**

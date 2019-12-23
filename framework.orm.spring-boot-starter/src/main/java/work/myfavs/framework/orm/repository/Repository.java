@@ -224,7 +224,7 @@ public class Repository<TModel>
    */
   public int execute(Sql sql) {
 
-    return this.execute(sql.getSql().toString(), sql.getParams());
+    return this.execute(sql.getSqlString(), sql.getParams());
   }
 
   /**

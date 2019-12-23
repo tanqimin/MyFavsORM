@@ -1,9 +1,8 @@
 package work.myfavs.framework.orm.util;
 
 import cn.hutool.core.util.StrUtil;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import cn.hutool.json.JSONUtil;
+import java.util.Iterator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,47 +45,6 @@ public class SqlLog {
     return stringBuilder.toString();
   }
 
-  public void showResult(ResultSet rs)
-      throws SQLException {
-
-    if (showResult && log.isDebugEnabled()) {
-      ResultSetMetaData metaData;
-      StringBuilder     logStr;
-      int               columnCount;
-      String            columnLabel;
-      Object            columnVal;
-      int               rows = 0;
-
-      metaData = rs.getMetaData();
-      columnCount = metaData.getColumnCount();
-
-      logStr = new StringBuilder(System.lineSeparator());
-      logStr.append(" QUERY RESULT:");
-      logStr.append(System.lineSeparator());
-
-      rs.beforeFirst();
-      while (rs.next()) {
-        rows++;
-        logStr.append(StrUtil.format("ROW[{}]: {", rs.getRow()));
-        for (int i = 1;
-             i <= columnCount;
-             i++) {
-          columnLabel = metaData.getColumnLabel(i);
-          columnVal = rs.getObject(i);
-          if (rs.wasNull()) {
-            logStr.append(StrUtil.format("\"{}\":null, ", columnLabel));
-          } else {
-            logStr.append(StrUtil.format("\"{}\":\"{}\", ", columnLabel, columnVal));
-          }
-        }
-        logStr.deleteCharAt(logStr.lastIndexOf(", ")).append("}").append(System.lineSeparator());
-      }
-      logStr.append(StrUtil.format("TOTAL RECORDS: {}", rows));
-      logStr.append(System.lineSeparator());
-      log.info(logStr.toString());
-    }
-  }
-
   public void showBatchSql(String sql, List<List> paramsList) {
 
     if (showSql && log.isInfoEnabled()) {
@@ -111,6 +69,25 @@ public class SqlLog {
     if (showResult && log.isInfoEnabled()) {
       log.info("AFFECTED ROWS: {}", result);
     }
+  }
+
+  public <TView> void showResult(List<TView> result) {
+
+    if (showSql && log.isInfoEnabled()) {
+      if (result != null && result.size() > 0) {
+        StringBuilder logStr = new StringBuilder();
+        logStr.append(" QUERY RESULT:");
+        logStr.append(System.lineSeparator());
+        for (Iterator<TView> iterator = result.iterator();
+             iterator.hasNext(); ) {
+          logStr.append(JSONUtil.parse(iterator.next()).toString()).append(System.lineSeparator());
+        }
+        logStr.append(StrUtil.format("TOTAL RECORDS: {}", result.size()));
+        logStr.append(System.lineSeparator());
+        log.info(logStr.toString());
+      }
+    }
+
   }
 
 }

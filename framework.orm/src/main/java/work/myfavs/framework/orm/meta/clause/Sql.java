@@ -779,7 +779,7 @@ public class Sql
   @Override
   public String toString() {
 
-    return this.getSql().toString();
+    return this.getSqlString();
   }
 
 }
