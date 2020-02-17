@@ -87,7 +87,9 @@ public class JdbcConnectionFactory
   protected void releaseConnection(Connection conn) {
 
     try {
-      conn.commit();
+      if (conn.getAutoCommit() == false) {
+        conn.commit();
+      }
     } catch (SQLException e) {
       throw new DBException(e, "Fail to committed transaction, error message : ");
     }
