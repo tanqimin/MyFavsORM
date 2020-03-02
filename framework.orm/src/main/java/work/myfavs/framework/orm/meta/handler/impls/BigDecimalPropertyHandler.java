@@ -14,7 +14,9 @@ public class BigDecimalPropertyHandler
     extends PropertyHandler<BigDecimal> {
 
   @Override
-  public BigDecimal convert(ResultSet rs, String columnName, Class<BigDecimal> clazz)
+  public BigDecimal convert(ResultSet rs,
+                            String columnName,
+                            Class<BigDecimal> clazz)
       throws SQLException {
 
     BigDecimal i = rs.getBigDecimal(columnName);
@@ -24,7 +26,9 @@ public class BigDecimalPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, BigDecimal param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           BigDecimal param)
       throws SQLException {
 
     if (param == null) {

@@ -1,9 +1,7 @@
 package work.myfavs.framework.orm.generator.meta;
 
 import java.util.*;
-import lombok.Data;
 
-@Data
 public class GeneratorMeta {
 
   /**
@@ -14,6 +12,26 @@ public class GeneratorMeta {
    * 实体表定义
    */
   private List<TableDefinition>       tableDefinitions = new ArrayList<>();
+
+  public Map<String, TypeDefinition> getTypeMapper() {
+
+    return typeMapper;
+  }
+
+  public void setTypeMapper(Map<String, TypeDefinition> typeMapper) {
+
+    this.typeMapper = typeMapper;
+  }
+
+  public List<TableDefinition> getTableDefinitions() {
+
+    return tableDefinitions;
+  }
+
+  public void setTableDefinitions(List<TableDefinition> tableDefinitions) {
+
+    this.tableDefinitions = tableDefinitions;
+  }
 
   /**
    * 获取所有实体类名称

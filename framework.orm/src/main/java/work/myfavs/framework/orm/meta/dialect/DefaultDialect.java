@@ -5,7 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.schema.AttributeMeta;
@@ -18,9 +19,10 @@ import work.myfavs.framework.orm.meta.schema.Metadata;
  *
  * @author tanqimin
  */
-@Slf4j
 public abstract class DefaultDialect
     implements IDialect {
+
+  private final static Logger log = LoggerFactory.getLogger(DefaultDialect.class);
 
   protected final Pattern P_SELECT        = Pattern.compile("^\\s*SELECT\\s+", Pattern.CASE_INSENSITIVE);
   protected final Pattern P_ORDER         = Pattern.compile("\\s+ORDER\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
@@ -31,7 +33,8 @@ public abstract class DefaultDialect
 
   protected static <TModel> String getTableName(Class<TModel> clazz) {
 
-    return Metadata.get(clazz).getTableName();
+    return Metadata.get(clazz)
+                   .getTableName();
   }
 
   /**
@@ -43,7 +46,8 @@ public abstract class DefaultDialect
   public abstract String getDialectName();
 
   @Override
-  public <TModel> Sql insert(Class<TModel> clazz, TModel model) {
+  public <TModel> Sql insert(Class<TModel> clazz,
+                             TModel model) {
 
     ClassMeta           classMeta;
     String              tableName;
@@ -70,11 +74,17 @@ public abstract class DefaultDialect
         insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
         valuesSql.append(StrUtil.format("?,"), ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
       }
-      insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
-      valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
+      insertSql.getSql()
+               .deleteCharAt(insertSql.getSqlString()
+                                      .lastIndexOf(","));
+      valuesSql.getSql()
+               .deleteCharAt(valuesSql.getSqlString()
+                                      .lastIndexOf(","));
     }
 
-    return insertSql.append(")").append(valuesSql).append(")");
+    return insertSql.append(")")
+                    .append(valuesSql)
+                    .append(")");
   }
 
   @Override
@@ -105,15 +115,23 @@ public abstract class DefaultDialect
         insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
         valuesSql.append(StrUtil.format("?,"));
       }
-      insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
-      valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
+      insertSql.getSql()
+               .deleteCharAt(insertSql.getSqlString()
+                                      .lastIndexOf(","));
+      valuesSql.getSql()
+               .deleteCharAt(valuesSql.getSqlString()
+                                      .lastIndexOf(","));
     }
 
-    return insertSql.append(")").append(valuesSql).append(")");
+    return insertSql.append(")")
+                    .append(valuesSql)
+                    .append(")");
   }
 
   @Override
-  public <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue) {
+  public <TModel> Sql update(Class<TModel> clazz,
+                             TModel model,
+                             boolean ignoreNullValue) {
 
     ClassMeta           classMeta;
     String              tableName;
@@ -127,7 +145,8 @@ public abstract class DefaultDialect
     primaryKey = classMeta.checkPrimaryKey();
     updateAttributes = classMeta.getUpdateAttributes();
 
-    sql = Sql.Update(tableName).append(" SET");
+    sql = Sql.Update(tableName)
+             .append(" SET");
 
     if (updateAttributes.size() > 0) {
       for (AttributeMeta attributeMeta : updateAttributes) {
@@ -138,7 +157,9 @@ public abstract class DefaultDialect
         }
         sql.append(StrUtil.format(" {} = ?,", attributeMeta.getColumnName()), fieldValue);
       }
-      sql.getSql().deleteCharAt(sql.getSql().lastIndexOf(","));
+      sql.getSql()
+         .deleteCharAt(sql.getSql()
+                          .lastIndexOf(","));
     }
     sql.append(StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()), ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
 
@@ -153,7 +174,8 @@ public abstract class DefaultDialect
   }
 
   @Override
-  public Sql count(String sql, List<Object> params) {
+  public Sql count(String sql,
+                   List<Object> params) {
 
     Matcher om = P_ORDER.matcher(sql);
     if (om.find()) {

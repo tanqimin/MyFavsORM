@@ -22,7 +22,8 @@ public class Gen {
     config.setJdbcUrl(url);                                               //数据库URL
     config.setJdbcUser(user);                                             //数据库用户
     config.setJdbcPwd(password);                                          //数据库密码
-    config.setTemplateDir("D:/project/github/tanqimin@gmail.com/myfavs.framework/framework.example");                                             //代码输出根目录
+    config.setTemplateDir(
+        "D:/project/github/tanqimin@gmail.com/myfavs.framework/framework.example");                                             //代码输出根目录
 
     config.setTablePrefix("tb_");
 

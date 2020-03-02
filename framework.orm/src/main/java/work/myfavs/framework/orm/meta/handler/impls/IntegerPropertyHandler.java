@@ -37,7 +37,9 @@ public class IntegerPropertyHandler
   }
 
   @Override
-  public Integer convert(ResultSet rs, String columnName, Class<Integer> clazz)
+  public Integer convert(ResultSet rs,
+                         String columnName,
+                         Class<Integer> clazz)
       throws SQLException {
 
     int i = rs.getInt(columnName);
@@ -52,7 +54,9 @@ public class IntegerPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Integer param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Integer param)
       throws SQLException {
 
     if (param == null) {

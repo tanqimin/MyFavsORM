@@ -37,7 +37,9 @@ public class LongPropertyHandler
   }
 
   @Override
-  public Long convert(ResultSet rs, String columnName, Class<Long> clazz)
+  public Long convert(ResultSet rs,
+                      String columnName,
+                      Class<Long> clazz)
       throws SQLException {
 
     long i = rs.getLong(columnName);
@@ -52,7 +54,9 @@ public class LongPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Long param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Long param)
       throws SQLException {
 
     if (param == null) {

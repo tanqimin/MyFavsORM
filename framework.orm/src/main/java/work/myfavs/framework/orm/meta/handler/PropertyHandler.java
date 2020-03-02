@@ -24,7 +24,9 @@ public abstract class PropertyHandler<T> {
    *
    * @throws SQLException SQLException
    */
-  abstract public T convert(ResultSet rs, String columnName, Class<T> clazz)
+  abstract public T convert(ResultSet rs,
+                            String columnName,
+                            Class<T> clazz)
       throws SQLException;
 
   /**
@@ -36,7 +38,9 @@ public abstract class PropertyHandler<T> {
    *
    * @throws SQLException SQLException
    */
-  abstract public void addParameter(PreparedStatement ps, int paramIndex, T param)
+  abstract public void addParameter(PreparedStatement ps,
+                                    int paramIndex,
+                                    T param)
       throws SQLException;
 
 }

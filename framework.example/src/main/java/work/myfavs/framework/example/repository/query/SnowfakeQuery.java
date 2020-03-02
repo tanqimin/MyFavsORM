@@ -40,14 +40,17 @@ public class SnowfakeQuery
    */
   public Snowfake getById(Object id) {
 
-    Sql sql = Sql.Select("*").from(META.TABLE).where(Cond.eq(META.COLUMNS.id, id));
+    Sql sql = Sql.Select("*")
+                 .from(META.TABLE)
+                 .where(Cond.eq(META.COLUMNS.id, id));
     return super.get(Snowfake.class, sql);
   }
 
   @Transactional(readOnly = true)
   public Page<Snowfake> findPage() {
 
-    return super.findPage(Snowfake.class, Sql.Select("*").from(META.TABLE), true, 1, 1);
+    return super.findPage(Snowfake.class, Sql.Select("*")
+                                             .from(META.TABLE), true, 1, 1);
   }
 
   public Snowfake getFirst() {

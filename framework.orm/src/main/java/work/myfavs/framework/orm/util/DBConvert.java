@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.meta.schema.AttributeMeta;
@@ -16,7 +15,6 @@ import work.myfavs.framework.orm.meta.schema.Metadata;
 /**
  * 数据库类型转换
  */
-@Slf4j
 public class DBConvert {
 
   /**
@@ -28,7 +26,8 @@ public class DBConvert {
    *
    * @return List
    */
-  public static <TModel> List<TModel> toList(Class<TModel> modelClass, ResultSet rs)
+  public static <TModel> List<TModel> toList(Class<TModel> modelClass,
+                                             ResultSet rs)
       throws SQLException {
 
     final Map<String, AttributeMeta> attrMetas;
@@ -37,16 +36,20 @@ public class DBConvert {
       return toRecordList(modelClass, rs);
     }
 
-    attrMetas = Metadata.get(modelClass).getQueryAttributes();
+    attrMetas = Metadata.get(modelClass)
+                        .getQueryAttributes();
 
-    if (attrMetas.isEmpty() && rs.getMetaData().getColumnCount() == 1) {
+    if (attrMetas.isEmpty() && rs.getMetaData()
+                                 .getColumnCount() == 1) {
       return toScalarList(modelClass, rs);
     }
 
     return toEntityList(modelClass, rs, attrMetas);
   }
 
-  private static <TModel> List<TModel> toEntityList(Class<TModel> modelClass, ResultSet rs, Map<String, AttributeMeta> attrMetas)
+  private static <TModel> List<TModel> toEntityList(Class<TModel> modelClass,
+                                                    ResultSet rs,
+                                                    Map<String, AttributeMeta> attrMetas)
       throws SQLException {
 
     final List<TModel> result;
@@ -68,7 +71,8 @@ public class DBConvert {
       for (int i = 1;
            i <= columnCount;
            i++) {
-        colName = metaData.getColumnLabel(i).toUpperCase();
+        colName = metaData.getColumnLabel(i)
+                          .toUpperCase();
         if (!attrMetas.containsKey(colName)) {
           continue;
         }
@@ -82,7 +86,8 @@ public class DBConvert {
     return result;
   }
 
-  private static <TModel> List<TModel> toScalarList(Class<TModel> modelClass, ResultSet rs)
+  private static <TModel> List<TModel> toScalarList(Class<TModel> modelClass,
+                                                    ResultSet rs)
       throws SQLException {
 
     final List<TModel> result;
@@ -94,13 +99,15 @@ public class DBConvert {
     metaData = rs.getMetaData();
 
     while (rs.next()) {
-      colName = metaData.getColumnLabel(1).toUpperCase();
+      colName = metaData.getColumnLabel(1)
+                        .toUpperCase();
       result.add(PropertyHandlerFactory.convert(rs, colName, modelClass));
     }
     return result;
   }
 
-  private static <TModel> List<TModel> toRecordList(Class<TModel> modelClass, ResultSet rs)
+  private static <TModel> List<TModel> toRecordList(Class<TModel> modelClass,
+                                                    ResultSet rs)
       throws SQLException {
 
     final List<TModel> result;

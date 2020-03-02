@@ -51,8 +51,8 @@ spring:
         enabled: true                       #是否启用StatViewServlet默认值true
         url-pattern: /druid/*
         reset-enable: true
-#        login-username: admin
-#        login-password: admin
+        #        login-username: admin
+        #        login-password: admin
         allow:
         deny:
   profiles:

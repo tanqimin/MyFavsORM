@@ -15,7 +15,8 @@ public class ResultSetUtil {
    *
    * @throws SQLException SQLException
    */
-  public static String getString(ResultSet rs, String columnLabel)
+  public static String getString(ResultSet rs,
+                                 String columnLabel)
       throws SQLException {
 
     String res = rs.getString(columnLabel);
@@ -34,7 +35,8 @@ public class ResultSetUtil {
    *
    * @throws SQLException SQLException
    */
-  public static Integer getInt(ResultSet rs, String columnLabel)
+  public static Integer getInt(ResultSet rs,
+                               String columnLabel)
       throws SQLException {
 
     int res = rs.getInt(columnLabel);
@@ -53,7 +55,8 @@ public class ResultSetUtil {
    *
    * @throws SQLException SQLException
    */
-  public static Boolean getBoolean(ResultSet rs, String columnLabel)
+  public static Boolean getBoolean(ResultSet rs,
+                                   String columnLabel)
       throws SQLException {
 
     boolean res = rs.getBoolean(columnLabel);

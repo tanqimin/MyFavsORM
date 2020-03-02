@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
-import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.dialect.DialectFactory;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
@@ -14,10 +13,10 @@ import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 
-@Slf4j
 public class DBTemplate
     implements Cloneable, AutoCloseable {
 
+  //region Attributes
   //数据源
   protected DataSource dataSource;
   //数据库方言
@@ -43,8 +42,11 @@ public class DBTemplate
   //数据中心ID
   protected long       dataCenterId     = 1L;
 
+  //数据库连接工厂
   protected Class<? extends ConnectionFactory> connectionFactoryClass = null;
+  //endregion
 
+  //region Constructor
   /**
    * 构造方法
    *
@@ -55,6 +57,7 @@ public class DBTemplate
     this.setDataSource(dataSource);
     this.setConnectionFactoryClass(JdbcConnectionFactory.class);
   }
+  //endregion
 
   /**
    * 创建一个 DBTemplate 实例
@@ -76,7 +79,8 @@ public class DBTemplate
    *
    * @return DBTemplate
    */
-  public DBTemplate registerPropertyHandler(Class<?> clazz, PropertyHandler propertyHandler) {
+  public DBTemplate registerPropertyHandler(Class<?> clazz,
+                                            PropertyHandler propertyHandler) {
 
     PropertyHandlerFactory.register(clazz, propertyHandler);
     return this;
@@ -148,7 +152,8 @@ public class DBTemplate
     });
   }
 
-  private void setTransactionIsolation(Connection conn, int isolation) {
+  private void setTransactionIsolation(Connection conn,
+                                       int isolation) {
 
     try {
       conn.setTransactionIsolation(isolation);

@@ -11,7 +11,9 @@ public class BlobPropertyHandler
 
 
   @Override
-  public Blob convert(ResultSet rs, String columnName, Class<Blob> clazz)
+  public Blob convert(ResultSet rs,
+                      String columnName,
+                      Class<Blob> clazz)
       throws SQLException {
 
     Blob i = rs.getBlob(columnName);
@@ -21,7 +23,9 @@ public class BlobPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Blob param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Blob param)
       throws SQLException {
 
     if (param == null) {

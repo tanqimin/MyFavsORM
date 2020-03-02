@@ -7,20 +7,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * SQL 语句构建
  * 注意：此处为了解决静态方法与普通方法不能重名的问题，所有静态方法均以大写字母开头
  */
-@EqualsAndHashCode(callSuper = true)
-@Data
 @SuppressWarnings(value = "unchecked")
 public class Sql
     extends Clause
     implements Serializable {
 
+  //region Constructor
   /**
    * 构造方法
    */
@@ -44,10 +41,12 @@ public class Sql
    * @param sql    SQL 语句
    * @param params 参数
    */
-  public Sql(String sql, List<Object> params) {
+  public Sql(String sql,
+             List<Object> params) {
 
     super(sql, params);
   }
+  //endregion
 
   public static Sql New(String sql) {
 
@@ -90,7 +89,9 @@ public class Sql
    *
    * @return 拼接后的 SQL
    */
-  public Sql append(String sql, Object param, Object... params) {
+  public Sql append(String sql,
+                    Object param,
+                    Object... params) {
 
     this.sql.append(sql);
     this.params.add(param);
@@ -106,7 +107,8 @@ public class Sql
    *
    * @return 拼接后的 SQL
    */
-  public Sql append(String sql, List<Object> params) {
+  public Sql append(String sql,
+                    List<Object> params) {
 
     this.sql.append(sql);
     this.params.addAll(params);
@@ -131,7 +133,8 @@ public class Sql
    *
    * @return SQL
    */
-  public static Sql Select(String field, String... fields) {
+  public static Sql Select(String field,
+                           String... fields) {
 
     Sql sql = new Sql(StrUtil.format("SELECT {}", field));
     if (fields != null && fields.length > 0) {
@@ -149,7 +152,8 @@ public class Sql
    */
   public Sql selectAll() {
 
-    this.append(" ").append(SelectAll());
+    this.append(" ")
+        .append(SelectAll());
     return this;
   }
 
@@ -161,7 +165,8 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql select(String field, String... fields) {
+  public Sql select(String field,
+                    String... fields) {
 
     this.append(StrUtil.format(" SELECT {}", field));
     if (fields != null && fields.length > 0) {
@@ -192,7 +197,8 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql from(String tableName, String alias) {
+  public Sql from(String tableName,
+                  String alias) {
 
     return this.append(StrUtil.format(" FROM {} {}", tableName, alias));
   }
@@ -205,7 +211,8 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql from(Sql sql, String alias) {
+  public Sql from(Sql sql,
+                  String alias) {
 
     return this.append(StrUtil.format(" FROM ({}) {}", sql.sql, alias), sql.params);
   }
@@ -218,17 +225,22 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql from(Supplier<Sql> supplier, String alias) {
+  public Sql from(Supplier<Sql> supplier,
+                  String alias) {
 
     return this.from(supplier.get(), alias);
   }
 
-  private Sql join(String tableName, String alias, String onClause) {
+  private Sql join(String tableName,
+                   String alias,
+                   String onClause) {
 
     return this.append(StrUtil.format(" JOIN {} {} ON {}", tableName, alias, onClause));
   }
 
-  private Sql join(Sql sql, String alias, String onClause) {
+  private Sql join(Sql sql,
+                   String alias,
+                   String onClause) {
 
     return this.append(StrUtil.format(" JOIN ({}) {} ON {}", sql.sql, alias, onClause), sql.params);
   }
@@ -242,9 +254,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql leftJoin(String tableName, String alias, String onClause) {
+  public Sql leftJoin(String tableName,
+                      String alias,
+                      String onClause) {
 
-    return this.append(" LEFT").join(tableName, alias, onClause);
+    return this.append(" LEFT")
+               .join(tableName, alias, onClause);
   }
 
   /**
@@ -256,9 +271,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql leftJoin(Sql sql, String alias, String onClause) {
+  public Sql leftJoin(Sql sql,
+                      String alias,
+                      String onClause) {
 
-    return this.append(" LEFT").join(sql, alias, onClause);
+    return this.append(" LEFT")
+               .join(sql, alias, onClause);
   }
 
   /**
@@ -270,9 +288,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql leftJoin(Supplier<Sql> supplier, String alias, String onClause) {
+  public Sql leftJoin(Supplier<Sql> supplier,
+                      String alias,
+                      String onClause) {
 
-    return this.append(" LEFT").join(supplier.get(), alias, onClause);
+    return this.append(" LEFT")
+               .join(supplier.get(), alias, onClause);
   }
 
   /**
@@ -284,9 +305,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql rightJoin(String tableName, String alias, String onClause) {
+  public Sql rightJoin(String tableName,
+                       String alias,
+                       String onClause) {
 
-    return this.append(" RIGHT").join(tableName, alias, onClause);
+    return this.append(" RIGHT")
+               .join(tableName, alias, onClause);
   }
 
   /**
@@ -298,9 +322,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql rightJoin(Sql sql, String alias, String onClause) {
+  public Sql rightJoin(Sql sql,
+                       String alias,
+                       String onClause) {
 
-    return this.append(" RIGHT").join(sql, alias, onClause);
+    return this.append(" RIGHT")
+               .join(sql, alias, onClause);
   }
 
   /**
@@ -312,9 +339,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql rightJoin(Supplier<Sql> supplier, String alias, String onClause) {
+  public Sql rightJoin(Supplier<Sql> supplier,
+                       String alias,
+                       String onClause) {
 
-    return this.append(" RIGHT").join(supplier.get(), alias, onClause);
+    return this.append(" RIGHT")
+               .join(supplier.get(), alias, onClause);
   }
 
   /**
@@ -326,9 +356,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql innerJoin(String tableName, String alias, String onClause) {
+  public Sql innerJoin(String tableName,
+                       String alias,
+                       String onClause) {
 
-    return this.append(" INNER").join(tableName, alias, onClause);
+    return this.append(" INNER")
+               .join(tableName, alias, onClause);
   }
 
   /**
@@ -340,9 +373,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql innerJoin(Sql sql, String alias, String onClause) {
+  public Sql innerJoin(Sql sql,
+                       String alias,
+                       String onClause) {
 
-    return this.append(" INNER").join(sql, alias, onClause);
+    return this.append(" INNER")
+               .join(sql, alias, onClause);
   }
 
   /**
@@ -354,9 +390,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql innerJoin(Supplier<Sql> supplier, String alias, String onClause) {
+  public Sql innerJoin(Supplier<Sql> supplier,
+                       String alias,
+                       String onClause) {
 
-    return this.append(" INNER").join(supplier.get(), alias, onClause);
+    return this.append(" INNER")
+               .join(supplier.get(), alias, onClause);
   }
 
   /**
@@ -368,9 +407,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql fullJoin(String tableName, String alias, String onClause) {
+  public Sql fullJoin(String tableName,
+                      String alias,
+                      String onClause) {
 
-    return this.append(" FULL").join(tableName, alias, onClause);
+    return this.append(" FULL")
+               .join(tableName, alias, onClause);
   }
 
   /**
@@ -382,9 +424,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql fullJoin(Sql sql, String alias, String onClause) {
+  public Sql fullJoin(Sql sql,
+                      String alias,
+                      String onClause) {
 
-    return this.append(" FULL").join(sql, alias, onClause);
+    return this.append(" FULL")
+               .join(sql, alias, onClause);
   }
 
   /**
@@ -396,9 +441,12 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql fullJoin(Supplier<Sql> supplier, String alias, String onClause) {
+  public Sql fullJoin(Supplier<Sql> supplier,
+                      String alias,
+                      String onClause) {
 
-    return this.append(" FULL").join(supplier.get(), alias, onClause);
+    return this.append(" FULL")
+               .join(supplier.get(), alias, onClause);
   }
 
   /**
@@ -443,7 +491,8 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql where(String sql, List<Object> params) {
+  public Sql where(String sql,
+                   List<Object> params) {
 
     return this.append(StrUtil.format(" WHERE {}", sql), params);
   }
@@ -542,7 +591,8 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql groupBy(String field, String... fields) {
+  public Sql groupBy(String field,
+                     String... fields) {
 
     this.append(StrUtil.format(" GROUP BY {}", field));
     if (fields != null && fields.length > 0) {
@@ -585,7 +635,8 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql having(String sql, List<Object> params) {
+  public Sql having(String sql,
+                    List<Object> params) {
 
     return this.append(StrUtil.format(" HAVING {}", sql), params);
   }
@@ -598,7 +649,8 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql orderBy(String field, String... fields) {
+  public Sql orderBy(String field,
+                     String... fields) {
 
     this.append(StrUtil.format(" ORDER BY {}", field));
     if (fields != null && fields.length > 0) {
@@ -631,7 +683,8 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql limit(int offset, int row) {
+  public Sql limit(int offset,
+                   int row) {
 
     return this.append(StrUtil.format(" LIMIT {},{}", offset, row));
   }
@@ -645,7 +698,9 @@ public class Sql
    *
    * @return SQL
    */
-  public static Sql Insert(String table, String field, String... fields) {
+  public static Sql Insert(String table,
+                           String field,
+                           String... fields) {
 
     Sql sql = new Sql(StrUtil.format("INSERT INTO {} ({}", table, field));
     if (fields != null && fields.length > 0) {
@@ -666,7 +721,8 @@ public class Sql
    *
    * @return SQL
    */
-  public static Sql Insert(String table, Map<String, Object> map) {
+  public static Sql Insert(String table,
+                           Map<String, Object> map) {
 
     Sql insertSql;
     Sql valuesSql;
@@ -680,7 +736,9 @@ public class Sql
       insertSql.sql.deleteCharAt(insertSql.sql.lastIndexOf(","));
       valuesSql.sql.deleteCharAt(valuesSql.sql.lastIndexOf(","));
     }
-    return insertSql.append(")").append(valuesSql).append(")");
+    return insertSql.append(")")
+                    .append(valuesSql)
+                    .append(")");
   }
 
   /**
@@ -691,7 +749,8 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql values(Object param, Object... params) {
+  public Sql values(Object param,
+                    Object... params) {
 
     this.append(StrUtil.format(" VALUES (?"), param);
     if (params != null && params.length > 0) {
@@ -723,7 +782,8 @@ public class Sql
    *
    * @return SQL
    */
-  public Sql set(String field, Object param) {
+  public Sql set(String field,
+                 Object param) {
 
     return this.append(StrUtil.format(" SET {} = ?", field), param);
   }
@@ -771,7 +831,8 @@ public class Sql
    *
    * @return SQL
    */
-  public static Sql Delete(String table, String alias) {
+  public static Sql Delete(String table,
+                           String alias) {
 
     return new Sql(StrUtil.format("DELETE {} FROM {} {}", alias, table, alias));
   }

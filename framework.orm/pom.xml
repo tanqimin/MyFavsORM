@@ -5,7 +5,7 @@
   <groupId>work.myfavs</groupId>
 
   <artifactId>framework.orm</artifactId>
-  <version>0.2.21.RELEASE</version>
+  <version>0.2.22.RELEASE</version>
   <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>
 
@@ -26,24 +26,15 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
-    <lombok.version>1.18.8</lombok.version>
     <hutool-core.version>5.1.0</hutool-core.version>
     <slf4j.version>1.7.26</slf4j.version>
-    <logback.version>1.2.3</logback.version>
+
     <junit.version>4.12</junit.version>
     <mysql.version>5.1.48</mysql.version>
     <HikariCP.version>3.3.1</HikariCP.version>
   </properties>
 
   <dependencies>
-    <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-core -->
     <dependency>
       <groupId>cn.hutool</groupId>
@@ -66,19 +57,7 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logback.version}</version>
-      <scope>provided</scope>
-    </dependency>
 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>${logback.version}</version>
-      <scope>provided</scope>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/junit/junit -->
     <dependency>
       <groupId>junit</groupId>

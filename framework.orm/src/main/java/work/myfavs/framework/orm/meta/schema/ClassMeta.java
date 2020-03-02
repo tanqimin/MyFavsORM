@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import lombok.Data;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.exception.DBException;
@@ -14,9 +13,9 @@ import work.myfavs.framework.orm.util.exception.DBException;
 /**
  * 类元数据
  */
-@Data
 public class ClassMeta {
 
+  //region Attributes
   private String         className;
   private String         tableName;
   private GenerationType strategy;
@@ -24,10 +23,75 @@ public class ClassMeta {
   private AttributeMeta              primaryKey;                                  //主键
   private List<AttributeMeta>        updateAttributes = new LinkedList<>();       //更新字段
   private Map<String, AttributeMeta> queryAttributes  = new HashMap<>();          //查询字段
+  //endregion
 
+  //region Getter && Setter
+  public String getClassName() {
+
+    return className;
+  }
+
+  public void setClassName(String className) {
+
+    this.className = className;
+  }
+
+  public String getTableName() {
+
+    return tableName;
+  }
+
+  public void setTableName(String tableName) {
+
+    this.tableName = tableName;
+  }
+
+  public GenerationType getStrategy() {
+
+    return strategy;
+  }
+
+  public void setStrategy(GenerationType strategy) {
+
+    this.strategy = strategy;
+  }
+
+  public AttributeMeta getPrimaryKey() {
+
+    return primaryKey;
+  }
+
+  public void setPrimaryKey(AttributeMeta primaryKey) {
+
+    this.primaryKey = primaryKey;
+  }
+
+  public List<AttributeMeta> getUpdateAttributes() {
+
+    return updateAttributes;
+  }
+
+  public void setUpdateAttributes(List<AttributeMeta> updateAttributes) {
+
+    this.updateAttributes = updateAttributes;
+  }
+
+  public Map<String, AttributeMeta> getQueryAttributes() {
+
+    return queryAttributes;
+  }
+
+  public void setQueryAttributes(Map<String, AttributeMeta> queryAttributes) {
+
+    this.queryAttributes = queryAttributes;
+  }
+  //endregion
+
+  //region Constructor
   private ClassMeta() {
 
   }
+  //endregion
 
   /**
    * 解析指定类为类元数据
@@ -48,7 +112,8 @@ public class ClassMeta {
     if (table != null) {
       classMeta.setClassName(clazz.getName());
       classMeta.setStrategy(table.strategy());
-      classMeta.setTableName(table.value().isEmpty()
+      classMeta.setTableName(table.value()
+                                  .isEmpty()
                                  ? clazz.getSimpleName()
                                  : table.value());
     }
@@ -61,7 +126,8 @@ public class ClassMeta {
         continue;
       }
 
-      final String  queryKey   = attr.getColumnName().toUpperCase();
+      final String queryKey = attr.getColumnName()
+                                  .toUpperCase();
       final boolean readonly   = attr.isReadonly();
       final boolean primaryKey = attr.isPrimaryKey();
 

@@ -3,12 +3,9 @@ package work.myfavs.framework.orm.generator;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.core.util.StrUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Data;
-import lombok.NonNull;
 import work.myfavs.framework.orm.generator.meta.GeneratorMeta;
 import work.myfavs.framework.orm.generator.meta.TableDefinition;
 import work.myfavs.framework.orm.generator.meta.column.ColumnDefinition;
@@ -20,7 +17,6 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 /**
  * 代码生成器
  */
-@Data
 public class CodeGenerator {
 
   //代码生成器配置
@@ -30,11 +26,42 @@ public class CodeGenerator {
   //生成器元数据
   private GeneratorMeta     generatorMeta;
 
+  public GeneratorConfig getGeneratorConfig() {
+
+    return generatorConfig;
+  }
+
+  public void setGeneratorConfig(GeneratorConfig generatorConfig) {
+
+    this.generatorConfig = generatorConfig;
+  }
+
+  public GeneratorTemplate getGeneratorTemplate() {
+
+    return generatorTemplate;
+  }
+
+  public void setGeneratorTemplate(GeneratorTemplate generatorTemplate) {
+
+    this.generatorTemplate = generatorTemplate;
+  }
+
+  public GeneratorMeta getGeneratorMeta() {
+
+    return generatorMeta;
+  }
+
+  public void setGeneratorMeta(GeneratorMeta generatorMeta) {
+
+    this.generatorMeta = generatorMeta;
+  }
+
   public CodeGenerator(GeneratorConfig generatorConfig) {
 
     this.generatorConfig = generatorConfig;
     this.generatorTemplate = new GeneratorTemplate();
-    this.generatorMeta = GeneratorMetaFactory.createInstance(generatorConfig).getGeneratorMeta();
+    this.generatorMeta = GeneratorMetaFactory.createInstance(generatorConfig)
+                                             .getGeneratorMeta();
   }
 
   /**
@@ -56,14 +83,15 @@ public class CodeGenerator {
    * @param tableName 数据表名称
    * @param columns   数据列集合
    */
-  private void outputEntity(@NonNull String tableName, @NonNull List<ColumnDefinition> columns) {
+  private void outputEntity(String tableName,
+                            List<ColumnDefinition> columns) {
 
-    String         entitiesPackage = generatorConfig.getEntityPackage();            //实体Package
-    String         prefix          = generatorConfig.getTablePrefix();                     //忽略数据表前缀
+    String entitiesPackage = generatorConfig.getEntityPackage();            //实体Package
+    String prefix          = generatorConfig.getTablePrefix();                     //忽略数据表前缀
 
-    String         className       = GeneratorUtil.toClass(tableName, prefix);        //实体类名称
-    GenerationType generationType  = generatorConfig.getGenerationType();
-    boolean        coverIfExist    = generatorConfig.isCoverEntityIfExists();
+    String         className      = GeneratorUtil.toClass(tableName, prefix);        //实体类名称
+    GenerationType generationType = generatorConfig.getGenerationType();
+    boolean        coverIfExist   = generatorConfig.isCoverEntityIfExists();
 
     Map<String, Object> params = new HashMap<>();                             //模板参数
 
@@ -87,7 +115,8 @@ public class CodeGenerator {
    *
    * @return 代码文件路径
    */
-  private String getFilePath(String packageName, String fileName) {
+  private String getFilePath(String packageName,
+                             String fileName) {
 
     StringBuilder res      = new StringBuilder();
     String        rootPath = generatorConfig.getTemplateDir();
@@ -98,7 +127,12 @@ public class CodeGenerator {
         res.append("/");
       }
     }
-    return res.append("src/main/java/").append(PathUtil.toPath(packageName)).append("/").append(fileName).append(".java").toString();
+    return res.append("src/main/java/")
+              .append(PathUtil.toPath(packageName))
+              .append("/")
+              .append(fileName)
+              .append(".java")
+              .toString();
   }
 
   /**
@@ -107,7 +141,9 @@ public class CodeGenerator {
    * @param filePath 文件路径
    * @param context  文件内容
    */
-  private void outputFile(String filePath, String context, boolean isCover) {
+  private void outputFile(String filePath,
+                          String context,
+                          boolean isCover) {
 
     if (FileUtil.exist(filePath) && !isCover) {
       return;

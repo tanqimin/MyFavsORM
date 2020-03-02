@@ -2,13 +2,15 @@ package work.myfavs.framework.orm.meta.schema;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 元数据构建
  */
-@Slf4j
 public class Metadata {
+
+  private final static Logger log = LoggerFactory.getLogger(Metadata.class);
 
   private final static Map<String, ClassMeta> CLASS_META_CACHE = new HashMap<>();
 

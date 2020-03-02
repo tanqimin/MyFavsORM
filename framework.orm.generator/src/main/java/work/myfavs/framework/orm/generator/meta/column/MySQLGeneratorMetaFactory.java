@@ -9,10 +9,10 @@ import work.myfavs.framework.orm.generator.meta.GeneratorMeta;
 import work.myfavs.framework.orm.generator.meta.TableDefinition;
 import work.myfavs.framework.orm.generator.meta.TypeDefinition;
 import work.myfavs.framework.orm.generator.util.GeneratorUtil;
+import work.myfavs.framework.orm.generator.util.ResultSetUtil;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.util.DBUtil;
-import work.myfavs.framework.orm.generator.util.ResultSetUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 public class MySQLGeneratorMetaFactory
@@ -29,7 +29,8 @@ public class MySQLGeneratorMetaFactory
   public GeneratorMeta createGeneratorMeta() {
 
     GeneratorMeta generatorMeta = new GeneratorMeta();
-    generatorMeta.getTypeMapper().putAll(generatorConfig.getTypeMapper());
+    generatorMeta.getTypeMapper()
+                 .putAll(generatorConfig.getTypeMapper());
     List<TableDefinition> tableDefinitions = generatorMeta.getTableDefinitions();
 
     String url  = generatorConfig.getJdbcUrl();
@@ -53,7 +54,8 @@ public class MySQLGeneratorMetaFactory
         TableDefinition  tableDefinition = getTableDefinition(table, tableDefinitions);
         ColumnDefinition column          = getColumnDefinition(rs);
 
-        tableDefinition.getColumns().add(column);
+        tableDefinition.getColumns()
+                       .add(column);
       }
 
       return generatorMeta;
@@ -91,7 +93,8 @@ public class MySQLGeneratorMetaFactory
     return sql;
   }
 
-  private TableDefinition getTableDefinition(String table, List<TableDefinition> tableDefinitions) {
+  private TableDefinition getTableDefinition(String table,
+                                             List<TableDefinition> tableDefinitions) {
 
     TableDefinition tableDefinition = null;
     for (TableDefinition definition : tableDefinitions) {
@@ -135,18 +138,21 @@ public class MySQLGeneratorMetaFactory
     return columnDefinition;
   }
 
-  private TypeDefinition createTypeDefinition(String dataType, String comment) {
+  private TypeDefinition createTypeDefinition(String dataType,
+                                              String comment) {
 
     if (comment != null) {
       if (comment.contains("#")) {
         String         className      = comment.split("#")[1];
         TypeDefinition typeDefinition = new TypeDefinition(className);
-        generatorConfig.getTypeMapper().put(className, typeDefinition);
+        generatorConfig.getTypeMapper()
+                       .put(className, typeDefinition);
         return typeDefinition;
       }
     }
 
-    for (Entry<String, TypeDefinition> entry : generatorConfig.getTypeMapper().entrySet()) {
+    for (Entry<String, TypeDefinition> entry : generatorConfig.getTypeMapper()
+                                                              .entrySet()) {
       if (StrUtil.equalsIgnoreCase(dataType, entry.getKey())) {
         return entry.getValue();
       }

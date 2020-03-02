@@ -1,12 +1,8 @@
 package work.myfavs.framework.orm.generator.meta;
 
-import lombok.Data;
-import lombok.NonNull;
-
 /**
  * 类型定义
  */
-@Data
 public class TypeDefinition {
 
   /**
@@ -26,21 +22,64 @@ public class TypeDefinition {
    */
   private String defValue;
 
+  public String getName() {
+
+    return name;
+  }
+
+  public void setName(String name) {
+
+    this.name = name;
+  }
+
+  public String getSimpleName() {
+
+    return simpleName;
+  }
+
+  public void setSimpleName(String simpleName) {
+
+    this.simpleName = simpleName;
+  }
+
+  public String getValueType() {
+
+    return valueType;
+  }
+
+  public void setValueType(String valueType) {
+
+    this.valueType = valueType;
+  }
+
+  public String getDefValue() {
+
+    return defValue;
+  }
+
+  public void setDefValue(String defValue) {
+
+    this.defValue = defValue;
+  }
+
   private TypeDefinition() {
 
   }
 
-  public TypeDefinition(@NonNull String name) {
+  public TypeDefinition(String name) {
 
     this(name, null);
   }
 
-  public TypeDefinition(@NonNull String name, String defValue) {
+  public TypeDefinition(String name,
+                        String defValue) {
 
     this(name, name, defValue);
   }
 
-  public TypeDefinition(@NonNull String name, String valueType, String defValue) {
+  public TypeDefinition(String name,
+                        String valueType,
+                        String defValue) {
 
     this.name = name;
     this.valueType = valueType;

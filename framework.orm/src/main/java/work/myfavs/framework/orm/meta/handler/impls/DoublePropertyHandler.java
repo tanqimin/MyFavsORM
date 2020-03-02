@@ -37,7 +37,9 @@ public class DoublePropertyHandler
   }
 
   @Override
-  public Double convert(ResultSet rs, String columnName, Class<Double> clazz)
+  public Double convert(ResultSet rs,
+                        String columnName,
+                        Class<Double> clazz)
       throws SQLException {
 
     double i = rs.getDouble(columnName);
@@ -52,7 +54,9 @@ public class DoublePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Double param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Double param)
       throws SQLException {
 
     if (param == null) {

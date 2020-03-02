@@ -2,10 +2,10 @@ package work.myfavs.framework.example.repository.query;
 
 import static work.myfavs.framework.example.domain.entity.Uuid.META;
 
-import work.myfavs.framework.example.domain.entity.Uuid;
-import work.myfavs.framework.example.repository.BaseQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import work.myfavs.framework.example.domain.entity.Uuid;
+import work.myfavs.framework.example.repository.BaseQuery;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -38,7 +38,10 @@ public class UuidQuery
    */
   public Uuid getById(Object id) {
 
-    Sql sql = Sql.Select("*").from(META.TABLE).where(Cond.eq(META.COLUMNS.id, id));
+    Sql sql = Sql.Select("*")
+                 .from(META.TABLE)
+                 .where(Cond.eq(META.COLUMNS.id, id));
     return super.get(Uuid.class, sql);
   }
+
 }

@@ -12,17 +12,24 @@ public class WebConfigurer
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-    registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
+    registry.addResourceHandler("/**")
+            .addResourceLocations("classpath:/static/");
   }
 
   @Override
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-    configurer.defaultContentType(MediaType.APPLICATION_JSON_UTF8).favorPathExtension(true);
+
+    configurer.defaultContentType(MediaType.APPLICATION_JSON_UTF8)
+              .favorPathExtension(true);
   }
 
   @Override
   public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/**").allowedMethods("*").allowedHeaders("*").allowedOrigins("*");
+
+    registry.addMapping("/**")
+            .allowedMethods("*")
+            .allowedHeaders("*")
+            .allowedOrigins("*");
   }
 
 }

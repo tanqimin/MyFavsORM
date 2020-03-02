@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import lombok.Data;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
@@ -13,10 +12,10 @@ import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 /**
  * 数据库列元数据
  */
-@Data
 public class AttributeMeta
     implements Serializable {
 
+  //region Attributes
   /**
    * 数据库 列名称
    */
@@ -38,9 +37,77 @@ public class AttributeMeta
    */
   private boolean  primaryKey = false;
 
+  /**
+   * 类型处理器
+   */
   private PropertyHandler propertyHandler = null;
+  //endregion
 
+  //region Getter && Setter
+  public String getColumnName() {
+
+    return columnName;
+  }
+
+  public void setColumnName(String columnName) {
+
+    this.columnName = columnName;
+  }
+
+  public String getFieldName() {
+
+    return fieldName;
+  }
+
+  public void setFieldName(String fieldName) {
+
+    this.fieldName = fieldName;
+  }
+
+  public Class<?> getFieldType() {
+
+    return fieldType;
+  }
+
+  public void setFieldType(Class<?> fieldType) {
+
+    this.fieldType = fieldType;
+  }
+
+  public boolean isReadonly() {
+
+    return readonly;
+  }
+
+  public void setReadonly(boolean readonly) {
+
+    this.readonly = readonly;
+  }
+
+  public boolean isPrimaryKey() {
+
+    return primaryKey;
+  }
+
+  public void setPrimaryKey(boolean primaryKey) {
+
+    this.primaryKey = primaryKey;
+  }
+
+  public PropertyHandler getPropertyHandler() {
+
+    return propertyHandler;
+  }
+
+  public void setPropertyHandler(PropertyHandler propertyHandler) {
+
+    this.propertyHandler = propertyHandler;
+  }
+  //endregion
+
+  //region Constructor
   private AttributeMeta() {}
+  //endregion
 
   /**
    * 把指定字段解析为属性元数据
@@ -61,7 +128,8 @@ public class AttributeMeta
       final String          fieldName       = field.getName();
       final Class<?>        fieldType       = field.getType();
       final PropertyHandler propertyHandler = PropertyHandlerFactory.getInstance(fieldType);
-      final String columnName = column.value().isEmpty()
+      final String columnName = column.value()
+                                      .isEmpty()
           ? fieldName
           : column.value();
 

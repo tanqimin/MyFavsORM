@@ -1,10 +1,7 @@
 package work.myfavs.framework.example.domain.dto;
 
-import lombok.Data;
-import work.myfavs.framework.example.domain.entity.Snowfake;
 import work.myfavs.framework.orm.meta.pagination.IPageable;
 
-@Data
 public class PageableDTO
     implements IPageable {
 

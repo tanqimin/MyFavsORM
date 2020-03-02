@@ -14,11 +14,12 @@ import work.myfavs.framework.example.repository.repo.UuidRepository;
 @Service
 public class TestPKService {
 
-  private final UuidRepository uuidRepository;
+  private final UuidRepository     uuidRepository;
   private final SnowfakeRepository snowfakeRepository;
 
   @Autowired
-  public TestPKService(UuidRepository uuidRepository, SnowfakeRepository snowfakeRepository) {
+  public TestPKService(UuidRepository uuidRepository,
+                       SnowfakeRepository snowfakeRepository) {
 
     this.uuidRepository = uuidRepository;
     this.snowfakeRepository = snowfakeRepository;
@@ -50,6 +51,8 @@ public class TestPKService {
 
   public void throwException()
       throws Exception {
+
     throw new Exception();
   }
+
 }

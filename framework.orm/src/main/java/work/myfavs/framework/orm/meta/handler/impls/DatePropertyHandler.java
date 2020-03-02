@@ -11,7 +11,9 @@ public class DatePropertyHandler
     extends PropertyHandler<Date> {
 
   @Override
-  public Date convert(ResultSet rs, String columnName, Class<Date> clazz)
+  public Date convert(ResultSet rs,
+                      String columnName,
+                      Class<Date> clazz)
       throws SQLException {
 
     Timestamp date = rs.getTimestamp(columnName);
@@ -21,7 +23,9 @@ public class DatePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Date param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Date param)
       throws SQLException {
 
     if (param == null) {

@@ -26,7 +26,8 @@ public interface IDialect {
    *
    * @return Sql对象
    */
-  <TModel> Sql insert(Class<TModel> clazz, TModel entity);
+  <TModel> Sql insert(Class<TModel> clazz,
+                      TModel entity);
 
   /**
    * 获取插入语句（不带参数）
@@ -66,7 +67,8 @@ public interface IDialect {
    *
    * @return 返回行数语句
    */
-  Sql count(String sql, List<Object> params);
+  Sql count(String sql,
+            List<Object> params);
 
   /**
    * 返回分页查询语句
@@ -79,7 +81,10 @@ public interface IDialect {
    *
    * @return Sql对象
    */
-  Sql selectTop(int currentPage, int pageSize, String sql, List<Object> params);
+  Sql selectTop(int currentPage,
+                int pageSize,
+                String sql,
+                List<Object> params);
 
   /**
    * 获取更新语句
@@ -91,7 +96,9 @@ public interface IDialect {
    *
    * @return Sql对象
    */
-  <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue);
+  <TModel> Sql update(Class<TModel> clazz,
+                      TModel model,
+                      boolean ignoreNullValue);
 
   /**
    * 获取删除实体语句

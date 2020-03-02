@@ -13,7 +13,9 @@ public class ByteArrayPropertyHandler
     extends PropertyHandler<byte[]> {
 
   @Override
-  public byte[] convert(ResultSet rs, String columnName, Class<byte[]> clazz)
+  public byte[] convert(ResultSet rs,
+                        String columnName,
+                        Class<byte[]> clazz)
       throws SQLException {
 
     byte[] val = rs.getBytes(columnName);
@@ -24,7 +26,9 @@ public class ByteArrayPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, byte[] param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           byte[] param)
       throws SQLException {
 
     if (param == null) {

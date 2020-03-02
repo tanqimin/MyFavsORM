@@ -6,13 +6,13 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework.example</artifactId>
-  <version>0.2.21.RELEASE</version>
+  <version>0.2.22.RELEASE</version>
 
   <properties>
     <druid.version>1.1.18</druid.version>
     <HikariCP.version>3.3.1</HikariCP.version>
-    <mysql.version>5.1.48</mysql.version>
-    <lombok.version>1.18.8</lombok.version>
+    <logback.version>1.2.3</logback.version>
+    <mysql-connector-java.version>8.0.19</mysql-connector-java.version>
   </properties>
 
   <parent>
@@ -26,14 +26,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter -->
@@ -50,10 +42,26 @@
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+    <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>${mysql.version}</version>
+      <version>${mysql-connector-java.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${logback.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

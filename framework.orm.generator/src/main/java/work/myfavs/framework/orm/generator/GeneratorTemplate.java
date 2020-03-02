@@ -36,7 +36,8 @@ public class GeneratorTemplate {
    *
    * @return 模板
    */
-  public String render(String templateFile, Map<String, Object> params) {
+  public String render(String templateFile,
+                       Map<String, Object> params) {
 
     GroupTemplate groupTemplate = new GroupTemplate(resourceLoader, configuration);
     Template      template      = groupTemplate.getTemplate(templateFile);

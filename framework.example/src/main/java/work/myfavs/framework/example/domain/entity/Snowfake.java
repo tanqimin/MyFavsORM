@@ -1,13 +1,9 @@
 package work.myfavs.framework.example.domain.entity;
 
 import java.io.Serializable;
-import lombok.Data;
-import java.util.Objects;
-import java.lang.Boolean;
-import java.lang.Long;
-import java.lang.String;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 import work.myfavs.framework.example.domain.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
@@ -18,7 +14,6 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
  * Snowfake 实体类
  * PS: 此文件通过代码生成器生成，修改此文件会有被覆盖的风险
  */
-@Data
 @Table(value = Snowfake.META.TABLE, strategy = GenerationType.SNOW_FLAKE)
 public class Snowfake
     implements Serializable {
@@ -28,37 +23,107 @@ public class Snowfake
    */
   @Column(value = Snowfake.META.COLUMNS.id)
   @PrimaryKey
-  private Long id = null;
+  private Long       id      = null;
   /**
    * 创建时间
    */
   @Column(value = Snowfake.META.COLUMNS.created)
-  private Date created = null; 
+  private Date       created = null;
   /**
    * 名称
    */
   @Column(value = Snowfake.META.COLUMNS.name)
-  private String name = null; 
+  private String     name    = null;
   /**
    * 是否停用
    */
   @Column(value = Snowfake.META.COLUMNS.disable)
-  private Boolean disable = false; 
+  private Boolean    disable = false;
   /**
    * 价格
    */
   @Column(value = Snowfake.META.COLUMNS.price)
-  private BigDecimal price = BigDecimal.ZERO; 
+  private BigDecimal price   = BigDecimal.ZERO;
   /**
    * 类型
    */
   @Column(value = Snowfake.META.COLUMNS.type)
-  private TypeEnum type = null; 
+  private TypeEnum   type    = null;
   /**
    * 配置
    */
   @Column(value = Snowfake.META.COLUMNS.config)
-  private String config = null; 
+  private String     config  = null;
+
+  public Long getId() {
+
+    return id;
+  }
+
+  public void setId(Long id) {
+
+    this.id = id;
+  }
+
+  public Date getCreated() {
+
+    return created;
+  }
+
+  public void setCreated(Date created) {
+
+    this.created = created;
+  }
+
+  public String getName() {
+
+    return name;
+  }
+
+  public void setName(String name) {
+
+    this.name = name;
+  }
+
+  public Boolean getDisable() {
+
+    return disable;
+  }
+
+  public void setDisable(Boolean disable) {
+
+    this.disable = disable;
+  }
+
+  public BigDecimal getPrice() {
+
+    return price;
+  }
+
+  public void setPrice(BigDecimal price) {
+
+    this.price = price;
+  }
+
+  public TypeEnum getType() {
+
+    return type;
+  }
+
+  public void setType(TypeEnum type) {
+
+    this.type = type;
+  }
+
+  public String getConfig() {
+
+    return config;
+  }
+
+  public void setConfig(String config) {
+
+    this.config = config;
+  }
 
   /**
    * 元数据
@@ -69,14 +134,16 @@ public class Snowfake
      * 表名
      */
     public static final String TABLE = "tb_snowfake";
+
     /**
      * 字段
      */
     public interface COLUMNS {
+
       /**
        * ID
        */
-      String id = "id";
+      String id      = "id";
       /**
        * 创建时间
        */
@@ -84,7 +151,7 @@ public class Snowfake
       /**
        * 名称
        */
-      String name = "name";
+      String name    = "name";
       /**
        * 是否停用
        */
@@ -92,17 +159,19 @@ public class Snowfake
       /**
        * 价格
        */
-      String price = "price";
+      String price   = "price";
       /**
        * 类型
        */
-      String type = "type";
+      String type    = "type";
       /**
        * 配置
        */
-      String config = "config";
+      String config  = "config";
+
     }
   }
+
   @Override
   public boolean equals(Object o) {
 
@@ -124,14 +193,8 @@ public class Snowfake
 
   @Override
   public String toString() {
-    return "Snowfake { "
-      + "id = " + id  + ", "
-      + "created = " + created  + ", "
-      + "name = " + name  + ", "
-      + "disable = " + disable  + ", "
-      + "price = " + price  + ", "
-      + "type = " + type  + ", "
-      + "config = " + config 
-      + " }";
+
+    return "Snowfake { " + "id = " + id + ", " + "created = " + created + ", " + "name = " + name + ", " + "disable = " + disable + ", " + "price = " + price + ", " + "type = " + type + ", " + "config = " + config + " }";
   }
+
 }

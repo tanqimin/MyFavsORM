@@ -3,7 +3,6 @@ package work.myfavs.framework.orm.repository;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Cond;
@@ -15,7 +14,6 @@ import work.myfavs.framework.orm.meta.dialect.IDialect;
  *
  * @param <TModel>
  */
-@Slf4j
 public class Repository<TModel>
     extends Query {
 
@@ -32,7 +30,8 @@ public class Repository<TModel>
 
     super(dbTemplate);
     this.dialect = dbTemplate.getDialect();
-    this.modelClass = (Class<TModel>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    this.modelClass = (Class<TModel>) ((ParameterizedType) this.getClass()
+                                                               .getGenericSuperclass()).getActualTypeArguments()[0];
   }
 
   /**
@@ -57,7 +56,8 @@ public class Repository<TModel>
    *
    * @return 记录
    */
-  public TModel getByField(String field, Object param) {
+  public TModel getByField(String field,
+                           Object param) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.getByField(modelClass, field, param);
@@ -100,7 +100,8 @@ public class Repository<TModel>
    *
    * @return 记录
    */
-  public TModel get(String sql, List<Object> params) {
+  public TModel get(String sql,
+                    List<Object> params) {
 
     return super.get(this.modelClass, sql, params);
   }
@@ -126,7 +127,8 @@ public class Repository<TModel>
    *
    * @return 实体集合
    */
-  public List<TModel> find(String sql, List<Object> params) {
+  public List<TModel> find(String sql,
+                           List<Object> params) {
 
     return super.find(modelClass, sql, params);
   }
@@ -151,7 +153,8 @@ public class Repository<TModel>
    *
    * @return 实体集合
    */
-  public List<TModel> findByField(String field, Object param) {
+  public List<TModel> findByField(String field,
+                                  Object param) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.findByField(modelClass, field, param);
@@ -166,7 +169,8 @@ public class Repository<TModel>
    *
    * @return 实体集合
    */
-  public List<TModel> findByField(String field, List<Object> params) {
+  public List<TModel> findByField(String field,
+                                  List<Object> params) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.findByField(modelClass, field, params);
@@ -249,7 +253,8 @@ public class Repository<TModel>
    *
    * @return 影响行数
    */
-  public int execute(String sql, List<Object> params) {
+  public int execute(String sql,
+                     List<Object> params) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.execute(sql, params);
@@ -306,7 +311,8 @@ public class Repository<TModel>
    *
    * @return 影响行数
    */
-  public int update(TModel entity, String[] columns) {
+  public int update(TModel entity,
+                    String[] columns) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.update(modelClass, entity, columns);
@@ -335,7 +341,8 @@ public class Repository<TModel>
    *
    * @return 影响行数
    */
-  public int update(Collection<TModel> entities, String[] columns) {
+  public int update(Collection<TModel> entities,
+                    String[] columns) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.update(modelClass, entities, columns);

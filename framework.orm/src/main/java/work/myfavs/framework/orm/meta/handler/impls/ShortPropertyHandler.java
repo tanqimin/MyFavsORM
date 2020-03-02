@@ -36,7 +36,9 @@ public class ShortPropertyHandler
   }
 
   @Override
-  public Short convert(ResultSet rs, String columnName, Class<Short> clazz)
+  public Short convert(ResultSet rs,
+                       String columnName,
+                       Class<Short> clazz)
       throws SQLException {
 
     short i = rs.getShort(columnName);
@@ -51,7 +53,9 @@ public class ShortPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Short param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Short param)
       throws SQLException {
 
     ps.setShort(paramIndex, param);

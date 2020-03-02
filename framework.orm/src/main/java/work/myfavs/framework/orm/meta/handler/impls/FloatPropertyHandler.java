@@ -37,7 +37,9 @@ public class FloatPropertyHandler
   }
 
   @Override
-  public Float convert(ResultSet rs, String columnName, Class<Float> clazz)
+  public Float convert(ResultSet rs,
+                       String columnName,
+                       Class<Float> clazz)
       throws SQLException {
 
     float i = rs.getFloat(columnName);
@@ -52,7 +54,9 @@ public class FloatPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Float param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Float param)
       throws SQLException {
 
     if (param == null) {

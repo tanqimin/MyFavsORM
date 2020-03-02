@@ -2,11 +2,9 @@ package work.myfavs.framework.orm.generator.meta.column;
 
 import cn.hutool.core.util.StrUtil;
 import java.io.Serializable;
-import lombok.Data;
 import work.myfavs.framework.orm.generator.meta.TypeDefinition;
 import work.myfavs.framework.orm.generator.util.GeneratorUtil;
 
-@Data
 public class ColumnDefinition
     implements Serializable {
 
@@ -65,6 +63,81 @@ public class ColumnDefinition
       return comment.split("#")[0];
     }
     return comment;
+  }
+
+  public String getTable() {
+
+    return table;
+  }
+
+  public void setTable(String table) {
+
+    this.table = table;
+  }
+
+  public String getColumn() {
+
+    return column;
+  }
+
+  public void setColumn(String column) {
+
+    this.column = column;
+  }
+
+  public Boolean getPrimaryKey() {
+
+    return primaryKey;
+  }
+
+  public void setPrimaryKey(Boolean primaryKey) {
+
+    this.primaryKey = primaryKey;
+  }
+
+  public Boolean getNullable() {
+
+    return nullable;
+  }
+
+  public void setNullable(Boolean nullable) {
+
+    this.nullable = nullable;
+  }
+
+  public Integer getIndex() {
+
+    return index;
+  }
+
+  public void setIndex(Integer index) {
+
+    this.index = index;
+  }
+
+  public String getDataType() {
+
+    return dataType;
+  }
+
+  public void setDataType(String dataType) {
+
+    this.dataType = dataType;
+  }
+
+  public TypeDefinition getTypeDefinition() {
+
+    return typeDefinition;
+  }
+
+  public void setTypeDefinition(TypeDefinition typeDefinition) {
+
+    this.typeDefinition = typeDefinition;
+  }
+
+  public void setComment(String comment) {
+
+    this.comment = comment;
   }
 
 }

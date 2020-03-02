@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.sql.DataSource;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +13,6 @@ import work.myfavs.framework.orm.entity.Snowfake;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
-@Slf4j
 public class DatabaseTest {
 
   String url      = "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
@@ -35,7 +33,9 @@ public class DatabaseTest {
     configuration.setAutoCommit(false);
     DataSource dataSource = new HikariDataSource(configuration);
 
-    this.dbTemplate = dbTemplate.build(dataSource).setShowSql(true).setShowResult(true);
+    this.dbTemplate = dbTemplate.build(dataSource)
+                                .setShowSql(true)
+                                .setShowResult(true);
   }
 
   @Test

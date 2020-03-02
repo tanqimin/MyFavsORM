@@ -24,7 +24,9 @@ public class BooleanPropertyHandler
   }
 
   @Override
-  public Boolean convert(ResultSet rs, String columnName, Class<Boolean> clazz)
+  public Boolean convert(ResultSet rs,
+                         String columnName,
+                         Class<Boolean> clazz)
       throws SQLException {
 
     boolean i = rs.getBoolean(columnName);
@@ -40,7 +42,9 @@ public class BooleanPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Boolean param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Boolean param)
       throws SQLException {
 
     if (param == null) {

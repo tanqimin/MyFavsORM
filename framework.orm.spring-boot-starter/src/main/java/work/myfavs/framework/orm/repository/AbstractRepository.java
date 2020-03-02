@@ -1,7 +1,6 @@
 package work.myfavs.framework.orm.repository;
 
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -9,7 +8,6 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 /**
  * 仓储基类
  */
-@Slf4j
 abstract public class AbstractRepository {
 
   protected DBTemplate dbTemplate;
@@ -31,7 +29,9 @@ abstract public class AbstractRepository {
    *
    * @return 结果集
    */
-  protected <TView> List<TView> find(Class<TView> viewClass, String sql, List<Object> params) {
+  protected <TView> List<TView> find(Class<TView> viewClass,
+                                     String sql,
+                                     List<Object> params) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.find(viewClass, sql, params);
@@ -47,7 +47,8 @@ abstract public class AbstractRepository {
    *
    * @return 结果集
    */
-  protected <TView> List<TView> find(Class<TView> viewClass, Sql sql) {
+  protected <TView> List<TView> find(Class<TView> viewClass,
+                                     Sql sql) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.find(viewClass, sql);
@@ -65,7 +66,10 @@ abstract public class AbstractRepository {
    *
    * @return 结果集
    */
-  protected <TView> List<TView> findTop(Class<TView> viewClass, int top, String sql, List<Object> params) {
+  protected <TView> List<TView> findTop(Class<TView> viewClass,
+                                        int top,
+                                        String sql,
+                                        List<Object> params) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.findTop(viewClass, top, sql, params);
@@ -82,7 +86,9 @@ abstract public class AbstractRepository {
    *
    * @return 结果集
    */
-  protected <TView> List<TView> findTop(Class<TView> viewClass, int top, Sql sql) {
+  protected <TView> List<TView> findTop(Class<TView> viewClass,
+                                        int top,
+                                        Sql sql) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.findTop(viewClass, top, sql);
@@ -99,7 +105,9 @@ abstract public class AbstractRepository {
    *
    * @return 记录
    */
-  protected <TView> TView get(Class<TView> viewClass, String sql, List<Object> params) {
+  protected <TView> TView get(Class<TView> viewClass,
+                              String sql,
+                              List<Object> params) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.get(viewClass, sql, params);
@@ -115,7 +123,8 @@ abstract public class AbstractRepository {
    *
    * @return 记录
    */
-  protected <TView> TView get(Class<TView> viewClass, Sql sql) {
+  protected <TView> TView get(Class<TView> viewClass,
+                              Sql sql) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.get(viewClass, sql);
@@ -130,7 +139,8 @@ abstract public class AbstractRepository {
    *
    * @return 行数
    */
-  protected long count(String sql, List<Object> params) {
+  protected long count(String sql,
+                       List<Object> params) {
 
     try (Database conn = this.dbTemplate.open()) {
       return conn.count(sql, params);

@@ -8,7 +8,9 @@ public class LocalDateTimePropertyHandler
     extends PropertyHandler<LocalDateTime> {
 
   @Override
-  public LocalDateTime convert(ResultSet rs, String columnName, Class<LocalDateTime> clazz)
+  public LocalDateTime convert(ResultSet rs,
+                               String columnName,
+                               Class<LocalDateTime> clazz)
       throws SQLException {
 
     Timestamp val = rs.getTimestamp(columnName);
@@ -19,7 +21,9 @@ public class LocalDateTimePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, LocalDateTime param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           LocalDateTime param)
       throws SQLException {
 
     if (param == null) {

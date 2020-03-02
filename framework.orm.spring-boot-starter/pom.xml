@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework.orm-spring-starter</artifactId>
-  <version>0.2.21.RELEASE</version>
+  <version>0.2.22.RELEASE</version>
   <packaging>jar</packaging>
 
   <!--私服仓库-->
@@ -27,9 +27,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
     <spring-jdbc.version>5.1.8.RELEASE</spring-jdbc.version>
-    <hutool-core.version>4.6.5</hutool-core.version>
-    <lombok.version>1.18.8</lombok.version>
-    <slf4j.version>1.7.26</slf4j.version>
     <junit.version>4.12</junit.version>
   </properties>
 
@@ -40,34 +37,11 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-core -->
-    <dependency>
-      <groupId>cn.hutool</groupId>
-      <artifactId>hutool-core</artifactId>
-      <version>${hutool-core.version}</version>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
       <version>${spring-jdbc.version}</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/junit/junit -->

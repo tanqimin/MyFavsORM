@@ -11,7 +11,9 @@ public class UUIDPropertyHandler
     extends PropertyHandler<UUID> {
 
   @Override
-  public UUID convert(ResultSet rs, String columnName, Class<UUID> clazz)
+  public UUID convert(ResultSet rs,
+                      String columnName,
+                      Class<UUID> clazz)
       throws SQLException {
 
     String val = rs.getString(columnName);
@@ -22,7 +24,9 @@ public class UUIDPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, UUID param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           UUID param)
       throws SQLException {
 
     if (param == null) {

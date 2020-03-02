@@ -24,7 +24,9 @@ public class BytePropertyHandler
   }
 
   @Override
-  public Byte convert(ResultSet rs, String columnName, Class<Byte> clazz)
+  public Byte convert(ResultSet rs,
+                      String columnName,
+                      Class<Byte> clazz)
       throws SQLException {
 
     byte i = rs.getByte(columnName);
@@ -39,7 +41,9 @@ public class BytePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Byte param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Byte param)
       throws SQLException {
 
     if (param == null) {

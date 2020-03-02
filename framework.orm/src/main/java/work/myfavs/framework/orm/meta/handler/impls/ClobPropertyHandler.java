@@ -11,7 +11,9 @@ public class ClobPropertyHandler
 
 
   @Override
-  public Clob convert(ResultSet rs, String columnName, Class<Clob> clazz)
+  public Clob convert(ResultSet rs,
+                      String columnName,
+                      Class<Clob> clazz)
       throws SQLException {
 
     Clob i = rs.getClob(columnName);
@@ -21,7 +23,9 @@ public class ClobPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Clob param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Clob param)
       throws SQLException {
 
     if (param == null) {

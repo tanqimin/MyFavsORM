@@ -9,12 +9,15 @@ public class DBException
 
   }
 
-  public DBException(CharSequence message, Object... params) {
+  public DBException(CharSequence message,
+                     Object... params) {
 
     super(StrUtil.format(message, params));
   }
 
-  public DBException(Throwable cause, CharSequence message, Object... params) {
+  public DBException(Throwable cause,
+                     CharSequence message,
+                     Object... params) {
 
     super(StrUtil.format(message, params), cause);
   }

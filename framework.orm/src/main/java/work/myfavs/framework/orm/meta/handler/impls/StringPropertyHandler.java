@@ -26,7 +26,9 @@ public class StringPropertyHandler
     extends PropertyHandler<String> {
 
   @Override
-  public String convert(ResultSet rs, String columnName, Class<String> clazz)
+  public String convert(ResultSet rs,
+                        String columnName,
+                        Class<String> clazz)
       throws SQLException {
 
     return rs.wasNull()
@@ -35,7 +37,9 @@ public class StringPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, String param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           String param)
       throws SQLException {
 
     if (param == null) {

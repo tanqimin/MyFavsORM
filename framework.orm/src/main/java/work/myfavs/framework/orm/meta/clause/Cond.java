@@ -41,7 +41,9 @@ public class Cond
    * @param param  参数
    * @param params 更多参数
    */
-  private Cond(String sql, Object param, Object... params) {
+  private Cond(String sql,
+               Object param,
+               Object... params) {
 
     super(sql);
     super.params.add(param);
@@ -50,7 +52,8 @@ public class Cond
     }
   }
 
-  private Cond(String sql, List<Object> params) {
+  private Cond(String sql,
+               List<Object> params) {
 
     super(sql);
     super.params.addAll(params);
@@ -65,7 +68,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond eq(String field, Object param) {
+  public static Cond eq(String field,
+                        Object param) {
 
     return eq(field, param, true);
   }
@@ -80,7 +84,9 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond eq(String field, Object param, boolean ignoreNull) {
+  public static Cond eq(String field,
+                        Object param,
+                        boolean ignoreNull) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return ignoreNull
@@ -99,7 +105,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond ne(String field, Object param) {
+  public static Cond ne(String field,
+                        Object param) {
 
     return ne(field, param, true);
   }
@@ -114,7 +121,9 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond ne(String field, Object param, boolean ignoreNull) {
+  public static Cond ne(String field,
+                        Object param,
+                        boolean ignoreNull) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return ignoreNull
@@ -156,7 +165,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond gt(String field, Object param) {
+  public static Cond gt(String field,
+                        Object param) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return new Cond();
@@ -172,7 +182,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond ge(String field, Object param) {
+  public static Cond ge(String field,
+                        Object param) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return new Cond();
@@ -188,7 +199,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond lt(String field, Object param) {
+  public static Cond lt(String field,
+                        Object param) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return new Cond();
@@ -204,7 +216,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond le(String field, Object param) {
+  public static Cond le(String field,
+                        Object param) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return new Cond();
@@ -221,13 +234,16 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond like(String field, Object param) {
+  public static Cond like(String field,
+                          Object param) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return new Cond();
     }
 
-    if (param.toString().contains("%") || param.toString().contains("_")) {
+    if (param.toString()
+             .contains("%") || param.toString()
+                                    .contains("_")) {
       return new Cond(StrUtil.format(" {} LIKE ?", field), param);
     }
 
@@ -245,7 +261,9 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond between(String field, Object param1, Object param2) {
+  public static Cond between(String field,
+                             Object param1,
+                             Object param2) {
 
     if (param1 == null && param2 == null) {
       return new Cond();
@@ -270,7 +288,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond in(String field, List params) {
+  public static Cond in(String field,
+                        List params) {
 
     return in(field, params, true);
   }
@@ -288,7 +307,9 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond in(String field, List params, boolean ignoreEmptyParams) {
+  public static Cond in(String field,
+                        List params,
+                        boolean ignoreEmptyParams) {
 
     Sql          inClauseSql;
     String       sql;
@@ -321,7 +342,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond in(String field, Sql sql) {
+  public static Cond in(String field,
+                        Sql sql) {
 
     return new Cond(StrUtil.format(" {} IN ({})", field, sql.sql), sql.params.toArray());
   }
@@ -337,7 +359,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond notIn(String field, List params) {
+  public static Cond notIn(String field,
+                           List params) {
 
     return notIn(field, params, true);
   }
@@ -355,7 +378,9 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond notIn(String field, List params, boolean ignoreEmptyParams) {
+  public static Cond notIn(String field,
+                           List params,
+                           boolean ignoreEmptyParams) {
 
     Sql          inClauseSql;
     String       sql;
@@ -388,7 +413,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond notIn(String field, Sql sql) {
+  public static Cond notIn(String field,
+                           Sql sql) {
 
     return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params.toArray());
   }
@@ -519,7 +545,8 @@ public class Cond
    *
    * @return Cond
    */
-  public static Cond create(Object object, String conditionGroup) {
+  public static Cond create(Object object,
+                            String conditionGroup) {
 
     Cond                   cond              = null;
     List<ConditionMatcher> conditionMatchers = new ArrayList<>();
@@ -565,7 +592,9 @@ public class Cond
 
   }
 
-  private static Cond createCondByOperator(Operator operator, String fieldName, Object paramVal) {
+  private static Cond createCondByOperator(Operator operator,
+                                           String fieldName,
+                                           Object paramVal) {
 
     switch (operator) {
       case EQUALS:

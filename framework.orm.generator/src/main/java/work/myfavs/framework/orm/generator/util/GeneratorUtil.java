@@ -1,7 +1,6 @@
 package work.myfavs.framework.orm.generator.util;
 
 import cn.hutool.core.util.StrUtil;
-import lombok.NonNull;
 
 public class GeneratorUtil {
 
@@ -12,7 +11,7 @@ public class GeneratorUtil {
    *
    * @return 类名称
    */
-  public static String toClass(@NonNull String tableName) {
+  public static String toClass(String tableName) {
 
     String className = StrUtil.toCamelCase(tableName);
     return StrUtil.upperFirst(className);
@@ -26,7 +25,8 @@ public class GeneratorUtil {
    *
    * @return 类名称
    */
-  public static String toClass(@NonNull String tableName, @NonNull String prefix) {
+  public static String toClass(String tableName,
+                               String prefix) {
 
     final String tableWithoutPrefix = StrUtil.removePrefix(tableName, prefix);
     final String className          = StrUtil.toCamelCase(tableWithoutPrefix);

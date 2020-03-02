@@ -3,7 +3,6 @@ package work.myfavs.framework.orm.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import lombok.Data;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.Condition;
@@ -12,7 +11,6 @@ import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 
-@Data
 @Table(value = "tb_snowfake", strategy = GenerationType.SNOW_FLAKE)
 public class Snowfake
     implements Serializable {
@@ -56,5 +54,76 @@ public class Snowfake
    */
   @Column(value = "config")
   private String     config  = null;
+
+
+  public Long getId() {
+
+    return id;
+  }
+
+  public void setId(Long id) {
+
+    this.id = id;
+  }
+
+  public Date getCreated() {
+
+    return created;
+  }
+
+  public void setCreated(Date created) {
+
+    this.created = created;
+  }
+
+  public String getName() {
+
+    return name;
+  }
+
+  public void setName(String name) {
+
+    this.name = name;
+  }
+
+  public Boolean getDisable() {
+
+    return disable;
+  }
+
+  public void setDisable(Boolean disable) {
+
+    this.disable = disable;
+  }
+
+  public BigDecimal getPrice() {
+
+    return price;
+  }
+
+  public void setPrice(BigDecimal price) {
+
+    this.price = price;
+  }
+
+  public TypeEnum getType() {
+
+    return type;
+  }
+
+  public void setType(TypeEnum type) {
+
+    this.type = type;
+  }
+
+  public String getConfig() {
+
+    return config;
+  }
+
+  public void setConfig(String config) {
+
+    this.config = config;
+  }
 
 }

@@ -13,7 +13,9 @@ public class ObjectPropertyHandler
     extends PropertyHandler<Object> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<Object> clazz)
+  public Object convert(ResultSet rs,
+                        String columnName,
+                        Class<Object> clazz)
       throws SQLException {
 
     Object val = rs.getObject(columnName);
@@ -23,7 +25,9 @@ public class ObjectPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Object param)
       throws SQLException {
 
     if (param == null) {

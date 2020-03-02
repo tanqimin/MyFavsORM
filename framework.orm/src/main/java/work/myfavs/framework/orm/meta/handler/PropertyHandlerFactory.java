@@ -66,7 +66,8 @@ public class PropertyHandlerFactory {
    * @param clazz           Class
    * @param propertyHandler PropertyHandler
    */
-  public static void register(Class<?> clazz, PropertyHandler propertyHandler) {
+  public static void register(Class<?> clazz,
+                              PropertyHandler propertyHandler) {
 
     HANDLER_MAP.put(clazz.getName(), propertyHandler);
   }
@@ -79,19 +80,24 @@ public class PropertyHandlerFactory {
   public static void register(Map<Class<?>, PropertyHandler> map) {
 
     for (Entry<Class<?>, PropertyHandler> entry : map.entrySet()) {
-      HANDLER_MAP.put(entry.getKey().getName(), entry.getValue());
+      HANDLER_MAP.put(entry.getKey()
+                           .getName(), entry.getValue());
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T convert(ResultSet rs, String columnName, Class<T> tClass)
+  public static <T> T convert(ResultSet rs,
+                              String columnName,
+                              Class<T> tClass)
       throws SQLException {
 
     return (T) getInstance(tClass).convert(rs, columnName, tClass);
   }
 
   @SuppressWarnings("unchecked")
-  public static void addParameter(PreparedStatement ps, int index, Object param)
+  public static void addParameter(PreparedStatement ps,
+                                  int index,
+                                  Object param)
       throws SQLException {
 
     if (param == null) {

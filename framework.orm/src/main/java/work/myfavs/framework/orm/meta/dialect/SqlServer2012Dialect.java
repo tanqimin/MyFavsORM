@@ -18,13 +18,17 @@ public class SqlServer2012Dialect
   }
 
   @Override
-  public Sql selectTop(int currentPage, int pageSize, String sql, List<Object> params) {
+  public Sql selectTop(int currentPage,
+                       int pageSize,
+                       String sql,
+                       List<Object> params) {
 
     Sql querySql = new Sql(sql, params);
 
     if (currentPage == 1 && pageSize == 1) {
       //如果sql本身只返回一个结果
-      if (P_SELECT_SINGLE.matcher(sql).find()) {
+      if (P_SELECT_SINGLE.matcher(sql)
+                         .find()) {
         return querySql;
       }
     }

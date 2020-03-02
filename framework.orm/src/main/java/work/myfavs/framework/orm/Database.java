@@ -11,8 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import javax.sql.DataSource;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -34,9 +34,10 @@ import work.myfavs.framework.orm.util.exception.DBException;
 /**
  * 数据库操作对象
  */
-@Slf4j
 public class Database
     implements AutoCloseable, Closeable {
+
+  private final static Logger log = LoggerFactory.getLogger(Database.class);
 
   private static Constructor<? extends ConnectionFactory> constructor = null;
   //数据库方言
@@ -93,7 +94,8 @@ public class Database
 
     log.debug("Try to commit transaction.");
     try {
-      this.connectionFactory.getCurrentConnection().commit();
+      this.connectionFactory.getCurrentConnection()
+                            .commit();
     } catch (SQLException e) {
       throw new DBException(e, "Fail to commit transaction, error message:");
     }
@@ -105,7 +107,8 @@ public class Database
 
     log.debug("Try to rollback transaction.");
     try {
-      this.connectionFactory.getCurrentConnection().rollback();
+      this.connectionFactory.getCurrentConnection()
+                            .rollback();
     } catch (SQLException e) {
       throw new DBException(e, "Fail to rollback transaction, error message:");
     }
@@ -123,7 +126,9 @@ public class Database
    *
    * @return 结果集
    */
-  public <TView> List<TView> find(Class<TView> viewClass, String sql, List<Object> params) {
+  public <TView> List<TView> find(Class<TView> viewClass,
+                                  String sql,
+                                  List<Object> params) {
 
     Metadata.get(viewClass);
 
@@ -161,7 +166,8 @@ public class Database
    *
    * @return 结果集
    */
-  public <TView> List<TView> find(Class<TView> viewClass, String sql) {
+  public <TView> List<TView> find(Class<TView> viewClass,
+                                  String sql) {
 
     return this.find(viewClass, sql, null);
   }
@@ -175,7 +181,8 @@ public class Database
    *
    * @return 结果集
    */
-  public <TView> List<TView> find(Class<TView> viewClass, Sql sql) {
+  public <TView> List<TView> find(Class<TView> viewClass,
+                                  Sql sql) {
 
     return this.find(viewClass, sql.getSqlString(), sql.getParams());
   }
@@ -188,7 +195,8 @@ public class Database
    *
    * @return 结果集
    */
-  public List<Record> find(String sql, List<Object> params) {
+  public List<Record> find(String sql,
+                           List<Object> params) {
 
     return this.find(Record.class, sql, params);
   }
@@ -216,7 +224,10 @@ public class Database
    *
    * @return 结果集
    */
-  public <TView> List<TView> findTop(Class<TView> viewClass, int top, String sql, List<Object> params) {
+  public <TView> List<TView> findTop(Class<TView> viewClass,
+                                     int top,
+                                     String sql,
+                                     List<Object> params) {
 
     Sql querySql = dialect.selectTop(1, top, sql, params);
     return this.find(viewClass, querySql);
@@ -233,7 +244,9 @@ public class Database
    *
    * @return 结果集
    */
-  public <TView> List<TView> findTop(Class<TView> viewClass, int top, Sql sql) {
+  public <TView> List<TView> findTop(Class<TView> viewClass,
+                                     int top,
+                                     Sql sql) {
 
     return this.findTop(viewClass, top, sql.getSqlString(), sql.getParams());
   }
@@ -247,7 +260,9 @@ public class Database
    *
    * @return 结果集
    */
-  public List<Record> findTop(int top, String sql, List<Object> params) {
+  public List<Record> findTop(int top,
+                              String sql,
+                              List<Object> params) {
 
     return this.findTop(Record.class, top, sql, params);
   }
@@ -260,7 +275,8 @@ public class Database
    *
    * @return 结果集
    */
-  public List<Record> findTop(int top, Sql sql) {
+  public List<Record> findTop(int top,
+                              Sql sql) {
 
     return this.findTop(Record.class, top, sql);
   }
@@ -275,9 +291,12 @@ public class Database
    *
    * @return 记录
    */
-  public <TView> TView get(Class<TView> viewClass, String sql, List<Object> params) {
+  public <TView> TView get(Class<TView> viewClass,
+                           String sql,
+                           List<Object> params) {
 
-    Iterator<TView> iterator = this.findTop(viewClass, 1, sql, params).iterator();
+    Iterator<TView> iterator = this.findTop(viewClass, 1, sql, params)
+                                   .iterator();
     if (iterator.hasNext()) {
       return iterator.next();
     }
@@ -293,7 +312,8 @@ public class Database
    *
    * @return 记录
    */
-  public <TView> TView get(Class<TView> viewClass, Sql sql) {
+  public <TView> TView get(Class<TView> viewClass,
+                           Sql sql) {
 
     return this.get(viewClass, sql.getSqlString(), sql.getParams());
   }
@@ -306,7 +326,8 @@ public class Database
    *
    * @return 记录
    */
-  public Record get(String sql, List<Object> params) {
+  public Record get(String sql,
+                    List<Object> params) {
 
     return this.get(Record.class, sql, params);
   }
@@ -331,10 +352,13 @@ public class Database
    *
    * @return 记录
    */
-  public <TView> TView getById(Class<TView> viewClass, Object id) {
+  public <TView> TView getById(Class<TView> viewClass,
+                               Object id) {
 
-    AttributeMeta primaryKey = Metadata.get(viewClass).checkPrimaryKey();
-    Sql           sql        = dialect.select(viewClass).where(Cond.eq(primaryKey.getColumnName(), id));
+    AttributeMeta primaryKey = Metadata.get(viewClass)
+                                       .checkPrimaryKey();
+    Sql sql = dialect.select(viewClass)
+                     .where(Cond.eq(primaryKey.getColumnName(), id));
     return this.get(viewClass, sql);
   }
 
@@ -347,9 +371,12 @@ public class Database
    *
    * @return 记录
    */
-  public <TView> TView getByField(Class<TView> viewClass, String field, Object param) {
+  public <TView> TView getByField(Class<TView> viewClass,
+                                  String field,
+                                  Object param) {
 
-    Sql sql = dialect.select(viewClass).where(Cond.eq(field, param));
+    Sql sql = dialect.select(viewClass)
+                     .where(Cond.eq(field, param));
     return this.get(viewClass, sql);
   }
 
@@ -361,9 +388,11 @@ public class Database
    *
    * @return 记录
    */
-  public <TView> TView getByCond(Class<TView> viewClass, Cond cond) {
+  public <TView> TView getByCond(Class<TView> viewClass,
+                                 Cond cond) {
 
-    Sql sql = dialect.select(viewClass).where(cond);
+    Sql sql = dialect.select(viewClass)
+                     .where(cond);
     return this.get(viewClass, sql);
   }
 
@@ -375,7 +404,8 @@ public class Database
    *
    * @return 记录
    */
-  public <TView> TView getByCondition(Class<TView> viewClass, Object object) {
+  public <TView> TView getByCondition(Class<TView> viewClass,
+                                      Object object) {
 
     return this.getByCond(viewClass, Cond.create(object));
   }
@@ -389,7 +419,9 @@ public class Database
    *
    * @return 记录
    */
-  public <TView> TView getByCondition(Class<TView> viewClass, Object object, String conditionGroup) {
+  public <TView> TView getByCondition(Class<TView> viewClass,
+                                      Object object,
+                                      String conditionGroup) {
 
     return this.getByCond(viewClass, Cond.create(object, conditionGroup));
   }
@@ -402,10 +434,13 @@ public class Database
    *
    * @return 实体集合
    */
-  public <TView> List<TView> findByIds(Class<TView> viewClass, List ids) {
+  public <TView> List<TView> findByIds(Class<TView> viewClass,
+                                       List ids) {
 
-    AttributeMeta primaryKey = Metadata.get(viewClass).checkPrimaryKey();
-    Sql           sql        = dialect.select(viewClass).where(Cond.in(primaryKey.getColumnName(), ids, false));
+    AttributeMeta primaryKey = Metadata.get(viewClass)
+                                       .checkPrimaryKey();
+    Sql sql = dialect.select(viewClass)
+                     .where(Cond.in(primaryKey.getColumnName(), ids, false));
     return this.find(viewClass, sql);
   }
 
@@ -418,9 +453,12 @@ public class Database
    *
    * @return 实体集合
    */
-  public <TView> List<TView> findByField(Class<TView> viewClass, String field, Object param) {
+  public <TView> List<TView> findByField(Class<TView> viewClass,
+                                         String field,
+                                         Object param) {
 
-    Sql sql = dialect.select(viewClass).where(Cond.eq(field, param));
+    Sql sql = dialect.select(viewClass)
+                     .where(Cond.eq(field, param));
     return this.find(viewClass, sql);
   }
 
@@ -433,9 +471,12 @@ public class Database
    *
    * @return 实体集合
    */
-  public <TView> List<TView> findByField(Class<TView> viewClass, String field, List<Object> params) {
+  public <TView> List<TView> findByField(Class<TView> viewClass,
+                                         String field,
+                                         List<Object> params) {
 
-    Sql sql = dialect.select(viewClass).where(Cond.in(field, params, false));
+    Sql sql = dialect.select(viewClass)
+                     .where(Cond.in(field, params, false));
     return this.find(viewClass, sql);
   }
 
@@ -447,9 +488,11 @@ public class Database
    *
    * @return 实体集合
    */
-  public <TView> List<TView> findByCond(Class<TView> viewClass, Cond cond) {
+  public <TView> List<TView> findByCond(Class<TView> viewClass,
+                                        Cond cond) {
 
-    Sql sql = dialect.select(viewClass).where(cond);
+    Sql sql = dialect.select(viewClass)
+                     .where(cond);
     return this.find(viewClass, sql);
   }
 
@@ -461,7 +504,8 @@ public class Database
    *
    * @return 实体集合
    */
-  public <TView> List<TView> findByCondition(Class<TView> viewClass, Object object) {
+  public <TView> List<TView> findByCondition(Class<TView> viewClass,
+                                             Object object) {
 
     return findByCond(viewClass, Cond.create(object));
   }
@@ -475,7 +519,9 @@ public class Database
    *
    * @return 实体集合
    */
-  public <TView> List<TView> findByCondition(Class<TView> viewClass, Object object, String conditionGroup) {
+  public <TView> List<TView> findByCondition(Class<TView> viewClass,
+                                             Object object,
+                                             String conditionGroup) {
 
     return findByCond(viewClass, Cond.create(object, conditionGroup));
   }
@@ -488,9 +534,11 @@ public class Database
    *
    * @return 行数
    */
-  public long count(String sql, List<Object> params) {
+  public long count(String sql,
+                    List<Object> params) {
 
-    return this.get(Number.class, dialect.count(sql, params)).longValue();
+    return this.get(Number.class, dialect.count(sql, params))
+               .longValue();
   }
 
   /**
@@ -518,7 +566,11 @@ public class Database
    *
    * @return 简单分页结果集
    */
-  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, String sql, List<Object> params, boolean enablePage, int currentPage,
+  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass,
+                                              String sql,
+                                              List<Object> params,
+                                              boolean enablePage,
+                                              int currentPage,
                                               int pageSize) {
 
     int         pagSize;
@@ -562,7 +614,11 @@ public class Database
    *
    * @return 简单分页结果集
    */
-  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass,
+                                              Sql sql,
+                                              boolean enablePage,
+                                              int currentPage,
+                                              int pageSize) {
 
     return this.findPageLite(viewClass, sql.getSqlString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
@@ -578,7 +634,10 @@ public class Database
    *
    * @return 简单分页结果集
    */
-  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, String sql, List<Object> params, IPageable pageable) {
+  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass,
+                                              String sql,
+                                              List<Object> params,
+                                              IPageable pageable) {
 
     return this.findPageLite(viewClass, sql, params, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
@@ -593,7 +652,9 @@ public class Database
    *
    * @return 简单分页结果集
    */
-  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, IPageable pageable) {
+  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass,
+                                              Sql sql,
+                                              IPageable pageable) {
 
     return this.findPageLite(viewClass, sql.getSqlString(), sql.getParams(), pageable.getEnablePage(), pageable.getCurrentPage(),
                              pageable.getPageSize());
@@ -611,7 +672,11 @@ public class Database
    *
    * @return 简单分页结果集
    */
-  public PageLite<Record> findPageLite(String sql, List<Object> params, boolean enablePage, int currentPage, int pageSize) {
+  public PageLite<Record> findPageLite(String sql,
+                                       List<Object> params,
+                                       boolean enablePage,
+                                       int currentPage,
+                                       int pageSize) {
 
     return this.findPageLite(Record.class, sql, params, enablePage, currentPage, pageSize);
   }
@@ -626,7 +691,10 @@ public class Database
    *
    * @return 简单分页结果集
    */
-  public PageLite<Record> findPageLite(Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public PageLite<Record> findPageLite(Sql sql,
+                                       boolean enablePage,
+                                       int currentPage,
+                                       int pageSize) {
 
     return this.findPageLite(Record.class, sql, enablePage, currentPage, pageSize);
   }
@@ -640,7 +708,9 @@ public class Database
    *
    * @return 简单分页结果集
    */
-  public PageLite<Record> findPageLite(String sql, List<Object> params, IPageable pageable) {
+  public PageLite<Record> findPageLite(String sql,
+                                       List<Object> params,
+                                       IPageable pageable) {
 
     return this.findPageLite(Record.class, sql, params, pageable);
   }
@@ -653,7 +723,8 @@ public class Database
    *
    * @return 简单分页结果集
    */
-  public PageLite<Record> findPageLite(Sql sql, IPageable pageable) {
+  public PageLite<Record> findPageLite(Sql sql,
+                                       IPageable pageable) {
 
     return this.findPageLite(Record.class, sql, pageable);
   }
@@ -671,7 +742,11 @@ public class Database
    *
    * @return 分页结果集
    */
-  public <TView> Page<TView> findPage(Class<TView> viewClass, String sql, List<Object> params, boolean enablePage, int currentPage,
+  public <TView> Page<TView> findPage(Class<TView> viewClass,
+                                      String sql,
+                                      List<Object> params,
+                                      boolean enablePage,
+                                      int currentPage,
                                       int pageSize) {
 
     int         pagSize;
@@ -733,7 +808,11 @@ public class Database
    *
    * @return 分页结果集
    */
-  public <TView> Page<TView> findPage(Class<TView> viewClass, @NonNull Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public <TView> Page<TView> findPage(Class<TView> viewClass,
+                                      Sql sql,
+                                      boolean enablePage,
+                                      int currentPage,
+                                      int pageSize) {
 
     return findPage(viewClass, sql.getSqlString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
@@ -749,7 +828,10 @@ public class Database
    *
    * @return 分页结果集
    */
-  public <TView> Page<TView> findPage(Class<TView> viewClass, String sql, List<Object> params, @NonNull IPageable pageable) {
+  public <TView> Page<TView> findPage(Class<TView> viewClass,
+                                      String sql,
+                                      List<Object> params,
+                                      IPageable pageable) {
 
     return findPage(viewClass, sql, params, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
@@ -764,7 +846,9 @@ public class Database
    *
    * @return 分页结果集
    */
-  public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, @NonNull IPageable pageable) {
+  public <TView> Page<TView> findPage(Class<TView> viewClass,
+                                      Sql sql,
+                                      IPageable pageable) {
 
     return findPage(viewClass, sql.getSqlString(), sql.getParams(), pageable.getEnablePage(), pageable.getCurrentPage(),
                     pageable.getPageSize());
@@ -781,7 +865,11 @@ public class Database
    *
    * @return 分页结果集
    */
-  public Page<Record> findPage(String sql, List<Object> params, boolean enablePage, int currentPage, int pageSize) {
+  public Page<Record> findPage(String sql,
+                               List<Object> params,
+                               boolean enablePage,
+                               int currentPage,
+                               int pageSize) {
 
     return this.findPage(Record.class, sql, params, enablePage, currentPage, pageSize);
   }
@@ -796,7 +884,10 @@ public class Database
    *
    * @return 分页结果集
    */
-  public Page<Record> findPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public Page<Record> findPage(Sql sql,
+                               boolean enablePage,
+                               int currentPage,
+                               int pageSize) {
 
     return this.findPage(Record.class, sql, enablePage, currentPage, pageSize);
   }
@@ -810,7 +901,9 @@ public class Database
    *
    * @return 分页结果集
    */
-  public Page<Record> findPage(String sql, List<Object> params, @NonNull IPageable pageable) {
+  public Page<Record> findPage(String sql,
+                               List<Object> params,
+                               IPageable pageable) {
 
     return this.findPage(Record.class, sql, params, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
@@ -823,7 +916,8 @@ public class Database
    *
    * @return 分页结果集
    */
-  public Page<Record> findPage(Sql sql, @NonNull IPageable pageable) {
+  public Page<Record> findPage(Sql sql,
+                               IPageable pageable) {
 
     return this.findPage(Record.class, sql, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
@@ -836,7 +930,8 @@ public class Database
    *
    * @return 影响行数
    */
-  public int execute(String sql, List<Object> params) {
+  public int execute(String sql,
+                     List<Object> params) {
 
     int               result = 0;
     Connection        conn   = null;
@@ -902,7 +997,8 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int create(Class<TModel> modelClass, TModel entity) {
+  public <TModel> int create(Class<TModel> modelClass,
+                             TModel entity) {
 
     int result = 0;
     if (entity == null) {
@@ -982,7 +1078,8 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int create(Class<TModel> modelClass, Collection<TModel> entities) {
+  public <TModel> int create(Class<TModel> modelClass,
+                             Collection<TModel> entities) {
 
     int                 result          = 0;
     GenerationType      strategy;
@@ -1088,7 +1185,8 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int update(Class<TModel> modelClass, TModel entity) {
+  public <TModel> int update(Class<TModel> modelClass,
+                             TModel entity) {
 
     if (entity == null) {
       return 0;
@@ -1105,7 +1203,8 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int updateIgnoreNull(Class<TModel> modelClass, TModel entity) {
+  public <TModel> int updateIgnoreNull(Class<TModel> modelClass,
+                                       TModel entity) {
 
     if (entity == null) {
       return 0;
@@ -1123,7 +1222,9 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int update(Class<TModel> modelClass, TModel entity, String[] columns) {
+  public <TModel> int update(Class<TModel> modelClass,
+                             TModel entity,
+                             String[] columns) {
 
     if (entity == null) {
       return 0;
@@ -1143,7 +1244,9 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int update(Class<TModel> modelClass, Collection<TModel> entities, String[] columns) {
+  public <TModel> int update(Class<TModel> modelClass,
+                             Collection<TModel> entities,
+                             String[] columns) {
 
     int                 result = 0;
     List<AttributeMeta> updateAttributes;
@@ -1167,7 +1270,8 @@ public class Database
     } else {
       updateAttributes = new LinkedList<>();
       for (String column : columns) {
-        AttributeMeta attributeMeta = classMeta.getQueryAttributes().get(column.toUpperCase());
+        AttributeMeta attributeMeta = classMeta.getQueryAttributes()
+                                               .get(column.toUpperCase());
         if (attributeMeta == null) {
           continue;
         }
@@ -1182,11 +1286,14 @@ public class Database
       throw new DBException("Could not match update attributes.");
     }
 
-    sql = Sql.Update(classMeta.getTableName()).append(" SET ");
+    sql = Sql.Update(classMeta.getTableName())
+             .append(" SET ");
     for (AttributeMeta updateAttribute : updateAttributes) {
       sql.append(StrUtil.format("{} = ?,", updateAttribute.getColumnName()));
     }
-    sql.getSql().deleteCharAt(sql.getSql().lastIndexOf(","));
+    sql.getSql()
+       .deleteCharAt(sql.getSql()
+                        .lastIndexOf(","));
     sql.append(StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()));
 
     paramsList = new LinkedList<>();
@@ -1233,7 +1340,8 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int update(Class<TModel> modelClass, List<TModel> entities) {
+  public <TModel> int update(Class<TModel> modelClass,
+                             List<TModel> entities) {
 
     return this.update(modelClass, entities, null);
   }
@@ -1247,7 +1355,8 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int delete(Class<TModel> modelClass, TModel entity) {
+  public <TModel> int delete(Class<TModel> modelClass,
+                             TModel entity) {
 
     String pkFieldName;
     Object pkVal;
@@ -1255,7 +1364,8 @@ public class Database
     if (entity == null) {
       return 0;
     }
-    AttributeMeta primaryKey = Metadata.get(modelClass).checkPrimaryKey();
+    AttributeMeta primaryKey = Metadata.get(modelClass)
+                                       .checkPrimaryKey();
     pkFieldName = primaryKey.getFieldName();
     pkVal = ReflectUtil.getFieldValue(entity, pkFieldName);
 
@@ -1271,7 +1381,8 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int delete(Class<TModel> modelClass, List<TModel> entities) {
+  public <TModel> int delete(Class<TModel> modelClass,
+                             List<TModel> entities) {
 
     String       pkFieldName;
     Object       pkVal;
@@ -1280,7 +1391,8 @@ public class Database
     if (entities == null || entities.size() == 0) {
       return 0;
     }
-    AttributeMeta primaryKey = Metadata.get(modelClass).checkPrimaryKey();
+    AttributeMeta primaryKey = Metadata.get(modelClass)
+                                       .checkPrimaryKey();
     pkFieldName = primaryKey.getFieldName();
     ids = new ArrayList<>();
     for (TModel entity : entities) {
@@ -1308,7 +1420,8 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int deleteByIds(Class<TModel> modelClass, Collection ids) {
+  public <TModel> int deleteByIds(Class<TModel> modelClass,
+                                  Collection ids) {
 
     if (ids == null || ids.size() == 0) {
       return 0;
@@ -1317,7 +1430,8 @@ public class Database
     ClassMeta     classMeta    = Metadata.get(modelClass);
     AttributeMeta primaryKey   = classMeta.checkPrimaryKey();
     String        pkColumnName = primaryKey.getColumnName();
-    Sql           sql          = Sql.Delete(classMeta.getTableName()).where(Cond.in(pkColumnName, new ArrayList<Object>(ids)));
+    Sql sql = Sql.Delete(classMeta.getTableName())
+                 .where(Cond.in(pkColumnName, new ArrayList<Object>(ids)));
     return execute(sql);
   }
 
@@ -1330,7 +1444,8 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int deleteById(Class<TModel> modelClass, Object id) {
+  public <TModel> int deleteById(Class<TModel> modelClass,
+                                 Object id) {
 
     if (id == null) {
       return 0;
@@ -1338,7 +1453,8 @@ public class Database
     ClassMeta     classMeta    = Metadata.get(modelClass);
     AttributeMeta primaryKey   = classMeta.checkPrimaryKey();
     String        pkColumnName = primaryKey.getColumnName();
-    Sql           sql          = Sql.Delete(classMeta.getTableName()).where(Cond.eq(pkColumnName, id));
+    Sql sql = Sql.Delete(classMeta.getTableName())
+                 .where(Cond.eq(pkColumnName, id));
     return execute(sql);
   }
 
@@ -1351,14 +1467,16 @@ public class Database
    *
    * @return 影响行数
    */
-  public <TModel> int deleteByCond(Class<TModel> modelClass, Cond cond) {
+  public <TModel> int deleteByCond(Class<TModel> modelClass,
+                                   Cond cond) {
 
     if (cond == null) {
       return 0;
     }
 
     ClassMeta classMeta = Metadata.get(modelClass);
-    Sql       sql       = Sql.Delete(classMeta.getTableName()).where(cond);
+    Sql sql = Sql.Delete(classMeta.getTableName())
+                 .where(cond);
     return execute(sql);
   }
 

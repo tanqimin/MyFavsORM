@@ -16,14 +16,18 @@ public class EnumPropertyHandler
 
   @Override
   @SuppressWarnings("unchecked")
-  public Object convert(ResultSet rs, String columnName, Class clazz)
+  public Object convert(ResultSet rs,
+                        String columnName,
+                        Class clazz)
       throws SQLException {
 
     return EnumUtil.fromString(clazz, rs.getString(columnName));
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Object param)
+  public void addParameter(PreparedStatement ps,
+                           int paramIndex,
+                           Object param)
       throws SQLException {
 
     if (param == null) {

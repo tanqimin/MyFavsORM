@@ -3,13 +3,15 @@ package work.myfavs.framework.orm;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
-@Slf4j
 public class JdbcConnectionFactory
     extends ConnectionFactory {
+
+  private final static Logger log = LoggerFactory.getLogger(JdbcConnectionFactory.class);
 
   private final ThreadLocal<Connection> connectionHolder     = new ThreadLocal<>();
   private final ThreadLocal<Integer>    connectionDeepHolder = new ThreadLocal<>();

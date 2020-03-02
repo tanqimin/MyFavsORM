@@ -25,7 +25,8 @@ public class PKGenerator {
    *
    * @return 雪花主键值
    */
-  public static long nextSnowFakeId(long workerId, long dataCenterId) {
+  public static long nextSnowFakeId(long workerId,
+                                    long dataCenterId) {
 
     if (snowflake == null) {
       snowflake = IdUtil.createSnowflake(workerId, dataCenterId);

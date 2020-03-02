@@ -2,10 +2,8 @@ package work.myfavs.framework.orm;
 
 import java.sql.Connection;
 import javax.sql.DataSource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
-@Slf4j
 public class SpringConnectionFactory
     extends JdbcConnectionFactory {
 
