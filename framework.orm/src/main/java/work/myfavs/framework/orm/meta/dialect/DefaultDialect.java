@@ -28,8 +28,7 @@ public abstract class DefaultDialect
   protected final Pattern P_ORDER         = Pattern.compile("\\s+ORDER\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   protected final Pattern P_GROUP         = Pattern.compile("\\s+GROUP\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   protected final Pattern P_HAVING        = Pattern.compile("\\s+HAVING\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  protected final Pattern P_SELECT_SINGLE = Pattern.compile("^\\s*SELECT\\s+((COUNT)\\([\\s\\S]*\\)\\s*,?)+((\\s*)|(\\s+FROM[\\s\\S]*))?$",
-                                                            Pattern.CASE_INSENSITIVE);
+  protected final Pattern P_SELECT_SINGLE = Pattern.compile("^\\s*SELECT\\s+((COUNT)\\([\\s\\S]*\\)\\s*,?)+((\\s*)|(\\s+FROM[\\s\\S]*))?$", Pattern.CASE_INSENSITIVE);
 
   protected static <TModel> String getTableName(Class<TModel> clazz) {
 
@@ -182,7 +181,13 @@ public abstract class DefaultDialect
       sql = sql.substring(0, om.start());
     }
 
-    return new Sql(StrUtil.format("SELECT COUNT(1) FROM ({}) count_alias", sql), params);
+    return new Sql(StrUtil.format("SELECT COUNT(*) FROM ({}) count_alias", sql), params);
+  }
+
+  @Override
+  public <TModel> Sql count(Class<TModel> clazz) {
+
+    return new Sql(StrUtil.format("SELECT COUNT(*) FROM {}", getTableName(clazz)));
   }
 
   @Override

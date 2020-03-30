@@ -71,6 +71,16 @@ public interface IDialect {
             List<Object> params);
 
   /**
+   * 获取返回行数语句
+   *
+   * @param clazz    实体类Class
+   * @param <TModel> 实体类类型
+   *
+   * @return 返回行数语句
+   */
+  <TModel> Sql count(Class<TModel> clazz);
+
+  /**
    * 返回分页查询语句
    * 如果 pageSize = -1L，则不分页
    *

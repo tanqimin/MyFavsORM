@@ -220,6 +220,34 @@ public class Repository<TModel>
   }
 
   /**
+   * 根据条件获取查询的行数
+   *
+   * @param cond 条件
+   *
+   * @return 行数
+   */
+  public long countByCond(Cond cond) {
+
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.countByCond(modelClass, cond);
+    }
+  }
+
+  /**
+   * 根据条件判断是否存在符合条件的数据
+   *
+   * @param cond 条件
+   *
+   * @return 查询结果行数大于0返回true，否则返回false
+   */
+  public boolean existsByCond(Cond cond) {
+
+    try (Database conn = this.dbTemplate.open()) {
+      return conn.existsByCond(modelClass, cond);
+    }
+  }
+
+  /**
    * 执行一个SQL语句
    *
    * @param sql SQL

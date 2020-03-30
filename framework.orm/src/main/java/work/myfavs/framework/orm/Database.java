@@ -554,6 +554,64 @@ public class Database
   }
 
   /**
+   * 根据条件获取查询的行数
+   *
+   * @param viewClass 查询的数据表、视图对应的Java View类型
+   * @param cond      条件
+   * @param <TView>   查询的数据表、视图对应的Java View类型
+   *
+   * @return 行数
+   */
+  public <TView> long countByCond(Class<TView> viewClass,
+                                  Cond cond) {
+
+    Sql sql = dialect.count(viewClass)
+                     .where(cond);
+    return this.count(sql);
+  }
+
+  /**
+   * 根据传入的SQL判断是否存在符合条件的数据
+   *
+   * @param sql SQL
+   *
+   * @return 查询结果行数大于0返回true，否则返回false
+   */
+  public boolean exists(Sql sql) {
+
+    return exists(sql.getSqlString(), sql.getParams());
+  }
+
+  /**
+   * 根据传入的SQL判断是否存在符合条件的数据
+   *
+   * @param sql    SQL语句
+   * @param params 参数
+   *
+   * @return 查询结果行数大于0返回true，否则返回false
+   */
+  public boolean exists(String sql,
+                        List<Object> params) {
+
+    return this.count(sql, params) > 0L;
+  }
+
+  /**
+   * 根据条件判断是否存在符合条件的数据
+   *
+   * @param viewClass 查询的数据表、视图对应的Java View类型
+   * @param cond      条件
+   * @param <TView>   查询的数据表、视图对应的Java View类型
+   *
+   * @return 查询结果行数大于0返回true，否则返回false
+   */
+  public <TView> boolean existsByCond(Class<TView> viewClass,
+                                      Cond cond) {
+
+    return this.countByCond(viewClass, cond) > 0L;
+  }
+
+  /**
    * 执行 SQL 语句，返回简单分页结果集
    *
    * @param viewClass   返回的数据类型
@@ -656,8 +714,7 @@ public class Database
                                               Sql sql,
                                               IPageable pageable) {
 
-    return this.findPageLite(viewClass, sql.getSqlString(), sql.getParams(), pageable.getEnablePage(), pageable.getCurrentPage(),
-                             pageable.getPageSize());
+    return this.findPageLite(viewClass, sql.getSqlString(), sql.getParams(), pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
 
 
@@ -850,8 +907,7 @@ public class Database
                                       Sql sql,
                                       IPageable pageable) {
 
-    return findPage(viewClass, sql.getSqlString(), sql.getParams(), pageable.getEnablePage(), pageable.getCurrentPage(),
-                    pageable.getPageSize());
+    return findPage(viewClass, sql.getSqlString(), sql.getParams(), pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
 
   /**

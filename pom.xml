@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework</artifactId>
-  <version>0.2.22.RELEASE</version>
+  <version>0.2.23.RELEASE</version>
 
   <build>
     <plugins>
