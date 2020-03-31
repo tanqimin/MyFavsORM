@@ -14,7 +14,8 @@ public class MyDao {
   private static DBTemplate DBTemplate;
 
   static {
-    DBTemplate = DBTemplate.build(getDataSource());
+    DBTemplate = new DBTemplate.Builder().dataSource(getDataSource())
+                                         .build();
   }
 
   public List<Record> findRecord() {
@@ -30,8 +31,7 @@ public class MyDao {
 
     HikariConfig configuration = new HikariConfig();
     configuration.setDriverClassName("com.mysql.jdbc.Driver");
-    configuration.setJdbcUrl(
-        "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8");
+    configuration.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8");
     configuration.setUsername("root");
     configuration.setPassword("root");
     configuration.setAutoCommit(false);

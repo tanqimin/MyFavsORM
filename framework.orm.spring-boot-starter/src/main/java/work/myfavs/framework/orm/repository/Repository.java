@@ -29,7 +29,7 @@ public class Repository<TModel>
   public Repository(DBTemplate dbTemplate) {
 
     super(dbTemplate);
-    this.dialect = dbTemplate.getDialect();
+    this.dialect = dbTemplate.getConfiguration().getDialect();
     this.modelClass = (Class<TModel>) ((ParameterizedType) this.getClass()
                                                                .getGenericSuperclass()).getActualTypeArguments()[0];
   }

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import work.myfavs.framework.orm.meta.annotation.Condition;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
+import work.myfavs.framework.orm.meta.schema.ClassMeta;
 
 /**
  * SQL 条件构建
@@ -57,6 +58,22 @@ public class Cond
 
     super(sql);
     super.params.addAll(params);
+  }
+
+  /**
+   * 创建逻辑删除条件
+   *
+   * @param classMeta 类元数据
+   *
+   * @return Cond
+   */
+  public static Cond logicalDeleteCond(ClassMeta classMeta) {
+
+    if (classMeta.isEnableLogicalDelete()) {
+      return Cond.eq(classMeta.getLogicalDeleteField(), 0);
+    } else {
+      return new Cond();
+    }
   }
 
   /**

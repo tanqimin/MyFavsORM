@@ -6,14 +6,20 @@
 ```java
 public class MyDao {
 
-  private static Orm orm;
+  private static DBTemplate dbTemplate;
 
   static {
-    orm = Orm.build(getDataSource());
+    dbTemplate = new DBTemplate.Builder()
+        .dataSource(dataSource)
+        .config(config -> {
+            config.setShowSql(true)
+                .setShowResult(true);
+        })
+        .build();
   }
   
   public List<Record> findRecord() {
-    try (Database db = orm.open()) {
+    try (Database db = dbTemplate.open()) {
       Sql sql = new Sql("SELECT * FROM tb_snowfake");
       return db.find(sql);
     }
@@ -29,16 +35,7 @@ public class MyDao {
 
 ## 使用实体映射
 如果需要使用实体映射，需要在创建Orm对象的时候，对其进行配置
-```
-  Orm orm = Orm.build(getDataSource())
-                //设置使用的数据库类型
-                .setDbType(DbType.MYSQL)     
-                //注册实体属性类型解析器，可自定义扩展
-                .registerPropertyHandler(String.class, new StringPropertyHandler())
-                .registerPropertyHandler(BigDecimal.class, new BigDecimalPropertyHandler())
-                .registerPropertyHandler(Long.class, new LongPropertyHandler())
-                .registerPropertyHandler(Boolean.class, new BooleanPropertyHandler())
-                .registerPropertyHandler(LocalDateTime.class, new LocalDateTimePropertyHandler());
+```java
 @Configuration
 public class DataSourceConfig {
     @Bean
@@ -48,19 +45,30 @@ public class DataSourceConfig {
 
     @Bean
     public DBTemplate dbTemplate(){
-        return DBTemplate.build(dataSource())
-                     //设置使用的数据库类型
-                     .setDbType(DbType.MYSQL)
-                     //注册实体属性类型解析器，可自定义扩展
-                     .registerPropertyHandler(String.class, new StringPropertyHandler())
-                     .registerPropertyHandler(BigDecimal.class, new BigDecimalPropertyHandler())
-                     .registerPropertyHandler(Long.class, new LongPropertyHandler())
-                     .registerPropertyHandler(Boolean.class, new BooleanPropertyHandler())
-                     .registerPropertyHandler(LocalDateTime.class, new LocalDateTimePropertyHandler());
+        return new DBTemplate.Builder().dataSource(primaryDataSource()) 
+            .connectionFactory(SpringConnectionFactory.class)
+            .config(config -> {
+                config.setDbType(DbType.MYSQL)
+                .setBatchSize(200)
+                .setFetchSize(100)
+                .setQueryTimeout(120)
+                .setDataCenterId(1L)
+                .setWorkerId(1L);
+            })
+            .mapping(mapper -> {
+                mapper.register(String.class, new StringPropertyHandler())
+                .register(BigDecimal.class, new BigDecimalPropertyHandler())
+                .register(Long.class, new LongPropertyHandler())
+                .register(long.class, new LongPropertyHandler(true))
+                .register(Boolean.class, new BooleanPropertyHandler())
+                .register(int.class, new IntegerPropertyHandler(true))
+                .register(Date.class, new DatePropertyHandler());
+            })
+            .build();
     }
 }
 ```
-DBTemplate 参数：
+配置 参数：
 * dbType: 数据库类型，目前支持 mysql、sqlserver、sqlserver2012；
 * showSql: 是否显示 SQL 和 SQL 参数，设置为true则显示，日志级别为info；
 * showResult: 是否显示查询结果，设置为true则显示，日志级别为info；
@@ -72,7 +80,7 @@ DBTemplate 参数：
 * dataCenterId: 数据中心ID(雪花算法生成主键用)；
 
 registerPropertyHandler 内置注册的实体属性类型解析器：
-```
+```java
     registerPropertyHandler(String.class, new StringPropertyHandler());
     registerPropertyHandler(java.util.Date.class, new DatePropertyHandler());
     registerPropertyHandler(LocalDateTime.class, new LocalDateTimePropertyHandler());

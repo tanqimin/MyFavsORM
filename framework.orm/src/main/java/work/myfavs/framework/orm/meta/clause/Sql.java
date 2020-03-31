@@ -18,6 +18,7 @@ public class Sql
     implements Serializable {
 
   //region Constructor
+
   /**
    * 构造方法
    */
@@ -772,6 +773,18 @@ public class Sql
   public static Sql Update(String table) {
 
     return new Sql(StrUtil.format("UPDATE {}", table));
+  }
+
+  /**
+   * 拼接 SET {表达式} 语句
+   *
+   * @param expression 表达式
+   *
+   * @return SQL
+   */
+  public Sql set(String expression) {
+
+    return this.append(StrUtil.format(" SET {}", expression));
   }
 
   /**

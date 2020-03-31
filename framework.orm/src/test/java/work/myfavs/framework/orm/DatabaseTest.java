@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import work.myfavs.framework.orm.DBTemplate.Builder;
 import work.myfavs.framework.orm.entity.Snowfake;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -33,9 +34,12 @@ public class DatabaseTest {
     configuration.setAutoCommit(false);
     DataSource dataSource = new HikariDataSource(configuration);
 
-    this.dbTemplate = dbTemplate.build(dataSource)
-                                .setShowSql(true)
-                                .setShowResult(true);
+    this.dbTemplate = new Builder().dataSource(dataSource)
+                                   .config(config -> {
+                                     config.setShowSql(true)
+                                           .setShowResult(true);
+                                   })
+                                   .build();
   }
 
   @Test

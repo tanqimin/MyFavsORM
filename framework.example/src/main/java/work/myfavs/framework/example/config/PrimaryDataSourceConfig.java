@@ -39,24 +39,26 @@ public class PrimaryDataSourceConfig {
   @Bean(name = "primaryDBTemplate", destroyMethod = "close")
   public DBTemplate dbTemplate() {
 
-    return DBTemplate.build(primaryDataSource())
-                     .setConnectionFactoryClass(SpringConnectionFactory.class)
-                     .registerPropertyHandler(String.class, new StringPropertyHandler())
-                     .registerPropertyHandler(BigDecimal.class, new BigDecimalPropertyHandler())
-                     .registerPropertyHandler(Long.class, new LongPropertyHandler())
-                     .registerPropertyHandler(long.class, new LongPropertyHandler(true))
-                     .registerPropertyHandler(Boolean.class, new BooleanPropertyHandler())
-                     .registerPropertyHandler(int.class, new IntegerPropertyHandler(true))
-                     .registerPropertyHandler(Date.class, new DatePropertyHandler())
-                     .setDbType(DbType.MYSQL)
-//                     .setShowSql(true)
-//                     .setShowResult(true)
-                     .setBatchSize(200)
-                     .setFetchSize(100)
-//                     .setMaxPageSize(100)
-                     .setQueryTimeout(120)
-                     .setDataCenterId(1L)
-                     .setWorkerId(1L);
+    return new DBTemplate.Builder().dataSource(primaryDataSource())
+                                   .connectionFactory(SpringConnectionFactory.class)
+                                   .config(config -> {
+                                     config.setDbType(DbType.MYSQL)
+                                           .setBatchSize(200)
+                                           .setFetchSize(100)
+                                           .setQueryTimeout(120)
+                                           .setDataCenterId(1L)
+                                           .setWorkerId(1L);
+                                   })
+                                   .mapping(mapper -> {
+                                     mapper.register(String.class, new StringPropertyHandler())
+                                           .register(BigDecimal.class, new BigDecimalPropertyHandler())
+                                           .register(Long.class, new LongPropertyHandler())
+                                           .register(long.class, new LongPropertyHandler(true))
+                                           .register(Boolean.class, new BooleanPropertyHandler())
+                                           .register(int.class, new IntegerPropertyHandler(true))
+                                           .register(Date.class, new DatePropertyHandler());
+                                   })
+                                   .build();
   }
 
 }

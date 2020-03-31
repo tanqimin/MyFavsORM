@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.schema.AttributeMeta;
@@ -73,12 +74,19 @@ public abstract class DefaultDialect
         insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
         valuesSql.append(StrUtil.format("?,"), ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
       }
-      insertSql.getSql()
-               .deleteCharAt(insertSql.getSqlString()
-                                      .lastIndexOf(","));
-      valuesSql.getSql()
-               .deleteCharAt(valuesSql.getSqlString()
-                                      .lastIndexOf(","));
+      //自动加入逻辑删除字段
+      if (classMeta.isEnableLogicalDelete()) {
+        insertSql.append(StrUtil.format("{}", classMeta.getLogicalDeleteField()));
+        valuesSql.append(StrUtil.format("0"));
+      } else {
+        insertSql.getSql()
+                 .deleteCharAt(insertSql.getSqlString()
+                                        .lastIndexOf(","));
+        valuesSql.getSql()
+                 .deleteCharAt(valuesSql.getSqlString()
+                                        .lastIndexOf(","));
+      }
+
     }
 
     return insertSql.append(")")
@@ -114,12 +122,19 @@ public abstract class DefaultDialect
         insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
         valuesSql.append(StrUtil.format("?,"));
       }
-      insertSql.getSql()
-               .deleteCharAt(insertSql.getSqlString()
-                                      .lastIndexOf(","));
-      valuesSql.getSql()
-               .deleteCharAt(valuesSql.getSqlString()
-                                      .lastIndexOf(","));
+      //自动加入逻辑删除字段
+      if (classMeta.isEnableLogicalDelete()) {
+        insertSql.append(StrUtil.format("{}", classMeta.getLogicalDeleteField()));
+        valuesSql.append(StrUtil.format("0"));
+      } else {
+        insertSql.getSql()
+                 .deleteCharAt(insertSql.getSqlString()
+                                        .lastIndexOf(","));
+        valuesSql.getSql()
+                 .deleteCharAt(valuesSql.getSqlString()
+                                        .lastIndexOf(","));
+      }
+
     }
 
     return insertSql.append(")")

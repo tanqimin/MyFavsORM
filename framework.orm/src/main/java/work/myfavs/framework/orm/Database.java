@@ -46,17 +46,20 @@ public class Database
   private static SqlLog                                   sqlLog      = null;
 
   private DBTemplate        dbTemplate;
+  private Configuration     configuration;
   private ConnectionFactory connectionFactory;
 
   public Database(DBTemplate dbTemplate) {
 
     this.dbTemplate = dbTemplate;
+    this.configuration = dbTemplate.getConfiguration();
     this.connectionFactory = createConnectionFactoryInstance(this.dbTemplate.getDataSource());
+
     if (dialect == null) {
-      dialect = DialectFactory.getInstance(this.dbTemplate.getDbType());
+      dialect = DialectFactory.getInstance(this.configuration.getDbType());
     }
     if (sqlLog == null) {
-      sqlLog = new SqlLog(this.dbTemplate.getShowSql(), this.dbTemplate.getShowResult());
+      sqlLog = new SqlLog(this.configuration.getShowSql(), this.configuration.getShowResult());
     }
   }
 
@@ -69,7 +72,7 @@ public class Database
 
     try {
       if (constructor == null) {
-        final Class<? extends ConnectionFactory> connectionFactoryClass = this.dbTemplate.getConnectionFactoryClass();
+        final Class<? extends ConnectionFactory> connectionFactoryClass = this.dbTemplate.getConnectionFactory();
         constructor = connectionFactoryClass.getConstructor(DataSource.class);
       }
       return constructor.newInstance(dataSource);
@@ -142,7 +145,7 @@ public class Database
 
       conn = this.open();
       pstmt = DBUtil.getPsForQuery(conn, sql, params);
-      pstmt.setFetchSize(this.dbTemplate.getFetchSize());
+      pstmt.setFetchSize(this.configuration.getFetchSize());
       rs = pstmt.executeQuery();
 
       result = DBConvert.toList(viewClass, rs);
@@ -355,10 +358,13 @@ public class Database
   public <TView> TView getById(Class<TView> viewClass,
                                Object id) {
 
-    AttributeMeta primaryKey = Metadata.get(viewClass)
-                                       .checkPrimaryKey();
+    ClassMeta     classMeta  = Metadata.get(viewClass);
+    AttributeMeta primaryKey = classMeta.checkPrimaryKey();
+
     Sql sql = dialect.select(viewClass)
-                     .where(Cond.eq(primaryKey.getColumnName(), id));
+                     .where(Cond.eq(primaryKey.getColumnName(), id))
+                     .and(Cond.logicalDeleteCond(classMeta));
+
     return this.get(viewClass, sql);
   }
 
@@ -376,7 +382,8 @@ public class Database
                                   Object param) {
 
     Sql sql = dialect.select(viewClass)
-                     .where(Cond.eq(field, param));
+                     .where(Cond.eq(field, param))
+                     .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.get(viewClass, sql);
   }
 
@@ -392,7 +399,8 @@ public class Database
                                  Cond cond) {
 
     Sql sql = dialect.select(viewClass)
-                     .where(cond);
+                     .where(cond)
+                     .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.get(viewClass, sql);
   }
 
@@ -437,10 +445,11 @@ public class Database
   public <TView> List<TView> findByIds(Class<TView> viewClass,
                                        List ids) {
 
-    AttributeMeta primaryKey = Metadata.get(viewClass)
-                                       .checkPrimaryKey();
+    ClassMeta     classMeta  = Metadata.get(viewClass);
+    AttributeMeta primaryKey = classMeta.checkPrimaryKey();
     Sql sql = dialect.select(viewClass)
-                     .where(Cond.in(primaryKey.getColumnName(), ids, false));
+                     .where(Cond.in(primaryKey.getColumnName(), ids, false))
+                     .and(Cond.logicalDeleteCond(classMeta));
     return this.find(viewClass, sql);
   }
 
@@ -458,7 +467,8 @@ public class Database
                                          Object param) {
 
     Sql sql = dialect.select(viewClass)
-                     .where(Cond.eq(field, param));
+                     .where(Cond.eq(field, param))
+                     .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);
   }
 
@@ -476,7 +486,8 @@ public class Database
                                          List<Object> params) {
 
     Sql sql = dialect.select(viewClass)
-                     .where(Cond.in(field, params, false));
+                     .where(Cond.in(field, params, false))
+                     .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);
   }
 
@@ -492,7 +503,8 @@ public class Database
                                         Cond cond) {
 
     Sql sql = dialect.select(viewClass)
-                     .where(cond);
+                     .where(cond)
+                     .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);
   }
 
@@ -566,7 +578,8 @@ public class Database
                                   Cond cond) {
 
     Sql sql = dialect.count(viewClass)
-                     .where(cond);
+                     .where(cond)
+                     .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.count(sql);
   }
 
@@ -645,7 +658,7 @@ public class Database
         throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
       }
 
-      long maxPageSize = this.dbTemplate.getMaxPageSize();
+      long maxPageSize = this.configuration.getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
         throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
       }
@@ -823,7 +836,7 @@ public class Database
         throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
       }
 
-      long maxPageSize = this.dbTemplate.getMaxPageSize();
+      long maxPageSize = this.configuration.getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
         throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
       }
@@ -1090,7 +1103,7 @@ public class Database
         } else if (strategy == GenerationType.UUID) {
           pkVal = PKGenerator.nextUUID();
         } else if (strategy == GenerationType.SNOW_FLAKE) {
-          pkVal = PKGenerator.nextSnowFakeId(this.dbTemplate.getWorkerId(), this.dbTemplate.getDataCenterId());
+          pkVal = PKGenerator.nextSnowFakeId(this.configuration.getWorkerId(), this.configuration.getDataCenterId());
         }
 
         ReflectUtil.setFieldValue(entity, pkFieldName, pkVal);
@@ -1183,7 +1196,7 @@ public class Database
           } else if (strategy == GenerationType.UUID) {
             pkVal = PKGenerator.nextUUID();
           } else if (strategy == GenerationType.SNOW_FLAKE) {
-            pkVal = PKGenerator.nextSnowFakeId(this.dbTemplate.getWorkerId(), this.dbTemplate.getDataCenterId());
+            pkVal = PKGenerator.nextSnowFakeId(this.configuration.getWorkerId(), this.configuration.getDataCenterId());
           }
 
           ReflectUtil.setFieldValue(entity, pkFieldName, pkVal);
@@ -1206,7 +1219,7 @@ public class Database
       getSqlLog().showBatchSql(sql.getSqlString(), paramsList);
 
       conn = this.open();
-      pstmt = DBUtil.getPsForUpdate(conn, autoGeneratedPK, sql.getSqlString(), paramsList, this.dbTemplate.getBatchSize());
+      pstmt = DBUtil.getPsForUpdate(conn, autoGeneratedPK, sql.getSqlString(), paramsList, this.configuration.getBatchSize());
 
       result = DBUtil.executeBatch(pstmt);
 
@@ -1247,7 +1260,9 @@ public class Database
     if (entity == null) {
       return 0;
     }
-    return execute(dialect.update(modelClass, entity, false));
+    Sql sql = dialect.update(modelClass, entity, false)
+                     .and(Cond.logicalDeleteCond(Metadata.get(modelClass)));
+    return execute(sql);
   }
 
   /**
@@ -1265,7 +1280,9 @@ public class Database
     if (entity == null) {
       return 0;
     }
-    return execute(dialect.update(modelClass, entity, true));
+    Sql sql = dialect.update(modelClass, entity, true)
+                     .and(Cond.logicalDeleteCond(Metadata.get(modelClass)));
+    return execute(sql);
   }
 
   /**
@@ -1347,10 +1364,16 @@ public class Database
     for (AttributeMeta updateAttribute : updateAttributes) {
       sql.append(StrUtil.format("{} = ?,", updateAttribute.getColumnName()));
     }
+
     sql.getSql()
        .deleteCharAt(sql.getSql()
                         .lastIndexOf(","));
+
     sql.append(StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()));
+
+    if (classMeta.isEnableLogicalDelete()) {
+      sql.append(StrUtil.format(" AND {} = 0", classMeta.getLogicalDeleteField()));
+    }
 
     paramsList = new LinkedList<>();
 
@@ -1372,7 +1395,7 @@ public class Database
       getSqlLog().showBatchSql(sql.getSqlString(), paramsList);
 
       conn = this.open();
-      pstmt = DBUtil.getPsForUpdate(conn, false, sql.getSqlString(), paramsList, this.dbTemplate.getBatchSize());
+      pstmt = DBUtil.getPsForUpdate(conn, false, sql.getSqlString(), paramsList, this.configuration.getBatchSize());
 
       result = DBUtil.executeBatch(pstmt);
 
@@ -1509,8 +1532,19 @@ public class Database
     ClassMeta     classMeta    = Metadata.get(modelClass);
     AttributeMeta primaryKey   = classMeta.checkPrimaryKey();
     String        pkColumnName = primaryKey.getColumnName();
-    Sql sql = Sql.Delete(classMeta.getTableName())
-                 .where(Cond.eq(pkColumnName, id));
+
+    Sql sql;
+
+    if (classMeta.isEnableLogicalDelete()) {
+      sql = Sql.Update(classMeta.getTableName())
+               .set(StrUtil.format("{} = {}", classMeta.getLogicalDeleteField(), pkColumnName))
+               .where(Cond.eq(pkColumnName, id))
+               .and(Cond.eq(classMeta.getLogicalDeleteField(), 0));
+    } else {
+      sql = Sql.Delete(classMeta.getTableName())
+               .where(Cond.eq(pkColumnName, id));
+    }
+
     return execute(sql);
   }
 
@@ -1531,8 +1565,19 @@ public class Database
     }
 
     ClassMeta classMeta = Metadata.get(modelClass);
-    Sql sql = Sql.Delete(classMeta.getTableName())
-                 .where(cond);
+    Sql       sql;
+
+    if (classMeta.isEnableLogicalDelete()) {
+      sql = Sql.Update(classMeta.getTableName())
+               .set(StrUtil.format("{} = {}", classMeta.getLogicalDeleteField(), classMeta.getPrimaryKey()
+                                                                                          .getColumnName()))
+               .where(cond)
+               .and(Cond.eq(classMeta.getLogicalDeleteField(), 0));
+    } else {
+      sql = Sql.Delete(classMeta.getTableName())
+               .where(cond);
+    }
+
     return execute(sql);
   }
 
@@ -1540,6 +1585,5 @@ public class Database
 
     return sqlLog;
   }
-
 
 }

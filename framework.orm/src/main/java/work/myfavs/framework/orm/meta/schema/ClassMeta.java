@@ -21,6 +21,8 @@ public class ClassMeta {
   private GenerationType strategy;
 
   private AttributeMeta              primaryKey;                                  //主键
+  private boolean                    enableLogicalDelete;                         //是否启用逻辑删除？
+  private String                     logicalDeleteField;                          //逻辑删除字段（数据库字段）
   private List<AttributeMeta>        updateAttributes = new LinkedList<>();       //更新字段
   private Map<String, AttributeMeta> queryAttributes  = new HashMap<>();          //查询字段
   //endregion
@@ -85,6 +87,27 @@ public class ClassMeta {
 
     this.queryAttributes = queryAttributes;
   }
+
+  public boolean isEnableLogicalDelete() {
+
+    return enableLogicalDelete;
+  }
+
+  public void setEnableLogicalDelete(boolean enableLogicalDelete) {
+
+    this.enableLogicalDelete = enableLogicalDelete;
+  }
+
+  public String getLogicalDeleteField() {
+
+    return logicalDeleteField;
+  }
+
+  public void setLogicalDeleteField(String logicalDeleteField) {
+
+    this.logicalDeleteField = logicalDeleteField;
+  }
+
   //endregion
 
   //region Constructor
@@ -116,6 +139,11 @@ public class ClassMeta {
                                   .isEmpty()
                                  ? clazz.getSimpleName()
                                  : table.value());
+      if (table.logicalDeleteField()
+               .isEmpty() == false) {
+        classMeta.setEnableLogicalDelete(true);
+        classMeta.setLogicalDeleteField(table.logicalDeleteField());
+      }
     }
 
     fields = ReflectUtil.getFields(clazz);
