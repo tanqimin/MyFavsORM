@@ -175,7 +175,7 @@ public class Cond
   }
 
   /**
-   * 创建 {field} &gt ? 条件
+   * 创建 field &gt; ? 条件
    *
    * @param field 字段
    * @param param 参数
@@ -192,7 +192,7 @@ public class Cond
   }
 
   /**
-   * 创建 {field} &ge ? 条件
+   * 创建 field &ge; ? 条件
    *
    * @param field 字段
    * @param param 参数
@@ -209,7 +209,7 @@ public class Cond
   }
 
   /**
-   * 创建 {field} &lt ? 条件
+   * 创建 field &lt; ? 条件
    *
    * @param field 字段
    * @param param 参数
@@ -226,7 +226,7 @@ public class Cond
   }
 
   /**
-   * 创建 {field} &le ? 条件
+   * 创建 field &le; ? 条件
    *
    * @param field 字段
    * @param param 参数
@@ -243,8 +243,8 @@ public class Cond
   }
 
   /**
-   * 创建 {field} LIKE ? 条件
-   * 如果参数中检测不到通配符（%, _）则改为 {field} = ? 语句
+   * 创建 field LIKE ? 条件
+   * 如果参数中检测不到通配符（%, _）则改为 field = ? 语句
    *
    * @param field 字段
    * @param param 参数
@@ -268,9 +268,9 @@ public class Cond
   }
 
   /**
-   * 创建 {field} BETWEEN ? AND ? 条件
-   * 如果参数1 不为 null， 参数2 为 null，则构建 {field} &ge ? 条件
-   * 如果参数1 为 null， 参数2 不为 null，则构建 {field} &le ? 条件
+   * 创建 field BETWEEN ? AND ? 条件
+   * 如果参数1 不为 null， 参数2 为 null，则构建 field &ge; ? 条件
+   * 如果参数1 为 null， 参数2 不为 null，则构建 field &le; ? 条件
    *
    * @param field  字段
    * @param param1 参数1
@@ -295,10 +295,10 @@ public class Cond
   }
 
   /**
-   * 构建 {field} IN (?,?..?) 语句
+   * 构建 field IN (?,?..?) 语句
    * 如果 params 集合为空，则不构建语句
-   * 如果 params 集合数量为 1， 则构建语句 {field} = ?
-   * 如果 params 集合数量大于 1， 则构建 {field} IN (?,?..?) 语句
+   * 如果 params 集合数量为 1， 则构建语句 field = ?
+   * 如果 params 集合数量大于 1， 则构建 field IN (?,?..?) 语句
    *
    * @param field  字段
    * @param params 参数
@@ -312,11 +312,11 @@ public class Cond
   }
 
   /**
-   * 构建 {field} IN (?,?..?) 语句
+   * 构建 field IN (?,?..?) 语句
    * 如果 params 集合为空，且 ignoreEmptyParams 为 true，则不构建语句
-   * 如果 params 集合为空，且 ignoreEmptyParams 为 false，则构建语句 1 > 2
-   * 如果 params 集合数量为 1， 则构建语句 {field} = ?
-   * 如果 params 集合数量大于 1， 则构建 {field} IN (?,?..?) 语句
+   * 如果 params 集合为空，且 ignoreEmptyParams 为 false，则构建语句 1 &gt; 2
+   * 如果 params 集合数量为 1， 则构建语句 field = ?
+   * 如果 params 集合数量大于 1， 则构建 field IN (?,?..?) 语句
    *
    * @param field             字段
    * @param params            参数
@@ -352,7 +352,7 @@ public class Cond
   }
 
   /**
-   * 构建 {field} IN ({sql}) 条件
+   * 构建 field IN ({sql}) 条件
    *
    * @param field 字段
    * @param sql   SQL
@@ -366,10 +366,10 @@ public class Cond
   }
 
   /**
-   * 构建 {field} NOT IN (?,?..?) 语句
+   * 构建 field NOT IN (?,?..?) 语句
    * 如果 params 集合为空，则不构建语句
-   * 如果 params 集合数量为 1， 则构建语句 {field} = ?
-   * 如果 params 集合数量大于 1， 则构建 {field} NOT IN (?,?..?) 语句
+   * 如果 params 集合数量为 1， 则构建语句 field = ?
+   * 如果 params 集合数量大于 1， 则构建 field NOT IN (?,?..?) 语句
    *
    * @param field  字段
    * @param params 参数
@@ -383,11 +383,11 @@ public class Cond
   }
 
   /**
-   * 构建 {field} NOT IN (?,?..?) 语句
+   * 构建 field NOT IN (?,?..?) 语句
    * 如果 params 集合为空，且 ignoreEmptyParams 为 true，则不构建语句
-   * 如果 params 集合为空，且 ignoreEmptyParams 为 false，则构建语句 1 > 2
-   * 如果 params 集合数量为 1， 则构建语句 {field} != ?
-   * 如果 params 集合数量大于 1， 则构建 {field} NOT IN (?,?..?) 语句
+   * 如果 params 集合为空，且 ignoreEmptyParams 为 false，则构建语句 1 &gt; 2
+   * 如果 params 集合数量为 1， 则构建语句 field != ?
+   * 如果 params 集合数量大于 1， 则构建 field NOT IN (?,?..?) 语句
    *
    * @param field             字段
    * @param params            参数
@@ -423,7 +423,7 @@ public class Cond
   }
 
   /**
-   * 构建 {field} NOT IN ({sql}) 条件
+   * 构建 field NOT IN ({sql}) 条件
    *
    * @param field 字段
    * @param sql   SQL

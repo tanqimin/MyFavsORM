@@ -12,7 +12,7 @@ import work.myfavs.framework.orm.meta.dialect.IDialect;
 /**
  * 仓储基类
  *
- * @param <TModel>
+ * @param <TModel> 实体类
  */
 public class Repository<TModel>
     extends Query {

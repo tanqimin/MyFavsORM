@@ -25,6 +25,8 @@ public class DBConvert {
    * @param <TModel>   Class TModel
    *
    * @return List
+   *
+   * @throws SQLException SQLException
    */
   public static <TModel> List<TModel> toList(Class<TModel> modelClass,
                                              ResultSet rs)

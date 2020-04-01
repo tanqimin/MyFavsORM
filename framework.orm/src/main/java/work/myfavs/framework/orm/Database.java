@@ -352,6 +352,7 @@ public class Database
    *
    * @param viewClass 结果类型
    * @param id        主键
+   * @param <TView>   实体类型
    *
    * @return 记录
    */
@@ -374,6 +375,7 @@ public class Database
    * @param viewClass 结果类型
    * @param field     字段名
    * @param param     参数
+   * @param <TView>   实体类型
    *
    * @return 记录
    */
@@ -392,6 +394,7 @@ public class Database
    *
    * @param viewClass 结果类型
    * @param cond      条件
+   * @param <TView>   实体类型
    *
    * @return 记录
    */
@@ -409,6 +412,7 @@ public class Database
    *
    * @param viewClass 结果类型
    * @param object    包含@Condition注解Field的对象
+   * @param <TView>   实体类型
    *
    * @return 记录
    */
@@ -424,6 +428,7 @@ public class Database
    * @param viewClass      结果类型
    * @param object         包含@Condition注解Field的对象
    * @param conditionGroup 条件组名
+   * @param <TView>        实体类型
    *
    * @return 记录
    */
@@ -439,6 +444,7 @@ public class Database
    *
    * @param viewClass 结果类型
    * @param ids       主键ID集合
+   * @param <TView>   实体类型
    *
    * @return 实体集合
    */
@@ -459,6 +465,7 @@ public class Database
    * @param viewClass 结果类型
    * @param field     字段名
    * @param param     参数
+   * @param <TView>   实体类型
    *
    * @return 实体集合
    */
@@ -478,6 +485,7 @@ public class Database
    * @param viewClass 结果类型
    * @param field     字段名
    * @param params    参数集合
+   * @param <TView>   实体类型
    *
    * @return 实体集合
    */
@@ -496,6 +504,7 @@ public class Database
    *
    * @param viewClass 结果类型
    * @param cond      查询条件
+   * @param <TView>   实体类型
    *
    * @return 实体集合
    */
@@ -513,6 +522,7 @@ public class Database
    *
    * @param viewClass 结果类型
    * @param object    包含@Condition注解Field的对象
+   * @param <TView>   实体类型
    *
    * @return 实体集合
    */
@@ -528,6 +538,7 @@ public class Database
    * @param viewClass      结果类型
    * @param object         包含@Condition注解Field的对象
    * @param conditionGroup 条件组名
+   * @param <TView>   实体类型
    *
    * @return 实体集合
    */
@@ -1539,7 +1550,7 @@ public class Database
       sql = Sql.Update(classMeta.getTableName())
                .set(StrUtil.format("{} = {}", classMeta.getLogicalDeleteField(), pkColumnName))
                .where(Cond.eq(pkColumnName, id))
-               .and(Cond.eq(classMeta.getLogicalDeleteField(), 0));
+               .and(Cond.logicalDeleteCond(classMeta));
     } else {
       sql = Sql.Delete(classMeta.getTableName())
                .where(Cond.eq(pkColumnName, id));
