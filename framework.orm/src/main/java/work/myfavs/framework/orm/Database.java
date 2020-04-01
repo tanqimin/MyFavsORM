@@ -538,7 +538,7 @@ public class Database
    * @param viewClass      结果类型
    * @param object         包含@Condition注解Field的对象
    * @param conditionGroup 条件组名
-   * @param <TView>   实体类型
+   * @param <TView>        实体类型
    *
    * @return 实体集合
    */
@@ -591,7 +591,8 @@ public class Database
     Sql sql = dialect.count(viewClass)
                      .where(cond)
                      .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
-    return this.count(sql);
+    return this.get(Number.class, sql)
+               .longValue();
   }
 
   /**
