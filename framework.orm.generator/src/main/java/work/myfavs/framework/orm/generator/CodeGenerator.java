@@ -26,6 +26,7 @@ public class CodeGenerator {
   //生成器元数据
   private GeneratorMeta     generatorMeta;
 
+  //region Getter && Setter
   public GeneratorConfig getGeneratorConfig() {
 
     return generatorConfig;
@@ -55,6 +56,7 @@ public class CodeGenerator {
 
     this.generatorMeta = generatorMeta;
   }
+  //endregion
 
   public CodeGenerator(GeneratorConfig generatorConfig) {
 

@@ -1,7 +1,5 @@
 package work.myfavs.framework.orm.meta.pagination;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,47 +8,14 @@ import java.util.List;
  * @param <TModel> 简单分页对象泛型
  */
 public class Page<TModel>
-    implements Serializable {
+    extends PageBase<TModel> {
 
   //region Attributes
-  private List<TModel> data         = new ArrayList<>();
-  private int          currentPage  = 1;
-  private int          pageSize     = 20;
-  private long         totalPages   = 1L;
-  private long         totalRecords = 0L;
+  private long totalPages   = 1L;
+  private long totalRecords = 0L;
   //endregion
 
   //region Getter && Setter
-  public List<TModel> getData() {
-
-    return data;
-  }
-
-  public void setData(List<TModel> data) {
-
-    this.data = data;
-  }
-
-  public int getCurrentPage() {
-
-    return currentPage;
-  }
-
-  public void setCurrentPage(int currentPage) {
-
-    this.currentPage = currentPage;
-  }
-
-  public int getPageSize() {
-
-    return pageSize;
-  }
-
-  public void setPageSize(int pageSize) {
-
-    this.pageSize = pageSize;
-  }
-
   public long getTotalPages() {
 
     return totalPages;
@@ -103,8 +68,8 @@ public class Page<TModel>
    * @return 分页对象
    */
   public static <TModel> Page<TModel> createInstance(List<TModel> data,
-                                                     int currentPage,
-                                                     int pageSize,
+                                                     long currentPage,
+                                                     long pageSize,
                                                      long totalPages,
                                                      long totalRecords) {
 
@@ -115,7 +80,7 @@ public class Page<TModel>
     instance.setTotalPages(totalPages);
     instance.setTotalRecords(totalRecords);
     return instance;
-  }
+}
 
   /**
    * 转换分页对象数据
@@ -127,7 +92,7 @@ public class Page<TModel>
    */
   public <TOther> Page<TOther> convert(List<TOther> data) {
 
-    return createInstance(data, this.currentPage, this.pageSize, this.totalPages, this.totalRecords);
+    return createInstance(data, this.getCurrentPage(), this.getPageSize(), this.totalPages, this.totalRecords);
   }
 
 }

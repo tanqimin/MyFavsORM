@@ -1,7 +1,5 @@
 package work.myfavs.framework.orm.meta.pagination;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,25 +8,13 @@ import java.util.List;
  * @param <TModel> 简单分页对象泛型
  */
 public class PageLite<TModel>
-    implements Serializable {
+    extends PageBase<TModel> {
 
   //region Attributes
-  private List<TModel> data        = new ArrayList<>();
-  private boolean      hasNext     = false;
-  private long         currentPage = 1;
-  private long         pageSize    = 20;
+  private boolean hasNext = false;
   //endregion
 
   //region Getter && Setter
-  public List<TModel> getData() {
-
-    return data;
-  }
-
-  public void setData(List<TModel> data) {
-
-    this.data = data;
-  }
 
   public boolean isHasNext() {
 
@@ -38,26 +24,6 @@ public class PageLite<TModel>
   public void setHasNext(boolean hasNext) {
 
     this.hasNext = hasNext;
-  }
-
-  public long getCurrentPage() {
-
-    return currentPage;
-  }
-
-  public void setCurrentPage(long currentPage) {
-
-    this.currentPage = currentPage;
-  }
-
-  public long getPageSize() {
-
-    return pageSize;
-  }
-
-  public void setPageSize(long pageSize) {
-
-    this.pageSize = pageSize;
   }
   //endregion
 
@@ -113,7 +79,7 @@ public class PageLite<TModel>
    */
   public <TOther> PageLite<TOther> convert(List<TOther> data) {
 
-    return createInstance(data, this.currentPage, this.pageSize);
+    return createInstance(data, this.getCurrentPage(), this.getPageSize());
   }
 
 }
