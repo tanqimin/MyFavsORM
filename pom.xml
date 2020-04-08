@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework</artifactId>
-  <version>0.2.26.RELEASE</version>
+  <version>0.2.27.RELEASE</version>
 
   <properties>
     <maven.compiler.encoding>UTF-8</maven.compiler.encoding>

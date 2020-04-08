@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.schema.AttributeMeta;
@@ -29,12 +28,12 @@ public abstract class DefaultDialect
   protected final Pattern P_ORDER         = Pattern.compile("\\s+ORDER\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   protected final Pattern P_GROUP         = Pattern.compile("\\s+GROUP\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   protected final Pattern P_HAVING        = Pattern.compile("\\s+HAVING\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  protected final Pattern P_SELECT_SINGLE = Pattern.compile("^\\s*SELECT\\s+((COUNT)\\([\\s\\S]*\\)\\s*,?)+((\\s*)|(\\s+FROM[\\s\\S]*))?$", Pattern.CASE_INSENSITIVE);
+  protected final Pattern P_SELECT_SINGLE = Pattern.compile("^\\s*SELECT\\s+((COUNT)\\([\\s\\S]*\\)\\s*,?)+((\\s*)|(\\s+FROM[\\s\\S]*))?$",
+                                                            Pattern.CASE_INSENSITIVE);
 
   protected static <TModel> String getTableName(Class<TModel> clazz) {
 
-    return Metadata.get(clazz)
-                   .getTableName();
+    return Metadata.get(clazz).getTableName();
   }
 
   /**
@@ -75,23 +74,15 @@ public abstract class DefaultDialect
         valuesSql.append(StrUtil.format("?,"), ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
       }
       //自动加入逻辑删除字段
-      if (classMeta.isEnableLogicalDelete()) {
-        insertSql.append(StrUtil.format("{}", classMeta.getLogicalDeleteField()));
-        valuesSql.append(StrUtil.format("0"));
-      } else {
-        insertSql.getSql()
-                 .deleteCharAt(insertSql.getSqlString()
-                                        .lastIndexOf(","));
-        valuesSql.getSql()
-                 .deleteCharAt(valuesSql.getSqlString()
-                                        .lastIndexOf(","));
+      if (needAppendLogicalDeleteField(classMeta)) {
+        insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
+        valuesSql.append(StrUtil.format("0,"));
       }
-
+      insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
+      valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
     }
 
-    return insertSql.append(")")
-                    .append(valuesSql)
-                    .append(")");
+    return insertSql.append(")").append(valuesSql).append(")");
   }
 
   @Override
@@ -122,24 +113,17 @@ public abstract class DefaultDialect
         insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
         valuesSql.append(StrUtil.format("?,"));
       }
-      //自动加入逻辑删除字段
-      if (classMeta.isEnableLogicalDelete()) {
-        insertSql.append(StrUtil.format("{}", classMeta.getLogicalDeleteField()));
-        valuesSql.append(StrUtil.format("0"));
-      } else {
-        insertSql.getSql()
-                 .deleteCharAt(insertSql.getSqlString()
-                                        .lastIndexOf(","));
-        valuesSql.getSql()
-                 .deleteCharAt(valuesSql.getSqlString()
-                                        .lastIndexOf(","));
-      }
 
+      //自动加入逻辑删除字段
+      if (needAppendLogicalDeleteField(classMeta)) {
+        insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
+        valuesSql.append(StrUtil.format("0,"));
+      }
+      insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
+      valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
     }
 
-    return insertSql.append(")")
-                    .append(valuesSql)
-                    .append(")");
+    return insertSql.append(")").append(valuesSql).append(")");
   }
 
   @Override
@@ -159,8 +143,7 @@ public abstract class DefaultDialect
     primaryKey = classMeta.checkPrimaryKey();
     updateAttributes = classMeta.getUpdateAttributes();
 
-    sql = Sql.Update(tableName)
-             .append(" SET");
+    sql = Sql.Update(tableName).append(" SET");
 
     if (updateAttributes.size() > 0) {
       for (AttributeMeta attributeMeta : updateAttributes) {
@@ -171,9 +154,7 @@ public abstract class DefaultDialect
         }
         sql.append(StrUtil.format(" {} = ?,", attributeMeta.getColumnName()), fieldValue);
       }
-      sql.getSql()
-         .deleteCharAt(sql.getSql()
-                          .lastIndexOf(","));
+      sql.getSql().deleteCharAt(sql.getSql().lastIndexOf(","));
     }
     sql.append(StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()), ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
 
@@ -209,6 +190,20 @@ public abstract class DefaultDialect
   public <TModel> Sql select(Class<TModel> clazz) {
 
     return new Sql(StrUtil.format("SELECT * FROM {}", getTableName(clazz)));
+  }
+
+  /**
+   * 检查是否需要添加逻辑删除字段包含字段
+   *
+   * @return 如果不启用逻辑删除，返回false
+   */
+  protected boolean needAppendLogicalDeleteField(ClassMeta classMeta) {
+
+    if (classMeta.isEnableLogicalDelete() == false) {
+      return false;
+    }
+
+    return classMeta.getQueryAttributes().containsKey(classMeta.getLogicalDeleteField()) == false;
   }
 
 }

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class PageBase<TModel>
+public class PageBase<TModel>
     implements Serializable {
 
   private List<TModel> data        = new ArrayList<>();

@@ -135,12 +135,10 @@ public class ClassMeta {
     if (table != null) {
       classMeta.setClassName(clazz.getName());
       classMeta.setStrategy(table.strategy());
-      classMeta.setTableName(table.value()
-                                  .isEmpty()
+      classMeta.setTableName(table.value().isEmpty()
                                  ? clazz.getSimpleName()
                                  : table.value());
-      if (table.logicalDeleteField()
-               .isEmpty() == false) {
+      if (table.logicalDeleteField().isEmpty() == false) {
         classMeta.setEnableLogicalDelete(true);
         classMeta.setLogicalDeleteField(table.logicalDeleteField());
       }
@@ -154,8 +152,7 @@ public class ClassMeta {
         continue;
       }
 
-      final String queryKey = attr.getColumnName()
-                                  .toUpperCase();
+      final String  queryKey   = attr.getColumnName().toUpperCase();
       final boolean readonly   = attr.isReadonly();
       final boolean primaryKey = attr.isPrimaryKey();
 
