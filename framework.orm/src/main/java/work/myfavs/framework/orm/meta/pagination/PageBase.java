@@ -2,7 +2,9 @@ package work.myfavs.framework.orm.meta.pagination;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 public class PageBase<TModel>
     implements Serializable {
@@ -39,6 +41,18 @@ public class PageBase<TModel>
   public void setPageSize(long pageSize) {
 
     this.pageSize = pageSize;
+  }
+
+  protected <TOther> List<TOther> convertData(Function<TModel, TOther> fun) {
+
+    List<TOther> list = new ArrayList<>();
+    for (Iterator<TModel> iterator = this.getData().iterator();
+         iterator.hasNext(); ) {
+      TModel item  = iterator.next();
+      TOther apply = fun.apply(item);
+      list.add(apply);
+    }
+    return list;
   }
 
 }

@@ -1,6 +1,7 @@
 package work.myfavs.framework.orm.meta.pagination;
 
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * 分页对象
@@ -80,7 +81,7 @@ public class Page<TModel>
     instance.setTotalPages(totalPages);
     instance.setTotalRecords(totalRecords);
     return instance;
-}
+  }
 
   /**
    * 转换分页对象数据
@@ -93,6 +94,19 @@ public class Page<TModel>
   public <TOther> Page<TOther> convert(List<TOther> data) {
 
     return createInstance(data, this.getCurrentPage(), this.getPageSize(), this.totalPages, this.totalRecords);
+  }
+
+  /**
+   * 转换分页对象数据
+   *
+   * @param fun      转换Function
+   * @param <TOther> 分页数据类型泛型
+   *
+   * @return 新分页数据
+   */
+  public <TOther> Page<TOther> convert(Function<TModel, TOther> fun) {
+
+    return convert(convertData(fun));
   }
 
 }

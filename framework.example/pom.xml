@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework.example</artifactId>
-  <version>0.2.27.RELEASE</version>
+  <version>0.2.28.RELEASE</version>
 
   <properties>
     <druid.version>1.1.18</druid.version>
