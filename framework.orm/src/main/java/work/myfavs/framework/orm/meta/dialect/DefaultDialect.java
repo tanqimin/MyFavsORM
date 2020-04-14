@@ -2,6 +2,7 @@ package work.myfavs.framework.orm.meta.dialect;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,12 +25,16 @@ public abstract class DefaultDialect
 
   private final static Logger log = LoggerFactory.getLogger(DefaultDialect.class);
 
-  protected final Pattern P_SELECT        = Pattern.compile("^\\s*SELECT\\s+", Pattern.CASE_INSENSITIVE);
-  protected final Pattern P_ORDER         = Pattern.compile("\\s+ORDER\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  protected final Pattern P_GROUP         = Pattern.compile("\\s+GROUP\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  protected final Pattern P_HAVING        = Pattern.compile("\\s+HAVING\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  protected final Pattern P_SELECT_SINGLE = Pattern.compile("^\\s*SELECT\\s+((COUNT)\\([\\s\\S]*\\)\\s*,?)+((\\s*)|(\\s+FROM[\\s\\S]*))?$",
-                                                            Pattern.CASE_INSENSITIVE);
+  protected final Pattern P_SELECT = Pattern.compile("^\\s*SELECT\\s+", Pattern.CASE_INSENSITIVE);
+  protected final Pattern P_ORDER = Pattern
+      .compile("\\s+ORDER\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  protected final Pattern P_GROUP = Pattern
+      .compile("\\s+GROUP\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  protected final Pattern P_HAVING = Pattern
+      .compile("\\s+HAVING\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  protected final Pattern P_SELECT_SINGLE = Pattern
+      .compile("^\\s*SELECT\\s+((COUNT)\\([\\s\\S]*\\)\\s*,?)+((\\s*)|(\\s+FROM[\\s\\S]*))?$",
+          Pattern.CASE_INSENSITIVE);
 
   protected static <TModel> String getTableName(Class<TModel> clazz) {
 
@@ -46,11 +51,11 @@ public abstract class DefaultDialect
 
   @Override
   public <TModel> Sql insert(Class<TModel> clazz,
-                             TModel model) {
+      TModel model) {
 
-    ClassMeta           classMeta;
-    String              tableName;
-    AttributeMeta       primaryKey;
+    ClassMeta classMeta;
+    String tableName;
+    AttributeMeta primaryKey;
     List<AttributeMeta> updateAttributes;
 
     Sql insertSql;
@@ -65,13 +70,15 @@ public abstract class DefaultDialect
     valuesSql = new Sql(StrUtil.format(" VALUES ("));
     if (classMeta.getStrategy() != GenerationType.IDENTITY) {
       insertSql.append(StrUtil.format("{},", primaryKey.getColumnName()));
-      valuesSql.append(StrUtil.format("?,"), ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
+      valuesSql.append(StrUtil.format("?,"),
+          ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
     }
 
     if (updateAttributes.size() > 0) {
       for (AttributeMeta attributeMeta : updateAttributes) {
         insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
-        valuesSql.append(StrUtil.format("?,"), ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
+        valuesSql.append(StrUtil.format("?,"),
+            ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
       }
       //自动加入逻辑删除字段
       if (needAppendLogicalDeleteField(classMeta)) {
@@ -88,9 +95,9 @@ public abstract class DefaultDialect
   @Override
   public <TModel> Sql insert(Class<TModel> clazz) {
 
-    ClassMeta           classMeta;
-    String              tableName;
-    AttributeMeta       primaryKey;
+    ClassMeta classMeta;
+    String tableName;
+    AttributeMeta primaryKey;
     List<AttributeMeta> updateAttributes;
 
     Sql insertSql;
@@ -128,12 +135,12 @@ public abstract class DefaultDialect
 
   @Override
   public <TModel> Sql update(Class<TModel> clazz,
-                             TModel model,
-                             boolean ignoreNullValue) {
+      TModel model,
+      boolean ignoreNullValue) {
 
-    ClassMeta           classMeta;
-    String              tableName;
-    AttributeMeta       primaryKey;
+    ClassMeta classMeta;
+    String tableName;
+    AttributeMeta primaryKey;
     List<AttributeMeta> updateAttributes;
 
     Sql sql;
@@ -156,7 +163,8 @@ public abstract class DefaultDialect
       }
       sql.getSql().deleteCharAt(sql.getSql().lastIndexOf(","));
     }
-    sql.append(StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()), ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
+    sql.append(StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()),
+        ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
 
     return sql;
   }
@@ -170,7 +178,7 @@ public abstract class DefaultDialect
 
   @Override
   public Sql count(String sql,
-                   List<Object> params) {
+      Collection params) {
 
     Matcher om = P_ORDER.matcher(sql);
     if (om.find()) {

@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.meta.dialect;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -20,14 +20,14 @@ public class SqlServerDialect
 
   @Override
   public Sql selectTop(int currentPage,
-                       int pageSize,
-                       String sql,
-                       List<Object> params) {
+      int pageSize,
+      String sql,
+      Collection params) {
 
     if (currentPage == 1 && pageSize == 1) {
       //如果sql本身只返回一个结果
       if (P_SELECT_SINGLE.matcher(sql)
-                         .find()) {
+          .find()) {
         return new Sql(sql, params);
       }
     }
@@ -38,8 +38,8 @@ public class SqlServerDialect
 
     int offset = pageSize * (currentPage - 1);
 
-    String  orderBys = null;
-    Matcher om       = P_ORDER.matcher(sql);
+    String orderBys = null;
+    Matcher om = P_ORDER.matcher(sql);
     if (om.find()) {
       orderBys = sql.substring(om.end());
       sql = sql.substring(0, om.start());
@@ -63,7 +63,8 @@ public class SqlServerDialect
     }
 
     // T-SQL offset starts with 1, not like MySQL with 0;
-    return querySql.append(") paginate_alias WHERE rownumber BETWEEN ? AND ?", offset + 1L, pageSize + offset);
+    return querySql
+        .append(") paginate_alias WHERE rownumber BETWEEN ? AND ?", offset + 1L, pageSize + offset);
   }
 
 }

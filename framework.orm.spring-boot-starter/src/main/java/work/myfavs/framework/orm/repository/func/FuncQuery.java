@@ -1,13 +1,14 @@
 package work.myfavs.framework.orm.repository.func;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
-public class FuncQuery extends FuncAbstractRepository {
+@SuppressWarnings("unchecked")
+public class FuncQuery extends FuncBaseRepository {
 
   public FuncQuery(DBTemplate dbTemplate) {
     super(dbTemplate);
@@ -52,7 +53,7 @@ public class FuncQuery extends FuncAbstractRepository {
    */
   public <TView> Stream<TView> find(Class<TView> viewClass,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
     return super.find(viewClass, sql, params);
   }
@@ -65,7 +66,7 @@ public class FuncQuery extends FuncAbstractRepository {
    * @return 结果集
    */
   public Stream<Record> findRecord(String sql,
-      List<Object> params) {
+      Collection params) {
 
     return this.find(Record.class, sql, params);
   }
@@ -94,7 +95,7 @@ public class FuncQuery extends FuncAbstractRepository {
   public <TView> Stream<TView> findTop(Class<TView> viewClass,
       int top,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
     return super.findTop(viewClass, top, sql, params);
   }
@@ -125,7 +126,7 @@ public class FuncQuery extends FuncAbstractRepository {
    */
   public Stream<Record> findRecordTop(int top,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
     return this.findTop(Record.class, top, sql, params);
   }
@@ -182,7 +183,7 @@ public class FuncQuery extends FuncAbstractRepository {
    */
   public <TView> Optional<TView> get(Class<TView> viewClass,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
     return super.get(viewClass, sql, params);
   }
@@ -195,7 +196,7 @@ public class FuncQuery extends FuncAbstractRepository {
    * @return 记录
    */
   public Optional<Record> getRecord(String sql,
-      List<Object> params) {
+      Collection params) {
 
     return this.get(Record.class, sql, params);
   }

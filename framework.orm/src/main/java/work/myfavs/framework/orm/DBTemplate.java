@@ -20,9 +20,9 @@ public class DBTemplate
   //数据源
   private DataSource                         dataSource;
   //数据库配置
-  private Configuration                      configuration     = new Configuration();
+  private DBConfig DBConfig = new DBConfig();
   //数据库连接工厂
-  private Class<? extends ConnectionFactory> connectionFactory = null;
+  private Class<? extends ConnFactory> connectionFactory = null;
   //类型解析器
   private Mapper                             mapper;
   //endregion
@@ -37,7 +37,7 @@ public class DBTemplate
   private DBTemplate(Builder builder) {
 
     this.dataSource = builder.dataSource;
-    this.configuration = builder.configuration;
+    this.DBConfig = builder.DBConfig;
     this.connectionFactory = builder.connectionFactory;
     this.mapper = builder.mapper;
 
@@ -58,19 +58,19 @@ public class DBTemplate
    *
    * @return Database
    */
-  public Database open() {
+  public DB open() {
 
     return this.open(null);
   }
 
-  private Database open(Consumer<Connection> consumer) {
+  private DB open(Consumer<Connection> consumer) {
 
-    Database   database   = new Database(this);
-    Connection connection = database.open();
+    DB db = new DB(this);
+    Connection connection = db.open();
     if (consumer != null) {
       consumer.accept(connection);
     }
-    return database;
+    return db;
   }
 
   @Override
@@ -84,9 +84,9 @@ public class DBTemplate
    *
    * @return Database
    */
-  public Database beginTransaction() {
+  public DB beginTransaction() {
 
-    return this.beginTransaction(this.configuration.getDefaultIsolation());
+    return this.beginTransaction(this.DBConfig.getDefaultIsolation());
   }
 
   /**
@@ -96,7 +96,7 @@ public class DBTemplate
    *
    * @return Database
    */
-  public Database beginTransaction(int transactionIsolation) {
+  public DB beginTransaction(int transactionIsolation) {
 
     return this.open(connection -> {
       try {
@@ -133,7 +133,7 @@ public class DBTemplate
    *
    * @return 连接工厂类
    */
-  public Class<? extends ConnectionFactory> getConnectionFactory() {
+  public Class<? extends ConnFactory> getConnectionFactory() {
 
     return connectionFactory;
   }
@@ -143,18 +143,18 @@ public class DBTemplate
    *
    * @return 配置
    */
-  public Configuration getConfiguration() {
+  public DBConfig getDBConfig() {
 
-    return configuration;
+    return DBConfig;
   }
 
   public static class Builder {
 
     private DataSource    dataSource;
-    private Configuration configuration;
+    private DBConfig DBConfig;
     public  Mapper        mapper = new Mapper();
 
-    private Class<? extends ConnectionFactory> connectionFactory = JdbcConnectionFactory.class;
+    private Class<? extends ConnFactory> connectionFactory = JdbcConnFactory.class;
 
     public Builder dataSource(DataSource dataSource) {
 
@@ -162,14 +162,14 @@ public class DBTemplate
       return this;
     }
 
-    public Builder config(Consumer<Configuration> consumer) {
+    public Builder config(Consumer<DBConfig> consumer) {
 
-      configuration = new Configuration();
-      consumer.accept(configuration);
+      DBConfig = new DBConfig();
+      consumer.accept(DBConfig);
       return this;
     }
 
-    public Builder connectionFactory(Class<? extends ConnectionFactory> connectionFactory) {
+    public Builder connectionFactory(Class<? extends ConnFactory> connectionFactory) {
 
       this.connectionFactory = connectionFactory;
       return this;
@@ -187,8 +187,8 @@ public class DBTemplate
         throw new DBException("Please set a dataSource.");
       }
 
-      if (this.configuration == null) {
-        this.configuration = new Configuration();
+      if (this.DBConfig == null) {
+        this.DBConfig = new DBConfig();
       }
       return new DBTemplate(this);
     }

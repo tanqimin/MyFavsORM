@@ -4,8 +4,8 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.DBTemplate;
-import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.schema.Metadata;
@@ -16,6 +16,7 @@ import work.myfavs.framework.orm.repository.func.FunRepository;
  *
  * @param <TModel> 实体类
  */
+@SuppressWarnings("unchecked")
 public class Repository<TModel>
     extends Query {
 
@@ -51,7 +52,7 @@ public class Repository<TModel>
    */
   public TModel getById(Object id) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.getById(modelClass, id);
     }
   }
@@ -66,7 +67,7 @@ public class Repository<TModel>
   public TModel getByField(String field,
       Object param) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.getByField(modelClass, field, param);
     }
   }
@@ -79,7 +80,7 @@ public class Repository<TModel>
    */
   protected TModel getByCond(Cond cond) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.getByCond(modelClass, cond);
     }
   }
@@ -92,7 +93,7 @@ public class Repository<TModel>
    */
   public TModel getByCondition(Object object) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.getByCondition(modelClass, object);
     }
   }
@@ -105,7 +106,7 @@ public class Repository<TModel>
    * @return 记录
    */
   public TModel get(String sql,
-      List<Object> params) {
+      Collection params) {
 
     return super.get(this.modelClass, sql, params);
   }
@@ -130,7 +131,7 @@ public class Repository<TModel>
    * @return 实体集合
    */
   public List<TModel> find(String sql,
-      List<Object> params) {
+      Collection params) {
 
     return super.find(modelClass, sql, params);
   }
@@ -153,7 +154,7 @@ public class Repository<TModel>
    * @return Map，Key为主键值， Value为实体对象
    */
   public Map<Object, TModel> findMap(String sql,
-      List<Object> params) {
+      Collection params) {
     final String fieldName = Metadata.get(modelClass).getPrimaryKey().getFieldName();
     return findMap(modelClass, fieldName, sql, params);
   }
@@ -178,7 +179,7 @@ public class Repository<TModel>
   public List<TModel> findByField(String field,
       Object param) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.findByField(modelClass, field, param);
     }
   }
@@ -191,9 +192,9 @@ public class Repository<TModel>
    * @return 实体集合
    */
   public List<TModel> findByField(String field,
-      List<Object> params) {
+      Collection params) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.findByField(modelClass, field, params);
     }
   }
@@ -206,7 +207,7 @@ public class Repository<TModel>
    */
   protected List<TModel> findByCond(Cond cond) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.findByCond(modelClass, cond);
     }
   }
@@ -219,7 +220,7 @@ public class Repository<TModel>
    */
   public List<TModel> findByCondition(Object object) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.findByCondition(modelClass, object);
     }
   }
@@ -230,9 +231,9 @@ public class Repository<TModel>
    * @param ids 主键ID集合
    * @return 实体集合
    */
-  public List<TModel> findByIds(List ids) {
+  public List<TModel> findByIds(Collection ids) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.findByIds(modelClass, ids);
     }
   }
@@ -245,7 +246,7 @@ public class Repository<TModel>
    */
   public long countByCond(Cond cond) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.countByCond(modelClass, cond);
     }
   }
@@ -258,7 +259,7 @@ public class Repository<TModel>
    */
   public boolean existsByCond(Cond cond) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.existsByCond(modelClass, cond);
     }
   }
@@ -282,7 +283,7 @@ public class Repository<TModel>
    */
   public int[] execute(List<Sql> sqlList) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.execute(sqlList);
     }
   }
@@ -295,9 +296,9 @@ public class Repository<TModel>
    * @return 影响行数
    */
   public int execute(String sql,
-      List<Object> params) {
+      Collection params) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.execute(sql, params);
     }
   }
@@ -310,7 +311,7 @@ public class Repository<TModel>
    */
   public int create(TModel entity) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.create(modelClass, entity);
     }
   }
@@ -323,7 +324,7 @@ public class Repository<TModel>
    */
   public int create(Collection<TModel> entities) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.create(modelClass, entities);
     }
   }
@@ -336,7 +337,7 @@ public class Repository<TModel>
    */
   public int update(TModel entity) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.update(modelClass, entity);
     }
   }
@@ -351,7 +352,7 @@ public class Repository<TModel>
   public int update(TModel entity,
       String[] columns) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.update(modelClass, entity, columns);
     }
   }
@@ -364,7 +365,7 @@ public class Repository<TModel>
    */
   public int updateIgnoreNull(TModel entity) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.updateIgnoreNull(modelClass, entity);
     }
   }
@@ -379,7 +380,7 @@ public class Repository<TModel>
   public int update(Collection<TModel> entities,
       String[] columns) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.update(modelClass, entities, columns);
     }
   }
@@ -403,7 +404,7 @@ public class Repository<TModel>
    */
   public int delete(TModel entity) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.delete(modelClass, entity);
     }
   }
@@ -416,7 +417,7 @@ public class Repository<TModel>
    */
   public int delete(List<TModel> entities) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.delete(modelClass, entities);
     }
   }
@@ -429,7 +430,7 @@ public class Repository<TModel>
    */
   public int deleteById(Object id) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.deleteById(modelClass, id);
     }
   }
@@ -442,7 +443,7 @@ public class Repository<TModel>
    */
   protected int deleteByCond(Cond cond) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.deleteByCond(modelClass, cond);
     }
   }
@@ -455,7 +456,7 @@ public class Repository<TModel>
    */
   public int deleteByIds(Collection ids) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.deleteByIds(modelClass, ids);
     }
   }

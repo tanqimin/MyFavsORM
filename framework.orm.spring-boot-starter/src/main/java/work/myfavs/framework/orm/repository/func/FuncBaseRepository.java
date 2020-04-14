@@ -1,17 +1,18 @@
 package work.myfavs.framework.orm.repository.func;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
+import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.DBTemplate;
-import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
-public class FuncAbstractRepository {
+@SuppressWarnings("unchecked")
+public class FuncBaseRepository {
 
   protected DBTemplate dbTemplate;
 
-  public FuncAbstractRepository(DBTemplate dbTemplate) {
+  public FuncBaseRepository(DBTemplate dbTemplate) {
     this.dbTemplate = dbTemplate;
   }
 
@@ -26,9 +27,9 @@ public class FuncAbstractRepository {
    */
   protected <TView> Stream<TView> find(Class<TView> viewClass,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().find(viewClass, sql, params);
     }
   }
@@ -44,7 +45,7 @@ public class FuncAbstractRepository {
   protected <TView> Stream<TView> find(Class<TView> viewClass,
       Sql sql) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().find(viewClass, sql);
     }
   }
@@ -62,9 +63,9 @@ public class FuncAbstractRepository {
   protected <TView> Stream<TView> findTop(Class<TView> viewClass,
       int top,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().findTop(viewClass, top, sql, params);
     }
   }
@@ -82,7 +83,7 @@ public class FuncAbstractRepository {
       int top,
       Sql sql) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().findTop(viewClass, top, sql);
     }
   }
@@ -98,9 +99,9 @@ public class FuncAbstractRepository {
    */
   protected <TView> Optional<TView> get(Class<TView> viewClass,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().get(viewClass, sql, params);
     }
   }
@@ -116,7 +117,7 @@ public class FuncAbstractRepository {
   protected <TView> Optional<TView> get(Class<TView> viewClass,
       Sql sql) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().get(viewClass, sql);
     }
   }

@@ -43,7 +43,7 @@ public class SqlExecutingEvent {
   }
 
   public SqlExecutingEvent(String sql,
-                           List<Object> params) {
+                           List params) {
 
     this.sql = new Sql(sql, params);
   }

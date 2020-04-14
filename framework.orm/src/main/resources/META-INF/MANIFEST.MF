@@ -1,2 +1,2 @@
 Library-Name: myfavs.orm
-Library-Description: Easy database query library
+Library-Description: Easy db query library

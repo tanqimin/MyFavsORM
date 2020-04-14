@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import work.myfavs.framework.orm.DBTemplate;
-import work.myfavs.framework.orm.SpringConnectionFactory;
+import work.myfavs.framework.orm.SpringConnFactory;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.handler.impls.*;
 
@@ -40,7 +40,7 @@ public class PrimaryDataSourceConfig {
   public DBTemplate dbTemplate() {
 
     return new DBTemplate.Builder().dataSource(primaryDataSource())
-                                   .connectionFactory(SpringConnectionFactory.class)
+                                   .connectionFactory(SpringConnFactory.class)
                                    .config(config -> {
                                      config.setDbType(DbType.MYSQL)
                                            .setBatchSize(200)

@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework.orm-generator</artifactId>
-  <version>0.2.29.RELEASE</version>
+  <version>0.2.30.RELEASE</version>
   <packaging>jar</packaging>
 
   <!--私服仓库-->

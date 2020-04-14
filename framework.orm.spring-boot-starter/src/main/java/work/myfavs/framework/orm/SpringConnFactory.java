@@ -4,11 +4,11 @@ import java.sql.Connection;
 import javax.sql.DataSource;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
-public class SpringConnectionFactory
-    extends JdbcConnectionFactory {
+public class SpringConnFactory
+    extends JdbcConnFactory {
 
 
-  public SpringConnectionFactory(DataSource dataSource) {
+  public SpringConnFactory(DataSource dataSource) {
 
     super(dataSource);
   }

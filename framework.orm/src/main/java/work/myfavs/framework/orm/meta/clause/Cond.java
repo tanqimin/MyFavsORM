@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -15,6 +16,7 @@ import work.myfavs.framework.orm.meta.schema.ClassMeta;
 /**
  * SQL 条件构建
  */
+@SuppressWarnings("unchecked")
 public class Cond
     extends Clause {
 
@@ -43,8 +45,8 @@ public class Cond
    * @param params 更多参数
    */
   private Cond(String sql,
-               Object param,
-               Object... params) {
+      Object param,
+      Object... params) {
 
     super(sql);
     super.params.add(param);
@@ -54,7 +56,7 @@ public class Cond
   }
 
   private Cond(String sql,
-               List<Object> params) {
+      Collection params) {
 
     super(sql);
     super.params.addAll(params);
@@ -64,7 +66,6 @@ public class Cond
    * 创建逻辑删除条件
    *
    * @param classMeta 类元数据
-   *
    * @return Cond
    */
   public static Cond logicalDeleteCond(ClassMeta classMeta) {
@@ -77,33 +78,29 @@ public class Cond
   }
 
   /**
-   * 创建 = 条件，如 field = param，如果 param 为 null，
-   * 则忽略当前条件
+   * 创建 = 条件，如 field = param，如果 param 为 null， 则忽略当前条件
    *
    * @param field 字段
    * @param param 参数值
-   *
    * @return Cond
    */
   public static Cond eq(String field,
-                        Object param) {
+      Object param) {
 
     return eq(field, param, true);
   }
 
   /**
-   * 创建 = 条件，如 field = param，如果 param 为 null，
-   * 且 ignoreNull = false 时，创建 field IS NULL
+   * 创建 = 条件，如 field = param，如果 param 为 null， 且 ignoreNull = false 时，创建 field IS NULL
    *
    * @param field      字段
    * @param param      参数值
    * @param ignoreNull 是否忽略 null 值
-   *
    * @return Cond
    */
   public static Cond eq(String field,
-                        Object param,
-                        boolean ignoreNull) {
+      Object param,
+      boolean ignoreNull) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return ignoreNull
@@ -114,33 +111,29 @@ public class Cond
   }
 
   /**
-   * 创建 != 条件，如 field != param，如果 param 为 null，
-   * 则忽略当前条件
+   * 创建 != 条件，如 field != param，如果 param 为 null， 则忽略当前条件
    *
    * @param field 字段
    * @param param 参数值
-   *
    * @return Cond
    */
   public static Cond ne(String field,
-                        Object param) {
+      Object param) {
 
     return ne(field, param, true);
   }
 
   /**
-   * 创建 != 条件，如 field != param，如果 param 为 null，
-   * 且 ignoreNull = false 时，创建 field IS NOT NULL
+   * 创建 != 条件，如 field != param，如果 param 为 null， 且 ignoreNull = false 时，创建 field IS NOT NULL
    *
    * @param field      字段
    * @param param      参数值
    * @param ignoreNull 是否忽略 null 值
-   *
    * @return Cond
    */
   public static Cond ne(String field,
-                        Object param,
-                        boolean ignoreNull) {
+      Object param,
+      boolean ignoreNull) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return ignoreNull
@@ -154,7 +147,6 @@ public class Cond
    * 创建 IS NULL 条件
    *
    * @param field 字段
-   *
    * @return Cond
    */
   public static Cond isNull(String field) {
@@ -166,7 +158,6 @@ public class Cond
    * 创建 IS NOT NULL 条件
    *
    * @param field 字段
-   *
    * @return Cond
    */
   public static Cond isNotNull(String field) {
@@ -179,11 +170,10 @@ public class Cond
    *
    * @param field 字段
    * @param param 参数
-   *
    * @return Cond
    */
   public static Cond gt(String field,
-                        Object param) {
+      Object param) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return new Cond();
@@ -196,11 +186,10 @@ public class Cond
    *
    * @param field 字段
    * @param param 参数
-   *
    * @return Cond
    */
   public static Cond ge(String field,
-                        Object param) {
+      Object param) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return new Cond();
@@ -213,11 +202,10 @@ public class Cond
    *
    * @param field 字段
    * @param param 参数
-   *
    * @return Cond
    */
   public static Cond lt(String field,
-                        Object param) {
+      Object param) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return new Cond();
@@ -230,11 +218,10 @@ public class Cond
    *
    * @param field 字段
    * @param param 参数
-   *
    * @return Cond
    */
   public static Cond le(String field,
-                        Object param) {
+      Object param) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return new Cond();
@@ -243,24 +230,22 @@ public class Cond
   }
 
   /**
-   * 创建 field LIKE ? 条件
-   * 如果参数中检测不到通配符（%, _）则改为 field = ? 语句
+   * 创建 field LIKE ? 条件 如果参数中检测不到通配符（%, _）则改为 field = ? 语句
    *
    * @param field 字段
    * @param param 参数
-   *
    * @return Cond
    */
   public static Cond like(String field,
-                          Object param) {
+      Object param) {
 
     if (StrUtil.isBlankIfStr(param)) {
       return new Cond();
     }
 
     if (param.toString()
-             .contains("%") || param.toString()
-                                    .contains("_")) {
+        .contains("%") || param.toString()
+        .contains("_")) {
       return new Cond(StrUtil.format(" {} LIKE ?", field), param);
     }
 
@@ -268,19 +253,17 @@ public class Cond
   }
 
   /**
-   * 创建 field BETWEEN ? AND ? 条件
-   * 如果参数1 不为 null， 参数2 为 null，则构建 field &ge; ? 条件
-   * 如果参数1 为 null， 参数2 不为 null，则构建 field &le; ? 条件
+   * 创建 field BETWEEN ? AND ? 条件 如果参数1 不为 null， 参数2 为 null，则构建 field &ge; ? 条件 如果参数1 为 null， 参数2 不为
+   * null，则构建 field &le; ? 条件
    *
    * @param field  字段
    * @param param1 参数1
    * @param param2 参数2
-   *
    * @return Cond
    */
   public static Cond between(String field,
-                             Object param1,
-                             Object param2) {
+      Object param1,
+      Object param2) {
 
     if (param1 == null && param2 == null) {
       return new Cond();
@@ -295,43 +278,37 @@ public class Cond
   }
 
   /**
-   * 构建 field IN (?,?..?) 语句
-   * 如果 params 集合为空，则不构建语句
-   * 如果 params 集合数量为 1， 则构建语句 field = ?
-   * 如果 params 集合数量大于 1， 则构建 field IN (?,?..?) 语句
+   * 构建 field IN (?,?..?) 语句 如果 params 集合为空，则不构建语句 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params
+   * 集合数量大于 1， 则构建 field IN (?,?..?) 语句
    *
    * @param field  字段
    * @param params 参数
-   *
    * @return Cond
    */
   public static Cond in(String field,
-                        List params) {
+      Collection params) {
 
     return in(field, params, true);
   }
 
   /**
-   * 构建 field IN (?,?..?) 语句
-   * 如果 params 集合为空，且 ignoreEmptyParams 为 true，则不构建语句
-   * 如果 params 集合为空，且 ignoreEmptyParams 为 false，则构建语句 1 &gt; 2
-   * 如果 params 集合数量为 1， 则构建语句 field = ?
-   * 如果 params 集合数量大于 1， 则构建 field IN (?,?..?) 语句
+   * 构建 field IN (?,?..?) 语句 如果 params 集合为空，且 ignoreEmptyParams 为 true，则不构建语句 如果 params 集合为空，且
+   * ignoreEmptyParams 为 false，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params 集合数量大于 1，
+   * 则构建 field IN (?,?..?) 语句
    *
    * @param field             字段
    * @param params            参数
    * @param ignoreEmptyParams 是否忽略空参数集合
-   *
    * @return Cond
    */
   public static Cond in(String field,
-                        List params,
-                        boolean ignoreEmptyParams) {
+      Collection params,
+      boolean ignoreEmptyParams) {
 
-    Sql          inClauseSql;
-    String       sql;
-    List<Object> sqlParams;
-    int          paramCnt;
+    Sql inClauseSql;
+    String sql;
+    List sqlParams;
+    int paramCnt;
 
     inClauseSql = createInClauseParams(params);
     sql = inClauseSql.sql.toString();
@@ -356,53 +333,46 @@ public class Cond
    *
    * @param field 字段
    * @param sql   SQL
-   *
    * @return Cond
    */
   public static Cond in(String field,
-                        Sql sql) {
+      Sql sql) {
 
     return new Cond(StrUtil.format(" {} IN ({})", field, sql.sql), sql.params.toArray());
   }
 
   /**
-   * 构建 field NOT IN (?,?..?) 语句
-   * 如果 params 集合为空，则不构建语句
-   * 如果 params 集合数量为 1， 则构建语句 field = ?
-   * 如果 params 集合数量大于 1， 则构建 field NOT IN (?,?..?) 语句
+   * 构建 field NOT IN (?,?..?) 语句 如果 params 集合为空，则不构建语句 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params
+   * 集合数量大于 1， 则构建 field NOT IN (?,?..?) 语句
    *
    * @param field  字段
    * @param params 参数
-   *
    * @return Cond
    */
   public static Cond notIn(String field,
-                           List params) {
+      Collection params) {
 
     return notIn(field, params, true);
   }
 
   /**
-   * 构建 field NOT IN (?,?..?) 语句
-   * 如果 params 集合为空，且 ignoreEmptyParams 为 true，则不构建语句
-   * 如果 params 集合为空，且 ignoreEmptyParams 为 false，则构建语句 1 &gt; 2
-   * 如果 params 集合数量为 1， 则构建语句 field != ?
-   * 如果 params 集合数量大于 1， 则构建 field NOT IN (?,?..?) 语句
+   * 构建 field NOT IN (?,?..?) 语句 如果 params 集合为空，且 ignoreEmptyParams 为 true，则不构建语句 如果 params 集合为空，且
+   * ignoreEmptyParams 为 false，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field != ? 如果 params 集合数量大于
+   * 1， 则构建 field NOT IN (?,?..?) 语句
    *
    * @param field             字段
    * @param params            参数
    * @param ignoreEmptyParams 是否忽略空参数集合
-   *
    * @return Cond
    */
   public static Cond notIn(String field,
-                           List params,
-                           boolean ignoreEmptyParams) {
+      Collection params,
+      boolean ignoreEmptyParams) {
 
-    Sql          inClauseSql;
-    String       sql;
-    List<Object> sqlParams;
-    int          paramCnt;
+    Sql inClauseSql;
+    String sql;
+    List sqlParams;
+    int paramCnt;
 
     inClauseSql = createInClauseParams(params);
     sql = inClauseSql.sql.toString();
@@ -427,20 +397,19 @@ public class Cond
    *
    * @param field 字段
    * @param sql   SQL
-   *
    * @return Cond
    */
   public static Cond notIn(String field,
-                           Sql sql) {
+      Sql sql) {
 
     return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params.toArray());
   }
 
-  private static Sql createInClauseParams(List params) {
+  private static Sql createInClauseParams(Collection params) {
 
-    Sql           sql;
+    Sql sql;
     StringBuilder sqlBuilder;
-    List<Object>  sqlParams;
+    List sqlParams;
 
     sqlBuilder = new StringBuilder();
     sqlParams = new ArrayList<>();
@@ -464,7 +433,6 @@ public class Cond
    * 构建 EXIST ({subSql}) 条件
    *
    * @param subSql SQL
-   *
    * @return Cond
    */
   public static Cond exists(Sql subSql) {
@@ -476,7 +444,6 @@ public class Cond
    * 构建 EXIST ({supplier}) 条件
    *
    * @param supplier Supplier
-   *
    * @return Cond
    */
   public static Cond exists(Supplier<Sql> supplier) {
@@ -488,7 +455,6 @@ public class Cond
    * 构建 NOT EXIST ({subSql}) 条件
    *
    * @param subSql SQL
-   *
    * @return Cond
    */
   public static Cond notExists(Sql subSql) {
@@ -500,7 +466,6 @@ public class Cond
    * 构建 NOT EXIST ({supplier}) 条件
    *
    * @param supplier Supplier
-   *
    * @return Cond
    */
   public static Cond notExists(Supplier<Sql> supplier) {
@@ -512,7 +477,6 @@ public class Cond
    * 使用 AND {cond} 拼接多个条件
    *
    * @param cond Cond
-   *
    * @return Cond
    */
   public Cond and(Cond cond) {
@@ -529,7 +493,6 @@ public class Cond
    * 使用 OR {cond} 拼接多个条件
    *
    * @param cond Cond
-   *
    * @return Cond
    */
   public Cond or(Cond cond) {
@@ -546,7 +509,6 @@ public class Cond
    * 根据@Condition 注解创建Cond
    *
    * @param object 包含@Condition注解Field的对象
-   *
    * @return Cond
    */
   public static Cond create(Object object) {
@@ -559,15 +521,14 @@ public class Cond
    *
    * @param object         包含@Condition注解Field的对象
    * @param conditionGroup 条件组名
-   *
    * @return Cond
    */
   public static Cond create(Object object,
-                            String conditionGroup) {
+      String conditionGroup) {
 
-    Cond                   cond              = null;
+    Cond cond = null;
     List<ConditionMatcher> conditionMatchers = new ArrayList<>();
-    final Field[]          fields            = ReflectUtil.getFields(object.getClass());
+    final Field[] fields = ReflectUtil.getFields(object.getClass());
     for (Field field : fields) {
       final Condition[] annotations = field.getAnnotationsByType(Condition.class);
       if (annotations != null && annotations.length > 0) {
@@ -602,16 +563,16 @@ public class Cond
 
   static class ConditionMatcher {
 
-    String   fieldName;
-    Object   fieldValue;
+    String fieldName;
+    Object fieldValue;
     Operator operator;
-    int      order;
+    int order;
 
   }
 
   private static Cond createCondByOperator(Operator operator,
-                                           String fieldName,
-                                           Object paramVal) {
+      String fieldName,
+      Object paramVal) {
 
     switch (operator) {
       case EQUALS:

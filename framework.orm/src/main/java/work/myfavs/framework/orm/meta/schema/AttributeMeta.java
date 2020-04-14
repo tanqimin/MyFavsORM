@@ -12,6 +12,7 @@ import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 /**
  * 数据库列元数据
  */
+@SuppressWarnings("unchecked")
 public class AttributeMeta
     implements Serializable {
 
@@ -19,11 +20,11 @@ public class AttributeMeta
   /**
    * 数据库 列名称
    */
-  private String   columnName;
+  private String columnName;
   /**
    * 类 属性名称
    */
-  private String   fieldName;
+  private String fieldName;
   /**
    * 类 属性类型
    */
@@ -31,11 +32,11 @@ public class AttributeMeta
   /**
    * 是否只读？
    */
-  private boolean  readonly   = false;
+  private boolean readonly = false;
   /**
    * 是否主键？
    */
-  private boolean  primaryKey = false;
+  private boolean primaryKey = false;
 
   /**
    * 类型处理器
@@ -106,14 +107,14 @@ public class AttributeMeta
   //endregion
 
   //region Constructor
-  private AttributeMeta() {}
+  private AttributeMeta() {
+  }
   //endregion
 
   /**
    * 把指定字段解析为属性元数据
    *
    * @param field 指定字段
-   *
    * @return 属性元数据
    */
   static AttributeMeta createInstance(Field field) {
@@ -124,12 +125,12 @@ public class AttributeMeta
     if (column != null) {
       attributeMeta = new AttributeMeta();
 
-      final PrimaryKey      primaryKey      = field.getAnnotation(PrimaryKey.class);
-      final String          fieldName       = field.getName();
-      final Class<?>        fieldType       = field.getType();
+      final PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
+      final String fieldName = field.getName();
+      final Class<?> fieldType = field.getType();
       final PropertyHandler propertyHandler = PropertyHandlerFactory.getInstance(fieldType);
       final String columnName = column.value()
-                                      .isEmpty()
+          .isEmpty()
           ? fieldName
           : column.value();
 

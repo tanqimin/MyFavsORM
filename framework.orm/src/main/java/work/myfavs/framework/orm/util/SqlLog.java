@@ -2,6 +2,7 @@ package work.myfavs.framework.orm.util;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ public class SqlLog {
   }
 
   public void showSql(String sql,
-      List params) {
+      Collection params) {
 
     if (showSql && log.isDebugEnabled()) {
       StringBuilder logStr = new StringBuilder();
@@ -35,7 +36,7 @@ public class SqlLog {
     }
   }
 
-  private String showParams(List params) {
+  private String showParams(Collection params) {
 
     StringBuilder stringBuilder;
     stringBuilder = new StringBuilder();

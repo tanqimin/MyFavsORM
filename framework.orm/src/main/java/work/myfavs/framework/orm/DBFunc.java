@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import work.myfavs.framework.orm.meta.Record;
@@ -14,28 +14,28 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.schema.AttributeMeta;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-import work.myfavs.framework.orm.util.DBConvert;
 import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.SqlLog;
+import work.myfavs.framework.orm.util.convert.DBConvert;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
  * 用于构建支持Java8特性的查询
  */
-public class DatabaseFunc {
+public class DBFunc {
 
   //SQL日志
   private static SqlLog sqlLog = null;
 
-  private Database database;
-  private Configuration configuration;
+  private DB db;
+  private DBConfig dbConfig;
 
-  public DatabaseFunc(Database database) {
-    this.database = database;
-    this.configuration = database.getConfiguration();
+  public DBFunc(DB db) {
+    this.db = db;
+    this.dbConfig = db.getDBConfig();
 
     if (sqlLog == null) {
-      sqlLog = new SqlLog(configuration.getShowSql(), configuration.getShowResult());
+      sqlLog = new SqlLog(dbConfig.getShowSql(), dbConfig.getShowResult());
     }
   }
 
@@ -51,7 +51,7 @@ public class DatabaseFunc {
    */
   public <TView> Stream<TView> find(Class<TView> viewClass,
       String sql,
-      List<Object> params) {
+      Collection params) {
     Metadata.get(viewClass);
 
     Connection conn = null;
@@ -62,12 +62,12 @@ public class DatabaseFunc {
     try {
       sqlLog.showSql(sql, params);
 
-      conn = this.database.open();
+      conn = this.db.open();
       pstmt = DBUtil.getPsForQuery(conn, sql, params);
-      pstmt.setFetchSize(configuration.getFetchSize());
+      pstmt.setFetchSize(dbConfig.getFetchSize());
       rs = pstmt.executeQuery();
 
-      result = DBConvert.toStream(viewClass, rs);
+      result = DBConvert.StreamAPI.toStream(viewClass, rs);
 
       sqlLog.showResult(result);
       return result;
@@ -75,7 +75,7 @@ public class DatabaseFunc {
       throw new DBException(e);
     } finally {
       DBUtil.close(pstmt, rs);
-      this.database.close();
+      this.db.close();
     }
   }
 
@@ -115,7 +115,7 @@ public class DatabaseFunc {
    * @return 结果集
    */
   public Stream<Record> find(String sql,
-      List<Object> params) {
+      Collection params) {
 
     return this.find(Record.class, sql, params);
   }
@@ -144,9 +144,9 @@ public class DatabaseFunc {
   public <TView> Stream<TView> findTop(Class<TView> viewClass,
       int top,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
-    Sql querySql = this.database.getDialect().selectTop(1, top, sql, params);
+    Sql querySql = this.db.getDialect().selectTop(1, top, sql, params);
     return this.find(viewClass, querySql);
   }
 
@@ -176,7 +176,7 @@ public class DatabaseFunc {
    */
   public Stream<Record> findTop(int top,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
     return this.findTop(Record.class, top, sql, params);
   }
@@ -205,7 +205,7 @@ public class DatabaseFunc {
    */
   public <TView> Optional<TView> get(Class<TView> viewClass,
       String sql,
-      List<Object> params) {
+      Collection params) {
     Iterator<TView> iterator = this.findTop(viewClass, 1, sql, params)
         .iterator();
     if (iterator.hasNext()) {
@@ -236,7 +236,7 @@ public class DatabaseFunc {
    * @return 记录
    */
   public Optional<Record> get(String sql,
-      List<Object> params) {
+      Collection params) {
 
     return this.get(Record.class, sql, params);
   }
@@ -266,7 +266,7 @@ public class DatabaseFunc {
     ClassMeta classMeta = Metadata.get(viewClass);
     AttributeMeta primaryKey = classMeta.checkPrimaryKey();
 
-    Sql sql = this.database.getDialect().select(viewClass)
+    Sql sql = this.db.getDialect().select(viewClass)
         .where(Cond.eq(primaryKey.getColumnName(), id))
         .and(Cond.logicalDeleteCond(classMeta));
 
@@ -287,7 +287,7 @@ public class DatabaseFunc {
       String field,
       Object param) {
 
-    Sql sql = this.database.getDialect().select(viewClass)
+    Sql sql = this.db.getDialect().select(viewClass)
         .where(Cond.eq(field, param))
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.get(viewClass, sql);
@@ -304,7 +304,7 @@ public class DatabaseFunc {
   public <TView> Optional<TView> getByCond(Class<TView> viewClass,
       Cond cond) {
 
-    Sql sql = this.database.getDialect().select(viewClass)
+    Sql sql = this.db.getDialect().select(viewClass)
         .where(cond)
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.get(viewClass, sql);
@@ -349,11 +349,11 @@ public class DatabaseFunc {
    * @return 实体集合
    */
   public <TView> Stream<TView> findByIds(Class<TView> viewClass,
-      List ids) {
+      Collection ids) {
 
     ClassMeta classMeta = Metadata.get(viewClass);
     AttributeMeta primaryKey = classMeta.checkPrimaryKey();
-    Sql sql = this.database.getDialect().select(viewClass)
+    Sql sql = this.db.getDialect().select(viewClass)
         .where(Cond.in(primaryKey.getColumnName(), ids, false))
         .and(Cond.logicalDeleteCond(classMeta));
     return this.find(viewClass, sql);
@@ -372,7 +372,7 @@ public class DatabaseFunc {
       String field,
       Object param) {
 
-    Sql sql = this.database.getDialect().select(viewClass)
+    Sql sql = this.db.getDialect().select(viewClass)
         .where(Cond.eq(field, param))
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);
@@ -389,9 +389,9 @@ public class DatabaseFunc {
    */
   public <TView> Stream<TView> findByField(Class<TView> viewClass,
       String field,
-      List<Object> params) {
+      Collection params) {
 
-    Sql sql = this.database.getDialect().select(viewClass)
+    Sql sql = this.db.getDialect().select(viewClass)
         .where(Cond.in(field, params, false))
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);
@@ -408,7 +408,7 @@ public class DatabaseFunc {
   public <TView> Stream<TView> findByCond(Class<TView> viewClass,
       Cond cond) {
 
-    Sql sql = this.database.getDialect().select(viewClass)
+    Sql sql = this.db.getDialect().select(viewClass)
         .where(cond)
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);

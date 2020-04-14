@@ -5,7 +5,7 @@ import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.dialect.DialectFactory;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
 
-public class Configuration {
+public class DBConfig {
 
   //数据库方言
   protected IDialect dialect;
@@ -61,7 +61,7 @@ public class Configuration {
    *
    * @return Configuration
    */
-  public Configuration setDbType(String dbType) {
+  public DBConfig setDbType(String dbType) {
 
     this.dbType = dbType;
     return this;
@@ -84,7 +84,7 @@ public class Configuration {
    *
    * @return Configuration
    */
-  public Configuration setBatchSize(int batchSize) {
+  public DBConfig setBatchSize(int batchSize) {
 
     this.batchSize = batchSize;
     return this;
@@ -107,7 +107,7 @@ public class Configuration {
    *
    * @return Configuration
    */
-  public Configuration setFetchSize(int fetchSize) {
+  public DBConfig setFetchSize(int fetchSize) {
 
     this.fetchSize = fetchSize;
     return this;
@@ -130,7 +130,7 @@ public class Configuration {
    *
    * @return Configuration
    */
-  public Configuration setQueryTimeout(int queryTimeout) {
+  public DBConfig setQueryTimeout(int queryTimeout) {
 
     this.queryTimeout = queryTimeout;
     return this;
@@ -153,7 +153,7 @@ public class Configuration {
    *
    * @return Configuration
    */
-  public Configuration setShowSql(boolean showSql) {
+  public DBConfig setShowSql(boolean showSql) {
 
     this.showSql = showSql;
     return this;
@@ -176,7 +176,7 @@ public class Configuration {
    *
    * @return Configuration
    */
-  public Configuration setShowResult(boolean showResult) {
+  public DBConfig setShowResult(boolean showResult) {
 
     this.showResult = showResult;
     return this;
@@ -199,7 +199,7 @@ public class Configuration {
    *
    * @return Configuration
    */
-  public Configuration setMaxPageSize(int maxPageSize) {
+  public DBConfig setMaxPageSize(int maxPageSize) {
 
     this.maxPageSize = maxPageSize;
     return this;
@@ -222,7 +222,7 @@ public class Configuration {
    *
    * @return Configuration
    */
-  public Configuration setDefaultIsolation(int defaultIsolation) {
+  public DBConfig setDefaultIsolation(int defaultIsolation) {
 
     this.defaultIsolation = defaultIsolation;
     return this;
@@ -245,7 +245,7 @@ public class Configuration {
    *
    * @return Configuration
    */
-  public Configuration setWorkerId(long workerId) {
+  public DBConfig setWorkerId(long workerId) {
 
     this.workerId = workerId;
     return this;
@@ -268,7 +268,7 @@ public class Configuration {
    *
    * @return Configuration
    */
-  public Configuration setDataCenterId(long dataCenterId) {
+  public DBConfig setDataCenterId(long dataCenterId) {
 
     this.dataCenterId = dataCenterId;
     return this;

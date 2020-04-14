@@ -1,7 +1,7 @@
 package work.myfavs.framework.orm.meta.dialect;
 
 
-import java.util.List;
+import java.util.Collection;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
@@ -19,16 +19,16 @@ public class MySqlDialect
 
   @Override
   public Sql selectTop(int currentPage,
-                       int pageSize,
-                       String sql,
-                       List<Object> params) {
+      int pageSize,
+      String sql,
+      Collection params) {
 
     Sql querySql;
     querySql = new Sql(sql, params);
     if (currentPage == 1 && pageSize == 1) {
       //如果sql本身只返回一个结果
       if (P_SELECT_SINGLE.matcher(sql)
-                         .find()) {
+          .find()) {
         return querySql;
       }
     }

@@ -2,10 +2,10 @@ package work.myfavs.framework.orm.meta.schema;
 
 import cn.hutool.core.util.ReflectUtil;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.exception.DBException;
@@ -16,15 +16,15 @@ import work.myfavs.framework.orm.util.exception.DBException;
 public class ClassMeta {
 
   //region Attributes
-  private String         className;
-  private String         tableName;
+  private String className;
+  private String tableName;
   private GenerationType strategy;
 
-  private AttributeMeta              primaryKey;                                  //主键
-  private boolean                    enableLogicalDelete;                         //是否启用逻辑删除？
-  private String                     logicalDeleteField;                          //逻辑删除字段（数据库字段）
-  private List<AttributeMeta>        updateAttributes = new LinkedList<>();       //更新字段
-  private Map<String, AttributeMeta> queryAttributes  = new HashMap<>();          //查询字段
+  private AttributeMeta primaryKey;                                                         //主键
+  private boolean enableLogicalDelete;                                                      //是否启用逻辑删除？
+  private String logicalDeleteField;                                                        //逻辑删除字段（数据库字段）
+  private List<AttributeMeta> updateAttributes = new Vector<>();                            //更新字段
+  private Map<String, AttributeMeta> queryAttributes = new ConcurrentHashMap<>();           //查询字段
   //endregion
 
   //region Getter && Setter
@@ -120,14 +120,13 @@ public class ClassMeta {
    * 解析指定类为类元数据
    *
    * @param clazz 指定类
-   *
    * @return 列元数据
    */
   public static ClassMeta createInstance(Class<?> clazz) {
 
-    Table     table;
+    Table table;
     ClassMeta classMeta;
-    Field[]   fields;
+    Field[] fields;
 
     table = clazz.getAnnotation(Table.class);
     classMeta = new ClassMeta();
@@ -136,8 +135,8 @@ public class ClassMeta {
       classMeta.setClassName(clazz.getName());
       classMeta.setStrategy(table.strategy());
       classMeta.setTableName(table.value().isEmpty()
-                                 ? clazz.getSimpleName()
-                                 : table.value());
+          ? clazz.getSimpleName()
+          : table.value());
       if (table.logicalDeleteField().isEmpty() == false) {
         classMeta.setEnableLogicalDelete(true);
         classMeta.setLogicalDeleteField(table.logicalDeleteField());
@@ -152,8 +151,8 @@ public class ClassMeta {
         continue;
       }
 
-      final String  queryKey   = attr.getColumnName().toUpperCase();
-      final boolean readonly   = attr.isReadonly();
+      final String queryKey = attr.getColumnName().toUpperCase();
+      final boolean readonly = attr.isReadonly();
       final boolean primaryKey = attr.isPrimaryKey();
 
       classMeta.queryAttributes.put(queryKey, attr);

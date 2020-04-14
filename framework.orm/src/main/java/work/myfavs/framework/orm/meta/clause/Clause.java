@@ -2,15 +2,17 @@ package work.myfavs.framework.orm.meta.clause;
 
 import cn.hutool.core.util.StrUtil;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * SQL 语句基类
  */
+@SuppressWarnings("unchecked")
 abstract public class Clause {
 
   protected StringBuilder sql;
-  protected List<Object>  params;
+  protected List params;
 
   //region Getter && Setter
   public StringBuilder getSql() {
@@ -23,14 +25,14 @@ abstract public class Clause {
     this.sql = sql;
   }
 
-  public List<Object> getParams() {
+  public List getParams() {
 
     return params;
   }
 
-  public void setParams(List<Object> params) {
+  public void setParams(Collection params) {
 
-    this.params = params;
+    this.params = new ArrayList(params);
   }
   //endregion
 
@@ -48,7 +50,7 @@ abstract public class Clause {
   }
 
   public Clause(String sql,
-                List params) {
+      Collection params) {
 
     this(sql);
     if (params != null && params.size() > 0) {
@@ -62,4 +64,8 @@ abstract public class Clause {
     return StrUtil.toString(sql);
   }
 
+  @Override
+  public String toString() {
+    return StrUtil.toString(sql);
+  }
 }

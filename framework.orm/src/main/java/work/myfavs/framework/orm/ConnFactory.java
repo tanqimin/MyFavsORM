@@ -6,11 +6,11 @@ import javax.sql.DataSource;
 /**
  * 数据库链接工厂
  */
-abstract public class ConnectionFactory {
+abstract public class ConnFactory {
 
   protected DataSource dataSource;
 
-  public ConnectionFactory(DataSource dataSource) {
+  public ConnFactory(DataSource dataSource) {
 
     this.dataSource = dataSource;
   }

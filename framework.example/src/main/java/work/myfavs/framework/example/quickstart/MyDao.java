@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.util.List;
 import javax.sql.DataSource;
 import work.myfavs.framework.orm.DBTemplate;
-import work.myfavs.framework.orm.Database;
+import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
@@ -20,7 +20,7 @@ public class MyDao {
 
   public List<Record> findRecord() {
 
-    try (Database db = DBTemplate.open()) {
+    try (DB db = DBTemplate.open()) {
       Sql sql = new Sql("SELECT * FROM tb_snowfake");
       return db.find(sql);
     }

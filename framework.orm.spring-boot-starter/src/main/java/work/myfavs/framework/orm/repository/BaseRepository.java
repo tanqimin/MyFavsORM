@@ -1,34 +1,36 @@
 package work.myfavs.framework.orm.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.DBTemplate;
-import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Sql;
-import work.myfavs.framework.orm.repository.func.FuncAbstractRepository;
+import work.myfavs.framework.orm.repository.func.FuncBaseRepository;
 
 /**
  * 仓储基类
  */
-abstract public class AbstractRepository {
+@SuppressWarnings("unchecked")
+abstract public class BaseRepository {
 
   protected DBTemplate dbTemplate;
 
-  private FuncAbstractRepository funcAbstractRepository;
+  private FuncBaseRepository funcBaseRepository;
 
-  private AbstractRepository() {
+  private BaseRepository() {
   }
 
-  public AbstractRepository(DBTemplate dbTemplate) {
+  public BaseRepository(DBTemplate dbTemplate) {
 
     this.dbTemplate = dbTemplate;
   }
 
-  public FuncAbstractRepository func() {
-    if (funcAbstractRepository == null) {
-      funcAbstractRepository = new FuncAbstractRepository(this.dbTemplate);
+  public FuncBaseRepository func() {
+    if (funcBaseRepository == null) {
+      funcBaseRepository = new FuncBaseRepository(this.dbTemplate);
     }
-    return funcAbstractRepository;
+    return funcBaseRepository;
   }
 
   /**
@@ -42,9 +44,9 @@ abstract public class AbstractRepository {
    */
   protected <TView> List<TView> find(Class<TView> viewClass,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.find(viewClass, sql, params);
     }
   }
@@ -60,7 +62,7 @@ abstract public class AbstractRepository {
   protected <TView> List<TView> find(Class<TView> viewClass,
       Sql sql) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.find(viewClass, sql);
     }
   }
@@ -78,8 +80,8 @@ abstract public class AbstractRepository {
   protected <TView> Map<Object, TView> findMap(Class<TView> viewClass,
       String keyField,
       String sql,
-      List<Object> params) {
-    try (Database conn = this.dbTemplate.open()) {
+      Collection params) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.findMap(viewClass, keyField, sql, params);
     }
   }
@@ -96,7 +98,7 @@ abstract public class AbstractRepository {
   protected <TView> Map<Object, TView> findMap(Class<TView> viewClass,
       String keyField,
       Sql sql) {
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.findMap(viewClass, keyField, sql);
     }
   }
@@ -114,9 +116,9 @@ abstract public class AbstractRepository {
   protected <TView> List<TView> findTop(Class<TView> viewClass,
       int top,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.findTop(viewClass, top, sql, params);
     }
   }
@@ -134,7 +136,7 @@ abstract public class AbstractRepository {
       int top,
       Sql sql) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.findTop(viewClass, top, sql);
     }
   }
@@ -150,9 +152,9 @@ abstract public class AbstractRepository {
    */
   protected <TView> TView get(Class<TView> viewClass,
       String sql,
-      List<Object> params) {
+      Collection params) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.get(viewClass, sql, params);
     }
   }
@@ -168,7 +170,7 @@ abstract public class AbstractRepository {
   protected <TView> TView get(Class<TView> viewClass,
       Sql sql) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.get(viewClass, sql);
     }
   }
@@ -181,9 +183,9 @@ abstract public class AbstractRepository {
    * @return 行数
    */
   protected long count(String sql,
-      List<Object> params) {
+      Collection params) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.count(sql, params);
     }
   }
@@ -196,7 +198,7 @@ abstract public class AbstractRepository {
    */
   protected long count(Sql sql) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.count(sql);
     }
   }

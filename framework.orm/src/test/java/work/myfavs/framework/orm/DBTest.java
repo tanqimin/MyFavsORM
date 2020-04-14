@@ -14,7 +14,7 @@ import work.myfavs.framework.orm.entity.Snowfake;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
-public class DatabaseTest {
+public class DBTest {
 
   String url      = "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
   String user     = "root";
@@ -45,8 +45,8 @@ public class DatabaseTest {
   @Test
   public void find() {
 
-    try (Database database = this.dbTemplate.open()) {
-      List<Snowfake> snowfakes = database.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
+    try (DB db = this.dbTemplate.open()) {
+      List<Snowfake> snowfakes = db.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
       Assert.assertNotNull(snowfakes);
       Assert.assertTrue(snowfakes.size() > 0);
     }
@@ -59,11 +59,11 @@ public class DatabaseTest {
     snowfake.setName("UUI%");
     snowfake.setType(TypeEnum.DRINK);
 
-    try (Database database = this.dbTemplate.open()) {
-      Snowfake res = database.getByCondition(Snowfake.class, snowfake);
+    try (DB db = this.dbTemplate.open()) {
+      Snowfake res = db.getByCondition(Snowfake.class, snowfake);
       Assert.assertNotNull(res);
 
-      List<Snowfake> ress = database.findByCondition(Snowfake.class, snowfake, "SNOW_DTO");
+      List<Snowfake> ress = db.findByCondition(Snowfake.class, snowfake, "SNOW_DTO");
       Assert.assertNotNull(ress);
     }
   }
@@ -71,7 +71,7 @@ public class DatabaseTest {
   @Test
   public void testTransaction() {
 
-    try (Database db = this.dbTemplate.open()) {
+    try (DB db = this.dbTemplate.open()) {
       long     count    = getCount(db);
       Snowfake snowfake = new Snowfake();
       snowfake.setCreated(new Date());
@@ -85,7 +85,7 @@ public class DatabaseTest {
     }
   }
 
-  private long getCount(Database db) {
+  private long getCount(DB db) {
 
     return db.count(new Sql("SELECT * FROM tb_snowfake"));
   }
@@ -246,7 +246,7 @@ public class DatabaseTest {
     snowfake.setType(TypeEnum.DRINK);
     snowfake.setConfig("");
 
-    try (Database db = dbTemplate.open()) {
+    try (DB db = dbTemplate.open()) {
       db.create(Snowfake.class, snowfake);
     }
 

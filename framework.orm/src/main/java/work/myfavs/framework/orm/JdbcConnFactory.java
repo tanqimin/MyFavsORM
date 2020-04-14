@@ -8,15 +8,15 @@ import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
-public class JdbcConnectionFactory
-    extends ConnectionFactory {
+public class JdbcConnFactory
+    extends ConnFactory {
 
-  private final static Logger log = LoggerFactory.getLogger(JdbcConnectionFactory.class);
+  private final static Logger log = LoggerFactory.getLogger(JdbcConnFactory.class);
 
   private final ThreadLocal<Connection> connectionHolder     = new ThreadLocal<>();
   private final ThreadLocal<Integer>    connectionDeepHolder = new ThreadLocal<>();
 
-  public JdbcConnectionFactory(DataSource dataSource) {
+  public JdbcConnFactory(DataSource dataSource) {
 
     super(dataSource);
   }

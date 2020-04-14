@@ -1,14 +1,15 @@
 package work.myfavs.framework.orm.repository.func;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
+import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.DBTemplate;
-import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
+@SuppressWarnings("unchecked")
 public class FunRepository<TModel> extends FuncQuery {
 
   protected Class<TModel> modelClass;
@@ -27,7 +28,7 @@ public class FunRepository<TModel> extends FuncQuery {
    */
   public Optional<TModel> getById(Object id) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().getById(modelClass, id);
     }
   }
@@ -42,7 +43,7 @@ public class FunRepository<TModel> extends FuncQuery {
   public Optional<TModel> getByField(String field,
       Object param) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().getByField(modelClass, field, param);
     }
   }
@@ -55,7 +56,7 @@ public class FunRepository<TModel> extends FuncQuery {
    */
   protected Optional<TModel> getByCond(Cond cond) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().getByCond(modelClass, cond);
     }
   }
@@ -68,7 +69,7 @@ public class FunRepository<TModel> extends FuncQuery {
    */
   public Optional<TModel> getByCondition(Object object) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().getByCondition(modelClass, object);
     }
   }
@@ -81,7 +82,7 @@ public class FunRepository<TModel> extends FuncQuery {
    * @return 记录
    */
   public Optional<TModel> get(String sql,
-      List<Object> params) {
+      Collection params) {
 
     return super.get(this.modelClass, sql, params);
   }
@@ -105,7 +106,7 @@ public class FunRepository<TModel> extends FuncQuery {
    * @return 实体集合
    */
   public Stream<TModel> find(String sql,
-      List<Object> params) {
+      Collection params) {
 
     return super.find(modelClass, sql, params);
   }
@@ -131,7 +132,7 @@ public class FunRepository<TModel> extends FuncQuery {
   public Stream<TModel> findByField(String field,
       Object param) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().findByField(modelClass, field, param);
     }
   }
@@ -144,9 +145,9 @@ public class FunRepository<TModel> extends FuncQuery {
    * @return 实体集合
    */
   public Stream<TModel> findByField(String field,
-      List<Object> params) {
+      Collection params) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().findByField(modelClass, field, params);
     }
   }
@@ -159,7 +160,7 @@ public class FunRepository<TModel> extends FuncQuery {
    */
   protected Stream<TModel> findByCond(Cond cond) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().findByCond(modelClass, cond);
     }
   }
@@ -172,7 +173,7 @@ public class FunRepository<TModel> extends FuncQuery {
    */
   public Stream<TModel> findByCondition(Object object) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().findByCondition(modelClass, object);
     }
   }
@@ -183,9 +184,9 @@ public class FunRepository<TModel> extends FuncQuery {
    * @param ids 主键ID集合
    * @return 实体集合
    */
-  public Stream<TModel> findByIds(List ids) {
+  public Stream<TModel> findByIds(Collection ids) {
 
-    try (Database conn = this.dbTemplate.open()) {
+    try (DB conn = this.dbTemplate.open()) {
       return conn.func().findByIds(modelClass, ids);
     }
   }
