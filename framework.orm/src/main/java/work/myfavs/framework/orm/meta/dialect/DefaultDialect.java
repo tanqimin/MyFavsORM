@@ -211,7 +211,9 @@ public abstract class DefaultDialect
       return false;
     }
 
-    return classMeta.getQueryAttributes().containsKey(classMeta.getLogicalDeleteField()) == false;
+    return
+        classMeta.getQueryAttributes().containsKey(classMeta.getLogicalDeleteField().toUpperCase())
+            == false;
   }
 
 }
