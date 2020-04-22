@@ -1,5 +1,6 @@
 package work.myfavs.framework.example.controller;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import work.myfavs.framework.example.business.TestPKService;
+import work.myfavs.framework.example.domain.entity.Identity;
 import work.myfavs.framework.example.domain.entity.Snowflake;
 import work.myfavs.framework.example.repository.query.SnowfakeQuery;
 import work.myfavs.framework.orm.meta.pagination.Page;
@@ -45,6 +47,11 @@ public class TestPKController {
 
     testPKService.testTransaction();
     return new ResponseEntity(HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/list-identity", method = RequestMethod.GET)
+  public ResponseEntity<List<Identity>> listIdentity(){
+    return new ResponseEntity<>(testPKService.listIdentity(), HttpStatus.OK);
   }
 
   @RequestMapping(value = "/find-by-page")

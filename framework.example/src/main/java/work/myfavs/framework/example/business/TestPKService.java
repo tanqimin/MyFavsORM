@@ -2,6 +2,8 @@ package work.myfavs.framework.example.business;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import work.myfavs.framework.example.domain.enums.TypeEnum;
 import work.myfavs.framework.example.repository.repo.IdentityRepository;
 import work.myfavs.framework.example.repository.repo.SnowflakeRepository;
 import work.myfavs.framework.example.repository.repo.UuidRepository;
+import work.myfavs.framework.orm.meta.clause.Sql;
 
 @Service
 public class TestPKService {
@@ -79,5 +82,10 @@ public class TestPKService {
       identity.setName("UPD_TEST");
       identityRepository.update(identity);
     }
+  }
+
+  @Transactional(readOnly = true)
+  public List<Identity> listIdentity() {
+    return identityRepository.func().find(new Sql("SELECT * FROM tb_identity")).collect(Collectors.toList());
   }
 }

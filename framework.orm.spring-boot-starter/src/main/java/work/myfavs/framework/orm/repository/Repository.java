@@ -39,7 +39,7 @@ public class Repository<TModel>
   @Override
   public FunRepository<TModel> func() {
     if (funRepository == null) {
-      funRepository = new FunRepository<>(dbTemplate);
+      funRepository = new FunRepository<>(dbTemplate, this.modelClass);
     }
     return funRepository;
   }
@@ -150,7 +150,7 @@ public class Repository<TModel>
   /**
    * 根据SQL查询实体集合
    *
-   * @param sql SQL
+   * @param sql    SQL
    * @param params 参数
    * @return Map，Key为主键值， Value为实体对象
    */

@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.repository.func;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -14,10 +13,9 @@ public class FunRepository<TModel> extends FuncQuery {
 
   protected Class<TModel> modelClass;
 
-  public FunRepository(DBTemplate dbTemplate) {
+  public FunRepository(DBTemplate dbTemplate, Class<TModel> modelClass) {
     super(dbTemplate);
-    this.modelClass = (Class<TModel>) ((ParameterizedType) this.getClass()
-        .getGenericSuperclass()).getActualTypeArguments()[0];
+    this.modelClass = modelClass;
   }
 
   /**

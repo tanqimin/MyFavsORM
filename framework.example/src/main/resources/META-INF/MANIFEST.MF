@@ -1,0 +1,2 @@
+Library-Name: myfavs.example
+Library-Description: Easy db query library

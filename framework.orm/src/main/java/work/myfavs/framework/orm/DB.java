@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
+import work.myfavs.framework.orm.meta.clause.Mode;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.DialectFactory;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
@@ -535,7 +536,7 @@ public class DB
     ClassMeta classMeta = Metadata.get(viewClass);
     AttributeMeta primaryKey = classMeta.checkPrimaryKey();
     Sql sql = this.getDialect().select(viewClass)
-        .where(Cond.in(primaryKey.getColumnName(), ids, false))
+        .where(Cond.in(primaryKey.getColumnName(), ids, Mode.NONE))
         .and(Cond.logicalDeleteCond(classMeta));
     return this.find(viewClass, sql);
   }
@@ -573,7 +574,7 @@ public class DB
       Collection params) {
 
     Sql sql = this.getDialect().select(viewClass)
-        .where(Cond.in(field, params, false))
+        .where(Cond.in(field, params, Mode.NONE))
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);
   }
@@ -1579,7 +1580,7 @@ public class DB
     AttributeMeta primaryKey = classMeta.checkPrimaryKey();
     String pkColumnName = primaryKey.getColumnName();
     Sql sql = Sql.Delete(classMeta.getTableName())
-        .where(Cond.in(pkColumnName, new ArrayList(ids)));
+        .where(Cond.in(pkColumnName, new ArrayList(ids), Mode.IGNORE));
     return execute(sql);
   }
 
