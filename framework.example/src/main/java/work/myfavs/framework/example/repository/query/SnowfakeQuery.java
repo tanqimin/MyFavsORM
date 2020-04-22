@@ -1,11 +1,11 @@
 package work.myfavs.framework.example.repository.query;
 
-import static work.myfavs.framework.example.domain.entity.Snowfake.META;
+import static work.myfavs.framework.example.domain.entity.Snowflake.META;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import work.myfavs.framework.example.domain.entity.Snowfake;
+import work.myfavs.framework.example.domain.entity.Snowflake;
 import work.myfavs.framework.example.repository.BaseQuery;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Cond;
@@ -38,24 +38,24 @@ public class SnowfakeQuery
    *
    * @return Snowfake
    */
-  public Snowfake getById(Object id) {
+  public Snowflake getById(Object id) {
 
     Sql sql = Sql.Select("*")
                  .from(META.TABLE)
                  .where(Cond.eq(META.COLUMNS.id, id));
-    return super.get(Snowfake.class, sql);
+    return super.get(Snowflake.class, sql);
   }
 
   @Transactional(readOnly = true)
-  public Page<Snowfake> findPage() {
+  public Page<Snowflake> findPage() {
 
-    return super.findPage(Snowfake.class, Sql.Select("*")
+    return super.findPage(Snowflake.class, Sql.Select("*")
                                              .from(META.TABLE), true, 1, 1);
   }
 
-  public Snowfake getFirst() {
+  public Snowflake getFirst() {
 
-    return super.get(Snowfake.class, "select * from " + META.TABLE, null);
+    return super.get(Snowflake.class, "select * from " + META.TABLE, null);
   }
 
 }

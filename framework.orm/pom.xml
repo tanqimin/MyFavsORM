@@ -5,34 +5,20 @@
   <groupId>work.myfavs</groupId>
 
   <artifactId>framework.orm</artifactId>
-  <version>0.2.31.RELEASE</version>
+  <version>0.2.32.RELEASE</version>
   <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>
 
-  <!--私服仓库-->
-  <distributionManagement>
-    <repository>
-      <id>maven-releases</id>
-      <name>Nexus Release Repository</name>
-      <url>http://192.168.8.11:3081/repository/maven-releases/</url>
-    </repository>
-    <snapshotRepository>
-      <id>maven-snapshots</id>
-      <name>Nexus Snapshot Repository</name>
-      <url>http://192.168.8.11:3081/repository/maven-snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
+  <parent>
+    <groupId>work.myfavs</groupId>
+    <artifactId>framework</artifactId>
+    <version>0.2.32.RELEASE</version>
+  </parent>
 
   <properties>
     <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
-    <hutool-core.version>5.1.0</hutool-core.version>
-    <slf4j.version>1.7.26</slf4j.version>
-
-    <junit.version>4.12</junit.version>
-    <mysql.version>5.1.48</mysql.version>
-    <HikariCP.version>3.3.1</HikariCP.version>
   </properties>
 
   <dependencies>
@@ -40,13 +26,11 @@
     <dependency>
       <groupId>cn.hutool</groupId>
       <artifactId>hutool-core</artifactId>
-      <version>${hutool-core.version}</version>
     </dependency>
 
     <dependency>
       <groupId>cn.hutool</groupId>
       <artifactId>hutool-json</artifactId>
-      <version>${hutool-core.version}</version>
     </dependency>
 
 
@@ -54,7 +38,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -63,21 +46,18 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>${mysql.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-      <version>${HikariCP.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -88,34 +68,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
-        <configuration>
-          <archive>
-            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <source>8</source>
-          <target>8</target>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.2.1</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

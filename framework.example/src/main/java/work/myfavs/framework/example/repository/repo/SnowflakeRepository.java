@@ -2,7 +2,7 @@ package work.myfavs.framework.example.repository.repo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import work.myfavs.framework.example.domain.entity.Snowfake;
+import work.myfavs.framework.example.domain.entity.Snowflake;
 import work.myfavs.framework.example.repository.BaseRepository;
 import work.myfavs.framework.orm.DBTemplate;
 
@@ -11,8 +11,8 @@ import work.myfavs.framework.orm.DBTemplate;
  * PS: 此文件通过代码生成器生成
  */
 @Repository
-public class SnowfakeRepository
-    extends BaseRepository<Snowfake> {
+public class SnowflakeRepository
+    extends BaseRepository<Snowflake> {
 
   /**
    * 构造方法
@@ -20,7 +20,7 @@ public class SnowfakeRepository
    * @param dbTemplate DBTemplate
    */
   @Autowired
-  public SnowfakeRepository(DBTemplate dbTemplate) {
+  public SnowflakeRepository(DBTemplate dbTemplate) {
 
     super(dbTemplate);
   }

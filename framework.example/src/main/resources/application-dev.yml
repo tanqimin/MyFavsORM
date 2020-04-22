@@ -1,8 +1,9 @@
-debug: false
 logging:
   level:
     ROOT: debug
 spring:
+  banner:
+    charset: utf-8
   datasource:
     primary:
       db-type: mysql #sqlserver

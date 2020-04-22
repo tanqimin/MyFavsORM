@@ -14,45 +14,45 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
  * Snowfake 实体类
  * PS: 此文件通过代码生成器生成，修改此文件会有被覆盖的风险
  */
-@Table(value = Snowfake.META.TABLE, strategy = GenerationType.SNOW_FLAKE)
-public class Snowfake
+@Table(value = Snowflake.META.TABLE, strategy = GenerationType.SNOW_FLAKE)
+public class Snowflake
     implements Serializable {
 
   /**
    * ID
    */
-  @Column(value = Snowfake.META.COLUMNS.id)
+  @Column(value = Snowflake.META.COLUMNS.id)
   @PrimaryKey
   private Long       id      = null;
   /**
    * 创建时间
    */
-  @Column(value = Snowfake.META.COLUMNS.created)
+  @Column(value = Snowflake.META.COLUMNS.created)
   private Date       created = null;
   /**
    * 名称
    */
-  @Column(value = Snowfake.META.COLUMNS.name)
+  @Column(value = Snowflake.META.COLUMNS.name)
   private String     name    = null;
   /**
    * 是否停用
    */
-  @Column(value = Snowfake.META.COLUMNS.disable)
+  @Column(value = Snowflake.META.COLUMNS.disable)
   private Boolean    disable = false;
   /**
    * 价格
    */
-  @Column(value = Snowfake.META.COLUMNS.price)
+  @Column(value = Snowflake.META.COLUMNS.price)
   private BigDecimal price   = BigDecimal.ZERO;
   /**
    * 类型
    */
-  @Column(value = Snowfake.META.COLUMNS.type)
+  @Column(value = Snowflake.META.COLUMNS.type)
   private TypeEnum   type    = null;
   /**
    * 配置
    */
-  @Column(value = Snowfake.META.COLUMNS.config)
+  @Column(value = Snowflake.META.COLUMNS.config)
   private String     config  = null;
 
   public Long getId() {
@@ -133,7 +133,7 @@ public class Snowfake
     /**
      * 表名
      */
-    public static final String TABLE = "tb_snowfake";
+    public static final String TABLE = "tb_snowflake";
 
     /**
      * 字段
@@ -181,7 +181,7 @@ public class Snowfake
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Snowfake entity = (Snowfake) o;
+    Snowflake entity = (Snowflake) o;
     return id.equals(entity.id);
   }
 

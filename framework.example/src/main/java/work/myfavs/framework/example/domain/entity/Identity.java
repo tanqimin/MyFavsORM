@@ -11,10 +11,9 @@ import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 /**
- * Identity 实体类
- * PS: 此文件通过代码生成器生成，修改此文件会有被覆盖的风险
+ * Identity 实体类 PS: 此文件通过代码生成器生成，修改此文件会有被覆盖的风险
  */
-@Table(value = Identity.META.TABLE, strategy = GenerationType.SNOW_FLAKE)
+@Table(value = Identity.META.TABLE, strategy = GenerationType.SNOW_FLAKE, logicalDeleteField = "deleted_tag")
 public class Identity
     implements Serializable {
 
@@ -23,32 +22,35 @@ public class Identity
    */
   @Column(value = Identity.META.COLUMNS.id)
   @PrimaryKey
-  private Long       id      = null;
+  private Long id = null;
   /**
    * 创建时间
    */
   @Column(value = Identity.META.COLUMNS.created)
-  private Date       created = null;
+  private Date created = null;
   /**
    * 名称
    */
   @Column(value = Identity.META.COLUMNS.name)
-  private String     name    = null;
+  private String name = null;
   /**
    * 是否停用？
    */
   @Column(value = Identity.META.COLUMNS.disable)
-  private Boolean    disable = false;
+  private Boolean disable = false;
   /**
    * 价格
    */
   @Column(value = Identity.META.COLUMNS.price)
-  private BigDecimal price   = BigDecimal.ZERO;
+  private BigDecimal price = BigDecimal.ZERO;
   /**
    * 类型
    */
   @Column(value = Identity.META.COLUMNS.type)
-  private TypeEnum   type    = null;
+  private TypeEnum type = null;
+
+  @Column(value = Identity.META.COLUMNS.deletedTag)
+  private Long deletedTag;
 
   public Long getId() {
 
@@ -110,6 +112,14 @@ public class Identity
     this.type = type;
   }
 
+  public Long getDeletedTag() {
+    return deletedTag;
+  }
+
+  public void setDeletedTag(Long deletedTag) {
+    this.deletedTag = deletedTag;
+  }
+
   /**
    * 元数据
    */
@@ -128,7 +138,7 @@ public class Identity
       /**
        * ID
        */
-      String id      = "id";
+      String id = "id";
       /**
        * 创建时间
        */
@@ -136,7 +146,7 @@ public class Identity
       /**
        * 名称
        */
-      String name    = "name";
+      String name = "name";
       /**
        * 是否停用？
        */
@@ -144,12 +154,15 @@ public class Identity
       /**
        * 价格
        */
-      String price   = "price";
+      String price = "price";
       /**
        * 类型
        */
-      String type    = "type";
-
+      String type = "type";
+      /**
+       * 逻辑删除标记
+       */
+      String deletedTag = "deleted_tag";
     }
   }
 
@@ -175,7 +188,9 @@ public class Identity
   @Override
   public String toString() {
 
-    return "Identity { " + "id = " + id + ", " + "created = " + created + ", " + "name = " + name + ", " + "disable = " + disable + ", " + "price = " + price + ", " + "type = " + type + " }";
+    return "Identity { " + "id = " + id + ", " + "created = " + created + ", " + "name = " + name
+        + ", " + "disable = " + disable + ", " + "price = " + price + ", " + "type = " + type
+        + " }";
   }
 
 }
