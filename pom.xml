@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework</artifactId>
-  <version>0.2.34.RELEASE</version>
+  <version>0.2.35.RELEASE</version>
   <packaging>pom</packaging>
 
   <properties>

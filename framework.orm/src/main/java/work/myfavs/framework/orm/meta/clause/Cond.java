@@ -278,18 +278,32 @@ public class Cond
   }
 
   /**
-   * 构建 field IN (?,?..?) 语句 如果 params 集合为空，且 mode 为 Mode.IGNORE，则不构建语句 如果 params 集合为空，且 mode为
-   * Mode.NONE，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params 集合数量大于 1， 则构建 field IN
-   * (?,?..?) 语句
+   * 构建 field IN (?,?..?) 语句 如果 params 集合为空，则不构建语句 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params
+   * 集合数量大于 1， 则构建 field IN (?,?..?) 语句
    *
    * @param field  字段
    * @param params 参数
-   * @param mode   mode
+   * @return Cond
+   */
+  public static Cond in(String field,
+      Collection params) {
+
+    return in(field, params, true);
+  }
+
+  /**
+   * 构建 field IN (?,?..?) 语句 如果 params 集合为空，且 ignoreEmpty 为 true，则不构建语句 如果 params 集合为空，且
+   * ignoreEmpty 为 false，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params 集合数量大于 1，
+   * 则构建 field IN (?,?..?) 语句
+   *
+   * @param field             字段
+   * @param params            参数
+   * @param ignoreEmpty 是否忽略空参数集合
    * @return Cond
    */
   public static Cond in(String field,
       Collection params,
-      Mode mode) {
+      boolean ignoreEmpty) {
 
     Sql inClauseSql;
     String sql;
@@ -303,10 +317,9 @@ public class Cond
     paramCnt = sqlParams.size();
 
     if (paramCnt == 0) {
-      if (Mode.IGNORE.equals(mode)) {
-        return new Cond();
-      }
-      return new Cond(StrUtil.format(" 1 > 2"));
+      return ignoreEmpty
+          ? new Cond()
+          : new Cond(StrUtil.format(" 1 > 2"));
     }
 
     if (paramCnt == 1) {
@@ -329,18 +342,32 @@ public class Cond
   }
 
   /**
-   * 构建 field NOT IN (?,?..?) 语句 如果 params 集合为空，且 mode 为 Mode.IGNORE，则不构建语句 如果 params 集合为空，且
-   * mode 为 Mode.NONE，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field != ? 如果 params 集合数量大于
-   * 1， 则构建 field NOT IN (?,?..?) 语句
+   * 构建 field NOT IN (?,?..?) 语句 如果 params 集合为空，则不构建语句 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params
+   * 集合数量大于 1， 则构建 field NOT IN (?,?..?) 语句
    *
    * @param field  字段
    * @param params 参数
-   * @param mode   mode
+   * @return Cond
+   */
+  public static Cond notIn(String field,
+      Collection params) {
+
+    return notIn(field, params, true);
+  }
+
+  /**
+   * 构建 field NOT IN (?,?..?) 语句 如果 params 集合为空，且 ignoreEmpty 为 true，则不构建语句 如果 params 集合为空，且
+   * ignoreEmpty 为 false，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field != ? 如果 params 集合数量大于
+   * 1， 则构建 field NOT IN (?,?..?) 语句
+   *
+   * @param field             字段
+   * @param params            参数
+   * @param ignoreEmpty 是否忽略空参数集合
    * @return Cond
    */
   public static Cond notIn(String field,
       Collection params,
-      Mode mode) {
+      boolean ignoreEmpty) {
 
     Sql inClauseSql;
     String sql;
@@ -354,10 +381,9 @@ public class Cond
     paramCnt = sqlParams.size();
 
     if (paramCnt == 0) {
-      if (Mode.IGNORE.equals(mode)) {
-        return new Cond();
-      }
-      return new Cond(StrUtil.format(" 1 > 2"));
+      return ignoreEmpty
+          ? new Cond()
+          : new Cond(StrUtil.format(" 1 > 2"));
     }
 
     if (paramCnt == 1) {

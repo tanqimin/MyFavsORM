@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
-import work.myfavs.framework.orm.meta.clause.Mode;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.schema.AttributeMeta;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
@@ -355,7 +354,7 @@ public class DBFunc {
     ClassMeta classMeta = Metadata.get(viewClass);
     AttributeMeta primaryKey = classMeta.checkPrimaryKey();
     Sql sql = this.db.getDialect().select(viewClass)
-        .where(Cond.in(primaryKey.getColumnName(), ids, Mode.NONE))
+        .where(Cond.in(primaryKey.getColumnName(), ids, false))
         .and(Cond.logicalDeleteCond(classMeta));
     return this.find(viewClass, sql);
   }
@@ -393,7 +392,7 @@ public class DBFunc {
       Collection params) {
 
     Sql sql = this.db.getDialect().select(viewClass)
-        .where(Cond.in(field, params, Mode.NONE))
+        .where(Cond.in(field, params, false))
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);
   }
