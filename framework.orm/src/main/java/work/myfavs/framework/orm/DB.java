@@ -57,7 +57,6 @@ public class DB
   private DBTemplate dbTemplate;
   private DBConfig DBConfig;
   private ConnFactory connFactory;
-  private DBFunc dbFunc;
 
   public DB(DBTemplate dbTemplate) {
 
@@ -162,19 +161,6 @@ public class DB
     }
 
     log.debug("The transaction rollback was successful.");
-  }
-
-  /**
-   * 获取支持Java8特性的DatabaseFunc类
-   *
-   * @return DatabaseFunc
-   */
-  public DBFunc func() {
-    log.debug("Use DatabaseFunc query data.");
-    if (this.dbFunc == null) {
-      dbFunc = new DBFunc(this);
-    }
-    return dbFunc;
   }
 
   /**
@@ -290,7 +276,7 @@ public class DB
           StrUtil.format("Class {} not exist Prop named {}", viewClass.getName(), keyField));
     }
 
-    return func().find(viewClass, sql, params)
+    return this.find(viewClass, sql, params).stream()
         .collect(Collectors.toMap(tView -> BeanUtil.getProperty(tView, keyField), tView -> tView));
   }
 
@@ -1175,10 +1161,9 @@ public class DB
         if (strategy == GenerationType.ASSIGNED) {
           throw new DBException("Assigned ID can not be null.");
         } else if (strategy == GenerationType.UUID) {
-          pkVal = PKGenerator.nextUUID();
+          pkVal = uuid();
         } else if (strategy == GenerationType.SNOW_FLAKE) {
-          pkVal = PKGenerator.nextSnowFakeId(this.DBConfig.getWorkerId(),
-              this.DBConfig.getDataCenterId());
+          pkVal = snowFlakeId();
         }
 
         ReflectUtil.setFieldValue(entity, pkFieldName, pkVal);
@@ -1210,6 +1195,11 @@ public class DB
     }
 
     return result;
+  }
+
+  public long snowFlakeId() {
+    return PKGenerator.nextSnowFakeId(this.DBConfig.getWorkerId(),
+        this.DBConfig.getDataCenterId());
   }
 
 
@@ -1268,10 +1258,9 @@ public class DB
           if (strategy == GenerationType.ASSIGNED) {
             throw new DBException("Assigned ID can not be null.");
           } else if (strategy == GenerationType.UUID) {
-            pkVal = PKGenerator.nextUUID();
+            pkVal = uuid();
           } else if (strategy == GenerationType.SNOW_FLAKE) {
-            pkVal = PKGenerator.nextSnowFakeId(this.DBConfig.getWorkerId(),
-                this.DBConfig.getDataCenterId());
+            pkVal = snowFlakeId();
           }
 
           ReflectUtil.setFieldValue(entity, pkFieldName, pkVal);
@@ -1319,6 +1308,10 @@ public class DB
     }
 
     return result;
+  }
+
+  public String uuid() {
+    return PKGenerator.nextUUID();
   }
 
   /**

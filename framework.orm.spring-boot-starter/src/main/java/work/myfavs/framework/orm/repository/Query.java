@@ -9,7 +9,6 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.pagination.IPageable;
 import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
-import work.myfavs.framework.orm.repository.func.FuncQuery;
 
 /**
  * 查询器基类
@@ -17,8 +16,6 @@ import work.myfavs.framework.orm.repository.func.FuncQuery;
 @SuppressWarnings("unchecked")
 public class Query
     extends BaseRepository {
-
-  private FuncQuery funcQuery;
 
   /**
    * 构造方法
@@ -28,14 +25,6 @@ public class Query
   public Query(DBTemplate dbTemplate) {
 
     super(dbTemplate);
-  }
-
-  @Override
-  public FuncQuery func() {
-    if (funcQuery == null) {
-      funcQuery = new FuncQuery(super.dbTemplate);
-    }
-    return funcQuery;
   }
 
   /**

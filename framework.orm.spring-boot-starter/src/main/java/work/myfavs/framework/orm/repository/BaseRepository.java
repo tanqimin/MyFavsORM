@@ -6,7 +6,6 @@ import java.util.Map;
 import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Sql;
-import work.myfavs.framework.orm.repository.func.FuncBaseRepository;
 
 /**
  * 仓储基类
@@ -16,21 +15,12 @@ abstract public class BaseRepository {
 
   protected DBTemplate dbTemplate;
 
-  private FuncBaseRepository funcBaseRepository;
-
   private BaseRepository() {
   }
 
   public BaseRepository(DBTemplate dbTemplate) {
 
     this.dbTemplate = dbTemplate;
-  }
-
-  public FuncBaseRepository func() {
-    if (funcBaseRepository == null) {
-      funcBaseRepository = new FuncBaseRepository(this.dbTemplate);
-    }
-    return funcBaseRepository;
   }
 
   /**

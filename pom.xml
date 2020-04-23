@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework</artifactId>
-  <version>0.2.35.RELEASE</version>
+  <version>0.3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <properties>
@@ -25,6 +25,7 @@
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
     <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+    <vavr.version>0.10.2</vavr.version>
   </properties>
 
   <!--私服仓库-->
@@ -108,6 +109,14 @@
         <artifactId>hutool-json</artifactId>
         <version>${hutool.version}</version>
       </dependency>
+
+      <!-- https://mvnrepository.com/artifact/io.vavr/vavr -->
+      <dependency>
+        <groupId>io.vavr</groupId>
+        <artifactId>vavr</artifactId>
+        <version>${vavr.version}</version>
+      </dependency>
+
 
       <dependency>
         <groupId>com.ibeetl</groupId>

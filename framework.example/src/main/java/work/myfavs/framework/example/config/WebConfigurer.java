@@ -19,9 +19,10 @@ public class WebConfigurer
   @Override
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 
-    configurer.defaultContentType(MediaType.APPLICATION_JSON_UTF8)
-              .favorPathExtension(true);
+    configurer.defaultContentType(MediaType.APPLICATION_JSON).favorParameter(true);
   }
+
+
 
   @Override
   public void addCorsMappings(CorsRegistry registry) {

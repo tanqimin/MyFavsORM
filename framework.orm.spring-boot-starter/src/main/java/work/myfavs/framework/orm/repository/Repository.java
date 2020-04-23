@@ -9,7 +9,7 @@ import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-import work.myfavs.framework.orm.repository.func.FunRepository;
+import work.myfavs.framework.orm.util.PKGenerator;
 
 /**
  * 仓储基类
@@ -21,7 +21,6 @@ public class Repository<TModel>
     extends Query {
 
   protected Class<TModel> modelClass;
-  protected FunRepository<TModel> funRepository;
 
   /**
    * 构造方法
@@ -34,14 +33,6 @@ public class Repository<TModel>
     super(dbTemplate);
     this.modelClass = (Class<TModel>) ((ParameterizedType) this.getClass()
         .getGenericSuperclass()).getActualTypeArguments()[0];
-  }
-
-  @Override
-  public FunRepository<TModel> func() {
-    if (funRepository == null) {
-      funRepository = new FunRepository<>(dbTemplate, this.modelClass);
-    }
-    return funRepository;
   }
 
   /**
@@ -460,6 +451,27 @@ public class Repository<TModel>
     try (DB conn = this.dbTemplate.open()) {
       return conn.deleteByIds(modelClass, ids);
     }
+  }
+
+  /**
+   * 创建一个UUID值
+   *
+   * @return UUID
+   */
+  public String uuid() {
+    return PKGenerator.nextUUID();
+  }
+
+  /**
+   * 创建一个雪花值
+   *
+   * @return 雪花值
+   */
+  public long snowFlakeId() {
+    final long workerId = this.dbTemplate.getDBConfig().getWorkerId();
+    final long dataCenterId = this.dbTemplate.getDBConfig().getDataCenterId();
+    return PKGenerator.nextSnowFakeId(workerId,
+        dataCenterId);
   }
 
 }

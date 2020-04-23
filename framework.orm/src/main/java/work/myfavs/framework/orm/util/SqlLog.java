@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,14 +83,6 @@ public class SqlLog {
   }
 
   public <TView> void showResult(List<TView> result) {
-
-    if (result == null) {
-      return;
-    }
-    showResult(result.stream());
-  }
-
-  public <TView> void showResult(Stream<TView> result) {
     if (showSql == false) {
       return;
     }
@@ -106,7 +97,7 @@ public class SqlLog {
       logStr.append(JSONUtil.toJsonStr(v))
           .append(System.lineSeparator());
     });
-    logStr.append(StrUtil.format("TOTAL RECORDS: {}", result.count()));
+    logStr.append(StrUtil.format("TOTAL RECORDS: {}", result.size()));
     logStr.append(System.lineSeparator());
     log.info(logStr.toString());
   }

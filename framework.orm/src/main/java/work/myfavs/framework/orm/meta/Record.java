@@ -15,6 +15,7 @@ import work.myfavs.framework.orm.util.common.RecordValueGetter;
 /**
  * ORM查询记录对象
  */
+@SuppressWarnings("unchecked")
 public class Record
     extends LinkedHashMap<String, Object> implements RecordValueGetter<String> {
 

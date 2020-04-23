@@ -3,7 +3,6 @@ package work.myfavs.framework.example.business;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,6 +85,7 @@ public class TestPKService {
 
   @Transactional(readOnly = true)
   public List<Identity> listIdentity() {
-    return identityRepository.func().find(new Sql("SELECT * FROM tb_identity")).collect(Collectors.toList());
+    return identityRepository
+        .find(new Sql("SELECT * FROM tb_identity"));
   }
 }
