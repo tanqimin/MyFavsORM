@@ -27,19 +27,18 @@ public class StringPropertyHandler
 
   @Override
   public String convert(ResultSet rs,
-                        String columnName,
-                        Class<String> clazz)
+      String columnName,
+      Class<String> clazz)
       throws SQLException {
 
-    return rs.wasNull()
-        ? null
-        : rs.getString(columnName);
+    final String str = rs.getString(columnName);
+    return rs.wasNull() ? null : str;
   }
 
   @Override
   public void addParameter(PreparedStatement ps,
-                           int paramIndex,
-                           String param)
+      int paramIndex,
+      String param)
       throws SQLException {
 
     if (param == null) {
