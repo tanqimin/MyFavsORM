@@ -1,8 +1,10 @@
 package work.myfavs.framework.orm.util;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,79 +29,103 @@ public class SqlLog {
     if (showSql && log.isDebugEnabled()) {
       StringBuilder logStr = new StringBuilder();
       logStr.append(System.lineSeparator());
+      logStr.append("################# MYFAVS ORM SHOW SQL #################");
+      logStr.append(System.lineSeparator());
+      logStr.append(System.lineSeparator());
       logStr.append(StrUtil.format("          SQL: {}", sql));
+      logStr.append(System.lineSeparator());
       logStr.append(System.lineSeparator());
       logStr.append(StrUtil.format("   PARAMETERS: {}", showParams(params)));
       logStr.append(System.lineSeparator());
-      log.info(logStr.toString());
+      logStr.append(System.lineSeparator());
+      logStr.append("#######################################################");
+      log.debug(logStr.toString());
     }
   }
 
   private String showParams(Collection params) {
 
-    StringBuilder stringBuilder;
-    stringBuilder = new StringBuilder();
-    if (params == null || params.size() == 0) {
-      return stringBuilder.toString();
+    if (CollectionUtil.isEmpty(params)) {
+      return "";
     }
+
+    StringBuilder logStr = new StringBuilder();
     for (Object param : params) {
-      stringBuilder.append(StrUtil.toString(param))
-          .append(", ");
+      logStr.append(StrUtil.format("{}, ", param));
     }
-    stringBuilder.deleteCharAt(stringBuilder.lastIndexOf(","));
-    return stringBuilder.toString();
+    logStr.deleteCharAt(logStr.lastIndexOf(","));
+    return logStr.toString();
   }
 
   public void showBatchSql(String sql,
       List<List> paramsList) {
 
-    if (showSql && log.isInfoEnabled()) {
-      StringBuilder logStr = new StringBuilder(System.lineSeparator());
-      logStr.append("          SQL: ")
-          .append(sql);
+    if (showSql && log.isDebugEnabled()) {
+      StringBuilder logStr = new StringBuilder();
+      logStr.append(System.lineSeparator());
+      logStr.append("################# MYFAVS ORM SHOW BATCH SQL #################");
+      logStr.append(System.lineSeparator());
+      logStr.append(System.lineSeparator());
+      logStr.append(StrUtil.format("          SQL: {}", sql));
+      logStr.append(System.lineSeparator());
+      logStr.append(System.lineSeparator());
       if (paramsList != null && paramsList.size() > 0) {
-        logStr.append(System.lineSeparator())
-            .append("   PARAMETERS: ")
-            .append(System.lineSeparator());
-        int i = 0;
-        for (List params : paramsList) {
-          logStr.append("PARAM[")
-              .append(i++)
-              .append("]: ");
-          logStr.append(StrUtil.format("{}", showParams(params)));
+        logStr.append("   PARAMETERS: ");
+        logStr.append(System.lineSeparator());
+        for (int i = 0; i < paramsList.size(); i++) {
+          List params = paramsList.get(i);
+          logStr.append(StrUtil.format("PARAMETERS [{}]: {}", i + 1, showParams(params)));
           logStr.append(System.lineSeparator());
         }
+        logStr.append(System.lineSeparator());
       }
-      logStr.append(System.lineSeparator());
-      log.info(logStr.toString());
+      logStr.append("#############################################################");
+      log.debug(logStr.toString());
     }
   }
 
   public void showAffectedRows(int result) {
 
-    if (showResult && log.isInfoEnabled()) {
-      log.info("AFFECTED ROWS: {}", result);
+    if (showResult && log.isDebugEnabled()) {
+      StringBuilder logStr = new StringBuilder();
+      logStr.append("################# MYFAVS ORM AFFECTED ROWS #################");
+      logStr.append(System.lineSeparator());
+      logStr.append(System.lineSeparator());
+      logStr.append(StrUtil.format("AFFECTED ROWS: {}", result));
+      logStr.append(System.lineSeparator());
+      logStr.append(System.lineSeparator());
+      logStr.append("############################################################");
+      log.debug(logStr.toString());
     }
   }
 
   public <TView> void showResult(List<TView> result) {
-    if (showSql == false) {
+    if (showResult == false) {
       return;
     }
-    if (log.isInfoEnabled()) {
+    if (log.isDebugEnabled()) {
       return;
     }
 
     StringBuilder logStr = new StringBuilder();
+    logStr.append(System.lineSeparator());
+    logStr.append("################# MYFAVS ORM SHOW RESULT #################");
+    logStr.append(System.lineSeparator());
+    logStr.append(System.lineSeparator());
     logStr.append(" QUERY RESULT:");
     logStr.append(System.lineSeparator());
-    result.forEach(v -> {
-      logStr.append(JSONUtil.toJsonStr(v))
-          .append(System.lineSeparator());
-    });
+    logStr.append(System.lineSeparator());
+    for (Iterator<TView> iterator = result.iterator(); iterator.hasNext(); ) {
+      TView next = iterator.next();
+      logStr.append(JSONUtil.toJsonStr(next));
+      logStr.append(System.lineSeparator());
+    }
+    logStr.append(System.lineSeparator());
     logStr.append(StrUtil.format("TOTAL RECORDS: {}", result.size()));
     logStr.append(System.lineSeparator());
-    log.info(logStr.toString());
+    logStr.append(System.lineSeparator());
+    logStr.append("##########################################################");
+    log.debug(logStr.toString());
   }
 
 }

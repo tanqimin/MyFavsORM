@@ -115,6 +115,7 @@
         <groupId>io.vavr</groupId>
         <artifactId>vavr</artifactId>
         <version>${vavr.version}</version>
+        <scope>provided</scope>
       </dependency>
 
 

@@ -32,6 +32,11 @@
       <artifactId>hutool-json</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>io.vavr</groupId>
+      <artifactId>vavr</artifactId>
+    </dependency>
+
 
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
     <dependency>
