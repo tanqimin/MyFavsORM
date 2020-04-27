@@ -67,7 +67,7 @@ public class DBUtil {
         execIdx = 0;
     for (Iterator<Collection> iterator = params.iterator(); iterator.hasNext(); ) {
       Collection param = iterator.next();
-      setParams(pst, params);
+      setParams(pst, param);
       pst.addBatch();
 
       if (++execIdx % batchSize == 0) {

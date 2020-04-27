@@ -1,6 +1,7 @@
 package work.myfavs.framework.example.business;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,13 +65,23 @@ public class TestPKService {
 
   @Transactional(rollbackFor = Exception.class)
   public void createIdentity() {
-    Identity identity = new Identity();
-    identity.setName("TEST");
-    identity.setType(TypeEnum.DRINK);
-    identity.setPrice(new BigDecimal(199.00));
-    identity.setDisable(false);
+    List<Identity> entities = new ArrayList<>();
+    Identity i1 = new Identity();
+    i1.setName("TEST");
+    i1.setType(TypeEnum.DRINK);
+    i1.setPrice(new BigDecimal(199.00));
+    i1.setDisable(false);
 
-    identityRepository.create(identity);
+    Identity i2 = new Identity();
+    i2.setName("TEST");
+    i2.setType(TypeEnum.FOOD);
+    i2.setPrice(new BigDecimal(199.00));
+    i2.setDisable(false);
+
+    entities.add(i1);
+    entities.add(i2);
+
+    identityRepository.create(entities);
   }
 
   @Transactional(rollbackFor = Exception.class)
