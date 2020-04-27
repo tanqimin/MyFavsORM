@@ -58,7 +58,7 @@ public class SqlLog {
   }
 
   public void showBatchSql(String sql,
-      List<List> paramsList) {
+      Collection<Collection> paramsList) {
 
     if (showSql && log.isDebugEnabled()) {
       StringBuilder logStr = new StringBuilder();
@@ -72,9 +72,10 @@ public class SqlLog {
       if (paramsList != null && paramsList.size() > 0) {
         logStr.append("   PARAMETERS: ");
         logStr.append(System.lineSeparator());
-        for (int i = 0; i < paramsList.size(); i++) {
-          List params = paramsList.get(i);
-          logStr.append(StrUtil.format("PARAMETERS [{}]: {}", i + 1, showParams(params)));
+        int i = 1;
+        for (Iterator<Collection> iterator = paramsList.iterator(); iterator.hasNext(); ) {
+          Collection params = iterator.next();
+          logStr.append(StrUtil.format("PARAMETERS [{}]: {}", i++, showParams(params)));
           logStr.append(System.lineSeparator());
         }
         logStr.append(System.lineSeparator());

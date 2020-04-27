@@ -13,8 +13,8 @@ public class JdbcConnFactory
 
   private final static Logger log = LoggerFactory.getLogger(JdbcConnFactory.class);
 
-  private final ThreadLocal<Connection> connectionHolder     = new ThreadLocal<>();
-  private final ThreadLocal<Integer>    connectionDeepHolder = new ThreadLocal<>();
+  private final ThreadLocal<Connection> connectionHolder = new ThreadLocal<>();
+  private final ThreadLocal<Integer> connectionDeepHolder = new ThreadLocal<>();
 
   public JdbcConnFactory(DataSource dataSource) {
 
@@ -75,7 +75,7 @@ public class JdbcConnFactory
   protected Connection createConnection() {
 
     try {
-      return DBUtil.createConnection(dataSource);
+      return dataSource.getConnection();
     } catch (SQLException e) {
       throw new DBException(e, "Could not get connection from datasource, error message: ");
     }
