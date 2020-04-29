@@ -1,7 +1,6 @@
 package work.myfavs.framework.orm.util;
 
 import cn.hutool.core.date.StopWatch;
-import cn.hutool.json.JSONUtil;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -30,8 +29,8 @@ public class SqlLogTest {
     stopWatch.start();
     StringBuilder sb = new StringBuilder();
     for (Person person : personList) {
-      sb.append(JSONUtil.parseObj(person)
-                        .toString());
+//      sb.append(JSON.parseObj(person)
+//                        .toString());
       sb.append("\n");
     }
     stopWatch.stop();

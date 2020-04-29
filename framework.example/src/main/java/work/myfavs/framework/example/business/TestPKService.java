@@ -14,6 +14,8 @@ import work.myfavs.framework.example.domain.enums.TypeEnum;
 import work.myfavs.framework.example.repository.repo.IdentityRepository;
 import work.myfavs.framework.example.repository.repo.SnowflakeRepository;
 import work.myfavs.framework.example.repository.repo.UuidRepository;
+import work.myfavs.framework.orm.meta.Record;
+import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
 @Service
@@ -65,6 +67,10 @@ public class TestPKService {
 
   @Transactional(rollbackFor = Exception.class)
   public void createIdentity() {
+    if (identityRepository.existsByCond(Cond.eq("name", "TEST"))) {
+      return;
+    }
+
     List<Identity> entities = new ArrayList<>();
     Identity i1 = new Identity();
     i1.setName("TEST");
@@ -98,5 +104,9 @@ public class TestPKService {
   public List<Identity> listIdentity() {
     return identityRepository
         .find(new Sql("SELECT * FROM tb_identity"));
+  }
+
+  public List<Record> findIdentityListByCond() {
+    return null;
   }
 }

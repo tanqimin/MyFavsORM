@@ -12,6 +12,7 @@ import work.myfavs.framework.example.business.TestPKService;
 import work.myfavs.framework.example.domain.entity.Identity;
 import work.myfavs.framework.example.domain.entity.Snowflake;
 import work.myfavs.framework.example.repository.query.SnowfakeQuery;
+import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.pagination.Page;
 
 @RequestMapping("/test-pk")
@@ -27,6 +28,11 @@ public class TestPKController {
   public ResponseEntity<Snowflake> get() {
 
     return new ResponseEntity<>(snowfakeQuery.getFirst(), HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/find-identity-list-by-cond", method = RequestMethod.GET)
+  public ResponseEntity<List<Record>> findIdentityListByCond(){
+    return new ResponseEntity(testPKService.findIdentityListByCond(),HttpStatus.OK);
   }
 
   @RequestMapping(value = "/create-identity", method = RequestMethod.GET)

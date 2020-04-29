@@ -26,6 +26,7 @@
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
     <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
     <vavr.version>0.10.2</vavr.version>
+    <fastjson.version>1.2.68</fastjson.version>
   </properties>
 
   <!--私服仓库-->
@@ -104,10 +105,11 @@
         <version>${hutool.version}</version>
       </dependency>
 
+      <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
       <dependency>
-        <groupId>cn.hutool</groupId>
-        <artifactId>hutool-json</artifactId>
-        <version>${hutool.version}</version>
+        <groupId>com.alibaba</groupId>
+        <artifactId>fastjson</artifactId>
+        <version>${fastjson.version}</version>
       </dependency>
 
       <!-- https://mvnrepository.com/artifact/io.vavr/vavr -->

@@ -292,12 +292,12 @@ public class Cond
   }
 
   /**
-   * 构建 field IN (?,?..?) 语句 如果 params 集合为空，且 ignoreEmpty 为 true，则不构建语句 如果 params 集合为空，且
-   * ignoreEmpty 为 false，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params 集合数量大于 1，
-   * 则构建 field IN (?,?..?) 语句
+   * 构建 field IN (?,?..?) 语句 如果 params 集合为空，且 ignoreEmpty 为 true，则不构建语句 如果 params 集合为空，且 ignoreEmpty
+   * 为 false，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params 集合数量大于 1， 则构建 field IN
+   * (?,?..?) 语句
    *
-   * @param field             字段
-   * @param params            参数
+   * @param field       字段
+   * @param params      参数
    * @param ignoreEmpty 是否忽略空参数集合
    * @return Cond
    */
@@ -357,11 +357,11 @@ public class Cond
 
   /**
    * 构建 field NOT IN (?,?..?) 语句 如果 params 集合为空，且 ignoreEmpty 为 true，则不构建语句 如果 params 集合为空，且
-   * ignoreEmpty 为 false，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field != ? 如果 params 集合数量大于
-   * 1， 则构建 field NOT IN (?,?..?) 语句
+   * ignoreEmpty 为 false，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field != ? 如果 params 集合数量大于 1， 则构建
+   * field NOT IN (?,?..?) 语句
    *
-   * @param field             字段
-   * @param params            参数
+   * @param field       字段
+   * @param params      参数
    * @param ignoreEmpty 是否忽略空参数集合
    * @return Cond
    */
@@ -421,8 +421,9 @@ public class Cond
         sqlBuilder.append("?,");
         sqlParams.add(param);
       }
-
-      sqlBuilder.deleteCharAt(sqlBuilder.lastIndexOf(","));
+      if (sqlParams.size() > 0) {
+        sqlBuilder.deleteCharAt(sqlBuilder.lastIndexOf(","));
+      }
     }
 
     sql = new Sql(sqlBuilder.toString(), sqlParams);

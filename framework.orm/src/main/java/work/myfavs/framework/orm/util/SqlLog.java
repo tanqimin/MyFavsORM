@@ -2,7 +2,7 @@ package work.myfavs.framework.orm.util;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -118,7 +118,7 @@ public class SqlLog {
     logStr.append(System.lineSeparator());
     for (Iterator<TView> iterator = result.iterator(); iterator.hasNext(); ) {
       TView next = iterator.next();
-      logStr.append(JSONUtil.toJsonStr(next));
+      logStr.append(JSON.toJSONString(next));
       logStr.append(System.lineSeparator());
     }
     logStr.append(System.lineSeparator());
