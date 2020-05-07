@@ -2,6 +2,7 @@ package work.myfavs.framework.orm;
 
 import cn.hutool.core.bean.BeanDesc.PropDesc;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import java.io.Closeable;
@@ -17,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
@@ -1385,90 +1387,63 @@ public class DB
       String[] columns) {
 
     int result = 0;
-    List<AttributeMeta> updateAttributes;
 
-    Sql sql;
-    Collection<Collection> paramsList;
-    Collection params;
-
-    Connection conn = null;
-    PreparedStatement pstmt = null;
-
-    if (entities == null) {
+    if (CollectionUtil.isEmpty(entities)) {
       return result;
     }
 
     ClassMeta classMeta = Metadata.get(modelClass);
-    AttributeMeta primaryKey = classMeta.checkPrimaryKey();
+    AttributeMeta pk = classMeta.checkPrimaryKey();
+    List<AttributeMeta> updAttrs = classMeta.getUpdateAttributes(columns);
 
-    if (columns == null || columns.length == 0) {
-      updateAttributes = classMeta.getUpdateAttributes();
-    } else {
-      updateAttributes = new LinkedList<>();
-      for (String column : columns) {
-        AttributeMeta attributeMeta = classMeta.getQueryAttributes()
-            .get(column.toUpperCase());
-        if (attributeMeta == null) {
-          continue;
-        }
-        if (attributeMeta.isPrimaryKey()) {
-          continue;
-        }
-        updateAttributes.add(attributeMeta);
-      }
-    }
-
-    if (updateAttributes.isEmpty()) {
+    if (updAttrs.isEmpty()) {
       throw new DBException("Could not match update attributes.");
     }
 
-    sql = Sql.Update(classMeta.getTableName())
-        .append(" SET ");
-    for (AttributeMeta updateAttribute : updateAttributes) {
-      sql.append(StrUtil.format("{} = ?,", updateAttribute.getColumnName()));
-    }
+    final int batchSize = getDBConfig().getBatchSize();
+    final List<List<TModel>> batchList = CollectionUtil.split(entities, batchSize);
+    List<Sql> batchSqls = new ArrayList<>();
 
-    sql.getSql()
-        .deleteCharAt(sql.getSql()
-            .lastIndexOf(","));
+    for (Iterator<List<TModel>> ei = batchList.iterator(); ei.hasNext(); ) {
+      List<TModel> entityList = ei.next();
+      Sql sql = Sql.Update(classMeta.getTableName()).append(" SET ");
 
-    sql.append(StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()));
+      List<Object> ids = new ArrayList<>();
+      Map<String, Sql> setClauses = new TreeMap<>();
+      for (Iterator<TModel> mi = entityList.iterator(); mi.hasNext(); ) {
+        TModel entity = mi.next();
+        for (AttributeMeta updAttr : updAttrs) {
+          Sql setClause = null;
+          final String columnName = updAttr.getColumnName();
+          if (setClauses.containsKey(columnName)) {
+            setClause = setClauses.get(columnName);
+          } else {
+            setClause = new Sql(StrUtil.format(" {} = CASE {} ",
+                columnName, pk.getColumnName()));
+          }
+          setClause.append(new Sql(" WHEN ? THEN ? ",
+              CollectionUtil.newArrayList(ReflectUtil.getFieldValue(entity, pk.getFieldName()),
+                  ReflectUtil.getFieldValue(entity, updAttr.getFieldName()))));
 
-    if (classMeta.isEnableLogicalDelete()) {
-      sql.append(StrUtil.format(" AND {} = 0", classMeta.getLogicalDeleteField()));
-    }
-
-    paramsList = new LinkedList<>();
-
-    for (Iterator<TModel> iterator = entities.iterator();
-        iterator.hasNext(); ) {
-      TModel entity = iterator.next();
-      params = new LinkedList<>();
-
-      for (AttributeMeta attributeMeta : updateAttributes) {
-        params.add(ReflectUtil.getFieldValue(entity, attributeMeta.getFieldName()));
+          setClauses.put(columnName, setClause);
+        }
+        ids.add(ReflectUtil.getFieldValue(entity, pk.getFieldName()));
       }
 
-      params.add(ReflectUtil.getFieldValue(entity, primaryKey.getFieldName()));
-      paramsList.add(params);
+      for (Sql setClause : setClauses.values()) {
+        sql.append(setClause).append(" END,");
+      }
+      sql.deleteLastChar(",");
+
+      sql.where(Cond.in(pk.getColumnName(), ids));
+      if (classMeta.isEnableLogicalDelete()) {
+        sql.append(StrUtil.format(" AND {} = 0", classMeta.getLogicalDeleteField()));
+      }
+      batchSqls.add(sql);
     }
-
-    try {
-
-      getSqlLog().showBatchSql(sql.getSqlString(), paramsList);
-
-      conn = this.open();
-      pstmt = DBUtil.getPstForUpdate(conn, false, sql.getSqlString());
-      result = DBUtil.executeBatch(pstmt, paramsList, this.DBConfig.getBatchSize());
-
-      getSqlLog().showAffectedRows(result);
-    } catch (SQLException e) {
-      throw new DBException(e);
-    } finally {
-      DBUtil.close(pstmt);
-      this.close();
+    for (Sql batchSql : batchSqls) {
+      result += this.execute(batchSql);
     }
-
     return result;
   }
 

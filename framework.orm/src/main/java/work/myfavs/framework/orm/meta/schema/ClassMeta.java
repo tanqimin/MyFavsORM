@@ -2,6 +2,7 @@ package work.myfavs.framework.orm.meta.schema;
 
 import cn.hutool.core.util.ReflectUtil;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -71,6 +72,21 @@ public class ClassMeta {
   public List<AttributeMeta> getUpdateAttributes() {
 
     return updateAttributes;
+  }
+
+  public List<AttributeMeta> getUpdateAttributes(String[] columns) {
+    if (columns == null || columns.length == 0) {
+      return updateAttributes;
+    }
+    List<AttributeMeta> res = new ArrayList<>();
+    for (String column : columns) {
+      final AttributeMeta attributeMeta = this.queryAttributes.get(column.toUpperCase());
+      if (attributeMeta == null || attributeMeta.isPrimaryKey() || attributeMeta.isReadonly()) {
+        continue;
+      }
+      res.add(attributeMeta);
+    }
+    return res;
   }
 
   public void setUpdateAttributes(List<AttributeMeta> updateAttributes) {

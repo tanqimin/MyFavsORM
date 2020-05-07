@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,5 +109,15 @@ public class TestPKService {
 
   public List<Record> findIdentityListByCond() {
     return null;
+  }
+
+  @Transactional()
+  public int testBatchUpdate() {
+    final List<Identity> identities = listIdentity();
+    for (Identity identity : identities) {
+      identity.setName(UUID.randomUUID().toString());
+      identity.setPrice(new BigDecimal(Math.random()));
+    }
+    return identityRepository.update(identities, new String[]{"name", "price"});
   }
 }

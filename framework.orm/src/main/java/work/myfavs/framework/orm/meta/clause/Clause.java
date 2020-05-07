@@ -68,4 +68,9 @@ abstract public class Clause {
   public String toString() {
     return StrUtil.toString(sql);
   }
+
+  public Clause deleteLastChar(String str) {
+    this.sql.deleteCharAt(this.sql.lastIndexOf(str));
+    return this;
+  }
 }

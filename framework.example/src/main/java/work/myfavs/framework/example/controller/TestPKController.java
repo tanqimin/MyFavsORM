@@ -31,18 +31,18 @@ public class TestPKController {
   }
 
   @RequestMapping(value = "/find-identity-list-by-cond", method = RequestMethod.GET)
-  public ResponseEntity<List<Record>> findIdentityListByCond(){
-    return new ResponseEntity(testPKService.findIdentityListByCond(),HttpStatus.OK);
+  public ResponseEntity<List<Record>> findIdentityListByCond() {
+    return new ResponseEntity(testPKService.findIdentityListByCond(), HttpStatus.OK);
   }
 
   @RequestMapping(value = "/create-identity", method = RequestMethod.GET)
-  public ResponseEntity createIdentity(){
+  public ResponseEntity createIdentity() {
     testPKService.createIdentity();
     return new ResponseEntity(HttpStatus.OK);
   }
 
   @RequestMapping(value = "/update-identity/{id}", method = RequestMethod.GET)
-  public ResponseEntity updateIdentity(@PathVariable Long id){
+  public ResponseEntity updateIdentity(@PathVariable Long id) {
     testPKService.updateIdentity(id);
     return new ResponseEntity(HttpStatus.OK);
   }
@@ -55,8 +55,13 @@ public class TestPKController {
     return new ResponseEntity(HttpStatus.OK);
   }
 
+  @RequestMapping(value = "/update", method = RequestMethod.GET)
+  public ResponseEntity<Integer> update() {
+    return new ResponseEntity<>(testPKService.testBatchUpdate(), HttpStatus.OK);
+  }
+
   @RequestMapping(value = "/list-identity", method = RequestMethod.GET)
-  public ResponseEntity<List<Identity>> listIdentity(){
+  public ResponseEntity<List<Identity>> listIdentity() {
     return new ResponseEntity<>(testPKService.listIdentity(), HttpStatus.OK);
   }
 
