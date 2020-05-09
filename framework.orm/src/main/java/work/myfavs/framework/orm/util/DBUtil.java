@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
@@ -71,12 +70,12 @@ public class DBUtil {
       pst.addBatch();
 
       if (++execIdx % batchSize == 0) {
-        result += Arrays.stream(pst.executeBatch()).sum();
+        result += pst.executeBatch().length;
         pst.clearBatch();
       }
     }
 
-    result += Arrays.stream(pst.executeBatch()).sum();
+    result += pst.executeBatch().length;
     pst.clearBatch();
 
     return result;
