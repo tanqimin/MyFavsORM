@@ -4,6 +4,10 @@ import java.sql.*;
 import java.time.LocalTime;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
+/**
+ * TIMESTAMP WITHOUT TIMEZONE
+ * @author tanqimin
+ */
 public class LocalTimePropertyHandler
     extends PropertyHandler<LocalTime> {
 
