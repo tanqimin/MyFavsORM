@@ -68,15 +68,12 @@ public class DBUtil {
       Collection param = iterator.next();
       setParams(pst, param);
       pst.addBatch();
-
-      if (++execIdx % batchSize == 0) {
+      execIdx++;
+      if (execIdx % batchSize == 0 || execIdx == params.size()) {
         result += pst.executeBatch().length;
         pst.clearBatch();
       }
     }
-
-    result += pst.executeBatch().length;
-    pst.clearBatch();
 
     return result;
   }
@@ -92,13 +89,15 @@ public class DBUtil {
   private static PreparedStatement setParams(PreparedStatement preparedStatement,
       Collection params)
       throws SQLException {
-
-    if (params != null && params.size() > 0) {
-      int index = 1;
-      for (Iterator iterator = params.iterator(); iterator.hasNext(); ) {
-        PropertyHandlerFactory.addParameter(preparedStatement, index++, iterator.next());
-      }
+    if (CollectionUtil.isEmpty(params)) {
+      return preparedStatement;
     }
+
+    int index = 1;
+    for (Iterator iterator = params.iterator(); iterator.hasNext(); ) {
+      PropertyHandlerFactory.addParameter(preparedStatement, index++, iterator.next());
+    }
+
     return preparedStatement;
   }
 

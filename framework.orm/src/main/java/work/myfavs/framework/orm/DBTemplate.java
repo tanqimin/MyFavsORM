@@ -18,13 +18,13 @@ public class DBTemplate
 
   //region Attributes
   //数据源
-  private DataSource                         dataSource;
+  private DataSource dataSource;
   //数据库配置
-  private DBConfig DBConfig = new DBConfig();
+  private DBConfig dbConfig;
   //数据库连接工厂
-  private Class<? extends ConnFactory> connectionFactory = null;
+  private Class<? extends ConnFactory> connectionFactory;
   //类型解析器
-  private Mapper                             mapper;
+  private Mapper mapper;
   //endregion
 
   //region Constructor
@@ -37,7 +37,7 @@ public class DBTemplate
   private DBTemplate(Builder builder) {
 
     this.dataSource = builder.dataSource;
-    this.DBConfig = builder.DBConfig;
+    this.dbConfig = builder.DBConfig;
     this.connectionFactory = builder.connectionFactory;
     this.mapper = builder.mapper;
 
@@ -86,14 +86,13 @@ public class DBTemplate
    */
   public DB beginTransaction() {
 
-    return this.beginTransaction(this.DBConfig.getDefaultIsolation());
+    return this.beginTransaction(this.dbConfig.getDefaultIsolation());
   }
 
   /**
    * 创建 Database 对象，并开启事务
    *
    * @param transactionIsolation 事务隔离级别
-   *
    * @return Database
    */
   public DB beginTransaction(int transactionIsolation) {
@@ -109,7 +108,7 @@ public class DBTemplate
   }
 
   private void setTransactionIsolation(Connection conn,
-                                       int isolation) {
+      int isolation) {
 
     try {
       conn.setTransactionIsolation(isolation);
@@ -143,16 +142,16 @@ public class DBTemplate
    *
    * @return 配置
    */
-  public DBConfig getDBConfig() {
+  public DBConfig getDbConfig() {
 
-    return DBConfig;
+    return dbConfig;
   }
 
   public static class Builder {
 
-    private DataSource    dataSource;
+    private DataSource dataSource;
     private DBConfig DBConfig;
-    public  Mapper        mapper = new Mapper();
+    public Mapper mapper = new Mapper();
 
     private Class<? extends ConnFactory> connectionFactory = JdbcConnFactory.class;
 
@@ -205,7 +204,7 @@ public class DBTemplate
     }
 
     public Mapper register(Class<?> clazz,
-                           PropertyHandler propertyHandler) {
+        PropertyHandler propertyHandler) {
 
       map.put(clazz, propertyHandler);
       return this;

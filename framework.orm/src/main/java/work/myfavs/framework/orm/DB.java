@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -63,7 +64,7 @@ public class DB
   public DB(DBTemplate dbTemplate) {
 
     this.dbTemplate = dbTemplate;
-    this.DBConfig = dbTemplate.getDBConfig();
+    this.DBConfig = dbTemplate.getDbConfig();
     this.connFactory = createConnectionFactoryInstance(this.dbTemplate.getDataSource());
 
     if (dialect == null) {
@@ -1215,6 +1216,101 @@ public class DB
    */
   public <TModel> int create(Class<TModel> modelClass,
       Collection<TModel> entities) {
+    if (CollectionUtil.isEmpty(entities)) {
+      return 0;
+    }
+
+    ClassMeta classMeta = Metadata.get(modelClass);
+
+    final boolean isMySQL = this.getDBConfig().getDbType().equals(DbType.MYSQL);
+    final boolean isIdentity = classMeta.getStrategy().equals(GenerationType.IDENTITY);
+
+    if (!isMySQL) {
+      return createInJdbcBatch(classMeta, entities);
+    }
+
+    if (isIdentity) {
+      return createInJdbcBatch(classMeta, entities);
+    }
+
+    return createInSqlBatch(classMeta, entities);
+  }
+
+  /**
+   * 使用SQL语句的批量创建方法 insert into table (f1, f2, f3) values (?,?,?),(?,?,?)...(?,?,?)
+   *
+   * @param classMeta 实体类
+   * @param entities  实体
+   * @param <TModel>  实体类类型
+   * @return 记录数
+   */
+  private <TModel> int createInSqlBatch(ClassMeta classMeta,
+      Collection<TModel> entities) {
+
+    int result = 0;
+
+    final List<AttributeMeta> updateAttributes = classMeta.getUpdateAttributes();
+    final GenerationType strategy = classMeta.getStrategy();
+    final AttributeMeta primaryKey = classMeta.checkPrimaryKey();
+    final String pkFieldName = primaryKey.getFieldName();
+
+    final List<Sql> sqlList = new ArrayList<>();
+
+    final int batchSize = this.getDBConfig().batchSize;
+    final List<List<TModel>> batchList = CollectionUtil.split(entities, batchSize);
+
+    for (Iterator<List<TModel>> ei = batchList.iterator(); ei.hasNext(); ) {
+      List<TModel> entityList = ei.next();
+
+      boolean insertClauseCompleted = false;
+      Sql insertClause = Sql.New(StrUtil.format("INSERT INTO {} (", classMeta.getTableName()));
+      Sql valuesClause = Sql.New(") VALUES ");
+
+      for (Iterator<TModel> mi = entityList.iterator(); mi.hasNext(); ) {
+        TModel entity = mi.next();
+
+        Object pkVal = ReflectUtil.getFieldValue(entity, pkFieldName);
+        if (pkVal == null) {
+          if (strategy == GenerationType.ASSIGNED) {
+            throw new DBException("Assigned ID can not be null.");
+          } else if (strategy == GenerationType.UUID) {
+            pkVal = uuid();
+          } else if (strategy == GenerationType.SNOW_FLAKE) {
+            pkVal = snowFlakeId();
+          }
+        }
+        if (insertClauseCompleted == false) {
+          insertClause.append(primaryKey.getColumnName() + ",");
+        }
+        valuesClause.append("(?,", pkVal);
+
+        for (AttributeMeta attr : updateAttributes) {
+          if (insertClauseCompleted == false) {
+            insertClause.append(attr.getColumnName() + ",");
+          }
+          valuesClause.append("?,", ReflectUtil.getFieldValue(entity, attr.getFieldName()));
+        }
+
+        if (insertClauseCompleted == false) {
+          insertClause.deleteLastChar(",");
+          insertClauseCompleted = true;
+        }
+        valuesClause.deleteLastChar(",");
+        valuesClause.append("),");
+      }
+
+      valuesClause.deleteLastChar(",");
+      sqlList.add(insertClause.append(valuesClause));
+    }
+
+    for (Sql batchSql : sqlList) {
+      result += this.execute(batchSql);
+    }
+    return result;
+  }
+
+  private <TModel> int createInJdbcBatch(ClassMeta classMeta,
+      Collection<TModel> entities) {
 
     int result = 0;
     GenerationType strategy;
@@ -1226,16 +1322,12 @@ public class DB
     Collection<Collection> paramsList;
     Collection params;
 
-    if (entities == null || entities.isEmpty()) {
-      return result;
-    }
-    ClassMeta classMeta = Metadata.get(modelClass);
     AttributeMeta primaryKey = classMeta.checkPrimaryKey();
 
     pkFieldName = primaryKey.getFieldName();
     strategy = classMeta.getStrategy();
     updateAttributes = classMeta.getUpdateAttributes();
-    sql = dialect.insert(modelClass);
+    sql = dialect.insert(classMeta.getClazz());
     paramsList = new LinkedList<>();
 
     if (strategy == GenerationType.IDENTITY) {

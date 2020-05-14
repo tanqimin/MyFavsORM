@@ -17,6 +17,7 @@ import work.myfavs.framework.orm.util.exception.DBException;
 public class ClassMeta {
 
   //region Attributes
+  private Class<?> clazz;
   private String className;
   private String tableName;
   private GenerationType strategy;
@@ -29,6 +30,16 @@ public class ClassMeta {
   //endregion
 
   //region Getter && Setter
+
+
+  public Class<?> getClazz() {
+    return clazz;
+  }
+
+  public void setClazz(Class<?> clazz) {
+    this.clazz = clazz;
+  }
+
   public String getClassName() {
 
     return className;
@@ -127,8 +138,14 @@ public class ClassMeta {
   //endregion
 
   //region Constructor
-  private ClassMeta() {
 
+  /**
+   * 构造方法
+   *
+   * @param clazz
+   */
+  private ClassMeta(Class<?> clazz) {
+    this.clazz = clazz;
   }
   //endregion
 
@@ -140,12 +157,12 @@ public class ClassMeta {
    */
   public static ClassMeta createInstance(Class<?> clazz) {
 
-    Table table;
     ClassMeta classMeta;
+    Table table;
     Field[] fields;
 
+    classMeta = new ClassMeta(clazz);
     table = clazz.getAnnotation(Table.class);
-    classMeta = new ClassMeta();
 
     if (table != null) {
       classMeta.setClassName(clazz.getName());

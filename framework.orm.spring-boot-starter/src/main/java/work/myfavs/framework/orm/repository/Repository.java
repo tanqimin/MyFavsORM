@@ -468,8 +468,8 @@ public class Repository<TModel>
    * @return 雪花值
    */
   public long snowFlakeId() {
-    final long workerId = this.dbTemplate.getDBConfig().getWorkerId();
-    final long dataCenterId = this.dbTemplate.getDBConfig().getDataCenterId();
+    final long workerId = this.dbTemplate.getDbConfig().getWorkerId();
+    final long dataCenterId = this.dbTemplate.getDbConfig().getDataCenterId();
     return PKGenerator.nextSnowFakeId(workerId,
         dataCenterId);
   }

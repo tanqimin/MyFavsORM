@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import work.myfavs.framework.example.domain.entity.Identity;
-import work.myfavs.framework.example.domain.entity.Snowflake;
 import work.myfavs.framework.example.domain.entity.Uuid;
 import work.myfavs.framework.example.domain.enums.TypeEnum;
 import work.myfavs.framework.example.repository.repo.IdentityRepository;
@@ -41,23 +40,18 @@ public class TestPKService {
   public void testTransaction()
       throws Exception {
 
-    Uuid uuid = new Uuid();
-    uuid.setCreated(new Date());
-    uuid.setName("UUID");
-    uuid.setDisable(false);
-    uuid.setPrice(new BigDecimal(199));
-    uuid.setType(TypeEnum.DRINK);
+    List<Uuid> uuidList = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+      Uuid uuid = new Uuid();
+      uuid.setCreated(new Date());
+      uuid.setName("UUID");
+      uuid.setDisable(false);
+      uuid.setPrice(new BigDecimal(199));
+      uuid.setType(TypeEnum.DRINK);
+      uuidList.add(uuid);
+    }
 
-    Snowflake snowflake = new Snowflake();
-    snowflake.setCreated(new Date());
-    snowflake.setName("UUID");
-    snowflake.setDisable(false);
-    snowflake.setPrice(new BigDecimal(199));
-    snowflake.setType(TypeEnum.DRINK);
-    snowflake.setConfig("");
-    uuidRepository.create(uuid);
-//    throwException();
-    snowflakeRepository.create(snowflake);
+    uuidRepository.create(uuidList);
   }
 
   public void throwException()
