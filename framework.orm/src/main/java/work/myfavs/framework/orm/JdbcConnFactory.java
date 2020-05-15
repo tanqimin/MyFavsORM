@@ -31,8 +31,6 @@ public class JdbcConnFactory
 
     Connection connection = getCurrentConnection();
     if (connection == null) {
-      log.debug("Could not found connection from thread local cache.");
-      log.debug("Create connection from datasource.");
       connection = createConnection();
       connectionHolder.set(connection);
       connectionDeepHolder.set(1);
@@ -41,14 +39,12 @@ public class JdbcConnFactory
       connectionDeepHolder.set(connDeep + 1);
     }
 
-    log.debug("Current connection deep : {}", connectionDeepHolder.get());
     return connection;
   }
 
   @Override
   public Connection getCurrentConnection() {
 
-    log.debug("Get connection from thread local cache.");
     return connectionHolder.get();
   }
 
@@ -56,9 +52,7 @@ public class JdbcConnFactory
   public void closeConnection(Connection connection) {
 
     final Integer connDeep = connectionDeepHolder.get();
-    log.debug("Current connection deep : {}", connDeep);
     if (connDeep == 1) {
-      log.debug("Release connection");
       Connection conn = connection == null
           ? getCurrentConnection()
           : connection;
@@ -66,7 +60,6 @@ public class JdbcConnFactory
       connectionHolder.remove();
       connectionDeepHolder.remove();
     } else {
-      log.debug("Reduce connection.");
       connectionDeepHolder.set(connDeep - 1);
     }
 

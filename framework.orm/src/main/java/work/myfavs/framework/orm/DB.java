@@ -1292,7 +1292,9 @@ public class DB
         }
 
         if (classMeta.needAppendLogicalDeleteField()) {
-          insertClause.append(classMeta.getLogicalDeleteField() + ",");
+          if (insertClauseCompleted == false) {
+            insertClause.append(classMeta.getLogicalDeleteField() + ",");
+          }
           valuesClause.append("?,", 0);
         }
 
