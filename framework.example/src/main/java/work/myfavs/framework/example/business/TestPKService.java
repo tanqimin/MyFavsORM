@@ -14,12 +14,13 @@ import work.myfavs.framework.example.domain.enums.TypeEnum;
 import work.myfavs.framework.example.repository.repo.IdentityRepository;
 import work.myfavs.framework.example.repository.repo.SnowflakeRepository;
 import work.myfavs.framework.example.repository.repo.UuidRepository;
+import work.myfavs.framework.orm.business.BaseService;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
 @Service
-public class TestPKService {
+public class TestPKService extends BaseService {
 
   private final UuidRepository uuidRepository;
   private final SnowflakeRepository snowflakeRepository;
@@ -36,7 +37,6 @@ public class TestPKService {
   }
 
 
-  @Transactional(rollbackFor = Exception.class)
   public void testTransaction()
       throws Exception {
 
@@ -50,8 +50,10 @@ public class TestPKService {
       uuid.setType(TypeEnum.DRINK);
       uuidList.add(uuid);
     }
+    super.tx(status -> {
+      uuidRepository.create(uuidList);
+    });
 
-    uuidRepository.create(uuidList);
   }
 
   public void throwException()
