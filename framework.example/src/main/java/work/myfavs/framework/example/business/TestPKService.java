@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import work.myfavs.framework.example.domain.entity.Identity;
 import work.myfavs.framework.example.domain.entity.Uuid;
@@ -37,6 +38,7 @@ public class TestPKService extends BaseService {
   }
 
 
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public void testTransaction()
       throws Exception {
 
@@ -50,7 +52,8 @@ public class TestPKService extends BaseService {
       uuid.setType(TypeEnum.DRINK);
       uuidList.add(uuid);
     }
-    super.tx(status -> {
+
+    tx(status -> {
       uuidRepository.create(uuidList);
     });
 

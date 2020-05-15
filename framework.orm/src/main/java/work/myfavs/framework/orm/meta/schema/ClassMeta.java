@@ -215,4 +215,17 @@ public class ClassMeta {
     return primaryKey;
   }
 
+  /**
+   * 检查是否需要添加逻辑删除字段包含字段
+   *
+   * @param classMeta 类元数据
+   * @return 如果不启用逻辑删除，返回false
+   */
+  public boolean needAppendLogicalDeleteField() {
+    if (!enableLogicalDelete) {
+      return false;
+    }
+
+    return !(queryAttributes.containsKey(logicalDeleteField.toLowerCase()));
+  }
 }

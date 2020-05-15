@@ -5,6 +5,8 @@ import javax.sql.DataSource;
 
 /**
  * 数据库链接工厂
+ *
+ * @author tanqimin
  */
 abstract public class ConnFactory {
 

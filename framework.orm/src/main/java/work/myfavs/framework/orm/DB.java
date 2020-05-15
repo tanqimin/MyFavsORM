@@ -1291,6 +1291,11 @@ public class DB
           valuesClause.append("?,", ReflectUtil.getFieldValue(entity, attr.getFieldName()));
         }
 
+        if (classMeta.needAppendLogicalDeleteField()) {
+          insertClause.append(classMeta.getLogicalDeleteField() + ",");
+          valuesClause.append("?,", 0);
+        }
+
         if (insertClauseCompleted == false) {
           insertClause.deleteLastChar(",");
           insertClauseCompleted = true;

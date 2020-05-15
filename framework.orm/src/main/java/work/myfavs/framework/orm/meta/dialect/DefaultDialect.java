@@ -81,7 +81,7 @@ public abstract class DefaultDialect
             ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
       }
       //自动加入逻辑删除字段
-      if (needAppendLogicalDeleteField(classMeta)) {
+      if (classMeta.needAppendLogicalDeleteField()) {
         insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
         valuesSql.append(StrUtil.format("0,"));
       }
@@ -122,7 +122,7 @@ public abstract class DefaultDialect
       }
 
       //自动加入逻辑删除字段
-      if (needAppendLogicalDeleteField(classMeta)) {
+      if (classMeta.needAppendLogicalDeleteField()) {
         insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
         valuesSql.append(StrUtil.format("0,"));
       }
@@ -198,23 +198,6 @@ public abstract class DefaultDialect
   public <TModel> Sql select(Class<TModel> clazz) {
 
     return new Sql(StrUtil.format("SELECT * FROM {}", getTableName(clazz)));
-  }
-
-  /**
-   * 检查是否需要添加逻辑删除字段包含字段
-   *
-   * @param classMeta 类元数据
-   * @return 如果不启用逻辑删除，返回false
-   */
-  protected boolean needAppendLogicalDeleteField(ClassMeta classMeta) {
-
-    if (classMeta.isEnableLogicalDelete() == false) {
-      return false;
-    }
-
-    return
-        classMeta.getQueryAttributes().containsKey(classMeta.getLogicalDeleteField().toUpperCase())
-            == false;
   }
 
 }

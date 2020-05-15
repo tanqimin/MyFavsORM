@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
+/**
+ * JDBC 连接工厂
+ *
+ * @author tanqimin
+ */
 public class JdbcConnFactory
     extends ConnFactory {
 
