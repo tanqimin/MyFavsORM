@@ -122,7 +122,7 @@ public class DB {
    *
    * @return 数据库连接
    */
-  private Connection open() {
+  public Connection open() {
 
     return getConnFactory().openConnection();
   }
@@ -130,7 +130,7 @@ public class DB {
   /**
    * 关闭数据库连接
    */
-  private void close() {
+  public void close() {
 
     getConnFactory().closeConnection(getConnFactory().getCurrentConnection());
   }
@@ -138,7 +138,7 @@ public class DB {
   /**
    * 提交事务
    */
-  private void commit() {
+  public void commit() {
 
     log.debug("Try to commit transaction.");
     try {
@@ -154,7 +154,7 @@ public class DB {
   /**
    * 回滚事务
    */
-  private void rollback() {
+  public void rollback() {
 
     log.debug("Try to rollback transaction.");
     try {
