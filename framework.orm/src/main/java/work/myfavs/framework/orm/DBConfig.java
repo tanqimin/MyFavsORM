@@ -5,30 +5,58 @@ import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.dialect.DialectFactory;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
 
+/**
+ * 数据库配置
+ *
+ * @author tanqimin
+ */
 public class DBConfig {
 
-  //数据库方言
-  protected IDialect dialect;
-  //数据库类型
-  protected String   dbType           = DbType.MYSQL;
-  //一次批量插入数据的数量
-  protected int      batchSize        = 200;
-  //查询每次抓取数据的数量
-  protected int      fetchSize        = 1000;
-  //查询超时时间，单位：秒
-  protected int      queryTimeout     = 60;
-  //是否显示SQL
-  protected boolean  showSql          = false;
-  //是否显示查询结果
-  protected boolean  showResult       = false;
-  //每页最大记录数
-  protected int      maxPageSize      = -1;
-  //默认事务级别
-  protected int      defaultIsolation = Connection.TRANSACTION_READ_COMMITTED;
-  //终端ID
-  protected long     workerId         = 1L;
-  //数据中心ID
-  protected long     dataCenterId     = 1L;
+  public final static String DEFAULT_DATASOURCE_NAME = "default";
+  /**
+   * 数据库方言
+   */
+  private IDialect dialect;
+  /**
+   * 数据库类型
+   */
+  private String dbType = DbType.MYSQL;
+  /**
+   * 一次批量插入数据的数量
+   */
+  private int batchSize = 200;
+  /**
+   * 查询每次抓取数据的数量
+   */
+  private int fetchSize = 1000;
+  /**
+   * 查询超时时间，单位：秒
+   */
+  private int queryTimeout = 60;
+  /**
+   * 是否显示SQL
+   */
+  private boolean showSql = false;
+  /**
+   * 是否显示查询结果
+   */
+  private boolean showResult = false;
+  /**
+   * 每页最大记录数
+   */
+  private int maxPageSize = -1;
+  /**
+   * 默认事务级别
+   */
+  private int defaultIsolation = Connection.TRANSACTION_READ_COMMITTED;
+  /**
+   * 终端ID
+   */
+  private long workerId = 1L;
+  /**
+   * 数据中心ID
+   */
+  private long dataCenterId = 1L;
 
   /**
    * 获取数据库方言
@@ -58,7 +86,6 @@ public class DBConfig {
    * 设置数据库类型
    *
    * @param dbType 数据库类型
-   *
    * @return Configuration
    */
   public DBConfig setDbType(String dbType) {
@@ -81,7 +108,6 @@ public class DBConfig {
    * 设置批处理大小
    *
    * @param batchSize 批处理大小
-   *
    * @return Configuration
    */
   public DBConfig setBatchSize(int batchSize) {
@@ -104,7 +130,6 @@ public class DBConfig {
    * 设置抓取数据大小
    *
    * @param fetchSize 抓取数据大小
-   *
    * @return Configuration
    */
   public DBConfig setFetchSize(int fetchSize) {
@@ -127,7 +152,6 @@ public class DBConfig {
    * 设置查询超时时间
    *
    * @param queryTimeout 查询超时时间
-   *
    * @return Configuration
    */
   public DBConfig setQueryTimeout(int queryTimeout) {
@@ -150,7 +174,6 @@ public class DBConfig {
    * 设置是否显示SQL（日志级别INFO）
    *
    * @param showSql 是否显示SQL
-   *
    * @return Configuration
    */
   public DBConfig setShowSql(boolean showSql) {
@@ -173,7 +196,6 @@ public class DBConfig {
    * 设置是否显示查询结果（日志级别INFO）
    *
    * @param showResult 是否显示查询结果
-   *
    * @return Configuration
    */
   public DBConfig setShowResult(boolean showResult) {
@@ -196,7 +218,6 @@ public class DBConfig {
    * 设置分页时每页最大记录数(小于 0 为不限制)
    *
    * @param maxPageSize 分页时每页最大记录数
-   *
    * @return Configuration
    */
   public DBConfig setMaxPageSize(int maxPageSize) {
@@ -219,7 +240,6 @@ public class DBConfig {
    * 设置默认事务隔离级别
    *
    * @param defaultIsolation 事务隔离级别
-   *
    * @return Configuration
    */
   public DBConfig setDefaultIsolation(int defaultIsolation) {
@@ -242,7 +262,6 @@ public class DBConfig {
    * 设置终端ID
    *
    * @param workerId 终端ID
-   *
    * @return Configuration
    */
   public DBConfig setWorkerId(long workerId) {
@@ -265,7 +284,6 @@ public class DBConfig {
    * 设置数据中心ID
    *
    * @param dataCenterId 数据中心ID
-   *
    * @return Configuration
    */
   public DBConfig setDataCenterId(long dataCenterId) {

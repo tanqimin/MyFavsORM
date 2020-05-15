@@ -49,6 +49,7 @@ public class Query
    * @param <TView>   结果集类型泛型
    * @return 结果集
    */
+  @Override
   public <TView> List<TView> find(Class<TView> viewClass,
       Sql sql) {
 
@@ -64,6 +65,7 @@ public class Query
    * @param <TView>   结果集类型泛型
    * @return 结果集
    */
+  @Override
   public <TView> List<TView> find(Class<TView> viewClass,
       String sql,
       Collection params) {
@@ -105,6 +107,7 @@ public class Query
    * @param <TView>   结果集类型泛型
    * @return 结果集
    */
+  @Override
   public <TView> List<TView> findTop(Class<TView> viewClass,
       int top,
       String sql,
@@ -122,6 +125,7 @@ public class Query
    * @param <TView>   结果集类型泛型
    * @return 结果集
    */
+  @Override
   public <TView> List<TView> findTop(Class<TView> viewClass,
       int top,
       Sql sql) {
@@ -179,6 +183,7 @@ public class Query
    * @param <TView>   结果集类型泛型
    * @return 记录
    */
+  @Override
   public <TView> TView get(Class<TView> viewClass,
       Sql sql) {
 
@@ -194,6 +199,7 @@ public class Query
    * @param <TView>   结果集类型泛型
    * @return 记录
    */
+  @Override
   public <TView> TView get(Class<TView> viewClass,
       String sql,
       Collection params) {
@@ -232,6 +238,7 @@ public class Query
    * @param params 参数
    * @return 行数
    */
+  @Override
   public long count(String sql,
       Collection params) {
 
@@ -244,6 +251,7 @@ public class Query
    * @param sql SQL
    * @return 行数
    */
+  @Override
   public long count(Sql sql) {
 
     return super.count(sql);
@@ -264,9 +272,7 @@ public class Query
       Collection params,
       IPageable pageable) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findPageLite(viewClass, sql, params, pageable);
-    }
+    return DB.conn(this.dbTemplate).findPageLite(viewClass, sql, params, pageable);
   }
 
   /**
@@ -282,9 +288,7 @@ public class Query
       Sql sql,
       IPageable pageable) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findPageLite(viewClass, sql, pageable);
-    }
+    return DB.conn(this.dbTemplate).findPageLite(viewClass, sql, pageable);
   }
 
   /**
@@ -306,9 +310,8 @@ public class Query
       int currentPage,
       int pageSize) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findPageLite(viewClass, sql, params, enablePage, currentPage, pageSize);
-    }
+    return DB.conn(this.dbTemplate)
+        .findPageLite(viewClass, sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
@@ -416,9 +419,8 @@ public class Query
       int currentPage,
       int pageSize) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findPage(viewClass, sql, params, enablePage, currentPage, pageSize);
-    }
+    return DB.conn(this.dbTemplate)
+        .findPage(viewClass, sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
@@ -457,9 +459,7 @@ public class Query
       Collection params,
       IPageable pageable) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findPage(viewClass, sql, params, pageable);
-    }
+    return DB.conn(this.dbTemplate).findPage(viewClass, sql, params, pageable);
   }
 
   /**
@@ -475,9 +475,7 @@ public class Query
       Sql sql,
       IPageable pageable) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findPage(viewClass, sql, pageable);
-    }
+    return DB.conn(this.dbTemplate).findPage(viewClass, sql, pageable);
   }
 
   /**

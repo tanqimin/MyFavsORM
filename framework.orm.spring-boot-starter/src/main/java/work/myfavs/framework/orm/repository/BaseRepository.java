@@ -9,6 +9,8 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 
 /**
  * 仓储基类
+ *
+ * @author tanqimin
  */
 @SuppressWarnings("unchecked")
 abstract public class BaseRepository {
@@ -36,9 +38,7 @@ abstract public class BaseRepository {
       String sql,
       Collection params) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.find(viewClass, sql, params);
-    }
+    return DB.conn(this.dbTemplate).find(viewClass, sql, params);
   }
 
   /**
@@ -52,9 +52,7 @@ abstract public class BaseRepository {
   protected <TView> List<TView> find(Class<TView> viewClass,
       Sql sql) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.find(viewClass, sql);
-    }
+    return DB.conn(this.dbTemplate).find(viewClass, sql);
   }
 
   /**
@@ -71,9 +69,7 @@ abstract public class BaseRepository {
       String keyField,
       String sql,
       Collection params) {
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findMap(viewClass, keyField, sql, params);
-    }
+    return DB.conn(this.dbTemplate).findMap(viewClass, keyField, sql, params);
   }
 
   /**
@@ -88,9 +84,7 @@ abstract public class BaseRepository {
   protected <TView> Map<Object, TView> findMap(Class<TView> viewClass,
       String keyField,
       Sql sql) {
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findMap(viewClass, keyField, sql);
-    }
+    return DB.conn(this.dbTemplate).findMap(viewClass, keyField, sql);
   }
 
   /**
@@ -108,9 +102,7 @@ abstract public class BaseRepository {
       String sql,
       Collection params) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findTop(viewClass, top, sql, params);
-    }
+    return DB.conn(this.dbTemplate).findTop(viewClass, top, sql, params);
   }
 
   /**
@@ -126,9 +118,7 @@ abstract public class BaseRepository {
       int top,
       Sql sql) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findTop(viewClass, top, sql);
-    }
+    return DB.conn(this.dbTemplate).findTop(viewClass, top, sql);
   }
 
   /**
@@ -144,9 +134,7 @@ abstract public class BaseRepository {
       String sql,
       Collection params) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.get(viewClass, sql, params);
-    }
+    return DB.conn(this.dbTemplate).get(viewClass, sql, params);
   }
 
   /**
@@ -160,9 +148,7 @@ abstract public class BaseRepository {
   protected <TView> TView get(Class<TView> viewClass,
       Sql sql) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.get(viewClass, sql);
-    }
+    return DB.conn(this.dbTemplate).get(viewClass, sql);
   }
 
   /**
@@ -175,9 +161,7 @@ abstract public class BaseRepository {
   protected long count(String sql,
       Collection params) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.count(sql, params);
-    }
+    return DB.conn(this.dbTemplate).count(sql, params);
   }
 
   /**
@@ -188,9 +172,7 @@ abstract public class BaseRepository {
    */
   protected long count(Sql sql) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.count(sql);
-    }
+    return DB.conn(this.dbTemplate).count(sql);
   }
 
 }

@@ -16,8 +16,8 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 
 public class DBTest {
 
-  String url      = "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
-  String user     = "root";
+  String url = "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
+  String user = "root";
   String password = "root";
 
   private DBTemplate dbTemplate;
@@ -35,21 +35,19 @@ public class DBTest {
     DataSource dataSource = new HikariDataSource(configuration);
 
     this.dbTemplate = new Builder().dataSource(dataSource)
-                                   .config(config -> {
-                                     config.setShowSql(true)
-                                           .setShowResult(true);
-                                   })
-                                   .build();
+        .config(config -> {
+          config.setShowSql(true)
+              .setShowResult(true);
+        })
+        .build();
   }
 
   @Test
   public void find() {
 
-    try (DB db = this.dbTemplate.open()) {
-      List<Snowfake> snowfakes = db.find(Snowfake.class, "SELECT * FROM tb_snowfake", null);
-      Assert.assertNotNull(snowfakes);
-      Assert.assertTrue(snowfakes.size() > 0);
-    }
+    List<Snowfake> snowfakes = DB.conn().find(Snowfake.class, "SELECT * FROM tb_snowflake", null);
+    Assert.assertNotNull(snowfakes);
+    Assert.assertTrue(snowfakes.size() > 0);
   }
 
   @Test
@@ -59,30 +57,29 @@ public class DBTest {
     snowfake.setName("UUI%");
     snowfake.setType(TypeEnum.DRINK);
 
-    try (DB db = this.dbTemplate.open()) {
+    DB.conn().tx(db -> {
       Snowfake res = db.getByCondition(Snowfake.class, snowfake);
       Assert.assertNotNull(res);
 
       List<Snowfake> ress = db.findByCondition(Snowfake.class, snowfake, "SNOW_DTO");
       Assert.assertNotNull(ress);
-    }
+    });
   }
 
   @Test
   public void testTransaction() {
+    Snowfake snowfake = new Snowfake();
+    snowfake.setCreated(new Date());
+    snowfake.setName("snowfake");
+    snowfake.setDisable(false);
+    snowfake.setPrice(new BigDecimal(100));
+    snowfake.setType(TypeEnum.DRINK);
 
-    try (DB db = this.dbTemplate.open()) {
-      long     count    = getCount(db);
-      Snowfake snowfake = new Snowfake();
-      snowfake.setCreated(new Date());
-      snowfake.setName("snowfake");
-      snowfake.setDisable(false);
-      snowfake.setPrice(new BigDecimal(100));
-      snowfake.setType(TypeEnum.DRINK);
+    DB.conn().tx(db -> {
+      long count = getCount(db);
       db.create(Snowfake.class, snowfake);
-
       Assert.assertEquals(++count, getCount(db));
-    }
+    });
   }
 
   private long getCount(DB db) {
@@ -246,10 +243,7 @@ public class DBTest {
     snowfake.setType(TypeEnum.DRINK);
     snowfake.setConfig("");
 
-    try (DB db = dbTemplate.open()) {
-      db.create(Snowfake.class, snowfake);
-    }
-
+    DB.conn().create(Snowfake.class, snowfake);
   }
 
   @Test

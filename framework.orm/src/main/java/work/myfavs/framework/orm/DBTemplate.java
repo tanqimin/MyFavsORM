@@ -1,30 +1,51 @@
 package work.myfavs.framework.orm;
 
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
+import work.myfavs.framework.orm.util.SqlLog;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 
-public class DBTemplate
-    implements Cloneable, AutoCloseable {
+public class DBTemplate {
+
+  private final static Map<String, DBTemplate> POOL = new ConcurrentHashMap<>();
+
+  public static DBTemplate get(String dsName) {
+    if (POOL.containsKey(dsName)) {
+      return POOL.get(dsName);
+    }
+
+    throw new DBException("The DataSource named {} not exists.", dsName);
+  }
 
   //region Attributes
-  //数据源
+  /**
+   * 数据源
+   */
   private DataSource dataSource;
-  //数据库配置
+  /**
+   * 数据库配置
+   */
   private DBConfig dbConfig;
-  //数据库连接工厂
-  private Class<? extends ConnFactory> connectionFactory;
-  //类型解析器
-  private Mapper mapper;
+  /**
+   * 数据库连接工厂
+   */
+  private ConnFactory connectionFactory;
+  /**
+   * SQL语句日志配置
+   */
+  private SqlLog sqlLog;
   //endregion
 
   //region Constructor
@@ -37,85 +58,28 @@ public class DBTemplate
   private DBTemplate(Builder builder) {
 
     this.dataSource = builder.dataSource;
-    this.dbConfig = builder.DBConfig;
-    this.connectionFactory = builder.connectionFactory;
-    this.mapper = builder.mapper;
-
+    this.dbConfig = builder.config;
+    this.connectionFactory = createConnFactory(builder.connectionFactory, builder.dataSource);
+    this.sqlLog = new SqlLog(this.dbConfig.getShowSql(), this.dbConfig.getShowResult());
     //注册 PropertyHandler
+    registerMapper(builder.mapper);
+  }
+
+  /**
+   * 注册 PropertyHandler
+   *
+   * @param mapper
+   */
+  private void registerMapper(Mapper mapper) {
     if (mapper == null || mapper.map.isEmpty()) {
       PropertyHandlerFactory.registerDefault();
-    } else {
-      for (Entry<Class<?>, PropertyHandler> entry : mapper.map.entrySet()) {
-        PropertyHandlerFactory.register(entry.getKey(), entry.getValue());
-      }
+      return;
+    }
+    for (Entry<Class<?>, PropertyHandler> entry : mapper.map.entrySet()) {
+      PropertyHandlerFactory.register(entry.getKey(), entry.getValue());
     }
   }
   //endregion
-
-
-  /**
-   * 创建 Database 对象
-   *
-   * @return Database
-   */
-  public DB open() {
-
-    return this.open(null);
-  }
-
-  private DB open(Consumer<Connection> consumer) {
-
-    DB db = new DB(this);
-    Connection connection = db.open();
-    if (consumer != null) {
-      consumer.accept(connection);
-    }
-    return db;
-  }
-
-  @Override
-  public void close() {
-
-  }
-
-
-  /**
-   * 创建 Database 对象，并开启事务
-   *
-   * @return Database
-   */
-  public DB beginTransaction() {
-
-    return this.beginTransaction(this.dbConfig.getDefaultIsolation());
-  }
-
-  /**
-   * 创建 Database 对象，并开启事务
-   *
-   * @param transactionIsolation 事务隔离级别
-   * @return Database
-   */
-  public DB beginTransaction(int transactionIsolation) {
-
-    return this.open(connection -> {
-      try {
-        connection.setAutoCommit(false);
-        connection.setTransactionIsolation(transactionIsolation);
-      } catch (SQLException e) {
-        throw new DBException(e, "Could not start the transaction, error message: ");
-      }
-    });
-  }
-
-  private void setTransactionIsolation(Connection conn,
-      int isolation) {
-
-    try {
-      conn.setTransactionIsolation(isolation);
-    } catch (SQLException e) {
-      throw new DBException(e, "Could not set the transaction isolation, error message: ");
-    }
-  }
 
   /**
    * 获取数据源
@@ -132,7 +96,7 @@ public class DBTemplate
    *
    * @return 连接工厂类
    */
-  public Class<? extends ConnFactory> getConnectionFactory() {
+  public ConnFactory getConnectionFactory() {
 
     return connectionFactory;
   }
@@ -147,11 +111,42 @@ public class DBTemplate
     return dbConfig;
   }
 
+  public SqlLog getSqlLog() {
+    return sqlLog;
+  }
+
+  /**
+   * 获取数据库连接工厂
+   *
+   * @param cls        数据库连接工厂类型
+   * @param dataSource 数据源
+   * @return 数据库连接工厂
+   */
+  private ConnFactory createConnFactory(Class<? extends ConnFactory> cls,
+      DataSource dataSource) {
+
+    try {
+      final Constructor<? extends ConnFactory> constructor = cls.getConstructor(DataSource.class);
+      return constructor.newInstance(dataSource);
+    } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+      throw new DBException(e, "Fail to create ConnectionFactory instance, error message:");
+    }
+  }
+
   public static class Builder {
 
+    private String dsName;
     private DataSource dataSource;
-    private DBConfig DBConfig;
+    private DBConfig config;
     public Mapper mapper = new Mapper();
+
+    public Builder() {
+      this(DBConfig.DEFAULT_DATASOURCE_NAME);
+    }
+
+    public Builder(String dsName) {
+      this.dsName = dsName;
+    }
 
     private Class<? extends ConnFactory> connectionFactory = JdbcConnFactory.class;
 
@@ -163,8 +158,8 @@ public class DBTemplate
 
     public Builder config(Consumer<DBConfig> consumer) {
 
-      DBConfig = new DBConfig();
-      consumer.accept(DBConfig);
+      config = new DBConfig();
+      consumer.accept(config);
       return this;
     }
 
@@ -186,10 +181,13 @@ public class DBTemplate
         throw new DBException("Please set a dataSource.");
       }
 
-      if (this.DBConfig == null) {
-        this.DBConfig = new DBConfig();
+      if (this.config == null) {
+        this.config = new DBConfig();
       }
-      return new DBTemplate(this);
+
+      return DBTemplate.POOL.computeIfAbsent(dsName, ds -> {
+        return new DBTemplate(this);
+      });
     }
 
   }

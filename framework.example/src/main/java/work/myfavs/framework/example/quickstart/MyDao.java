@@ -4,8 +4,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.List;
 import javax.sql.DataSource;
-import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.DB;
+import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
@@ -15,15 +15,13 @@ public class MyDao {
 
   static {
     DBTemplate = new DBTemplate.Builder().dataSource(getDataSource())
-                                         .build();
+        .build();
   }
 
   public List<Record> findRecord() {
 
-    try (DB db = DBTemplate.open()) {
-      Sql sql = new Sql("SELECT * FROM tb_snowfake");
-      return db.find(sql);
-    }
+    Sql sql = new Sql("SELECT * FROM tb_snowfake");
+    return DB.conn().find(sql);
   }
 
 
@@ -31,7 +29,8 @@ public class MyDao {
 
     HikariConfig configuration = new HikariConfig();
     configuration.setDriverClassName("com.mysql.jdbc.Driver");
-    configuration.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8");
+    configuration.setJdbcUrl(
+        "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8");
     configuration.setUsername("root");
     configuration.setPassword("root");
     configuration.setAutoCommit(false);

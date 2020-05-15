@@ -43,9 +43,7 @@ public class Repository<TModel>
    */
   public TModel getById(Object id) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.getById(modelClass, id);
-    }
+    return DB.conn(this.dbTemplate).getById(modelClass, id);
   }
 
   /**
@@ -58,9 +56,7 @@ public class Repository<TModel>
   public TModel getByField(String field,
       Object param) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.getByField(modelClass, field, param);
-    }
+    return DB.conn(this.dbTemplate).getByField(modelClass, field, param);
   }
 
   /**
@@ -71,9 +67,7 @@ public class Repository<TModel>
    */
   protected TModel getByCond(Cond cond) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.getByCond(modelClass, cond);
-    }
+    return DB.conn(this.dbTemplate).getByCond(modelClass, cond);
   }
 
   /**
@@ -84,9 +78,7 @@ public class Repository<TModel>
    */
   public TModel getByCondition(Object object) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.getByCondition(modelClass, object);
-    }
+    return DB.conn(this.dbTemplate).getByCondition(modelClass, object);
   }
 
   /**
@@ -171,9 +163,7 @@ public class Repository<TModel>
   public List<TModel> findByField(String field,
       Object param) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findByField(modelClass, field, param);
-    }
+    return DB.conn(this.dbTemplate).findByField(modelClass, field, param);
   }
 
   /**
@@ -186,9 +176,7 @@ public class Repository<TModel>
   public List<TModel> findByField(String field,
       Collection params) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findByField(modelClass, field, params);
-    }
+    return DB.conn(this.dbTemplate).findByField(modelClass, field, params);
   }
 
   /**
@@ -199,9 +187,7 @@ public class Repository<TModel>
    */
   protected List<TModel> findByCond(Cond cond) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findByCond(modelClass, cond);
-    }
+    return DB.conn(this.dbTemplate).findByCond(modelClass, cond);
   }
 
   /**
@@ -212,9 +198,7 @@ public class Repository<TModel>
    */
   public List<TModel> findByCondition(Object object) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findByCondition(modelClass, object);
-    }
+    return DB.conn(this.dbTemplate).findByCondition(modelClass, object);
   }
 
   /**
@@ -225,9 +209,7 @@ public class Repository<TModel>
    */
   public List<TModel> findByIds(Collection ids) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.findByIds(modelClass, ids);
-    }
+    return DB.conn(this.dbTemplate).findByIds(modelClass, ids);
   }
 
   /**
@@ -238,9 +220,7 @@ public class Repository<TModel>
    */
   public long countByCond(Cond cond) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.countByCond(modelClass, cond);
-    }
+    return DB.conn(this.dbTemplate).countByCond(modelClass, cond);
   }
 
   /**
@@ -251,9 +231,7 @@ public class Repository<TModel>
    */
   public boolean existsByCond(Cond cond) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.existsByCond(modelClass, cond);
-    }
+    return DB.conn(this.dbTemplate).existsByCond(modelClass, cond);
   }
 
   /**
@@ -275,9 +253,7 @@ public class Repository<TModel>
    */
   public int[] execute(List<Sql> sqlList) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.execute(sqlList);
-    }
+    return DB.conn(this.dbTemplate).execute(sqlList);
   }
 
   /**
@@ -290,9 +266,7 @@ public class Repository<TModel>
   public int execute(String sql,
       Collection params) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.execute(sql, params);
-    }
+    return DB.conn(this.dbTemplate).execute(sql, params);
   }
 
   /**
@@ -303,9 +277,7 @@ public class Repository<TModel>
    */
   public int create(TModel entity) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.create(modelClass, entity);
-    }
+    return DB.conn(this.dbTemplate).create(modelClass, entity);
   }
 
   /**
@@ -316,9 +288,7 @@ public class Repository<TModel>
    */
   public int create(Collection<TModel> entities) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.create(modelClass, entities);
-    }
+    return DB.conn(this.dbTemplate).create(modelClass, entities);
   }
 
   /**
@@ -329,9 +299,7 @@ public class Repository<TModel>
    */
   public int update(TModel entity) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.update(modelClass, entity);
-    }
+    return DB.conn(this.dbTemplate).update(modelClass, entity);
   }
 
   /**
@@ -344,9 +312,7 @@ public class Repository<TModel>
   public int update(TModel entity,
       String[] columns) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.update(modelClass, entity, columns);
-    }
+    return DB.conn(this.dbTemplate).update(modelClass, entity, columns);
   }
 
   /**
@@ -357,9 +323,7 @@ public class Repository<TModel>
    */
   public int updateIgnoreNull(TModel entity) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.updateIgnoreNull(modelClass, entity);
-    }
+    return DB.conn(this.dbTemplate).updateIgnoreNull(modelClass, entity);
   }
 
   /**
@@ -372,9 +336,7 @@ public class Repository<TModel>
   public int update(Collection<TModel> entities,
       String[] columns) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.update(modelClass, entities, columns);
-    }
+    return DB.conn(this.dbTemplate).update(modelClass, entities, columns);
   }
 
   /**
@@ -396,9 +358,7 @@ public class Repository<TModel>
    */
   public int delete(TModel entity) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.delete(modelClass, entity);
-    }
+    return DB.conn(this.dbTemplate).delete(modelClass, entity);
   }
 
   /**
@@ -409,9 +369,7 @@ public class Repository<TModel>
    */
   public int delete(List<TModel> entities) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.delete(modelClass, entities);
-    }
+    return DB.conn(this.dbTemplate).delete(modelClass, entities);
   }
 
   /**
@@ -422,9 +380,7 @@ public class Repository<TModel>
    */
   public int deleteById(Object id) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.deleteById(modelClass, id);
-    }
+    return DB.conn(this.dbTemplate).deleteById(modelClass, id);
   }
 
   /**
@@ -435,9 +391,7 @@ public class Repository<TModel>
    */
   protected int deleteByCond(Cond cond) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.deleteByCond(modelClass, cond);
-    }
+    return DB.conn(this.dbTemplate).deleteByCond(modelClass, cond);
   }
 
   /**
@@ -448,9 +402,7 @@ public class Repository<TModel>
    */
   public int deleteByIds(Collection ids) {
 
-    try (DB conn = this.dbTemplate.open()) {
-      return conn.deleteByIds(modelClass, ids);
-    }
+    return DB.conn(this.dbTemplate).deleteByIds(modelClass, ids);
   }
 
   /**

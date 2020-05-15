@@ -93,8 +93,8 @@ public class CondTest {
     Assert.assertEquals(cond.sql.toString(), " code IN (?,?)");
     Assert.assertEquals(2, cond.params.size());
 
-    Sql sql = Sql.select("*")
-                 .from("dept");
+    Sql sql = Sql.Select("*")
+        .from("dept");
     cond = Cond.in("code", sql);
     Assert.assertEquals(cond.sql.toString(), " code IN (SELECT * FROM dept)");
   }
@@ -118,8 +118,8 @@ public class CondTest {
     Assert.assertEquals(cond.sql.toString(), " code NOT IN (?,?)");
     Assert.assertEquals(2, cond.params.size());
 
-    Sql sql = Sql.select("*")
-                 .from("dept");
+    Sql sql = Sql.Select("*")
+        .from("dept");
     cond = Cond.notIn("code", sql);
     Assert.assertEquals(cond.sql.toString(), " code NOT IN (SELECT * FROM dept)");
   }
