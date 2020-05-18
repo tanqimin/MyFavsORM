@@ -66,18 +66,9 @@ public class ClassMeta implements Serializable {
     return clazz;
   }
 
-  public void setClazz(Class<?> clazz) {
-    this.clazz = clazz;
-  }
-
   public String getClassName() {
 
     return className;
-  }
-
-  public void setClassName(String className) {
-
-    this.className = className;
   }
 
   public String getTableName() {
@@ -87,28 +78,14 @@ public class ClassMeta implements Serializable {
     return this.tableName;
   }
 
-  public void setTableName(String tableName) {
-    this.tableName = tableName;
-  }
-
   public GenerationType getStrategy() {
 
     return strategy;
   }
 
-  public void setStrategy(GenerationType strategy) {
-
-    this.strategy = strategy;
-  }
-
   public Attribute getPrimaryKey() {
 
     return primaryKey;
-  }
-
-  public void setPrimaryKey(Attribute primaryKey) {
-
-    this.primaryKey = primaryKey;
   }
 
   public Attributes getUpdateAttributes() {
@@ -120,19 +97,9 @@ public class ClassMeta implements Serializable {
     return updateAttributes.getAttributes(columns);
   }
 
-  public void setUpdateAttributes(Attributes updateAttributes) {
-
-    this.updateAttributes = updateAttributes;
-  }
-
   public Attributes getQueryAttributes() {
 
     return queryAttributes;
-  }
-
-  public void setQueryAttributes(Attributes queryAttributes) {
-
-    this.queryAttributes = queryAttributes;
   }
 
   public boolean isEnableLogicalDelete() {
@@ -140,21 +107,9 @@ public class ClassMeta implements Serializable {
     return enableLogicalDelete;
   }
 
-  public void setEnableLogicalDelete(boolean enableLogicalDelete) {
-
-    this.enableLogicalDelete = enableLogicalDelete;
-  }
-
   public String getLogicalDeleteField() {
 
     return logicalDeleteField;
-  }
-
-  public void setLogicalDeleteField(String logicalDeleteField) {
-    if (StrUtil.isNotEmpty(logicalDeleteField)) {
-      setEnableLogicalDelete(true);
-      this.logicalDeleteField = logicalDeleteField;
-    }
   }
 
   //endregion
