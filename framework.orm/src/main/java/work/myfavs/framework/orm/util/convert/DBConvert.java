@@ -77,17 +77,11 @@ public class DBConvert {
       ResultSet rs)
       throws SQLException {
 
-    final List<TModel> list;
-
-    final ResultSetMetaData metaData;
-    String colName;
-
-    list = new ArrayList<>();
-    metaData = rs.getMetaData();
+    final List<TModel> list = new ArrayList<>();
+    final ResultSetMetaData metaData = rs.getMetaData();
 
     while (rs.next()) {
-      colName = metaData.getColumnLabel(1)
-          .toUpperCase();
+      String colName = metaData.getColumnLabel(1);
       list.add(PropertyHandlerFactory.convert(rs, colName, modelClass));
     }
     return list;
