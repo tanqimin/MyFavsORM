@@ -3,14 +3,14 @@ package work.myfavs.framework.orm.meta.dialect;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import java.util.Collection;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
-import work.myfavs.framework.orm.meta.schema.AttributeMeta;
+import work.myfavs.framework.orm.meta.schema.Attribute;
+import work.myfavs.framework.orm.meta.schema.Attributes;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 
@@ -55,8 +55,8 @@ public abstract class DefaultDialect
 
     ClassMeta classMeta;
     String tableName;
-    AttributeMeta primaryKey;
-    List<AttributeMeta> updateAttributes;
+    Attribute primaryKey;
+    Attributes updateAttributes;
 
     Sql insertSql;
     Sql valuesSql;
@@ -70,20 +70,19 @@ public abstract class DefaultDialect
     valuesSql = new Sql(StrUtil.format(" VALUES ("));
     if (classMeta.getStrategy() != GenerationType.IDENTITY) {
       insertSql.append(StrUtil.format("{},", primaryKey.getColumnName()));
-      valuesSql.append(StrUtil.format("?,"),
-          ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
+      valuesSql.append("?,", ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
     }
 
     if (updateAttributes.size() > 0) {
-      for (AttributeMeta attributeMeta : updateAttributes) {
-        insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
-        valuesSql.append(StrUtil.format("?,"),
-            ReflectUtil.getFieldValue(model, attributeMeta.getFieldName()));
-      }
+      updateAttributes.forEach((col, attr) -> {
+        insertSql.append(StrUtil.format("{},", attr.getColumnName()));
+        valuesSql.append("?,", ReflectUtil.getFieldValue(model, attr.getFieldName()));
+      });
+
       //自动加入逻辑删除字段
       if (classMeta.needAppendLogicalDeleteField()) {
         insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
-        valuesSql.append(StrUtil.format("0,"));
+        valuesSql.append("0,");
       }
       insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
       valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
@@ -97,8 +96,8 @@ public abstract class DefaultDialect
 
     ClassMeta classMeta;
     String tableName;
-    AttributeMeta primaryKey;
-    List<AttributeMeta> updateAttributes;
+    Attribute primaryKey;
+    Attributes updateAttributes;
 
     Sql insertSql;
     Sql valuesSql;
@@ -116,10 +115,10 @@ public abstract class DefaultDialect
     }
 
     if (updateAttributes.size() > 0) {
-      for (AttributeMeta attributeMeta : updateAttributes) {
-        insertSql.append(StrUtil.format("{},", attributeMeta.getColumnName()));
-        valuesSql.append(StrUtil.format("?,"));
-      }
+      updateAttributes.forEach((col, attr) -> {
+        insertSql.append(StrUtil.format("{},", attr.getColumnName()));
+        valuesSql.append("?,");
+      });
 
       //自动加入逻辑删除字段
       if (classMeta.needAppendLogicalDeleteField()) {
@@ -140,8 +139,8 @@ public abstract class DefaultDialect
 
     ClassMeta classMeta;
     String tableName;
-    AttributeMeta primaryKey;
-    List<AttributeMeta> updateAttributes;
+    Attribute primaryKey;
+    Attributes updateAttributes;
 
     Sql sql;
 
@@ -153,14 +152,15 @@ public abstract class DefaultDialect
     sql = Sql.Update(tableName).append(" SET");
 
     if (updateAttributes.size() > 0) {
-      for (AttributeMeta attributeMeta : updateAttributes) {
-        final Object fieldValue = ReflectUtil.getFieldValue(model, attributeMeta.getFieldName());
+      updateAttributes.forEach((col, attr) -> {
+        final Object fieldValue = ReflectUtil.getFieldValue(model, attr.getFieldName());
         //忽略属性为null的字段生成
         if (fieldValue == null && ignoreNullValue) {
-          continue;
+          return;
         }
-        sql.append(StrUtil.format(" {} = ?,", attributeMeta.getColumnName()), fieldValue);
-      }
+        sql.append(StrUtil.format(" {} = ?,", attr.getColumnName()), fieldValue);
+      });
+
       sql.getSql().deleteCharAt(sql.getSql().lastIndexOf(","));
     }
     sql.append(StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()),

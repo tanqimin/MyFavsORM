@@ -6,10 +6,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
-import work.myfavs.framework.orm.meta.schema.AttributeMeta;
+import work.myfavs.framework.orm.meta.schema.Attribute;
+import work.myfavs.framework.orm.meta.schema.Attributes;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 
 /**
@@ -29,13 +29,12 @@ public class DBConvert {
   public static <TModel> List<TModel> toList(Class<TModel> modelClass,
       ResultSet rs)
       throws SQLException {
-    final Map<String, AttributeMeta> attrMetas;
 
     if (modelClass == Record.class) {
       return toRecord(modelClass, rs);
     }
 
-    attrMetas = Metadata.get(modelClass)
+    final Attributes attrMetas = Metadata.get(modelClass)
         .getQueryAttributes();
 
     if (attrMetas.isEmpty() && rs.getMetaData()
@@ -48,36 +47,25 @@ public class DBConvert {
 
   private static <TModel> List<TModel> toEntity(Class<TModel> modelClass,
       ResultSet rs,
-      Map<String, AttributeMeta> attrMetas)
+      Attributes attributes)
       throws SQLException {
 
-    final List<TModel> list;
+    final List<TModel> list = new ArrayList<>();
+    final ResultSetMetaData metaData = rs.getMetaData();
+    final int columnCount = metaData.getColumnCount();
 
-    final ResultSetMetaData metaData;
-    final int columnCount;
-
-    TModel model;
-    String colName;
-    Object columnValue;
-    AttributeMeta attributeMeta;
-
-    list = new ArrayList<>();
-    metaData = rs.getMetaData();
-    columnCount = metaData.getColumnCount();
+    //找出与查询结果匹配的字段
+    final List<Attribute> existsAttrs = new ArrayList<>();
+    for (int i = 1; i <= columnCount; i++) {
+      if (attributes.containsColumn(metaData.getColumnLabel(i))) {
+        existsAttrs.add(attributes.getAttribute(metaData.getColumnLabel(i)));
+      }
+    }
 
     while (rs.next()) {
-      model = ReflectUtil.newInstance(modelClass);
-      for (int i = 1;
-          i <= columnCount;
-          i++) {
-        colName = metaData.getColumnLabel(i)
-            .toUpperCase();
-        if (!attrMetas.containsKey(colName)) {
-          continue;
-        }
-        attributeMeta = attrMetas.get(colName);
-        columnValue = attributeMeta.convert(rs);
-        ReflectUtil.setFieldValue(model, attributeMeta.getFieldName(), columnValue);
+      TModel model = ReflectUtil.newInstance(modelClass);
+      for (Attribute attr : existsAttrs) {
+        ReflectUtil.setFieldValue(model, attr.getFieldName(), attr.value(rs));
       }
       list.add(model);
     }
@@ -109,29 +97,16 @@ public class DBConvert {
       ResultSet rs)
       throws SQLException {
 
-    final List<TModel> list;
-
-    final ResultSetMetaData metaData;
-    final int columnCount;
-
-    TModel tModel;
-    String colName;
-    Object colValue;
-
-    list = new ArrayList<>();
-    metaData = rs.getMetaData();
-    columnCount = metaData.getColumnCount();
+    final List<TModel> list = new ArrayList<>();
+    final ResultSetMetaData metaData = rs.getMetaData();
+    final int columnCount = metaData.getColumnCount();
 
     while (rs.next()) {
-      tModel = ReflectUtil.newInstance(modelClass);
-      for (int i = 1;
-          i <= columnCount;
-          i++) {
-        colName = metaData.getColumnLabel(i);
-        colValue = rs.getObject(i);
-        ((Record) tModel).put(colName, rs.wasNull()
-            ? null
-            : colValue);
+      TModel tModel = ReflectUtil.newInstance(modelClass);
+      for (int i = 1; i <= columnCount; i++) {
+        String colName = metaData.getColumnLabel(i);
+        Object colValue = rs.getObject(i);
+        ((Record) tModel).put(colName, rs.wasNull() ? null : colValue);
       }
       list.add(tModel);
     }

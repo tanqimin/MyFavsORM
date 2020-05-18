@@ -1,7 +1,7 @@
-debug: true
+debug: false
 logging:
   level:
-    ROOT: debug
+    ROOT: warn
 spring:
   banner:
     charset: utf-8

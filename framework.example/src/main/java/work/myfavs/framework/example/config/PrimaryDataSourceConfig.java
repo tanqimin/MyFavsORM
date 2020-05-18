@@ -36,7 +36,7 @@ public class PrimaryDataSourceConfig {
     return new DataSourceTransactionManager(primaryDataSource());
   }
 
-  @Bean(name = "primaryDBTemplate", destroyMethod = "close")
+  @Bean(name = "primaryDBTemplate")
   public DBTemplate dbTemplate() {
 
     return new DBTemplate.Builder().dataSource(primaryDataSource())

@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 元数据构建
+ *
+ * @author tanqimin
  */
 public class Metadata {
 

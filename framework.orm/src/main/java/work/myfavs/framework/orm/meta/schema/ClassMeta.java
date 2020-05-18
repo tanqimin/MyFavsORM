@@ -1,32 +1,62 @@
 package work.myfavs.framework.orm.meta.schema;
 
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
+import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
  * 类元数据
+ *
+ * @author tanqimin
  */
-public class ClassMeta {
+public class ClassMeta implements Serializable {
+
+  private static final long serialVersionUID = -540703036198571358L;
 
   //region Attributes
-  private Class<?> clazz;
-  private String className;
-  private String tableName;
-  private GenerationType strategy;
 
-  private AttributeMeta primaryKey;                                                         //主键
-  private boolean enableLogicalDelete;                                                      //是否启用逻辑删除？
-  private String logicalDeleteField;                                                        //逻辑删除字段（数据库字段）
-  private List<AttributeMeta> updateAttributes = new Vector<>();                            //更新字段
-  private Map<String, AttributeMeta> queryAttributes = new ConcurrentHashMap<>();           //查询字段
+  /**
+   * 类型
+   */
+  private Class<?> clazz;
+  /**
+   * 类名
+   */
+  private String className;
+  /**
+   * 数据表名
+   */
+  private String tableName;
+  /**
+   * 主键生成策略
+   */
+  private GenerationType strategy;
+  /**
+   * 主键
+   */
+  private Attribute primaryKey;
+  /**
+   * 是否启用逻辑删除？
+   */
+  private boolean enableLogicalDelete;
+  /**
+   * 逻辑删除字段（数据库字段）
+   */
+  private String logicalDeleteField;
+  /**
+   * 更新字段
+   */
+  private Attributes updateAttributes = new Attributes();
+  /**
+   * 查询字段
+   */
+  private Attributes queryAttributes = new Attributes();
+
   //endregion
 
   //region Getter && Setter
@@ -51,12 +81,13 @@ public class ClassMeta {
   }
 
   public String getTableName() {
-
-    return tableName;
+    if (StrUtil.isEmpty(this.tableName)) {
+      return clazz.getSimpleName();
+    }
+    return this.tableName;
   }
 
   public void setTableName(String tableName) {
-
     this.tableName = tableName;
   }
 
@@ -70,47 +101,36 @@ public class ClassMeta {
     this.strategy = strategy;
   }
 
-  public AttributeMeta getPrimaryKey() {
+  public Attribute getPrimaryKey() {
 
     return primaryKey;
   }
 
-  public void setPrimaryKey(AttributeMeta primaryKey) {
+  public void setPrimaryKey(Attribute primaryKey) {
 
     this.primaryKey = primaryKey;
   }
 
-  public List<AttributeMeta> getUpdateAttributes() {
+  public Attributes getUpdateAttributes() {
 
     return updateAttributes;
   }
 
-  public List<AttributeMeta> getUpdateAttributes(String[] columns) {
-    if (columns == null || columns.length == 0) {
-      return updateAttributes;
-    }
-    List<AttributeMeta> res = new ArrayList<>();
-    for (String column : columns) {
-      final AttributeMeta attributeMeta = this.queryAttributes.get(column.toUpperCase());
-      if (attributeMeta == null || attributeMeta.isPrimaryKey() || attributeMeta.isReadonly()) {
-        continue;
-      }
-      res.add(attributeMeta);
-    }
-    return res;
+  public List<Attribute> getUpdateAttributes(String[] columns) {
+    return updateAttributes.getAttributes(columns);
   }
 
-  public void setUpdateAttributes(List<AttributeMeta> updateAttributes) {
+  public void setUpdateAttributes(Attributes updateAttributes) {
 
     this.updateAttributes = updateAttributes;
   }
 
-  public Map<String, AttributeMeta> getQueryAttributes() {
+  public Attributes getQueryAttributes() {
 
     return queryAttributes;
   }
 
-  public void setQueryAttributes(Map<String, AttributeMeta> queryAttributes) {
+  public void setQueryAttributes(Attributes queryAttributes) {
 
     this.queryAttributes = queryAttributes;
   }
@@ -131,8 +151,10 @@ public class ClassMeta {
   }
 
   public void setLogicalDeleteField(String logicalDeleteField) {
-
-    this.logicalDeleteField = logicalDeleteField;
+    if (StrUtil.isNotEmpty(logicalDeleteField)) {
+      setEnableLogicalDelete(true);
+      this.logicalDeleteField = logicalDeleteField;
+    }
   }
 
   //endregion
@@ -146,6 +168,40 @@ public class ClassMeta {
    */
   private ClassMeta(Class<?> clazz) {
     this.clazz = clazz;
+    this.className = clazz.getName();
+
+    final Table table = clazz.getAnnotation(Table.class);
+    if (table != null) {
+      this.strategy = table.strategy();
+      this.tableName = table.value();
+      this.enableLogicalDelete = StrUtil.isNotEmpty(table.logicalDeleteField());
+      this.logicalDeleteField = table.logicalDeleteField();
+    }
+
+    final Field[] fields = ReflectUtil.getFields(clazz);
+
+    if (fields == null || fields.length <= 0) {
+      return;
+    }
+
+    for (Field field : fields) {
+      final Attribute attr = Attribute.createInstance(field);
+      if (attr == null) {
+        continue;
+      }
+
+      this.queryAttributes.put(attr.getColumnName(), attr);
+
+      if (attr.isReadonly()) {
+        continue;
+      }
+
+      if (attr.isPrimaryKey()) {
+        this.primaryKey = attr;
+      } else {
+        this.updateAttributes.put(attr.getColumnName(), attr);
+      }
+    }
   }
   //endregion
 
@@ -156,50 +212,7 @@ public class ClassMeta {
    * @return 列元数据
    */
   public static ClassMeta createInstance(Class<?> clazz) {
-
-    ClassMeta classMeta;
-    Table table;
-    Field[] fields;
-
-    classMeta = new ClassMeta(clazz);
-    table = clazz.getAnnotation(Table.class);
-
-    if (table != null) {
-      classMeta.setClassName(clazz.getName());
-      classMeta.setStrategy(table.strategy());
-      classMeta.setTableName(table.value().isEmpty()
-          ? clazz.getSimpleName()
-          : table.value());
-      if (table.logicalDeleteField().isEmpty() == false) {
-        classMeta.setEnableLogicalDelete(true);
-        classMeta.setLogicalDeleteField(table.logicalDeleteField());
-      }
-    }
-
-    fields = ReflectUtil.getFields(clazz);
-
-    for (Field field : fields) {
-      AttributeMeta attr = AttributeMeta.createInstance(field);
-      if (attr == null) {
-        continue;
-      }
-
-      final String queryKey = attr.getColumnName().toUpperCase();
-      final boolean readonly = attr.isReadonly();
-      final boolean primaryKey = attr.isPrimaryKey();
-
-      classMeta.queryAttributes.put(queryKey, attr);
-      if (readonly) {
-        continue;
-      }
-      if (primaryKey) {
-        classMeta.setPrimaryKey(attr);
-      } else {
-        classMeta.updateAttributes.add(attr);
-      }
-    }
-
-    return classMeta;
+    return new ClassMeta(clazz);
   }
 
   /**
@@ -207,7 +220,7 @@ public class ClassMeta {
    *
    * @return 主键
    */
-  public AttributeMeta checkPrimaryKey() {
+  public Attribute checkPrimaryKey() {
 
     if (primaryKey == null) {
       throw new DBException("The view class [{}] could not contain primary key", getClassName());
@@ -218,7 +231,6 @@ public class ClassMeta {
   /**
    * 检查是否需要添加逻辑删除字段包含字段
    *
-   * @param classMeta 类元数据
    * @return 如果不启用逻辑删除，返回false
    */
   public boolean needAppendLogicalDeleteField() {
@@ -226,6 +238,6 @@ public class ClassMeta {
       return false;
     }
 
-    return !(queryAttributes.containsKey(logicalDeleteField.toLowerCase()));
+    return !(queryAttributes.containsColumn(logicalDeleteField));
   }
 }
