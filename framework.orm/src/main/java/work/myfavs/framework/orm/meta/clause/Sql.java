@@ -2,6 +2,7 @@ package work.myfavs.framework.orm.meta.clause;
 
 import cn.hutool.core.util.StrUtil;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -33,6 +34,21 @@ public class Sql
   public Sql(String sql) {
 
     super(sql);
+  }
+
+  public Sql(String sql, Object param1, Object... params) {
+    super(sql, toCollection(param1, params));
+  }
+
+  private static Collection toCollection(Object param1, Object... params) {
+    Collection pars = new ArrayList();
+    pars.add(param1);
+    if (params != null && params.length > 0) {
+      for (Object param : params) {
+        pars.add(param);
+      }
+    }
+    return pars;
   }
 
   /**

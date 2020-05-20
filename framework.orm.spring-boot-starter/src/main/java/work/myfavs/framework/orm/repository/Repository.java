@@ -137,7 +137,7 @@ public class Repository<TModel>
    * @param params 参数
    * @return Map，Key为主键值， Value为实体对象
    */
-  public Map<Object, TModel> findMap(String sql,
+  public <TKey> Map<TKey, TModel> findMap(String sql,
       Collection params) {
     final String fieldName = Metadata.get(modelClass).getPrimaryKey().getFieldName();
     return findMap(modelClass, fieldName, sql, params);
@@ -149,7 +149,7 @@ public class Repository<TModel>
    * @param sql SQL
    * @return Map，Key为主键值， Value为实体对象
    */
-  public Map<Object, TModel> findMap(Sql sql) {
+  public <TKey> Map<TKey, TModel> findMap(Sql sql) {
     return this.findMap(sql.getSqlString(), sql.getParams());
   }
 

@@ -22,7 +22,7 @@ public final class SqlCache {
 
   public static Sql put(Class<?> clazz, Opt opt, String[] columns, Sql sql) {
     final String key = getKey(clazz, opt, columns);
-    return CACHE.put(key, sql);
+    return pack(CACHE.put(key, sql));
   }
 
   public static Sql put(Class<?> clazz, Opt opt, Sql sql) {
@@ -31,7 +31,7 @@ public final class SqlCache {
 
   public static Sql get(Class<?> clazz, Opt opt, String[] columns) {
     final String key = getKey(clazz, opt, columns);
-    return Optional.ofNullable(CACHE.get(key)).map(Sql::new).orElse(null);
+    return pack(CACHE.get(key));
   }
 
   public static Sql get(Class<?> clazz, Opt opt) {
@@ -50,7 +50,7 @@ public final class SqlCache {
   public static Sql computeIfAbsent(Class<?> clazz, Opt opt, String[] columns,
       Function<String, Sql> func) {
     final String key = getKey(clazz, opt, columns);
-    return CACHE.computeIfAbsent(key, func);
+    return pack(CACHE.computeIfAbsent(key, func));
   }
 
   public static Sql computeIfAbsent(Class<?> clazz, Opt opt,
@@ -74,6 +74,16 @@ public final class SqlCache {
     }
 
     return StrUtil.format("{}_{}_{}", clazzName, optType, col);
+  }
+
+  /**
+   * 对缓存结果打包，避免引用被修改
+   *
+   * @param sql SQL
+   * @return SQL
+   */
+  private static Sql pack(Sql sql) {
+    return Optional.ofNullable(sql).map(Sql::new).orElse(null);
   }
 
   /**

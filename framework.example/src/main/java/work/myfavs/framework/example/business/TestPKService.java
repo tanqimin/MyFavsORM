@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -84,10 +85,13 @@ public class TestPKService extends BaseService {
     i2.setPrice(new BigDecimal(199.00));
     i2.setDisable(false);
 
-    entities.add(i1);
-    entities.add(i2);
+    identityRepository.create(i1);
+    identityRepository.create(i2);
 
-    identityRepository.create(entities);
+//    entities.add(i1);
+//    entities.add(i2);
+//
+//    identityRepository.create(entities);
   }
 
   @Transactional(rollbackFor = Exception.class)
@@ -110,7 +114,7 @@ public class TestPKService extends BaseService {
     return null;
   }
 
-  @Transactional()
+  @Transactional(rollbackFor = Exception.class)
   public int testBatchUpdate() {
     final List<Identity> identities = listIdentity();
     for (Identity identity : identities) {
@@ -118,5 +122,11 @@ public class TestPKService extends BaseService {
       identity.setPrice(new BigDecimal(Math.random()));
     }
     return identityRepository.update(identities, new String[]{"name", "price"});
+  }
+
+  @Transactional(readOnly = true)
+  public Map<String, Identity> findMap() {
+
+    return identityRepository.findMap();
   }
 }

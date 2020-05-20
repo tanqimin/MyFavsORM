@@ -34,6 +34,10 @@ public class DBTemplate {
 
   //region Attributes
   /**
+   * 数据源名称
+   */
+  private String dsName;
+  /**
    * 数据源
    */
   private DataSource dataSource;
@@ -60,6 +64,7 @@ public class DBTemplate {
    */
   private DBTemplate(Builder builder) {
 
+    this.dsName = builder.dsName;
     this.dataSource = builder.dataSource;
     this.dbConfig = builder.config;
     this.connectionFactory = createConnFactory(builder.connectionFactory, builder.dataSource);
@@ -83,6 +88,15 @@ public class DBTemplate {
     }
   }
   //endregion
+
+  /**
+   * 获取数据源名称
+   *
+   * @return 数据源名称
+   */
+  public String getDsName() {
+    return dsName;
+  }
 
   /**
    * 获取数据源

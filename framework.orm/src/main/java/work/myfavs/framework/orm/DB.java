@@ -272,7 +272,7 @@ public class DB {
    * @param <TView>   结果集类型泛型
    * @return Map
    */
-  public <TView> Map<Object, TView> findMap(Class<TView> viewClass,
+  public <TKey, TView> Map<TKey, TView> findMap(Class<TView> viewClass,
       String keyField, String sql,
       Collection params) {
     final PropDesc prop = BeanUtil.getBeanDesc(viewClass).getProp(keyField);
@@ -280,7 +280,7 @@ public class DB {
       throw new DBException("Class {} not exist Prop named {}", viewClass.getName(), keyField);
     }
 
-    return this.find(viewClass, sql, params).stream()
+    return this.find(viewClass, sql, params).parallelStream()
         .collect(Collectors.toMap(tView -> BeanUtil.getProperty(tView, keyField), tView -> tView));
   }
 
@@ -293,7 +293,7 @@ public class DB {
    * @param <TView>   结果集类型泛型
    * @return Map
    */
-  public <TView> Map<Object, TView> findMap(Class<TView> viewClass,
+  public <TKey, TView> Map<TKey, TView> findMap(Class<TView> viewClass,
       String keyField, Sql sql) {
     return findMap(viewClass, keyField, sql.getSqlString(), sql.getParams());
   }

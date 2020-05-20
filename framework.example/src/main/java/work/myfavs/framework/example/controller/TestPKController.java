@@ -1,6 +1,7 @@
 package work.myfavs.framework.example.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,11 @@ public class TestPKController {
   public ResponseEntity<Snowflake> get() {
 
     return new ResponseEntity<>(snowfakeQuery.getFirst(), HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/find-map", method = RequestMethod.GET)
+  public ResponseEntity<Map<String, Identity>> findMap() {
+    return new ResponseEntity<>(testPKService.findMap(), HttpStatus.OK);
   }
 
   @RequestMapping(value = "/find-identity-list-by-cond", method = RequestMethod.GET)

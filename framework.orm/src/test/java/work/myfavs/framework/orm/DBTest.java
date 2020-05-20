@@ -3,6 +3,8 @@ package work.myfavs.framework.orm;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import javax.sql.DataSource;
@@ -12,6 +14,7 @@ import org.junit.Test;
 import work.myfavs.framework.orm.DBTemplate.Builder;
 import work.myfavs.framework.orm.entity.Snowfake;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
+import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
 public class DBTest {
@@ -44,7 +47,6 @@ public class DBTest {
 
   @Test
   public void find() {
-
     List<Snowfake> snowfakes = DB.conn().find(Snowfake.class, "SELECT * FROM tb_snowflake", null);
     Assert.assertNotNull(snowfakes);
     Assert.assertTrue(snowfakes.size() > 0);
@@ -60,7 +62,6 @@ public class DBTest {
     DB.conn().tx(db -> {
       Snowfake res = db.getByCondition(Snowfake.class, snowfake);
       Assert.assertNotNull(res);
-
       List<Snowfake> ress = db.findByCondition(Snowfake.class, snowfake, "SNOW_DTO");
       Assert.assertNotNull(ress);
     });

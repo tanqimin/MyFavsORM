@@ -23,8 +23,7 @@ public class PrimaryDataSourceConfig {
   @ConfigurationProperties("spring.datasource.primary")
   public DataSource primaryDataSource() {
 
-    DruidDataSource datasource = DruidDataSourceBuilder.create()
-                                                       .build();
+    DruidDataSource datasource = DruidDataSourceBuilder.create().build();
     datasource.setDefaultAutoCommit(false);
     return datasource;
   }

@@ -65,7 +65,7 @@ abstract public class BaseRepository {
    * @param <TView>   结果集类型泛型
    * @return Map
    */
-  protected <TView> Map<Object, TView> findMap(Class<TView> viewClass,
+  protected <TKey, TView> Map<TKey, TView> findMap(Class<TView> viewClass,
       String keyField,
       String sql,
       Collection params) {
@@ -81,7 +81,7 @@ abstract public class BaseRepository {
    * @param <TView>   结果集类型泛型
    * @return Map
    */
-  protected <TView> Map<Object, TView> findMap(Class<TView> viewClass,
+  protected <TKey, TView> Map<TKey, TView> findMap(Class<TView> viewClass,
       String keyField,
       Sql sql) {
     return DB.conn(this.dbTemplate).findMap(viewClass, keyField, sql);
