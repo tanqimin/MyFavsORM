@@ -53,9 +53,6 @@ public class Attribute
   //region Getter && Setter
 
   public String getColumnName() {
-    if (StrUtil.isEmpty(this.columnName)) {
-      return this.fieldName;
-    }
     return columnName;
   }
 
@@ -104,7 +101,7 @@ public class Attribute
       attribute.fieldType = field.getType();
       attribute.readonly = column.readonly();
       attribute.primaryKey = isPrimaryKey(field);
-      attribute.columnName = column.value();
+      attribute.columnName = StrUtil.isEmpty(column.value()) ? field.getName() : column.value();
       attribute.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
     }
     return attribute;

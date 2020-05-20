@@ -72,10 +72,7 @@ public class ClassMeta implements Serializable {
   }
 
   public String getTableName() {
-    if (StrUtil.isEmpty(this.tableName)) {
-      return clazz.getSimpleName();
-    }
-    return this.tableName;
+    return tableName;
   }
 
   public GenerationType getStrategy() {
@@ -128,7 +125,7 @@ public class ClassMeta implements Serializable {
     final Table table = clazz.getAnnotation(Table.class);
     if (table != null) {
       this.strategy = table.strategy();
-      this.tableName = table.value();
+      this.tableName = StrUtil.isEmpty(table.value()) ? clazz.getSimpleName() : table.value();
       this.enableLogicalDelete = StrUtil.isNotEmpty(table.logicalDeleteField());
       this.logicalDeleteField = table.logicalDeleteField();
     }

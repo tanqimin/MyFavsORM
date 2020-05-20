@@ -3,6 +3,7 @@ package work.myfavs.framework.orm.meta.dialect;
 import cn.hutool.core.util.StrUtil;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -30,7 +31,7 @@ public final class SqlCache {
 
   public static Sql get(Class<?> clazz, Opt opt, String[] columns) {
     final String key = getKey(clazz, opt, columns);
-    return CACHE.get(key);
+    return Optional.ofNullable(CACHE.get(key)).map(Sql::new).orElse(null);
   }
 
   public static Sql get(Class<?> clazz, Opt opt) {

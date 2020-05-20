@@ -46,6 +46,10 @@ public class Sql
 
     super(sql, params);
   }
+
+  public Sql(Sql sql) {
+    super(sql.getSqlString(), sql.getParams());
+  }
   //endregion
 
   public static Sql New(String sql) {
