@@ -1553,7 +1553,7 @@ public class DB {
    * @return 影响行数
    */
   public <TModel> int update(Class<TModel> modelClass,
-      List<TModel> entities) {
+      Collection<TModel> entities) {
 
     return this.update(modelClass, entities, null);
   }
@@ -1592,7 +1592,7 @@ public class DB {
    * @return 影响行数
    */
   public <TModel> int delete(Class<TModel> modelClass,
-      List<TModel> entities) {
+      Collection<TModel> entities) {
 
     String pkFieldName;
     Object pkVal;

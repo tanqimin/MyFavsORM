@@ -4,6 +4,11 @@ import java.sql.Connection;
 import javax.sql.DataSource;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
+/**
+ * Spring 连接工厂
+ *
+ * @author tanqimin
+ */
 public class SpringConnFactory
     extends JdbcConnFactory {
 

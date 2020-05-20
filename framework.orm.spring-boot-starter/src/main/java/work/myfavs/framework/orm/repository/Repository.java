@@ -345,7 +345,7 @@ public class Repository<TModel>
    * @param entities 实体集合
    * @return 影响行数
    */
-  public int update(List<TModel> entities) {
+  public int update(Collection<TModel> entities) {
 
     return this.update(entities, null);
   }
@@ -367,7 +367,7 @@ public class Repository<TModel>
    * @param entities 实体集合
    * @return 影响行数
    */
-  public int delete(List<TModel> entities) {
+  public int delete(Collection<TModel> entities) {
 
     return DB.conn(this.dbTemplate).delete(modelClass, entities);
   }

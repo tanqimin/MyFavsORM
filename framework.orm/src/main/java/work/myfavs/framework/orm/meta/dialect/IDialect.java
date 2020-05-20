@@ -24,8 +24,7 @@ public interface IDialect {
    * @param <TModel> 实体类类型
    * @return Sql对象
    */
-  <TModel> Sql insert(Class<TModel> clazz,
-      TModel entity);
+  <TModel> Sql insert(Class<TModel> clazz, TModel entity);
 
   /**
    * 获取插入语句（不带参数）
@@ -35,16 +34,6 @@ public interface IDialect {
    * @return Sql对象
    */
   <TModel> Sql insert(Class<TModel> clazz);
-//  /**
-//   * 获取插入语句
-//   *
-//   * @param clazz    实体类Class
-//   * @param columns  列元数据集合
-//   * @param <TModel> 实体类类型
-//   *
-//   * @return Sql语句
-//   */
-//  <TModel> String create(Class<TModel> clazz, List<AttributeMeta> columns);
 
   /**
    * 获取所有记录语句
@@ -62,8 +51,7 @@ public interface IDialect {
    * @param params 参数
    * @return 返回行数语句
    */
-  Sql count(String sql,
-      Collection params);
+  Sql count(String sql, Collection params);
 
   /**
    * 获取返回行数语句
@@ -83,10 +71,7 @@ public interface IDialect {
    * @param params      参数
    * @return Sql对象
    */
-  Sql selectTop(int currentPage,
-      int pageSize,
-      String sql,
-      Collection params);
+  Sql selectTop(int currentPage, int pageSize, String sql, Collection params);
 
   /**
    * 获取更新语句
@@ -97,9 +82,7 @@ public interface IDialect {
    * @param <TModel>        实体类类型
    * @return Sql对象
    */
-  <TModel> Sql update(Class<TModel> clazz,
-      TModel model,
-      boolean ignoreNullValue);
+  <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue);
 
   /**
    * 获取删除实体语句

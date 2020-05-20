@@ -3,8 +3,6 @@ package work.myfavs.framework.orm;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,6 +15,11 @@ import work.myfavs.framework.orm.util.SqlLog;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 
+/**
+ * 数据库配置
+ *
+ * @author tanqimin
+ */
 public class DBTemplate {
 
   private final static Map<String, DBTemplate> POOL = new ConcurrentHashMap<>();

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.clause.Sql;
+import work.myfavs.framework.orm.meta.dialect.SqlCache.Opt;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.Attributes;
@@ -50,86 +51,61 @@ public abstract class DefaultDialect
   public abstract String getDialectName();
 
   @Override
-  public <TModel> Sql insert(Class<TModel> clazz,
-      TModel model) {
+  public <TModel> Sql insert(Class<TModel> clazz, TModel model) {
 
-    ClassMeta classMeta;
-    String tableName;
-    Attribute primaryKey;
-    Attributes updateAttributes;
+    Sql sql = insert(clazz);
 
-    Sql insertSql;
-    Sql valuesSql;
+    ClassMeta classMeta = Metadata.get(clazz);
+    Attribute primaryKey = classMeta.getPrimaryKey();
+    Attributes updateAttributes = classMeta.getUpdateAttributes();
 
-    classMeta = Metadata.get(clazz);
-    tableName = classMeta.getTableName();
-    primaryKey = classMeta.getPrimaryKey();
-    updateAttributes = classMeta.getUpdateAttributes();
-
-    insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
-    valuesSql = new Sql(StrUtil.format(" VALUES ("));
     if (classMeta.getStrategy() != GenerationType.IDENTITY) {
-      insertSql.append(StrUtil.format("{},", primaryKey.getColumnName()));
-      valuesSql.append("?,", ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
+      sql.getParams().add(ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
     }
 
     if (updateAttributes.size() > 0) {
       updateAttributes.forEach((col, attr) -> {
-        insertSql.append(StrUtil.format("{},", attr.getColumnName()));
-        valuesSql.append("?,", ReflectUtil.getFieldValue(model, attr.getFieldName()));
+        sql.getParams().add(ReflectUtil.getFieldValue(model, attr.getFieldName()));
       });
-
-      //自动加入逻辑删除字段
-      if (classMeta.needAppendLogicalDeleteField()) {
-        insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
-        valuesSql.append("0,");
-      }
-      insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
-      valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
     }
 
-    return insertSql.append(")").append(valuesSql).append(")");
+    return sql;
   }
 
   @Override
   public <TModel> Sql insert(Class<TModel> clazz) {
 
-    ClassMeta classMeta;
-    String tableName;
-    Attribute primaryKey;
-    Attributes updateAttributes;
+    return SqlCache.computeIfAbsent(clazz, Opt.INSERT, (key) -> {
 
-    Sql insertSql;
-    Sql valuesSql;
+      ClassMeta classMeta = Metadata.get(clazz);
+      String tableName = classMeta.getTableName();
+      Attribute primaryKey = classMeta.checkPrimaryKey();
+      Attributes updateAttributes = classMeta.getUpdateAttributes();
 
-    classMeta = Metadata.get(clazz);
-    tableName = classMeta.getTableName();
-    primaryKey = classMeta.checkPrimaryKey();
-    updateAttributes = classMeta.getUpdateAttributes();
-
-    insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
-    valuesSql = new Sql(StrUtil.format(" VALUES ("));
-    if (classMeta.getStrategy() != GenerationType.IDENTITY) {
-      insertSql.append(StrUtil.format("{},", primaryKey.getColumnName()));
-      valuesSql.append(StrUtil.format("?,"));
-    }
-
-    if (updateAttributes.size() > 0) {
-      updateAttributes.forEach((col, attr) -> {
-        insertSql.append(StrUtil.format("{},", attr.getColumnName()));
-        valuesSql.append("?,");
-      });
-
-      //自动加入逻辑删除字段
-      if (classMeta.needAppendLogicalDeleteField()) {
-        insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
-        valuesSql.append(StrUtil.format("0,"));
+      Sql insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
+      Sql valuesSql = new Sql(StrUtil.format(" VALUES ("));
+      if (classMeta.getStrategy() != GenerationType.IDENTITY) {
+        insertSql.append(StrUtil.format("{},", primaryKey.getColumnName()));
+        valuesSql.append(StrUtil.format("?,"));
       }
-      insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
-      valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
-    }
 
-    return insertSql.append(")").append(valuesSql).append(")");
+      if (updateAttributes.size() > 0) {
+        updateAttributes.forEach((col, attr) -> {
+          insertSql.append(StrUtil.format("{},", attr.getColumnName()));
+          valuesSql.append("?,");
+        });
+
+        //自动加入逻辑删除字段
+        if (classMeta.needAppendLogicalDeleteField()) {
+          insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
+          valuesSql.append(StrUtil.format("0,"));
+        }
+        insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
+        valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
+      }
+
+      return insertSql.append(")").append(valuesSql).append(")");
+    });
   }
 
   @Override
