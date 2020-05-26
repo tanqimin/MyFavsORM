@@ -1,11 +1,13 @@
 package work.myfavs.framework.orm;
 
 
+import cn.hutool.core.io.FileUtil;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
@@ -28,7 +30,8 @@ public class DBTemplate {
     if (POOL.containsKey(dsName)) {
       return POOL.get(dsName);
     }
-
+    FileUtil.exist("classpath://myfavs.properties");
+    Properties properties = new Properties();
     throw new DBException("The DataSource named {} not exists.", dsName);
   }
 

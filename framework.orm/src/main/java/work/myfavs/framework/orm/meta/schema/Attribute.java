@@ -101,7 +101,9 @@ public class Attribute
       attribute.fieldType = field.getType();
       attribute.readonly = column.readonly();
       attribute.primaryKey = isPrimaryKey(field);
-      attribute.columnName = StrUtil.isEmpty(column.value()) ? field.getName() : column.value();
+      attribute.columnName = StrUtil.isEmpty(column.value())
+          ? StrUtil.toUnderlineCase(field.getName())
+          : column.value();
       attribute.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
     }
     return attribute;

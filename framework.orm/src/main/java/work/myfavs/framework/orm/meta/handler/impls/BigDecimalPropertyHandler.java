@@ -8,7 +8,9 @@ import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 /**
- * Created by tanqimin on 2016/1/29.
+ *
+ * @author tanqimin
+ * @date 2016/1/29
  */
 public class BigDecimalPropertyHandler
     extends PropertyHandler<BigDecimal> {

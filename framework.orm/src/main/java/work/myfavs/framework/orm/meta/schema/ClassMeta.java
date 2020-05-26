@@ -125,7 +125,9 @@ public class ClassMeta implements Serializable {
     final Table table = clazz.getAnnotation(Table.class);
     if (table != null) {
       this.strategy = table.strategy();
-      this.tableName = StrUtil.isEmpty(table.value()) ? clazz.getSimpleName() : table.value();
+      this.tableName = StrUtil.isEmpty(table.value())
+          ? StrUtil.toUnderlineCase(clazz.getSimpleName())
+          : table.value();
       this.enableLogicalDelete = StrUtil.isNotEmpty(table.logicalDeleteField());
       this.logicalDeleteField = table.logicalDeleteField();
     }
