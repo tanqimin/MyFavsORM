@@ -630,6 +630,19 @@ public class Sql
   }
 
   /**
+   * 拼接 ORDER BY {field}
+   *
+   * @param field 字段，可包含排序方法，如 code DESC
+   * @return SQL
+   */
+  public Sql orderBy(String field) {
+    if (StrUtil.isNotEmpty(field)) {
+      this.append(StrUtil.format(" ORDER BY {}", field));
+    }
+    return this;
+  }
+
+  /**
    * 拼接 ORDER BY {field}, {fields[1]}... 语句
    *
    * @param field  字段，可包含排序方法，如 code DESC
