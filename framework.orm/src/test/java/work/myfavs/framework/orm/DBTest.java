@@ -3,8 +3,6 @@ package work.myfavs.framework.orm;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import javax.sql.DataSource;
@@ -14,13 +12,13 @@ import org.junit.Test;
 import work.myfavs.framework.orm.DBTemplate.Builder;
 import work.myfavs.framework.orm.entity.Snowfake;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
-import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
+import work.myfavs.framework.orm.meta.dialect.TableAlias;
 
 public class DBTest {
 
-  String url = "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
-  String user = "root";
+  String url      = "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
+  String user     = "root";
   String password = "root";
 
   private DBTemplate dbTemplate;
@@ -60,7 +58,9 @@ public class DBTest {
     snowfake.setType(TypeEnum.DRINK);
 
     DB.conn().tx(db -> {
-      Snowfake res = db.getByCondition(Snowfake.class, snowfake);
+      Snowfake res = TableAlias.function("tb_snowfake_123123", s -> db.getByCondition(Snowfake.class, snowfake));
+
+      TableAlias.clear();
       Assert.assertNotNull(res);
       List<Snowfake> ress = db.findByCondition(Snowfake.class, snowfake, "SNOW_DTO");
       Assert.assertNotNull(ress);
