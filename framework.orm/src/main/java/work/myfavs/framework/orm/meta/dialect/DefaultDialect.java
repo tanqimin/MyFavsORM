@@ -26,20 +26,19 @@ public abstract class DefaultDialect
 
   private final static Logger log = LoggerFactory.getLogger(DefaultDialect.class);
 
-  protected final Pattern P_SELECT = Pattern.compile("^\\s*SELECT\\s+", Pattern.CASE_INSENSITIVE);
-  protected final Pattern P_ORDER = Pattern
+  protected final Pattern P_SELECT        = Pattern.compile("^\\s*SELECT\\s+", Pattern.CASE_INSENSITIVE);
+  protected final Pattern P_ORDER         = Pattern
       .compile("\\s+ORDER\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  protected final Pattern P_GROUP = Pattern
+  protected final Pattern P_GROUP         = Pattern
       .compile("\\s+GROUP\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  protected final Pattern P_HAVING = Pattern
+  protected final Pattern P_HAVING        = Pattern
       .compile("\\s+HAVING\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   protected final Pattern P_SELECT_SINGLE = Pattern
       .compile("^\\s*SELECT\\s+((COUNT)\\([\\s\\S]*\\)\\s*,?)+((\\s*)|(\\s+FROM[\\s\\S]*))?$",
           Pattern.CASE_INSENSITIVE);
 
   protected static <TModel> String getTableName(Class<TModel> clazz) {
-
-    return Metadata.get(clazz).getTableName();
+    return TableAlias.getOpt().orElse(Metadata.get(clazz).getTableName());
   }
 
   /**
@@ -55,8 +54,8 @@ public abstract class DefaultDialect
 
     Sql sql = insert(clazz);
 
-    ClassMeta classMeta = Metadata.get(clazz);
-    Attribute primaryKey = classMeta.getPrimaryKey();
+    ClassMeta  classMeta        = Metadata.get(clazz);
+    Attribute  primaryKey       = classMeta.getPrimaryKey();
     Attributes updateAttributes = classMeta.getUpdateAttributes();
 
     if (classMeta.getStrategy() != GenerationType.IDENTITY) {
@@ -77,9 +76,9 @@ public abstract class DefaultDialect
 
     return SqlCache.computeIfAbsent(clazz, Opt.INSERT, (key) -> {
 
-      ClassMeta classMeta = Metadata.get(clazz);
-      String tableName = classMeta.getTableName();
-      Attribute primaryKey = classMeta.checkPrimaryKey();
+      ClassMeta  classMeta        = Metadata.get(clazz);
+      String     tableName        = TableAlias.getOpt().orElse(classMeta.getTableName());
+      Attribute  primaryKey       = classMeta.checkPrimaryKey();
       Attributes updateAttributes = classMeta.getUpdateAttributes();
 
       Sql insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
@@ -113,16 +112,16 @@ public abstract class DefaultDialect
       TModel model,
       boolean ignoreNullValue) {
 
-    ClassMeta classMeta;
-    String tableName;
-    Attribute primaryKey;
+    ClassMeta  classMeta;
+    String     tableName;
+    Attribute  primaryKey;
     Attributes updateAttributes;
 
     Sql sql;
 
-    classMeta = Metadata.get(clazz);
-    tableName = classMeta.getTableName();
-    primaryKey = classMeta.checkPrimaryKey();
+    classMeta        = Metadata.get(clazz);
+    tableName        = TableAlias.getOpt().orElse(classMeta.getTableName());
+    primaryKey       = classMeta.checkPrimaryKey();
     updateAttributes = classMeta.getUpdateAttributes();
 
     sql = Sql.Update(tableName).append(" SET");
@@ -149,7 +148,8 @@ public abstract class DefaultDialect
   public <TModel> Sql delete(Class<TModel> clazz) {
 
     ClassMeta classMeta = Metadata.get(clazz);
-    return Sql.Delete(classMeta.getTableName());
+    String    tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
+    return Sql.Delete(tableName);
   }
 
   @Override

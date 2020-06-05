@@ -26,6 +26,7 @@ import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
+import work.myfavs.framework.orm.meta.dialect.TableAlias;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.pagination.IPageable;
 import work.myfavs.framework.orm.meta.pagination.Page;
@@ -1259,7 +1260,8 @@ public class DB {
       List<TModel> entityList = ei.next();
 
       boolean insertClauseCompleted = false;
-      Sql     insertClause          = Sql.New(StrUtil.format("INSERT INTO {} (", classMeta.getTableName()));
+      String  tableName             = TableAlias.getOpt().orElse(classMeta.getTableName());
+      Sql     insertClause          = Sql.New(StrUtil.format("INSERT INTO {} (", tableName));
       Sql     valuesClause          = Sql.New(") VALUES ");
 
       for (Iterator<TModel> mi = entityList.iterator(); mi.hasNext(); ) {
@@ -1497,11 +1499,12 @@ public class DB {
 
     final int                batchSize = getDBConfig().getBatchSize();
     final List<List<TModel>> batchList = CollectionUtil.split(entities, batchSize);
+    String                   tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     List<Sql>                batchSqls = new ArrayList<>();
 
     for (Iterator<List<TModel>> ei = batchList.iterator(); ei.hasNext(); ) {
       List<TModel> entityList = ei.next();
-      Sql          sql        = Sql.Update(classMeta.getTableName()).append(" SET ");
+      Sql          sql        = Sql.Update(tableName).append(" SET ");
 
       List<Object>     ids        = new ArrayList<>();
       Map<String, Sql> setClauses = new TreeMap<>();
@@ -1637,7 +1640,8 @@ public class DB {
     ClassMeta classMeta    = Metadata.get(modelClass);
     Attribute primaryKey   = classMeta.checkPrimaryKey();
     String    pkColumnName = primaryKey.getColumnName();
-    Sql sql = Sql.Delete(classMeta.getTableName())
+    String    tableName    = TableAlias.getOpt().orElse(classMeta.getTableName());
+    Sql sql = Sql.Delete(tableName)
         .where(Cond.in(pkColumnName, new ArrayList(ids), false));
     return execute(sql);
   }
@@ -1660,15 +1664,15 @@ public class DB {
     Attribute primaryKey   = classMeta.checkPrimaryKey();
     String    pkColumnName = primaryKey.getColumnName();
 
-    Sql sql;
-
+    Sql    sql;
+    String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     if (classMeta.isEnableLogicalDelete()) {
-      sql = Sql.Update(classMeta.getTableName())
+      sql = Sql.Update(tableName)
           .set(StrUtil.format("{} = {}", classMeta.getLogicalDeleteField(), pkColumnName))
           .where(Cond.eq(pkColumnName, id))
           .and(Cond.logicalDeleteCond(classMeta));
     } else {
-      sql = Sql.Delete(classMeta.getTableName())
+      sql = Sql.Delete(tableName)
           .where(Cond.eq(pkColumnName, id));
     }
 
@@ -1692,16 +1696,14 @@ public class DB {
 
     ClassMeta classMeta = Metadata.get(modelClass);
     Sql       sql;
-
+    String    tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     if (classMeta.isEnableLogicalDelete()) {
-      sql = Sql.Update(classMeta.getTableName())
-          .set(
-              StrUtil.format("{} = {}", classMeta.getLogicalDeleteField(), classMeta.getPrimaryKey()
-                  .getColumnName()))
+      sql = Sql.Update(tableName)
+          .set(StrUtil.format("{} = {}", classMeta.getLogicalDeleteField(), classMeta.getPrimaryKey().getColumnName()))
           .where(cond)
           .and(Cond.eq(classMeta.getLogicalDeleteField(), 0));
     } else {
-      sql = Sql.Delete(classMeta.getTableName())
+      sql = Sql.Delete(tableName)
           .where(cond);
     }
 
