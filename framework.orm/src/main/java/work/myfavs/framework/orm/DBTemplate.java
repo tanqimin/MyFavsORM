@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import javax.sql.DataSource;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
+import work.myfavs.framework.orm.util.PKGenerator;
 import work.myfavs.framework.orm.util.SqlLog;
 import work.myfavs.framework.orm.util.exception.DBException;
 
@@ -39,15 +40,15 @@ public class DBTemplate {
   /**
    * 数据源名称
    */
-  private String dsName;
+  private String      dsName;
   /**
    * 数据源
    */
-  private DataSource dataSource;
+  private DataSource  dataSource;
   /**
    * 数据库配置
    */
-  private DBConfig dbConfig;
+  private DBConfig    dbConfig;
   /**
    * 数据库连接工厂
    */
@@ -55,7 +56,11 @@ public class DBTemplate {
   /**
    * SQL语句日志配置
    */
-  private SqlLog sqlLog;
+  private SqlLog      sqlLog;
+  /**
+   * 主键生成器
+   */
+  private PKGenerator pkGenerator;
   //endregion
 
   //region Constructor
@@ -67,11 +72,12 @@ public class DBTemplate {
    */
   private DBTemplate(Builder builder) {
 
-    this.dsName = builder.dsName;
-    this.dataSource = builder.dataSource;
-    this.dbConfig = builder.config;
+    this.dsName            = builder.dsName;
+    this.dataSource        = builder.dataSource;
+    this.dbConfig          = builder.config;
     this.connectionFactory = createConnFactory(builder.connectionFactory, builder.dataSource);
-    this.sqlLog = new SqlLog(this.dbConfig.getShowSql(), this.dbConfig.getShowResult());
+    this.sqlLog            = new SqlLog(this.dbConfig.getShowSql(), this.dbConfig.getShowResult());
+    this.pkGenerator       = new PKGenerator(this.dbConfig.getWorkerId(), this.dbConfig.getDataCenterId());
     //注册 PropertyHandler
     registerMapper(builder.mapper);
   }
@@ -135,6 +141,10 @@ public class DBTemplate {
     return sqlLog;
   }
 
+  public PKGenerator getPkGenerator() {
+    return pkGenerator;
+  }
+
   /**
    * 获取数据库连接工厂
    *
@@ -155,10 +165,10 @@ public class DBTemplate {
 
   public static class Builder {
 
-    private String dsName;
+    private String     dsName;
     private DataSource dataSource;
-    private DBConfig config;
-    public Mapper mapper = new Mapper();
+    private DBConfig   config;
+    public  Mapper     mapper = new Mapper();
 
     public Builder() {
       this(DBConfig.DEFAULT_DATASOURCE_NAME);

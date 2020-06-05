@@ -9,7 +9,6 @@ import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-import work.myfavs.framework.orm.util.PKGenerator;
 
 /**
  * 仓储基类
@@ -411,7 +410,7 @@ public class Repository<TModel>
    * @return UUID
    */
   public String uuid() {
-    return PKGenerator.nextUUID();
+    return this.dbTemplate.getPkGenerator().nextUUID();
   }
 
   /**
@@ -420,10 +419,7 @@ public class Repository<TModel>
    * @return 雪花值
    */
   public long snowFlakeId() {
-    final long workerId = this.dbTemplate.getDbConfig().getWorkerId();
-    final long dataCenterId = this.dbTemplate.getDbConfig().getDataCenterId();
-    return PKGenerator.nextSnowFakeId(workerId,
-        dataCenterId);
+    return this.dbTemplate.getPkGenerator().nextSnowFakeId();
   }
 
 }
