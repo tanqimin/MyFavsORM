@@ -2,6 +2,9 @@ package work.myfavs.framework.orm.meta.schema;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +14,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 字段集合封装
@@ -40,14 +44,15 @@ public class Attributes {
   }
 
   public List<Attribute> getAttributes(String[] columnNames) {
-    List<Attribute> res = new LinkedList<>();
-    if (ArrayUtil.isEmpty(columnNames)) {
-      res.addAll(map.values());
-      return res;
+    if(ArrayUtil.isNotEmpty(columnNames)){
+      return new ArrayList<>(map.values());
     }
+
+    List<Attribute> res = new LinkedList<>();
     for (String columnName : columnNames) {
-      if (containsColumn(columnName)) {
-        res.add(getAttribute(columnName));
+      final String col = StrUtil.trim(columnName);
+      if (containsColumn(col)) {
+        res.add(getAttribute(col));
       }
     }
     return res;
