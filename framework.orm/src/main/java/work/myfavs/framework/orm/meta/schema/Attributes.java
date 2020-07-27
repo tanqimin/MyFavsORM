@@ -44,7 +44,7 @@ public class Attributes {
   }
 
   public List<Attribute> getAttributes(String[] columnNames) {
-    if(ArrayUtil.isNotEmpty(columnNames)){
+    if(ArrayUtil.isEmpty(columnNames)){
       return new ArrayList<>(map.values());
     }
 
