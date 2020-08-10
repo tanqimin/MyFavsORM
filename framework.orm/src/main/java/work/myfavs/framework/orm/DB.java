@@ -110,6 +110,16 @@ public class DB {
   }
 
   /**
+   * 是否使用SQL Server数据库
+   *
+   * @return
+   */
+  private boolean isSqlServer() {
+    return StrUtil.equals(getDBConfig().getDbType(), DbType.SQL_SERVER)
+        || StrUtil.equals(getDBConfig().getDbType(), DbType.SQL_SERVER_2012);
+  }
+
+  /**
    * 获取数据库连接工厂
    *
    * @return 数据库连接工厂
@@ -1489,6 +1499,10 @@ public class DB {
       return result;
     }
 
+    if (isSqlServer()) {
+      return updateByLines(modelClass, entities, columns);
+    }
+
     ClassMeta       classMeta = Metadata.get(modelClass);
     Attribute       pk        = classMeta.checkPrimaryKey();
     List<Attribute> updAttrs  = classMeta.getUpdateAttributes(columns);
@@ -1542,6 +1556,86 @@ public class DB {
     for (Sql batchSql : batchSqls) {
       result += this.execute(batchSql);
     }
+    return result;
+  }
+
+  /**
+   * 更新实体
+   *
+   * @param modelClass 实体类型
+   * @param entities   实体集合
+   * @param columns    需要更新的列
+   * @param <TModel>   实体类型泛型
+   * @return 影响行数
+   */
+  private <TModel> int updateByLines(Class<TModel> modelClass,
+      Collection<TModel> entities,
+      String[] columns) {
+
+    int result = 0;
+
+    ClassMeta       classMeta = Metadata.get(modelClass);
+    Attribute       pk        = classMeta.checkPrimaryKey();
+    List<Attribute> updAttrs  = classMeta.getUpdateAttributes(columns);
+
+    if (updAttrs.isEmpty()) {
+      throw new DBException("Could not match update attributes.");
+    }
+
+    Sql                    sql;
+    Collection<Collection> paramsList;
+    Collection             params;
+
+    Connection        conn  = null;
+    PreparedStatement pstmt = null;
+
+    sql = Sql.Update(classMeta.getTableName())
+        .append(" SET ");
+    for (Attribute updateAttribute : updAttrs) {
+      sql.append(StrUtil.format("{} = ?,", updateAttribute.getColumnName()));
+    }
+
+    sql.getSql()
+        .deleteCharAt(sql.getSql()
+            .lastIndexOf(","));
+
+    sql.append(StrUtil.format(" WHERE {} = ?", pk.getColumnName()));
+
+    if (classMeta.isEnableLogicalDelete()) {
+      sql.append(StrUtil.format(" AND {} = 0", classMeta.getLogicalDeleteField()));
+    }
+
+    paramsList = new LinkedList<>();
+
+    for (Iterator<TModel> iterator = entities.iterator();
+        iterator.hasNext(); ) {
+      TModel entity = iterator.next();
+      params = new LinkedList<>();
+
+      for (Attribute attributeMeta : updAttrs) {
+        params.add(ReflectUtil.getFieldValue(entity, attributeMeta.getFieldName()));
+      }
+
+      params.add(ReflectUtil.getFieldValue(entity, pk.getFieldName()));
+      paramsList.add(params);
+    }
+
+    try {
+
+      getSqlLog().showBatchSql(sql.getSqlString(), paramsList);
+
+      conn   = this.open();
+      pstmt  = DBUtil.getPstForUpdate(conn, false, sql.getSqlString());
+      result = DBUtil.executeBatch(pstmt, paramsList, getDBConfig().getBatchSize());
+
+      getSqlLog().showAffectedRows(result);
+    } catch (SQLException e) {
+      throw new DBException(e);
+    } finally {
+      DBUtil.close(pstmt);
+      this.close();
+    }
+
     return result;
   }
 
