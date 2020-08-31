@@ -1233,6 +1233,17 @@ public class DB {
     final boolean isIdentity = classMeta.getStrategy().equals(GenerationType.IDENTITY);
 
     if (!isMySQL) {
+      /*
+       * 此处处理了一个MSSQL的JDBC驱动问题，当批量保存时，不能返回KEY，所以使用传统的方法遍历
+       * 请参考： @see <a href="http://stackoverflow.com/questions/13641832/getgeneratedkeys-after-preparedstatement-executebatch">stackoverflow</a>
+       */
+      if (isSqlServer() && isIdentity) {
+        int result = 0;
+        for (TModel entity : entities) {
+          result += create(modelClass, entity);
+        }
+        return result;
+      }
       return createInJdbcBatch(classMeta, entities);
     }
 
