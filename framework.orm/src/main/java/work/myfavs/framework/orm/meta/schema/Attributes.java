@@ -3,18 +3,11 @@ package work.myfavs.framework.orm.meta.schema;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * 字段集合封装
@@ -31,7 +24,40 @@ public class Attributes {
 
   private final Lock writeLock = readWriteLock.writeLock();
 
+  /**
+   * 根据实体属性名获取Attribute
+   *
+   * @param fieldName 实体属性名
+   *
+   * @return Attribute
+   */
+  public Attribute getAttributeByFieldName(String fieldName) {
+
+    Assert.notBlank(fieldName);
+
+    readLock.lock();
+
+    try {
+      for (Attribute value : map.values()) {
+        if (StrUtil.equals(value.getFieldName(), fieldName, true)) {
+          return value;
+        }
+      }
+    } finally {
+      readLock.unlock();
+    }
+    return null;
+  }
+
+  /**
+   * 根据数据库字段名获取Attribute
+   *
+   * @param columnName 数据库字段名
+   *
+   * @return Attribute
+   */
   public Attribute getAttribute(String columnName) {
+
     Assert.notBlank(columnName);
 
     final String key = columnName.toUpperCase();
@@ -44,7 +70,8 @@ public class Attributes {
   }
 
   public List<Attribute> getAttributes(String[] columnNames) {
-    if(ArrayUtil.isEmpty(columnNames)){
+
+    if (ArrayUtil.isEmpty(columnNames)) {
       return new ArrayList<>(map.values());
     }
 
@@ -59,15 +86,19 @@ public class Attributes {
   }
 
   public String[] columns() {
+
     readLock.lock();
     try {
-      return map.keySet().toArray(new String[]{});
+      return map.keySet()
+                .toArray(new String[]{});
     } finally {
       readLock.unlock();
     }
   }
 
-  public Attribute put(String columnName, Attribute value) {
+  public Attribute put(String columnName,
+                       Attribute value) {
+
     Assert.notBlank(columnName);
     Assert.notNull(value);
 
@@ -81,6 +112,7 @@ public class Attributes {
   }
 
   public void forEach(BiConsumer<String, Attribute> action) {
+
     readLock.lock();
     try {
       map.forEach(action);
@@ -90,7 +122,8 @@ public class Attributes {
   }
 
   public Attribute computeIfAbsent(String columnName,
-      Function<String, Attribute> mappingFunction) {
+                                   Function<String, Attribute> mappingFunction) {
+
     Assert.notBlank(columnName);
 
     final String key = columnName.toUpperCase();
@@ -103,6 +136,7 @@ public class Attributes {
   }
 
   public boolean containsColumn(String columnName) {
+
     final String key = columnName.toUpperCase();
 
     readLock.lock();
@@ -114,6 +148,7 @@ public class Attributes {
   }
 
   public Collection<Attribute> values() {
+
     readLock.lock();
     try {
       return map.values();
@@ -124,6 +159,7 @@ public class Attributes {
 
 
   public int size() {
+
     readLock.lock();
     try {
       return map.size();
@@ -133,6 +169,7 @@ public class Attributes {
   }
 
   public boolean isEmpty() {
+
     readLock.lock();
     try {
       return map.isEmpty();
@@ -140,4 +177,5 @@ public class Attributes {
       readLock.unlock();
     }
   }
+
 }
