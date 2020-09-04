@@ -486,7 +486,7 @@ public class DB {
       Cond cond) {
 
     Sql sql = this.getDialect().select(viewClass)
-        .where(cond)
+        .where().and(cond)
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.get(viewClass, sql);
   }
@@ -535,7 +535,7 @@ public class DB {
     ClassMeta classMeta  = Metadata.get(viewClass);
     Attribute primaryKey = classMeta.checkPrimaryKey();
     Sql sql = this.getDialect().select(viewClass)
-        .where(Cond.in(primaryKey.getColumnName(), ids, false))
+        .where().and(Cond.in(primaryKey.getColumnName(), ids, false))
         .and(Cond.logicalDeleteCond(classMeta));
     return this.find(viewClass, sql);
   }
@@ -573,7 +573,7 @@ public class DB {
       Collection params) {
 
     Sql sql = this.getDialect().select(viewClass)
-        .where(Cond.in(field, params, false))
+        .where().and(Cond.in(field, params, false))
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);
   }
@@ -590,7 +590,7 @@ public class DB {
       Cond cond) {
 
     Sql sql = this.getDialect().select(viewClass)
-        .where(cond)
+        .where().and(cond)
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);
   }
@@ -662,7 +662,7 @@ public class DB {
       Cond cond) {
 
     Sql sql = getDialect().count(viewClass)
-        .where(cond)
+        .where().and(cond)
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.get(Number.class, sql)
         .longValue();
@@ -1558,7 +1558,7 @@ public class DB {
       }
       sql.deleteLastChar(",");
 
-      sql.where(Cond.in(pk.getColumnName(), ids));
+      sql.where().and(Cond.in(pk.getColumnName(), ids));
       if (classMeta.isEnableLogicalDelete()) {
         sql.append(StrUtil.format(" AND {} = 0", classMeta.getLogicalDeleteField()));
       }
@@ -1747,7 +1747,7 @@ public class DB {
     String    pkColumnName = primaryKey.getColumnName();
     String    tableName    = TableAlias.getOpt().orElse(classMeta.getTableName());
     Sql sql = Sql.Delete(tableName)
-        .where(Cond.in(pkColumnName, new ArrayList(ids), false));
+        .where().and(Cond.in(pkColumnName, new ArrayList(ids), false));
     return execute(sql);
   }
 
@@ -1805,11 +1805,11 @@ public class DB {
     if (classMeta.isEnableLogicalDelete()) {
       sql = Sql.Update(tableName)
           .set(StrUtil.format("{} = {}", classMeta.getLogicalDeleteField(), classMeta.getPrimaryKey().getColumnName()))
-          .where(cond)
+          .where().and(cond)
           .and(Cond.eq(classMeta.getLogicalDeleteField(), 0));
     } else {
       sql = Sql.Delete(tableName)
-          .where(cond);
+          .where().and(cond);
     }
 
     return execute(sql);

@@ -78,6 +78,7 @@ public class CondTest {
   public void in() {
 
     List list = new ArrayList();
+    list.add("");
     Cond cond = Cond.in("code", list);
     Assert.assertEquals(cond.sql.toString(), "");
 
