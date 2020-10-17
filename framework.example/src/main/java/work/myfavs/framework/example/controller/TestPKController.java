@@ -2,6 +2,7 @@ package work.myfavs.framework.example.controller;
 
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,8 @@ public class TestPKController {
   private TestPKService testPKService;
 
   @RequestMapping(value = "/get", method = RequestMethod.GET)
-  public ResponseEntity<Snowflake> get() {
-
+  public ResponseEntity<Snowflake> get(HttpServletRequest request)
+  {
     return new ResponseEntity<>(snowfakeQuery.getFirst(), HttpStatus.OK);
   }
 
