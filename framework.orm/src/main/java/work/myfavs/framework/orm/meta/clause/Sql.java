@@ -132,6 +132,56 @@ public class Sql
   }
 
   /**
+   * 追加拼接 SQL
+   *
+   * @param sql SQL 对象
+   * @return 拼接后的 SQL
+   */
+  public Sql appendLine(Sql sql) {
+
+    return this.append(sql.append(System.lineSeparator()));
+  }
+
+  /**
+   * 追加拼接 SQL
+   *
+   * @param sql SQL 语句
+   * @return 拼接后的 SQL
+   */
+  public Sql appendLine(String sql) {
+
+    return this.append(sql.concat(System.lineSeparator()));
+  }
+
+  /**
+   * 追加拼接 SQL
+   *
+   * @param sql    SQL 语句
+   * @param param  参数
+   * @param params 更多的参数
+   * @return 拼接后的 SQL
+   */
+  public Sql appendLine(String sql,
+                    Object param,
+                    Object... params) {
+
+    return this.append(sql.concat(System.lineSeparator()), param, params);
+  }
+
+  /**
+   * 追加拼接 SQL
+   *
+   * @param sql    SQL 语句
+   * @param params 参数集合
+   * @return 拼接后的 SQL
+   */
+  public Sql appendLine(String sql,
+                    Collection params) {
+
+    return this.append(sql.concat(System.lineSeparator()), params);
+  }
+
+  /**
    * 创建 SELECT * 语句
    *
    * @return SQL
