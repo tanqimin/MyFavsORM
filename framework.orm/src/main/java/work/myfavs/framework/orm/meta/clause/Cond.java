@@ -338,7 +338,7 @@ public class Cond
   public static Cond in(String field,
       Sql sql) {
 
-    return new Cond(StrUtil.format(" {} IN ({})", field, sql.sql), sql.params.toArray());
+    return new Cond(StrUtil.format(" {} IN ({})", field, sql.sql), sql.params);
   }
 
   /**
@@ -389,7 +389,7 @@ public class Cond
     if (paramCnt == 1) {
       return ne(field, sqlParams.get(0));
     }
-    return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql), sqlParams.toArray());
+    return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql), sqlParams);
   }
 
   /**
@@ -402,7 +402,7 @@ public class Cond
   public static Cond notIn(String field,
       Sql sql) {
 
-    return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params.toArray());
+    return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params);
   }
 
   private static Sql createInClauseParams(Collection params) {
