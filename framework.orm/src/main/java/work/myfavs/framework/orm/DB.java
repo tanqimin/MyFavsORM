@@ -469,7 +469,7 @@ public class DB {
       Object param) {
 
     Sql sql = this.getDialect().select(viewClass)
-        .where(Cond.eq(field, param))
+        .where().and(Cond.eq(field, param))
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.get(viewClass, sql);
   }
@@ -554,7 +554,7 @@ public class DB {
       Object param) {
 
     Sql sql = this.getDialect().select(viewClass)
-        .where(Cond.eq(field, param))
+        .where().and(Cond.eq(field, param, false))
         .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
     return this.find(viewClass, sql);
   }
