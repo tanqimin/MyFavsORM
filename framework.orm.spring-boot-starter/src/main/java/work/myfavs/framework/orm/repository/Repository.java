@@ -223,6 +223,17 @@ public class Repository<TModel>
   }
 
   /**
+   * 判断实体（根据ID）是否存在
+   *
+   * @param entity 实体
+   * @return 存在返回true，不存在返回false
+   */
+  public boolean exists(TModel entity) {
+
+    return DB.conn(this.dbTemplate).exists(modelClass, entity);
+  }
+
+  /**
    * 根据条件判断是否存在符合条件的数据
    *
    * @param cond 条件
@@ -347,6 +358,16 @@ public class Repository<TModel>
   public int update(Collection<TModel> entities) {
 
     return this.update(entities, null);
+  }
+
+  /**
+   * 如果记录存在更新，不存在则创建
+   *
+   * @param entity 实体
+   * @return 影响行数
+   */
+  public int createOrUpdate(TModel entity) {
+    return DB.conn(this.dbTemplate).createOrUpdate(modelClass, entity);
   }
 
   /**

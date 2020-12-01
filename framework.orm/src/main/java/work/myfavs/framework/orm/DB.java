@@ -693,6 +693,25 @@ public class DB {
   }
 
   /**
+   * 判断实体（根据ID）是否存在
+   *
+   * @param modelClass 实体类型
+   * @param entity     实体
+   * @param <TModel>   实体类型泛型
+   * @return 存在返回true，不存在返回false
+   */
+  public <TModel> boolean exists(Class<TModel> modelClass, TModel entity) {
+    if (entity == null) {
+      return false;
+    }
+
+    Attribute primaryKey = Metadata.get(modelClass).checkPrimaryKey();
+    Object    pkVal      = ReflectUtil.getFieldValue(entity, primaryKey.getFieldName());
+    Sql       existSql   = getDialect().count(modelClass).where(Cond.eq(primaryKey.getColumnName(), pkVal));
+    return exists(existSql);
+  }
+
+  /**
    * 根据条件判断是否存在符合条件的数据
    *
    * @param viewClass 查询的数据表、视图对应的Java View类型
@@ -1662,6 +1681,22 @@ public class DB {
       Collection<TModel> entities) {
 
     return this.update(modelClass, entities, null);
+  }
+
+  /**
+   * 如果记录存在更新，不存在则创建
+   *
+   * @param modelClass 实体类型
+   * @param entities   实体集合
+   * @param <TModel>   实体类型泛型
+   * @return 影响行数
+   */
+  public <TModel> int createOrUpdate(Class<TModel> modelClass, TModel entity) {
+    if (exists(modelClass, entity)) {
+      return update(modelClass, entity);
+    } else {
+      return create(modelClass, entity);
+    }
   }
 
   /**
