@@ -12,51 +12,81 @@ import work.myfavs.framework.orm.meta.dialect.IDialect;
  */
 public class DBConfig {
 
-  public final static String DEFAULT_DATASOURCE_NAME = "default";
+  public final static String   DEFAULT_DATASOURCE_NAME = "default" ;
   /**
    * 数据库方言
    */
-  private IDialect dialect;
+  private             IDialect dialect;
   /**
    * 数据库类型
    */
-  private String dbType = DbType.MYSQL;
+  private             String   dbType                  = DbType.MYSQL;
   /**
    * 一次批量插入数据的数量
    */
-  private int batchSize = 200;
+  private             int      batchSize               = 200;
   /**
    * 查询每次抓取数据的数量
    */
-  private int fetchSize = 1000;
+  private             int      fetchSize               = 1000;
   /**
    * 查询超时时间，单位：秒
    */
-  private int queryTimeout = 60;
+  private             int      queryTimeout            = 60;
   /**
    * 是否显示SQL
    */
-  private boolean showSql = false;
+  private             boolean  showSql                 = false;
   /**
    * 是否显示查询结果
    */
-  private boolean showResult = false;
+  private             boolean  showResult              = false;
   /**
    * 每页最大记录数
    */
-  private int maxPageSize = -1;
+  private             int      maxPageSize             = -1;
   /**
    * 默认事务级别
    */
-  private int defaultIsolation = Connection.TRANSACTION_READ_COMMITTED;
+  private             int      defaultIsolation        = Connection.TRANSACTION_READ_COMMITTED;
   /**
    * 终端ID
    */
-  private long workerId = 1L;
+  private             long     workerId                = 1L;
   /**
    * 数据中心ID
    */
-  private long dataCenterId = 1L;
+  private             long     dataCenterId            = 1L;
+
+  /**
+   * 分页查询结果数据集合字段名称
+   */
+  private String pageDataField = "data" ;
+
+  /**
+   * 分页查询结果当前页码字段名称
+   */
+  private String pageCurrentField = "currentPage" ;
+
+  /**
+   * 分页查询结果每页记录数字段名称
+   */
+  private String pageSizeField = "pageSize" ;
+
+  /**
+   * 分页查询结果总页数字段名称
+   */
+  private String pageTotalPageField = "totalPages" ;
+
+  /**
+   * 分页查询结果总记录数字段名称
+   */
+  private String pageTotalRecordField = "totalRecords" ;
+
+  /**
+   * 分页查询结果是否存在下一页字段名称
+   */
+  private String pageHasNextField = "hasNext" ;
 
   /**
    * 获取数据库方言
@@ -292,4 +322,123 @@ public class DBConfig {
     return this;
   }
 
+  /**
+   * 获取分页查询结果数据集合字段名称
+   *
+   * @return 分页查询结果数据集合字段名称
+   */
+  public String getPageDataField() {
+    return pageDataField;
+  }
+
+  /**
+   * 设置分页查询结果数据集合字段名称
+   *
+   * @param pageDataField 分页查询结果数据集合字段名称
+   * @return Configuration
+   */
+  public DBConfig setPageDataField(String pageDataField) {
+    this.pageDataField = pageDataField;
+    return this;
+  }
+
+  /**
+   * 获取分页查询结果当前页码字段名称
+   *
+   * @return 分页查询结果当前页码字段名称
+   */
+  public String getPageCurrentField() {
+    return pageCurrentField;
+  }
+
+  /**
+   * 设置分页查询结果当前页码字段名称
+   *
+   * @param pageCurrentField 分页查询结果当前页码字段名称
+   * @return Configuration
+   */
+  public DBConfig setPageCurrentField(String pageCurrentField) {
+    this.pageCurrentField = pageCurrentField;
+    return this;
+  }
+
+  /**
+   * 获取分页查询结果每页记录数字段名称
+   *
+   * @return 分页查询结果每页记录数字段名称
+   */
+  public String getPageSizeField() {
+    return pageSizeField;
+  }
+
+  /**
+   * 设置分页查询结果每页记录数字段名称
+   *
+   * @param pageSizeField 分页查询结果每页记录数字段名称
+   * @return Configuration
+   */
+  public DBConfig setPageSizeField(String pageSizeField) {
+    this.pageSizeField = pageSizeField;
+    return this;
+  }
+
+  /**
+   * 获取分页查询结果总页数字段名称
+   *
+   * @return 分页查询结果总页数字段名称
+   */
+  public String getPageTotalPageField() {
+    return pageTotalPageField;
+  }
+
+  /**
+   * 设置分页查询结果总页数字段名称
+   *
+   * @param pageTotalPageField 分页查询结果总页数字段名称
+   * @return Configuration
+   */
+  public DBConfig setPageTotalPageField(String pageTotalPageField) {
+    this.pageTotalPageField = pageTotalPageField;
+    return this;
+  }
+
+  /**
+   * 获取分页查询结果总记录数字段名称
+   *
+   * @return 分页查询结果总记录数字段名称
+   */
+  public String getPageTotalRecordField() {
+    return pageTotalRecordField;
+  }
+
+  /**
+   * 设置分页查询结果总记录数字段名称
+   *
+   * @param pageTotalRecordField 分页查询结果总记录数字段名称
+   * @return Configuration
+   */
+  public DBConfig setPageTotalRecordField(String pageTotalRecordField) {
+    this.pageTotalRecordField = pageTotalRecordField;
+    return this;
+  }
+
+  /**
+   * 获取分页查询结果是否存在下一页字段名称
+   *
+   * @return 分页查询结果是否存在下一页字段名称
+   */
+  public String getPageHasNextField() {
+    return pageHasNextField;
+  }
+
+  /**
+   * 设置分页查询结果是否存在下一页字段名称
+   *
+   * @param pageHasNextField 分页查询结果是否存在下一页字段名称
+   * @return Configuration
+   */
+  public DBConfig setPageHasNextField(String pageHasNextField) {
+    this.pageHasNextField = pageHasNextField;
+    return this;
+  }
 }

@@ -49,8 +49,9 @@ public class SnowfakeQuery
   @Transactional(readOnly = true)
   public Page<Snowflake> findPage() {
 
-    return super.findPage(Snowflake.class, Sql.Select("*")
-                                             .from(META.TABLE), true, 1, 1);
+    final Page<Snowflake> page = super.findPage(Snowflake.class, Sql.Select("*")
+        .from(META.TABLE), true, 1, 1);
+    return page;
   }
 
   public Snowflake getFirst() {

@@ -13,7 +13,12 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.SpringConnFactory;
 import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.meta.handler.impls.*;
+import work.myfavs.framework.orm.meta.handler.impls.BigDecimalPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.BooleanPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.DatePropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.IntegerPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.LongPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.StringPropertyHandler;
 
 @Configuration
 public class PrimaryDataSourceConfig {
@@ -39,25 +44,31 @@ public class PrimaryDataSourceConfig {
   public DBTemplate dbTemplate() {
 
     return new DBTemplate.Builder().dataSource(primaryDataSource())
-                                   .connectionFactory(SpringConnFactory.class)
-                                   .config(config -> {
-                                     config.setDbType(DbType.MYSQL)
-                                           .setBatchSize(200)
-                                           .setFetchSize(100)
-                                           .setQueryTimeout(120)
-                                           .setDataCenterId(1L)
-                                           .setWorkerId(1L);
-                                   })
-                                   .mapping(mapper -> {
-                                     mapper.register(String.class, new StringPropertyHandler())
-                                           .register(BigDecimal.class, new BigDecimalPropertyHandler())
-                                           .register(Long.class, new LongPropertyHandler())
-                                           .register(long.class, new LongPropertyHandler(true))
-                                           .register(Boolean.class, new BooleanPropertyHandler())
-                                           .register(int.class, new IntegerPropertyHandler(true))
-                                           .register(Date.class, new DatePropertyHandler());
-                                   })
-                                   .build();
+        .connectionFactory(SpringConnFactory.class)
+        .config(config -> {
+          config.setDbType(DbType.MYSQL)
+              .setBatchSize(200)
+              .setFetchSize(100)
+              .setQueryTimeout(120)
+              .setDataCenterId(1L)
+              .setWorkerId(1L)
+              .setPageDataField("list")
+              .setPageCurrentField("pageNumber")
+              .setPageSizeField("pageSize")
+              .setPageTotalPageField("totalPage")
+              .setPageTotalRecordField("totalRow")
+              .setPageHasNextField("next");
+        })
+        .mapping(mapper -> {
+          mapper.register(String.class, new StringPropertyHandler())
+              .register(BigDecimal.class, new BigDecimalPropertyHandler())
+              .register(Long.class, new LongPropertyHandler())
+              .register(long.class, new LongPropertyHandler(true))
+              .register(Boolean.class, new BooleanPropertyHandler())
+              .register(int.class, new IntegerPropertyHandler(true))
+              .register(Date.class, new DatePropertyHandler());
+        })
+        .build();
   }
 
 }

@@ -769,7 +769,7 @@ public class DB {
     querySql = getDialect().selectTop(currentPage, pagSize, sql, params);
     data     = this.find(viewClass, querySql);
 
-    return PageLite.createInstance(data, currentPage, pagSize);
+    return PageLite.createInstance(this.dbTemplate, data, currentPage, pagSize);
 
   }
 
@@ -958,7 +958,7 @@ public class DB {
 //      return findPage(viewClass, sql, params, true, totalPages, pagSize);
 //    }
 
-    return Page.createInstance(data, currentPage, pagSize, totalPages, totalRecords);
+    return Page.createInstance(this.dbTemplate, data, currentPage, pagSize, totalPages, totalRecords);
   }
 
   /**
@@ -1687,7 +1687,7 @@ public class DB {
    * 如果记录存在更新，不存在则创建
    *
    * @param modelClass 实体类型
-   * @param entities   实体集合
+   * @param entity   实体集合
    * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
