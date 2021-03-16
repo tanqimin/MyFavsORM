@@ -36,7 +36,7 @@ Sql sql = new Sql("SELECT * FROM tb_product");
 List<Record> list = DB.conn().find(sql);
 ```
 
-## 详细使用
+## 使用入门
 
 ### 查询
 
@@ -92,7 +92,7 @@ Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.eq("id", 1L));
 Sql sql = new Sql().select("*").from("tb_product").where(Cond.eq("id", 1L));
 ```
 
-##### 条件构建类`Cond`
+##### 条件构建类Cond
 
 对于系统中，大家会发现where、and、or等方法中的参数，都是条件构建器`Cond`：
 
@@ -264,6 +264,34 @@ Db.conn().tx(db -> {
     db.update(p1);
     db.delete(p2);
 });
+```
+
+
+
+## 高级使用
+
+### 同构表（分表）查询
+
+在一些业务场景需要使用另外一个同构表进行操作，可以使用TableAlias类进行操作，假设我们需要根据用户区域进行分表，原始数据表为order，分表为order_1
+
+```java
+TableAlias.set("order_1");
+Order order = db.getById(Order.class, id);
+//此时查询的语句为：select * from order_1 where id = ?
+TableAlias.clear();		//用完后记得调用clear()方法恢复原表名哦
+
+Order order = db.getById(Order.class, id);
+//此时查询的语句为：select * from order where id = ?
+```
+
+也可以使用以下方式查询：
+
+```java
+Order order = TableAlias.function("order_1", s -> db.getById(Order.class, id));
+//此时查询的语句为：select * from order_1 where id = ?
+
+Order order = db.getById(Order.class, id);
+//此时查询的语句为：select * from order where id = ?
 ```
 
 

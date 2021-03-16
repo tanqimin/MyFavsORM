@@ -22,7 +22,7 @@ public class TableAlias {
     return Optional.ofNullable(get());
   }
 
-  private static void set(String tableName) {
+  public static void set(String tableName) {
     TABLE_ALIAS_POOL.set(tableName);
   }
 
