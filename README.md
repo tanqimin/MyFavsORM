@@ -260,7 +260,7 @@ DB.conn().deleteByIds(params);
 ### 事务
 
 ```java
-Db.conn().tx(db -> {
+DB.conn().tx(db -> {
     db.update(p1);
     db.delete(p2);
 });
