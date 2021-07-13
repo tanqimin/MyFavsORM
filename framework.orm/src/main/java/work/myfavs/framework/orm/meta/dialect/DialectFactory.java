@@ -22,7 +22,7 @@ public class DialectFactory {
     map.put(DbType.MYSQL, new MySqlDialect());
     map.put(DbType.H2, new H2Dialect());
     map.put(DbType.POSTGRE_SQL, new PostgreSQLDialect());
-    map.put(DbType.ORACLE, new PostgreSQLDialect());
+    map.put(DbType.ORACLE, new OracleDialect());
   }
 
   private DialectFactory() {
