@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -176,6 +177,33 @@ public class DB {
     }
 
     log.debug("The transaction rollback was successful.");
+  }
+
+  /**
+   * 调用存储过程
+   *
+   * @param sql       调用存储过程语句，如：{ call proc_name(?,?,?)}
+   * @param func      func
+   * @param <TResult> 结果
+   * @return TResult
+   */
+  public <TResult> TResult call(String sql, Function<CallableStatement, TResult> func) {
+    Connection        conn = null;
+    CallableStatement cs   = null;
+
+    try {
+      conn = this.open();
+      cs   = conn.prepareCall(sql);
+      getSqlLog().showSql(sql, null);
+      final TResult result = func.apply(cs);
+      getSqlLog().showResult(result);
+      return result;
+    } catch (SQLException e) {
+      throw new DBException(e);
+    } finally {
+      DBUtil.close(cs);
+      this.close();
+    }
   }
 
   /**
@@ -1687,7 +1715,7 @@ public class DB {
    * 如果记录存在更新，不存在则创建
    *
    * @param modelClass 实体类型
-   * @param entity   实体集合
+   * @param entity     实体集合
    * @param <TModel>   实体类型泛型
    * @return 影响行数
    */

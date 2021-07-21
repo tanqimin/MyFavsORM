@@ -19,7 +19,7 @@ public class SqlLog {
   public SqlLog(boolean showSql,
       boolean showResult) {
 
-    this.showSql = showSql;
+    this.showSql    = showSql;
     this.showResult = showResult;
   }
 
@@ -129,4 +129,24 @@ public class SqlLog {
     log.debug(logStr.toString());
   }
 
+  public <TView> void showResult(TView result) {
+    if (showResult == false) {
+      return;
+    }
+    if (log.isDebugEnabled()) {
+      return;
+    }
+
+    StringBuilder logStr = new StringBuilder();
+    logStr.append(System.lineSeparator());
+    logStr.append("################# MYFAVS ORM SHOW RESULT #################");
+    logStr.append(System.lineSeparator());
+    logStr.append(System.lineSeparator());
+    logStr.append(" QUERY RESULT:" + JSON.toJSONString(result));
+
+    logStr.append(System.lineSeparator());
+    logStr.append(System.lineSeparator());
+    logStr.append("##########################################################");
+    log.debug(logStr.toString());
+  }
 }
