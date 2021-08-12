@@ -43,6 +43,7 @@ import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
  * 数据库操作对象
+ * @author tanqimin
  */
 @SuppressWarnings("unchecked")
 public class DB {

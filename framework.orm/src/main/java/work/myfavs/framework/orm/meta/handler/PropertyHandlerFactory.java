@@ -1,7 +1,11 @@
 package work.myfavs.framework.orm.meta.handler;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -9,21 +13,35 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import work.myfavs.framework.orm.meta.handler.impls.*;
+import work.myfavs.framework.orm.meta.handler.impls.BigDecimalPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.BlobPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.BooleanPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.ByteArrayPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.BytePropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.ClobPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.DatePropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.DoublePropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.EnumPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.FloatPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.IntegerPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.LocalDatePropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.LocalDateTimePropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.LocalTimePropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.LongPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.ObjectPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.ShortPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.StringPropertyHandler;
+import work.myfavs.framework.orm.meta.handler.impls.UUIDPropertyHandler;
 
 public class PropertyHandlerFactory {
 
-  private final static Map<String, PropertyHandler<?>> HANDLER_MAP             = new HashMap<>();
-  private final static EnumPropertyHandler             ENUM_PROPERTY_HANDLER   = new EnumPropertyHandler();
-  private final static ObjectPropertyHandler           OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
+  private static final Map<String, PropertyHandler<?>> HANDLER_MAP = new HashMap<>();
+  private static final EnumPropertyHandler ENUM_PROPERTY_HANDLER = new EnumPropertyHandler();
+  private static final ObjectPropertyHandler OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
 
-  private PropertyHandlerFactory() {
+  private PropertyHandlerFactory() {}
 
-  }
-
-  /**
-   * 注册默认的PropertyHandler
-   */
+  /** 注册默认的PropertyHandler */
   public static void registerDefault() {
 
     register(String.class, new StringPropertyHandler());
@@ -63,11 +81,10 @@ public class PropertyHandlerFactory {
   /**
    * 注册解析器类型
    *
-   * @param clazz           Class
+   * @param clazz Class
    * @param propertyHandler PropertyHandler
    */
-  public static void register(Class<?> clazz,
-                              PropertyHandler propertyHandler) {
+  public static void register(Class<?> clazz, PropertyHandler propertyHandler) {
 
     HANDLER_MAP.put(clazz.getName(), propertyHandler);
   }
@@ -80,24 +97,19 @@ public class PropertyHandlerFactory {
   public static void register(Map<Class<?>, PropertyHandler> map) {
 
     for (Entry<Class<?>, PropertyHandler> entry : map.entrySet()) {
-      HANDLER_MAP.put(entry.getKey()
-                           .getName(), entry.getValue());
+      HANDLER_MAP.put(entry.getKey().getName(), entry.getValue());
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T convert(ResultSet rs,
-                              String columnName,
-                              Class<T> tClass)
+  public static <T> T convert(ResultSet rs, String columnName, Class<T> tClass)
       throws SQLException {
 
     return (T) getInstance(tClass).convert(rs, columnName, tClass);
   }
 
   @SuppressWarnings("unchecked")
-  public static void addParameter(PreparedStatement ps,
-                                  int index,
-                                  Object param)
+  public static void addParameter(PreparedStatement ps, int index, Object param)
       throws SQLException {
 
     if (param == null) {
@@ -121,5 +133,4 @@ public class PropertyHandlerFactory {
 
     return OBJECT_PROPERTY_HANDLER;
   }
-
 }

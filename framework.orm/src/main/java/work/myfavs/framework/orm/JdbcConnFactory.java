@@ -13,10 +13,9 @@ import work.myfavs.framework.orm.util.exception.DBException;
  *
  * @author tanqimin
  */
-public class JdbcConnFactory
-    extends ConnFactory {
+public class JdbcConnFactory extends ConnFactory {
 
-  private final static Logger log = LoggerFactory.getLogger(JdbcConnFactory.class);
+  private static final Logger log = LoggerFactory.getLogger(JdbcConnFactory.class);
 
   private final ThreadLocal<Connection> connectionHolder = new ThreadLocal<>();
   private final ThreadLocal<Integer> connectionDeepHolder = new ThreadLocal<>();
@@ -31,12 +30,11 @@ public class JdbcConnFactory
 
     Connection connection = getCurrentConnection();
     if (connection == null) {
+      connectionDeepHolder.set(1);
       connection = createConnection();
       connectionHolder.set(connection);
-      connectionDeepHolder.set(1);
     } else {
-      Integer connDeep = connectionDeepHolder.get();
-      connectionDeepHolder.set(connDeep + 1);
+      connectionDeepHolder.set(connectionDeepHolder.get() + 1);
     }
 
     return connection;
@@ -53,16 +51,13 @@ public class JdbcConnFactory
 
     final Integer connDeep = connectionDeepHolder.get();
     if (connDeep == 1) {
-      Connection conn = connection == null
-          ? getCurrentConnection()
-          : connection;
+      Connection conn = connection == null ? getCurrentConnection() : connection;
       releaseConnection(conn);
       connectionHolder.remove();
       connectionDeepHolder.remove();
     } else {
       connectionDeepHolder.set(connDeep - 1);
     }
-
   }
 
   /**
@@ -86,14 +81,7 @@ public class JdbcConnFactory
    */
   protected void releaseConnection(Connection conn) {
 
-    try {
-      if (conn.getAutoCommit() == false) {
-        conn.commit();
-      }
-    } catch (SQLException e) {
-      throw new DBException(e, "Fail to committed transaction, error message : ");
-    }
+    DBUtil.commit(conn);
     DBUtil.close(conn);
   }
-
 }
