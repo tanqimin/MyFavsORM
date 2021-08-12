@@ -1,16 +1,11 @@
 package work.myfavs.framework.orm.meta.dialect;
 
-
 import java.util.Collection;
 import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
-/**
- * @author tanqimin
- */
-public class OracleDialect
-    extends DefaultDialect {
+/** @author tanqimin */
+public class OracleDialect extends DefaultDialect {
 
   @Override
   public String getDialectName() {
@@ -19,15 +14,11 @@ public class OracleDialect
   }
 
   @Override
-  public Sql selectTop(int currentPage,
-      int pageSize,
-      String sql,
-      Collection params) {
+  public Sql selectTop(int currentPage, int pageSize, String sql, Collection params) {
 
     if (currentPage == 1 && pageSize == 1) {
-      //如果sql本身只返回一个结果
-      if (P_SELECT_SINGLE.matcher(sql)
-          .find()) {
+      // 如果sql本身只返回一个结果
+      if (P_SELECT_SINGLE.matcher(sql).find()) {
         return new Sql(sql, params);
       }
     }
@@ -37,7 +28,8 @@ public class OracleDialect
     }
 
     int offset = pageSize * (currentPage - 1);
-    //"SELECT * FROM ( SELECT row_.*, ROWNUM rownum_ FROM (  " + sql + " ) row_ WHERE ROWNUM <= " + end + ") paginate_alias" + " WHERE paginate_alias.rownum_ >= " + start
+    // "SELECT * FROM ( SELECT row_.*, ROWNUM rownum_ FROM (  " + sql + " ) row_ WHERE ROWNUM <= " +
+    // end + ") paginate_alias" + " WHERE paginate_alias.rownum_ >= " + start
 
     Sql querySql = new Sql();
     querySql.append("SELECT * FROM ( SELECT row_.*, ROWNUM rownum_ FROM (");
@@ -47,5 +39,4 @@ public class OracleDialect
 
     return querySql;
   }
-
 }

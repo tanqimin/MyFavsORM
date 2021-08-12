@@ -1,6 +1,5 @@
 package work.myfavs.framework.example;
 
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -11,8 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @ServletComponentScan
 @SpringBootApplication
-public class Application
-    extends SpringBootServletInitializer {
+public class Application extends SpringBootServletInitializer {
 
   // Spring应用启动起来
   public static void main(String[] args) {
@@ -25,5 +23,4 @@ public class Application
 
     return builder.sources(Application.class);
   }
-
 }

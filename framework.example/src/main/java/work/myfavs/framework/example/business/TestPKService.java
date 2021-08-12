@@ -29,7 +29,8 @@ public class TestPKService extends BaseService {
   private final IdentityRepository identityRepository;
 
   @Autowired
-  public TestPKService(UuidRepository uuidRepository,
+  public TestPKService(
+      UuidRepository uuidRepository,
       SnowflakeRepository snowflakeRepository,
       IdentityRepository identityRepository) {
 
@@ -38,10 +39,8 @@ public class TestPKService extends BaseService {
     this.identityRepository = identityRepository;
   }
 
-
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
-  public void testTransaction()
-      throws Exception {
+  public void testTransaction() throws Exception {
 
     List<Uuid> uuidList = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
@@ -54,14 +53,13 @@ public class TestPKService extends BaseService {
       uuidList.add(uuid);
     }
 
-    tx(status -> {
-      uuidRepository.create(uuidList);
-    });
-
+    tx(
+        status -> {
+          uuidRepository.create(uuidList);
+        });
   }
 
-  public void throwException()
-      throws Exception {
+  public void throwException() throws Exception {
 
     throw new Exception();
   }
@@ -88,10 +86,10 @@ public class TestPKService extends BaseService {
     identityRepository.create(i1);
     identityRepository.create(i2);
 
-//    entities.add(i1);
-//    entities.add(i2);
-//
-//    identityRepository.create(entities);
+    //    entities.add(i1);
+    //    entities.add(i2);
+    //
+    //    identityRepository.create(entities);
   }
 
   @Transactional(rollbackFor = Exception.class)
@@ -106,8 +104,7 @@ public class TestPKService extends BaseService {
 
   @Transactional(readOnly = true)
   public List<Identity> listIdentity() {
-    return identityRepository
-        .find(new Sql("SELECT * FROM tb_identity"));
+    return identityRepository.find(new Sql("SELECT * FROM tb_identity"));
   }
 
   public List<Record> findIdentityListByCond() {
@@ -121,7 +118,7 @@ public class TestPKService extends BaseService {
       identity.setName(UUID.randomUUID().toString());
       identity.setPrice(new BigDecimal(Math.random()));
     }
-    return identityRepository.update(identities, new String[]{"name", "price"});
+    return identityRepository.update(identities, new String[] {"name", "price"});
   }
 
   @Transactional(readOnly = true)

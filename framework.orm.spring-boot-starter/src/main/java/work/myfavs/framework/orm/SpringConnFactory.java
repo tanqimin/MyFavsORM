@@ -9,9 +9,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
  *
  * @author tanqimin
  */
-public class SpringConnFactory
-    extends JdbcConnFactory {
-
+public class SpringConnFactory extends JdbcConnFactory {
 
   public SpringConnFactory(DataSource dataSource) {
 
@@ -39,5 +37,4 @@ public class SpringConnFactory
 
     DataSourceUtils.releaseConnection(conn, super.dataSource);
   }
-
 }

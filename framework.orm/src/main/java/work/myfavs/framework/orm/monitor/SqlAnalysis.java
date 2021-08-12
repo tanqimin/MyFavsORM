@@ -2,36 +2,23 @@ package work.myfavs.framework.orm.monitor;
 
 import java.io.Serializable;
 
-/**
- * SQL 分析
- */
-public class SqlAnalysis
-    implements Serializable {
+/** SQL 分析 */
+public class SqlAnalysis implements Serializable {
 
-  //region Attributes
-  /**
-   * 执行消耗时间
-   */
-  private long      elapsed        = -1L;
-  /**
-   * 影响行数
-   */
-  private int       affectedRows   = 0;
-  /**
-   * 查询结果序列化消耗时间
-   */
-  private long      mappingElapsed = -1L;
-  /**
-   * 是否出错？
-   */
-  private boolean   hasError       = false;
-  /**
-   * 错误/异常
-   */
-  private Throwable throwable      = null;
-  //endregion
+  // region Attributes
+  /** 执行消耗时间 */
+  private long elapsed = -1L;
+  /** 影响行数 */
+  private int affectedRows = 0;
+  /** 查询结果序列化消耗时间 */
+  private long mappingElapsed = -1L;
+  /** 是否出错？ */
+  private boolean hasError = false;
+  /** 错误/异常 */
+  private Throwable throwable = null;
+  // endregion
 
-  //region Getter && Setter
+  // region Getter && Setter
   public long getElapsed() {
 
     return elapsed;
@@ -81,6 +68,6 @@ public class SqlAnalysis
 
     this.throwable = throwable;
   }
-  //endregion
+  // endregion
 
 }

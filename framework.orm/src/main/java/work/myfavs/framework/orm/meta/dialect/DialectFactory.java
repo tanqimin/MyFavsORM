@@ -5,7 +5,6 @@ import java.util.Map;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.util.exception.DBException;
 
-
 /**
  * 数据库方言工厂类
  *
@@ -13,7 +12,7 @@ import work.myfavs.framework.orm.util.exception.DBException;
  */
 public class DialectFactory {
 
-  private final static Map<String, IDialect> map;
+  private static final Map<String, IDialect> map;
 
   static {
     map = new HashMap<>();
@@ -25,15 +24,12 @@ public class DialectFactory {
     map.put(DbType.ORACLE, new OracleDialect());
   }
 
-  private DialectFactory() {
-
-  }
+  private DialectFactory() {}
 
   /**
    * 获取数据库方言实现
    *
    * @param dbType 数据库类型，sqlserver、mysql
-   *
    * @return 数据库方言实现类
    */
   public static IDialect getInstance(String dbType) {
@@ -44,5 +40,4 @@ public class DialectFactory {
     }
     return iDialect;
   }
-
 }

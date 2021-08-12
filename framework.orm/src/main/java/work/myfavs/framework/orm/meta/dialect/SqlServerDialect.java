@@ -5,12 +5,8 @@ import java.util.regex.Matcher;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
-
-/**
- * @author tanqimin
- */
-public class SqlServerDialect
-    extends DefaultDialect {
+/** @author tanqimin */
+public class SqlServerDialect extends DefaultDialect {
 
   @Override
   public String getDialectName() {
@@ -19,15 +15,11 @@ public class SqlServerDialect
   }
 
   @Override
-  public Sql selectTop(int currentPage,
-      int pageSize,
-      String sql,
-      Collection params) {
+  public Sql selectTop(int currentPage, int pageSize, String sql, Collection params) {
 
     if (currentPage == 1 && pageSize == 1) {
-      //如果sql本身只返回一个结果
-      if (P_SELECT_SINGLE.matcher(sql)
-          .find()) {
+      // 如果sql本身只返回一个结果
+      if (P_SELECT_SINGLE.matcher(sql).find()) {
         return new Sql(sql, params);
       }
     }
@@ -45,7 +37,7 @@ public class SqlServerDialect
       sql = sql.substring(0, om.start());
     }
 
-    //mssql ROW_NUMBER分页必须要至少一个ORDER BY
+    // mssql ROW_NUMBER分页必须要至少一个ORDER BY
     if (orderBys == null) {
       orderBys = "CURRENT_TIMESTAMP";
     }
@@ -63,8 +55,7 @@ public class SqlServerDialect
     }
 
     // T-SQL offset starts with 1, not like MySQL with 0;
-    return querySql
-        .append(") paginate_alias WHERE rownumber BETWEEN ? AND ?", offset + 1L, pageSize + offset);
+    return querySql.append(
+        ") paginate_alias WHERE rownumber BETWEEN ? AND ?", offset + 1L, pageSize + offset);
   }
-
 }

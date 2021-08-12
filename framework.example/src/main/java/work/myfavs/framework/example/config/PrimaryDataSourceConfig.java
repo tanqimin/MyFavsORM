@@ -43,32 +43,36 @@ public class PrimaryDataSourceConfig {
   @Bean(name = "primaryDBTemplate")
   public DBTemplate dbTemplate() {
 
-    return new DBTemplate.Builder().dataSource(primaryDataSource())
+    return new DBTemplate.Builder()
+        .dataSource(primaryDataSource())
         .connectionFactory(SpringConnFactory.class)
-        .config(config -> {
-          config.setDbType(DbType.MYSQL)
-              .setBatchSize(200)
-              .setFetchSize(100)
-              .setQueryTimeout(120)
-              .setDataCenterId(1L)
-              .setWorkerId(1L)
-              .setPageDataField("list")
-              .setPageCurrentField("pageNumber")
-              .setPageSizeField("pageSize")
-              .setPageTotalPageField("totalPage")
-              .setPageTotalRecordField("totalRow")
-              .setPageHasNextField("next");
-        })
-        .mapping(mapper -> {
-          mapper.register(String.class, new StringPropertyHandler())
-              .register(BigDecimal.class, new BigDecimalPropertyHandler())
-              .register(Long.class, new LongPropertyHandler())
-              .register(long.class, new LongPropertyHandler(true))
-              .register(Boolean.class, new BooleanPropertyHandler())
-              .register(int.class, new IntegerPropertyHandler(true))
-              .register(Date.class, new DatePropertyHandler());
-        })
+        .config(
+            config -> {
+              config
+                  .setDbType(DbType.MYSQL)
+                  .setBatchSize(200)
+                  .setFetchSize(100)
+                  .setQueryTimeout(120)
+                  .setDataCenterId(1L)
+                  .setWorkerId(1L)
+                  .setPageDataField("list")
+                  .setPageCurrentField("pageNumber")
+                  .setPageSizeField("pageSize")
+                  .setPageTotalPageField("totalPage")
+                  .setPageTotalRecordField("totalRow")
+                  .setPageHasNextField("next");
+            })
+        .mapping(
+            mapper -> {
+              mapper
+                  .register(String.class, new StringPropertyHandler())
+                  .register(BigDecimal.class, new BigDecimalPropertyHandler())
+                  .register(Long.class, new LongPropertyHandler())
+                  .register(long.class, new LongPropertyHandler(true))
+                  .register(Boolean.class, new BooleanPropertyHandler())
+                  .register(int.class, new IntegerPropertyHandler(true))
+                  .register(Date.class, new DatePropertyHandler());
+            })
         .build();
   }
-
 }

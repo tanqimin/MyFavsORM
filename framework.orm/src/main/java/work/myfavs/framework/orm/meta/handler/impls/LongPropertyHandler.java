@@ -22,14 +22,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class LongPropertyHandler
-    extends PropertyHandler<Long> {
+public class LongPropertyHandler extends PropertyHandler<Long> {
 
   private boolean isPrimitive;
 
-  public LongPropertyHandler() {
-
-  }
+  public LongPropertyHandler() {}
 
   public LongPropertyHandler(boolean isPrimitive) {
 
@@ -37,10 +34,7 @@ public class LongPropertyHandler
   }
 
   @Override
-  public Long convert(ResultSet rs,
-                      String columnName,
-                      Class<Long> clazz)
-      throws SQLException {
+  public Long convert(ResultSet rs, String columnName, Class<Long> clazz) throws SQLException {
 
     long i = rs.getLong(columnName);
     if (rs.wasNull()) {
@@ -54,10 +48,7 @@ public class LongPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps,
-                           int paramIndex,
-                           Long param)
-      throws SQLException {
+  public void addParameter(PreparedStatement ps, int paramIndex, Long param) throws SQLException {
 
     if (param == null) {
       ps.setNull(paramIndex, Types.BIGINT);
@@ -65,5 +56,4 @@ public class LongPropertyHandler
     }
     ps.setLong(paramIndex, param);
   }
-
 }

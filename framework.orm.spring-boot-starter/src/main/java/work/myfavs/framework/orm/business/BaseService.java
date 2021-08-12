@@ -14,18 +14,18 @@ import org.springframework.transaction.support.TransactionCallback;
  *
  * @author tanqimin
  */
-abstract public class BaseService {
+public abstract class BaseService {
 
-  private final static int[] ISOLATION_LEVEL_SCOPE = new int[]{
-      Connection.TRANSACTION_NONE,
-      Connection.TRANSACTION_READ_UNCOMMITTED,
-      Connection.TRANSACTION_READ_COMMITTED,
-      Connection.TRANSACTION_REPEATABLE_READ,
-      Connection.TRANSACTION_SERIALIZABLE
-  };
+  private static final int[] ISOLATION_LEVEL_SCOPE =
+      new int[] {
+        Connection.TRANSACTION_NONE,
+        Connection.TRANSACTION_READ_UNCOMMITTED,
+        Connection.TRANSACTION_READ_COMMITTED,
+        Connection.TRANSACTION_REPEATABLE_READ,
+        Connection.TRANSACTION_SERIALIZABLE
+      };
 
-  @Autowired
-  private PlatformTransactionManager transactionManager;
+  @Autowired private PlatformTransactionManager transactionManager;
 
   protected <T> T tx(TransactionCallback<T> callback) {
     return tx(callback, -1, -1, false);
@@ -67,10 +67,10 @@ abstract public class BaseService {
     tx(consumer, -1, timeout, readOnly);
   }
 
-  private void tx(Consumer<TransactionStatus> consumer, int isolationLevel,
-      int timeout, boolean readOnly) {
-    final DefaultTransactionDefinition td = createTransDefinition(
-        isolationLevel, timeout, readOnly);
+  private void tx(
+      Consumer<TransactionStatus> consumer, int isolationLevel, int timeout, boolean readOnly) {
+    final DefaultTransactionDefinition td =
+        createTransDefinition(isolationLevel, timeout, readOnly);
 
     final TransactionStatus status = transactionManager.getTransaction(td);
     try {
@@ -82,10 +82,10 @@ abstract public class BaseService {
     }
   }
 
-  private <T> T tx(TransactionCallback<T> callback, int isolationLevel,
-      int timeout, boolean readOnly) {
-    final DefaultTransactionDefinition td = createTransDefinition(
-        isolationLevel, timeout, readOnly);
+  private <T> T tx(
+      TransactionCallback<T> callback, int isolationLevel, int timeout, boolean readOnly) {
+    final DefaultTransactionDefinition td =
+        createTransDefinition(isolationLevel, timeout, readOnly);
 
     final TransactionStatus status = transactionManager.getTransaction(td);
     try {
@@ -98,8 +98,8 @@ abstract public class BaseService {
     }
   }
 
-  private DefaultTransactionDefinition createTransDefinition(int isolationLevel,
-      int timeout, boolean readOnly) {
+  private DefaultTransactionDefinition createTransDefinition(
+      int isolationLevel, int timeout, boolean readOnly) {
     DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
     if (ArrayUtil.contains(ISOLATION_LEVEL_SCOPE, isolationLevel)) {
       definition.setIsolationLevel(isolationLevel);

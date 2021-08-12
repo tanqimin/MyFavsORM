@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Map;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
-/**
- * SQL 执行前事件
- */
+/** SQL 执行前事件 */
 public class SqlExecutingEvent {
 
-  private Sql                 sql;
+  private Sql sql;
   private Map<String, Object> context = new HashMap<>();
 
   public Sql getSql() {
@@ -33,19 +31,15 @@ public class SqlExecutingEvent {
     this.context = context;
   }
 
-  public SqlExecutingEvent() {
-
-  }
+  public SqlExecutingEvent() {}
 
   public SqlExecutingEvent(Sql sql) {
 
     this.sql = sql;
   }
 
-  public SqlExecutingEvent(String sql,
-                           List params) {
+  public SqlExecutingEvent(String sql, List params) {
 
     this.sql = new Sql(sql, params);
   }
-
 }

@@ -1,20 +1,22 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Types;
 import java.time.LocalTime;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 /**
  * TIMESTAMP WITHOUT TIMEZONE
+ *
  * @author tanqimin
  */
-public class LocalTimePropertyHandler
-    extends PropertyHandler<LocalTime> {
+public class LocalTimePropertyHandler extends PropertyHandler<LocalTime> {
 
   @Override
-  public LocalTime convert(ResultSet rs,
-                           String columnName,
-                           Class<LocalTime> clazz)
+  public LocalTime convert(ResultSet rs, String columnName, Class<LocalTime> clazz)
       throws SQLException {
 
     Time val = rs.getTime(columnName);
@@ -25,9 +27,7 @@ public class LocalTimePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps,
-                           int paramIndex,
-                           LocalTime param)
+  public void addParameter(PreparedStatement ps, int paramIndex, LocalTime param)
       throws SQLException {
 
     if (param == null) {
@@ -36,5 +36,4 @@ public class LocalTimePropertyHandler
     }
     ps.setTime(paramIndex, Time.valueOf(param));
   }
-
 }

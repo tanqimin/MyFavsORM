@@ -10,41 +10,27 @@ import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 @Table(value = "tb_uuid", strategy = GenerationType.UUID)
-public class Uuid
-    implements Serializable {
+public class Uuid implements Serializable {
 
-  /**
-   * ID
-   */
+  /** ID */
   @Column(value = "id")
   @PrimaryKey
-  private String     id      = null;
-  /**
-   * 创建时间
-   */
+  private String id = null;
+  /** 创建时间 */
   @Column(value = "created")
-  private Date       created = null;
-  /**
-   * 名称
-   */
+  private Date created = null;
+  /** 名称 */
   @Column(value = "name")
-  private String     name    = null;
-  /**
-   * 是否停用
-   */
+  private String name = null;
+  /** 是否停用 */
   @Column(value = "disable")
-  private Boolean    disable = false;
-  /**
-   * 价格
-   */
+  private Boolean disable = false;
+  /** 价格 */
   @Column(value = "price")
-  private BigDecimal price   = BigDecimal.ZERO;
-  /**
-   * 类型
-   */
+  private BigDecimal price = BigDecimal.ZERO;
+  /** 类型 */
   @Column(value = "type")
-  private TypeEnum   type    = null;
-
+  private TypeEnum type = null;
 
   public String getId() {
 
@@ -105,5 +91,4 @@ public class Uuid
 
     this.type = type;
   }
-
 }

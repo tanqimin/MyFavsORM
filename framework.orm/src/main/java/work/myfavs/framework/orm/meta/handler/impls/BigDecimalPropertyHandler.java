@@ -8,29 +8,21 @@ import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 /**
- *
  * @author tanqimin
  * @date 2016/1/29
  */
-public class BigDecimalPropertyHandler
-    extends PropertyHandler<BigDecimal> {
+public class BigDecimalPropertyHandler extends PropertyHandler<BigDecimal> {
 
   @Override
-  public BigDecimal convert(ResultSet rs,
-                            String columnName,
-                            Class<BigDecimal> clazz)
+  public BigDecimal convert(ResultSet rs, String columnName, Class<BigDecimal> clazz)
       throws SQLException {
 
     BigDecimal i = rs.getBigDecimal(columnName);
-    return rs.wasNull()
-        ? null
-        : i;
+    return rs.wasNull() ? null : i;
   }
 
   @Override
-  public void addParameter(PreparedStatement ps,
-                           int paramIndex,
-                           BigDecimal param)
+  public void addParameter(PreparedStatement ps, int paramIndex, BigDecimal param)
       throws SQLException {
 
     if (param == null) {
@@ -39,5 +31,4 @@ public class BigDecimalPropertyHandler
     }
     ps.setBigDecimal(paramIndex, param);
   }
-
 }

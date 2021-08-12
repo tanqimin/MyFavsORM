@@ -15,10 +15,9 @@ import work.myfavs.framework.orm.meta.clause.Sql;
  */
 public final class SqlCache {
 
-  private final static Map<String, Sql> CACHE = new ConcurrentHashMap<>();
+  private static final Map<String, Sql> CACHE = new ConcurrentHashMap<>();
 
-  private SqlCache() {
-  }
+  private SqlCache() {}
 
   public static Sql put(Class<?> clazz, Opt opt, String[] columns, Sql sql) {
     final String key = getKey(clazz, opt, columns);
@@ -47,14 +46,13 @@ public final class SqlCache {
     return contains(clazz, opt, null);
   }
 
-  public static Sql computeIfAbsent(Class<?> clazz, Opt opt, String[] columns,
-      Function<String, Sql> func) {
+  public static Sql computeIfAbsent(
+      Class<?> clazz, Opt opt, String[] columns, Function<String, Sql> func) {
     final String key = getKey(clazz, opt, columns);
     return pack(CACHE.computeIfAbsent(key, func));
   }
 
-  public static Sql computeIfAbsent(Class<?> clazz, Opt opt,
-      Function<String, Sql> func) {
+  public static Sql computeIfAbsent(Class<?> clazz, Opt opt, Function<String, Sql> func) {
     return computeIfAbsent(clazz, opt, null, func);
   }
 
@@ -86,25 +84,15 @@ public final class SqlCache {
     return Optional.ofNullable(sql).map(Sql::new).orElse(null);
   }
 
-  /**
-   * SQL 操作类型
-   */
+  /** SQL 操作类型 */
   enum Opt {
-    /**
-     * 查询
-     */
+    /** 查询 */
     SELECT,
-    /**
-     * 插入
-     */
+    /** 插入 */
     INSERT,
-    /**
-     * 更新
-     */
+    /** 更新 */
     UPDATE,
-    /**
-     * 删除
-     */
-    DELETE;
+    /** 删除 */
+    DELETE
   }
 }

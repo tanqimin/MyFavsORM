@@ -10,50 +10,32 @@ import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
-/**
- * Snowfake 实体类
- * PS: 此文件通过代码生成器生成，修改此文件会有被覆盖的风险
- */
+/** Snowfake 实体类 PS: 此文件通过代码生成器生成，修改此文件会有被覆盖的风险 */
 @Table(value = Snowflake.META.TABLE, strategy = GenerationType.SNOW_FLAKE)
-public class Snowflake
-    implements Serializable {
+public class Snowflake implements Serializable {
 
-  /**
-   * ID
-   */
+  /** ID */
   @Column(value = Snowflake.META.COLUMNS.id)
   @PrimaryKey
-  private Long       id      = null;
-  /**
-   * 创建时间
-   */
+  private Long id = null;
+  /** 创建时间 */
   @Column(value = Snowflake.META.COLUMNS.created)
-  private Date       created = null;
-  /**
-   * 名称
-   */
+  private Date created = null;
+  /** 名称 */
   @Column(value = Snowflake.META.COLUMNS.name)
-  private String     name    = null;
-  /**
-   * 是否停用
-   */
+  private String name = null;
+  /** 是否停用 */
   @Column(value = Snowflake.META.COLUMNS.disable)
-  private Boolean    disable = false;
-  /**
-   * 价格
-   */
+  private Boolean disable = false;
+  /** 价格 */
   @Column(value = Snowflake.META.COLUMNS.price)
-  private BigDecimal price   = BigDecimal.ZERO;
-  /**
-   * 类型
-   */
+  private BigDecimal price = BigDecimal.ZERO;
+  /** 类型 */
   @Column(value = Snowflake.META.COLUMNS.type)
-  private TypeEnum   type    = null;
-  /**
-   * 配置
-   */
+  private TypeEnum type = null;
+  /** 配置 */
   @Column(value = Snowflake.META.COLUMNS.config)
-  private String     config  = null;
+  private String config = null;
 
   public Long getId() {
 
@@ -125,50 +107,29 @@ public class Snowflake
     this.config = config;
   }
 
-  /**
-   * 元数据
-   */
+  /** 元数据 */
   public enum META {
     ;
-    /**
-     * 表名
-     */
+    /** 表名 */
     public static final String TABLE = "tb_snowflake";
 
-    /**
-     * 字段
-     */
+    /** 字段 */
     public interface COLUMNS {
 
-      /**
-       * ID
-       */
-      String id      = "id";
-      /**
-       * 创建时间
-       */
+      /** ID */
+      String id = "id";
+      /** 创建时间 */
       String created = "created";
-      /**
-       * 名称
-       */
-      String name    = "name";
-      /**
-       * 是否停用
-       */
+      /** 名称 */
+      String name = "name";
+      /** 是否停用 */
       String disable = "disable";
-      /**
-       * 价格
-       */
-      String price   = "price";
-      /**
-       * 类型
-       */
-      String type    = "type";
-      /**
-       * 配置
-       */
-      String config  = "config";
-
+      /** 价格 */
+      String price = "price";
+      /** 类型 */
+      String type = "type";
+      /** 配置 */
+      String config = "config";
     }
   }
 
@@ -194,7 +155,27 @@ public class Snowflake
   @Override
   public String toString() {
 
-    return "Snowfake { " + "id = " + id + ", " + "created = " + created + ", " + "name = " + name + ", " + "disable = " + disable + ", " + "price = " + price + ", " + "type = " + type + ", " + "config = " + config + " }";
+    return "Snowfake { "
+        + "id = "
+        + id
+        + ", "
+        + "created = "
+        + created
+        + ", "
+        + "name = "
+        + name
+        + ", "
+        + "disable = "
+        + disable
+        + ", "
+        + "price = "
+        + price
+        + ", "
+        + "type = "
+        + type
+        + ", "
+        + "config = "
+        + config
+        + " }";
   }
-
 }

@@ -16,8 +16,7 @@ import work.myfavs.framework.orm.meta.schema.Metadata;
  * @param <TModel> 实体类
  */
 @SuppressWarnings("unchecked")
-public class Repository<TModel>
-    extends Query {
+public class Repository<TModel> extends Query {
 
   protected Class<TModel> modelClass;
 
@@ -30,8 +29,10 @@ public class Repository<TModel>
   public Repository(DBTemplate dbTemplate) {
 
     super(dbTemplate);
-    this.modelClass = (Class<TModel>) ((ParameterizedType) this.getClass()
-        .getGenericSuperclass()).getActualTypeArguments()[0];
+    this.modelClass =
+        (Class<TModel>)
+            ((ParameterizedType) this.getClass().getGenericSuperclass())
+                .getActualTypeArguments()[0];
   }
 
   /**
@@ -52,8 +53,7 @@ public class Repository<TModel>
    * @param param 参数
    * @return 记录
    */
-  public TModel getByField(String field,
-      Object param) {
+  public TModel getByField(String field, Object param) {
 
     return DB.conn(this.dbTemplate).getByField(modelClass, field, param);
   }
@@ -83,12 +83,11 @@ public class Repository<TModel>
   /**
    * 根据SQL获取记录
    *
-   * @param sql    SQL语句
+   * @param sql SQL语句
    * @param params 参数
    * @return 记录
    */
-  public TModel get(String sql,
-      Collection params) {
+  public TModel get(String sql, Collection params) {
 
     return super.get(this.modelClass, sql, params);
   }
@@ -104,16 +103,14 @@ public class Repository<TModel>
     return super.get(this.modelClass, sql);
   }
 
-
   /**
    * 根据SQL查询实体集合
    *
-   * @param sql    SQL语句
+   * @param sql SQL语句
    * @param params 参数
    * @return 实体集合
    */
-  public List<TModel> find(String sql,
-      Collection params) {
+  public List<TModel> find(String sql, Collection params) {
 
     return super.find(modelClass, sql, params);
   }
@@ -132,12 +129,11 @@ public class Repository<TModel>
   /**
    * 根据SQL查询实体集合
    *
-   * @param sql    SQL
+   * @param sql SQL
    * @param params 参数
    * @return Map，Key为主键值， Value为实体对象
    */
-  public <TKey> Map<TKey, TModel> findMap(String sql,
-      Collection params) {
+  public <TKey> Map<TKey, TModel> findMap(String sql, Collection params) {
     final String fieldName = Metadata.get(modelClass).getPrimaryKey().getFieldName();
     return findMap(modelClass, fieldName, sql, params);
   }
@@ -159,8 +155,7 @@ public class Repository<TModel>
    * @param param 参数
    * @return 实体集合
    */
-  public List<TModel> findByField(String field,
-      Object param) {
+  public List<TModel> findByField(String field, Object param) {
 
     return DB.conn(this.dbTemplate).findByField(modelClass, field, param);
   }
@@ -168,12 +163,11 @@ public class Repository<TModel>
   /**
    * 根据字段查询实体集合
    *
-   * @param field  字段名
+   * @param field 字段名
    * @param params 参数集合
    * @return 实体集合
    */
-  public List<TModel> findByField(String field,
-      Collection params) {
+  public List<TModel> findByField(String field, Collection params) {
 
     return DB.conn(this.dbTemplate).findByField(modelClass, field, params);
   }
@@ -269,12 +263,11 @@ public class Repository<TModel>
   /**
    * 执行一个SQL语句
    *
-   * @param sql    SQL语句
+   * @param sql SQL语句
    * @param params 参数
    * @return 影响行数
    */
-  public int execute(String sql,
-      Collection params) {
+  public int execute(String sql, Collection params) {
 
     return DB.conn(this.dbTemplate).execute(sql, params);
   }
@@ -315,12 +308,11 @@ public class Repository<TModel>
   /**
    * 更新实体
    *
-   * @param entity  实体
+   * @param entity 实体
    * @param columns 需要更新的列
    * @return 影响行数
    */
-  public int update(TModel entity,
-      String[] columns) {
+  public int update(TModel entity, String[] columns) {
 
     return DB.conn(this.dbTemplate).update(modelClass, entity, columns);
   }
@@ -340,11 +332,10 @@ public class Repository<TModel>
    * 更新实体
    *
    * @param entities 实体集合
-   * @param columns  需要更新的列
+   * @param columns 需要更新的列
    * @return 影响行数
    */
-  public int update(Collection<TModel> entities,
-      String[] columns) {
+  public int update(Collection<TModel> entities, String[] columns) {
 
     return DB.conn(this.dbTemplate).update(modelClass, entities, columns);
   }
@@ -442,5 +433,4 @@ public class Repository<TModel>
   public long snowFlakeId() {
     return this.dbTemplate.getPkGenerator().nextSnowFakeId();
   }
-
 }

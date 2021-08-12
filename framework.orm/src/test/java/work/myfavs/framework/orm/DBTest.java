@@ -17,15 +17,15 @@ import work.myfavs.framework.orm.meta.dialect.TableAlias;
 
 public class DBTest {
 
-  String url      = "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
-  String user     = "root";
+  String url =
+      "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
+  String user = "root";
   String password = "root";
 
   private DBTemplate dbTemplate;
 
   @Before
-  public void setUp()
-      throws Exception {
+  public void setUp() throws Exception {
 
     HikariConfig configuration = new HikariConfig();
     configuration.setDriverClassName("com.mysql.jdbc.Driver");
@@ -35,12 +35,14 @@ public class DBTest {
     configuration.setAutoCommit(false);
     DataSource dataSource = new HikariDataSource(configuration);
 
-    this.dbTemplate = new Builder().dataSource(dataSource)
-        .config(config -> {
-          config.setShowSql(true)
-              .setShowResult(true);
-        })
-        .build();
+    this.dbTemplate =
+        new Builder()
+            .dataSource(dataSource)
+            .config(
+                config -> {
+                  config.setShowSql(true).setShowResult(true);
+                })
+            .build();
   }
 
   @Test
@@ -57,14 +59,18 @@ public class DBTest {
     snowfake.setName("UUI%");
     snowfake.setType(TypeEnum.DRINK);
 
-    DB.conn().tx(db -> {
-      Snowfake res = TableAlias.function("tb_snowfake_123123", s -> db.getByCondition(Snowfake.class, snowfake));
+    DB.conn()
+        .tx(
+            db -> {
+              Snowfake res =
+                  TableAlias.function(
+                      "tb_snowfake_123123", s -> db.getByCondition(Snowfake.class, snowfake));
 
-      TableAlias.clear();
-      Assert.assertNotNull(res);
-      List<Snowfake> ress = db.findByCondition(Snowfake.class, snowfake, "SNOW_DTO");
-      Assert.assertNotNull(ress);
-    });
+              TableAlias.clear();
+              Assert.assertNotNull(res);
+              List<Snowfake> ress = db.findByCondition(Snowfake.class, snowfake, "SNOW_DTO");
+              Assert.assertNotNull(ress);
+            });
   }
 
   @Test
@@ -76,11 +82,13 @@ public class DBTest {
     snowfake.setPrice(new BigDecimal(100));
     snowfake.setType(TypeEnum.DRINK);
 
-    DB.conn().tx(db -> {
-      long count = getCount(db);
-      db.create(Snowfake.class, snowfake);
-      Assert.assertEquals(++count, getCount(db));
-    });
+    DB.conn()
+        .tx(
+            db -> {
+              long count = getCount(db);
+              db.create(Snowfake.class, snowfake);
+              Assert.assertEquals(++count, getCount(db));
+            });
   }
 
   private long getCount(DB db) {
@@ -89,149 +97,91 @@ public class DBTest {
   }
 
   @Test
-  public void commit() {
-
-  }
+  public void commit() {}
 
   @Test
-  public void rollback() {
-
-  }
+  public void rollback() {}
 
   @Test
-  public void close() {
-
-  }
+  public void close() {}
 
   @Test
-  public void findTop() {
-
-  }
+  public void findTop() {}
 
   @Test
-  public void testFindTop() {
-
-  }
+  public void testFindTop() {}
 
   @Test
-  public void testFindTop1() {
-
-  }
+  public void testFindTop1() {}
 
   @Test
-  public void testFindTop2() {
-
-  }
+  public void testFindTop2() {}
 
   @Test
-  public void get() {
-
-  }
+  public void get() {}
 
   @Test
-  public void testGet() {
-
-  }
+  public void testGet() {}
 
   @Test
-  public void testGet1() {
-
-  }
+  public void testGet1() {}
 
   @Test
-  public void testGet2() {
-
-  }
+  public void testGet2() {}
 
   @Test
-  public void getById() {
-
-  }
+  public void getById() {}
 
   @Test
-  public void getByField() {
-
-  }
+  public void getByField() {}
 
   @Test
-  public void findByIds() {
-
-  }
+  public void findByIds() {}
 
   @Test
-  public void findByField() {
-
-  }
+  public void findByField() {}
 
   @Test
-  public void testFindByField() {
-
-  }
+  public void testFindByField() {}
 
   @Test
-  public void count() {
-
-  }
+  public void count() {}
 
   @Test
-  public void testCount() {
-
-  }
+  public void testCount() {}
 
   @Test
-  public void findPageLite() {
-
-  }
+  public void findPageLite() {}
 
   @Test
-  public void testFindPageLite() {
-
-  }
+  public void testFindPageLite() {}
 
   @Test
-  public void testFindPageLite1() {
-
-  }
+  public void testFindPageLite1() {}
 
   @Test
-  public void testFindPageLite2() {
-
-  }
+  public void testFindPageLite2() {}
 
   @Test
-  public void findPage() {
-
-  }
+  public void findPage() {}
 
   @Test
-  public void testFindPage() {
-
-  }
+  public void testFindPage() {}
 
   @Test
-  public void testFindPage1() {
-
-  }
+  public void testFindPage1() {}
 
   @Test
-  public void testFindPage2() {
-
-  }
+  public void testFindPage2() {}
 
   @Test
-  public void execute() {
-
-  }
+  public void execute() {}
 
   @Test
-  public void testExecute() {
-
-  }
+  public void testExecute() {}
 
   @Test
-  public void testExecute1() {
-
-  }
+  public void testExecute1() {}
 
   @Test
   public void create() {
@@ -248,48 +198,29 @@ public class DBTest {
   }
 
   @Test
-  public void testCreate() {
-
-  }
+  public void testCreate() {}
 
   @Test
-  public void update() {
-
-  }
+  public void update() {}
 
   @Test
-  public void testUpdate() {
-
-  }
+  public void testUpdate() {}
 
   @Test
-  public void testUpdate1() {
-
-  }
+  public void testUpdate1() {}
 
   @Test
-  public void testUpdate2() {
-
-  }
+  public void testUpdate2() {}
 
   @Test
-  public void delete() {
-
-  }
+  public void delete() {}
 
   @Test
-  public void testDelete() {
-
-  }
+  public void testDelete() {}
 
   @Test
-  public void deleteByIds() {
-
-  }
+  public void deleteByIds() {}
 
   @Test
-  public void deleteById() {
-
-  }
-
+  public void deleteById() {}
 }

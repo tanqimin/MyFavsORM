@@ -10,13 +10,9 @@ import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
-/**
- * Uuid Query
- * PS: 此文件通过代码生成器生成
- */
+/** Uuid Query PS: 此文件通过代码生成器生成 */
 @Repository
-public class UuidQuery
-    extends BaseQuery {
+public class UuidQuery extends BaseQuery {
 
   /**
    * 构造方法
@@ -33,15 +29,11 @@ public class UuidQuery
    * 根据主键获取 Uuid
    *
    * @param id 主键
-   *
    * @return Uuid
    */
   public Uuid getById(Object id) {
 
-    Sql sql = Sql.Select("*")
-                 .from(META.TABLE)
-                 .where(Cond.eq(META.COLUMNS.id, id));
+    Sql sql = Sql.Select("*").from(META.TABLE).where(Cond.eq(META.COLUMNS.id, id));
     return super.get(Uuid.class, sql);
   }
-
 }

@@ -1,25 +1,15 @@
 package work.myfavs.framework.orm.generator.meta;
 
-/**
- * 类型定义
- */
+/** 类型定义 */
 public class TypeDefinition {
 
-  /**
-   * 类型全称，如：java.lang.Long
-   */
+  /** 类型全称，如：java.lang.Long */
   private String name;
-  /**
-   * 类型名称，如：Long
-   */
+  /** 类型名称，如：Long */
   private String simpleName;
-  /**
-   * 值类型，如：long
-   */
+  /** 值类型，如：long */
   private String valueType;
-  /**
-   * 默认值
-   */
+  /** 默认值 */
   private String defValue;
 
   public String getName() {
@@ -62,24 +52,19 @@ public class TypeDefinition {
     this.defValue = defValue;
   }
 
-  private TypeDefinition() {
-
-  }
+  private TypeDefinition() {}
 
   public TypeDefinition(String name) {
 
     this(name, null);
   }
 
-  public TypeDefinition(String name,
-                        String defValue) {
+  public TypeDefinition(String name, String defValue) {
 
     this(name, name, defValue);
   }
 
-  public TypeDefinition(String name,
-                        String valueType,
-                        String defValue) {
+  public TypeDefinition(String name, String valueType, String defValue) {
 
     this.name = name;
     this.valueType = valueType;
@@ -92,6 +77,4 @@ public class TypeDefinition {
       this.simpleName = name;
     }
   }
-
-
 }

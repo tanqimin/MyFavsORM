@@ -1,7 +1,11 @@
 package work.myfavs.framework.orm.generator.meta.column;
 
 import cn.hutool.core.util.StrUtil;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map.Entry;
 import work.myfavs.framework.orm.generator.GeneratorConfig;
@@ -15,10 +19,9 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
-public class MySQLGeneratorMetaFactory
-    extends GeneratorMetaFactory {
+public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
 
-  private GeneratorConfig generatorConfig;
+  private final GeneratorConfig generatorConfig;
 
   public MySQLGeneratorMetaFactory(GeneratorConfig generatorConfig) {
 
@@ -29,33 +32,31 @@ public class MySQLGeneratorMetaFactory
   public GeneratorMeta createGeneratorMeta() {
 
     GeneratorMeta generatorMeta = new GeneratorMeta();
-    generatorMeta.getTypeMapper()
-                 .putAll(generatorConfig.getTypeMapper());
+    generatorMeta.getTypeMapper().putAll(generatorConfig.getTypeMapper());
     List<TableDefinition> tableDefinitions = generatorMeta.getTableDefinitions();
 
-    String url  = generatorConfig.getJdbcUrl();
+    String url = generatorConfig.getJdbcUrl();
     String user = generatorConfig.getJdbcUser();
-    String pwd  = generatorConfig.getJdbcPwd();
+    String pwd = generatorConfig.getJdbcPwd();
 
-    Connection        conn = null;
-    PreparedStatement ps   = null;
-    ResultSet         rs   = null;
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
 
     try {
       conn = DriverManager.getConnection(url, user, pwd);
       String dbName = conn.getCatalog();
-      Sql    sql    = getSql(dbName);
+      Sql sql = getSql(dbName);
       ps = DBUtil.getPstForQuery(conn, sql.getSqlString(), sql.getParams());
       rs = ps.executeQuery();
 
       while (rs.next()) {
         String table = ResultSetUtil.getString(rs, "table");
 
-        TableDefinition  tableDefinition = getTableDefinition(table, tableDefinitions);
-        ColumnDefinition column          = getColumnDefinition(rs);
+        TableDefinition tableDefinition = getTableDefinition(table, tableDefinitions);
+        ColumnDefinition column = getColumnDefinition(rs);
 
-        tableDefinition.getColumns()
-                       .add(column);
+        tableDefinition.getColumns().add(column);
       }
 
       return generatorMeta;
@@ -81,20 +82,20 @@ public class MySQLGeneratorMetaFactory
     where table_schema = 'myfavs_test'
      */
 
-    Sql sql = Sql.Select("table_name AS `table`,")
-                 .append(" column_name AS `column`,")
-                 .append(" data_type AS `type`,")
-                 .append(" CASE is_nullable WHEN 'YES' THEN 1 ELSE 0 END AS `nullable`,")
-                 .append(" CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END AS `pk`,")
-                 .append(" ordinal_position AS `idx`,")
-                 .append(" column_comment AS `comment`")
-                 .from("information_schema.`COLUMNS`")
-                 .where(Cond.eq("table_schema", dbName));
+    Sql sql =
+        Sql.Select("table_name AS `table`,")
+            .append(" column_name AS `column`,")
+            .append(" data_type AS `type`,")
+            .append(" CASE is_nullable WHEN 'YES' THEN 1 ELSE 0 END AS `nullable`,")
+            .append(" CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END AS `pk`,")
+            .append(" ordinal_position AS `idx`,")
+            .append(" column_comment AS `comment`")
+            .from("information_schema.`COLUMNS`")
+            .where(Cond.eq("table_schema", dbName));
     return sql;
   }
 
-  private TableDefinition getTableDefinition(String table,
-                                             List<TableDefinition> tableDefinitions) {
+  private TableDefinition getTableDefinition(String table, List<TableDefinition> tableDefinitions) {
 
     TableDefinition tableDefinition = null;
     for (TableDefinition definition : tableDefinitions) {
@@ -113,17 +114,15 @@ public class MySQLGeneratorMetaFactory
     return tableDefinition;
   }
 
+  private ColumnDefinition getColumnDefinition(ResultSet rs) throws SQLException {
 
-  private ColumnDefinition getColumnDefinition(ResultSet rs)
-      throws SQLException {
-
-    String  table    = ResultSetUtil.getString(rs, "table");
-    String  column   = ResultSetUtil.getString(rs, "column");
-    Boolean pk       = ResultSetUtil.getBoolean(rs, "pk");
+    String table = ResultSetUtil.getString(rs, "table");
+    String column = ResultSetUtil.getString(rs, "column");
+    Boolean pk = ResultSetUtil.getBoolean(rs, "pk");
     Boolean nullable = ResultSetUtil.getBoolean(rs, "nullable");
-    Integer idx      = ResultSetUtil.getInt(rs, "idx");
-    String  dataType = ResultSetUtil.getString(rs, "type");
-    String  comment  = ResultSetUtil.getString(rs, "comment");
+    Integer idx = ResultSetUtil.getInt(rs, "idx");
+    String dataType = ResultSetUtil.getString(rs, "type");
+    String comment = ResultSetUtil.getString(rs, "comment");
 
     ColumnDefinition columnDefinition = new ColumnDefinition();
 
@@ -138,21 +137,18 @@ public class MySQLGeneratorMetaFactory
     return columnDefinition;
   }
 
-  private TypeDefinition createTypeDefinition(String dataType,
-                                              String comment) {
+  private TypeDefinition createTypeDefinition(String dataType, String comment) {
 
     if (comment != null) {
       if (comment.contains("#")) {
-        String         className      = comment.split("#")[1];
+        String className = comment.split("#")[1];
         TypeDefinition typeDefinition = new TypeDefinition(className);
-        generatorConfig.getTypeMapper()
-                       .put(className, typeDefinition);
+        generatorConfig.getTypeMapper().put(className, typeDefinition);
         return typeDefinition;
       }
     }
 
-    for (Entry<String, TypeDefinition> entry : generatorConfig.getTypeMapper()
-                                                              .entrySet()) {
+    for (Entry<String, TypeDefinition> entry : generatorConfig.getTypeMapper().entrySet()) {
       if (StrUtil.equalsIgnoreCase(dataType, entry.getKey())) {
         return entry.getValue();
       }
@@ -160,5 +156,4 @@ public class MySQLGeneratorMetaFactory
 
     throw new DBException("{} type is not registered.", dataType);
   }
-
 }

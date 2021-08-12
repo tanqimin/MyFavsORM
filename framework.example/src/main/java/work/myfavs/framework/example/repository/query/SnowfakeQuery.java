@@ -12,13 +12,9 @@ import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.pagination.Page;
 
-/**
- * Snowfake Query
- * PS: 此文件通过代码生成器生成
- */
+/** Snowfake Query PS: 此文件通过代码生成器生成 */
 @Repository
-public class SnowfakeQuery
-    extends BaseQuery {
+public class SnowfakeQuery extends BaseQuery {
 
   /**
    * 构造方法
@@ -35,22 +31,19 @@ public class SnowfakeQuery
    * 根据主键获取 Snowfake
    *
    * @param id 主键
-   *
    * @return Snowfake
    */
   public Snowflake getById(Object id) {
 
-    Sql sql = Sql.Select("*")
-                 .from(META.TABLE)
-                 .where(Cond.eq(META.COLUMNS.id, id));
+    Sql sql = Sql.Select("*").from(META.TABLE).where(Cond.eq(META.COLUMNS.id, id));
     return super.get(Snowflake.class, sql);
   }
 
   @Transactional(readOnly = true)
   public Page<Snowflake> findPage() {
 
-    final Page<Snowflake> page = super.findPage(Snowflake.class, Sql.Select("*")
-        .from(META.TABLE), true, 1, 1);
+    final Page<Snowflake> page =
+        super.findPage(Snowflake.class, Sql.Select("*").from(META.TABLE), true, 1, 1);
     return page;
   }
 
@@ -58,5 +51,4 @@ public class SnowfakeQuery
 
     return super.get(Snowflake.class, "select * from " + META.TABLE, null);
   }
-
 }

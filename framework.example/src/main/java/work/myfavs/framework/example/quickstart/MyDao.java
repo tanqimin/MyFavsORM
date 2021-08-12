@@ -11,11 +11,10 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 
 public class MyDao {
 
-  private static DBTemplate DBTemplate;
+  private static final DBTemplate DBTemplate;
 
   static {
-    DBTemplate = new DBTemplate.Builder().dataSource(getDataSource())
-        .build();
+    DBTemplate = new DBTemplate.Builder().dataSource(getDataSource()).build();
   }
 
   public List<Record> findRecord() {
@@ -23,7 +22,6 @@ public class MyDao {
     Sql sql = new Sql("SELECT * FROM tb_snowfake");
     return DB.conn().find(sql);
   }
-
 
   private static DataSource getDataSource() {
 
@@ -36,5 +34,4 @@ public class MyDao {
     configuration.setAutoCommit(false);
     return new HikariDataSource(configuration);
   }
-
 }

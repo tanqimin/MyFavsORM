@@ -7,14 +7,10 @@ import java.sql.Types;
 import java.util.UUID;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class UUIDPropertyHandler
-    extends PropertyHandler<UUID> {
+public class UUIDPropertyHandler extends PropertyHandler<UUID> {
 
   @Override
-  public UUID convert(ResultSet rs,
-                      String columnName,
-                      Class<UUID> clazz)
-      throws SQLException {
+  public UUID convert(ResultSet rs, String columnName, Class<UUID> clazz) throws SQLException {
 
     String val = rs.getString(columnName);
     if (rs.wasNull()) {
@@ -24,10 +20,7 @@ public class UUIDPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps,
-                           int paramIndex,
-                           UUID param)
-      throws SQLException {
+  public void addParameter(PreparedStatement ps, int paramIndex, UUID param) throws SQLException {
 
     if (param == null) {
       ps.setNull(paramIndex, Types.VARCHAR);
@@ -35,5 +28,4 @@ public class UUIDPropertyHandler
     }
     ps.setString(paramIndex, param.toString());
   }
-
 }

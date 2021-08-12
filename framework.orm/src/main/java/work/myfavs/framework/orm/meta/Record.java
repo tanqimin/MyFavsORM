@@ -12,12 +12,9 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import work.myfavs.framework.orm.util.common.RecordValueGetter;
 
-/**
- * ORM查询记录对象
- */
+/** ORM查询记录对象 */
 @SuppressWarnings("unchecked")
-public class Record
-    extends LinkedHashMap<String, Object> implements RecordValueGetter<String> {
+public class Record extends LinkedHashMap<String, Object> implements RecordValueGetter<String> {
 
   private static final long serialVersionUID = 4437164782221886837L;
 
@@ -33,7 +30,7 @@ public class Record
   /**
    * 设置属性
    *
-   * @param attr  属性名称
+   * @param attr 属性名称
    * @param value 属性值
    * @return Record
    */
@@ -45,9 +42,9 @@ public class Record
   /**
    * 获取属性
    *
-   * @param attr         属性名称
+   * @param attr 属性名称
    * @param defaultValue 如果获取属性为null，则返回defaultValue
-   * @param <T>          属性类型
+   * @param <T> 属性类型
    * @return 属性值
    */
   public <T> T get(String attr, T defaultValue) {
@@ -62,7 +59,7 @@ public class Record
    * 获取属性
    *
    * @param attr 属性名称
-   * @param <T>  属性类型
+   * @param <T> 属性类型
    * @return 属性值
    */
   public <T> T getBean(String attr) {
@@ -198,7 +195,7 @@ public class Record
    * 转换为Bean对象
    *
    * @param bean Bean
-   * @param <T>  Bean类型
+   * @param <T> Bean类型
    * @return Bean
    */
   public <T> T toBean(T bean) {
@@ -210,7 +207,7 @@ public class Record
    * 转换为Bean对象
    *
    * @param tClass Bean类
-   * @param <T>    Bean类型
+   * @param <T> Bean类型
    * @return Bean
    */
   public <T> T toBean(Class<T> tClass) {
@@ -221,7 +218,7 @@ public class Record
    * 转换为Bean对象，忽略属性大小写
    *
    * @param tClass Bean类
-   * @param <T>    Bean类型
+   * @param <T> Bean类型
    * @return Bean
    */
   public <T> T toBeanIgnoreCase(Class<T> tClass) {
@@ -232,7 +229,7 @@ public class Record
    * Bean转换为Record
    *
    * @param bean Bean
-   * @param <T>  Bean类型
+   * @param <T> Bean类型
    * @return Record
    */
   public <T> Record toRecord(T bean) {

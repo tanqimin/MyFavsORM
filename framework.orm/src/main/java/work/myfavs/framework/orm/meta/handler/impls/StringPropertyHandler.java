@@ -22,24 +22,17 @@ import java.sql.SQLException;
 import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class StringPropertyHandler
-    extends PropertyHandler<String> {
+public class StringPropertyHandler extends PropertyHandler<String> {
 
   @Override
-  public String convert(ResultSet rs,
-      String columnName,
-      Class<String> clazz)
-      throws SQLException {
+  public String convert(ResultSet rs, String columnName, Class<String> clazz) throws SQLException {
 
     final String str = rs.getString(columnName);
     return rs.wasNull() ? null : str;
   }
 
   @Override
-  public void addParameter(PreparedStatement ps,
-      int paramIndex,
-      String param)
-      throws SQLException {
+  public void addParameter(PreparedStatement ps, int paramIndex, String param) throws SQLException {
 
     if (param == null) {
       ps.setNull(paramIndex, Types.VARCHAR);
@@ -47,5 +40,4 @@ public class StringPropertyHandler
     }
     ps.setString(paramIndex, param);
   }
-
 }

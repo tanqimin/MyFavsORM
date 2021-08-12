@@ -17,40 +17,27 @@ import work.myfavs.framework.orm.util.exception.DBException;
  * @author tanqimin
  */
 @SuppressWarnings("unchecked")
-public class Attribute
-    implements Serializable {
+public class Attribute implements Serializable {
 
   private static final long serialVersionUID = 6913045257426812101L;
 
-  //region Attributes
-  /**
-   * 数据库 列名称
-   */
+  // region Attributes
+  /** 数据库 列名称 */
   private String columnName;
-  /**
-   * 类 属性名称
-   */
+  /** 类 属性名称 */
   private String fieldName;
-  /**
-   * 类 属性类型
-   */
+  /** 类 属性类型 */
   private Class<?> fieldType;
-  /**
-   * 是否只读？
-   */
+  /** 是否只读？ */
   private boolean readonly = false;
-  /**
-   * 是否主键？
-   */
+  /** 是否主键？ */
   private boolean primaryKey = false;
 
-  /**
-   * 类型处理器
-   */
+  /** 类型处理器 */
   private PropertyHandler propertyHandler = null;
-  //endregion
+  // endregion
 
-  //region Getter && Setter
+  // region Getter && Setter
 
   public String getColumnName() {
     return columnName;
@@ -66,7 +53,6 @@ public class Attribute
     return fieldType;
   }
 
-
   public boolean isReadonly() {
 
     return readonly;
@@ -77,14 +63,13 @@ public class Attribute
     return primaryKey;
   }
 
-  //endregion
+  // endregion
 
-  //region Constructor
+  // region Constructor
 
-  private Attribute() {
-  }
+  private Attribute() {}
 
-  //endregion
+  // endregion
 
   /**
    * 把指定字段解析为属性元数据
@@ -101,9 +86,10 @@ public class Attribute
       attribute.fieldType = field.getType();
       attribute.readonly = column.readonly();
       attribute.primaryKey = isPrimaryKey(field);
-      attribute.columnName = StrUtil.isEmpty(column.value())
-          ? StrUtil.toUnderlineCase(field.getName())
-          : column.value();
+      attribute.columnName =
+          StrUtil.isEmpty(column.value())
+              ? StrUtil.toUnderlineCase(field.getName())
+              : column.value();
       attribute.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
     }
     return attribute;
@@ -121,5 +107,4 @@ public class Attribute
       throw new DBException(ex);
     }
   }
-
 }

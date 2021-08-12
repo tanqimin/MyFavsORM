@@ -21,14 +21,11 @@ import work.myfavs.framework.orm.meta.pagination.Page;
 @RestController
 public class TestPKController {
 
-  @Autowired
-  private SnowfakeQuery snowfakeQuery;
-  @Autowired
-  private TestPKService testPKService;
+  @Autowired private SnowfakeQuery snowfakeQuery;
+  @Autowired private TestPKService testPKService;
 
   @RequestMapping(value = "/get", method = RequestMethod.GET)
-  public ResponseEntity<Snowflake> get(HttpServletRequest request)
-  {
+  public ResponseEntity<Snowflake> get(HttpServletRequest request) {
     return new ResponseEntity<>(snowfakeQuery.getFirst(), HttpStatus.OK);
   }
 
@@ -55,8 +52,7 @@ public class TestPKController {
   }
 
   @RequestMapping(value = "/create", method = RequestMethod.GET)
-  public ResponseEntity create()
-      throws Exception {
+  public ResponseEntity create() throws Exception {
 
     testPKService.testTransaction();
     return new ResponseEntity(HttpStatus.OK);
@@ -77,5 +73,4 @@ public class TestPKController {
 
     return new ResponseEntity<>(snowfakeQuery.findPage(), HttpStatus.OK);
   }
-
 }

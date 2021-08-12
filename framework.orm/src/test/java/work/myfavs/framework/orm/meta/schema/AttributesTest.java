@@ -14,8 +14,7 @@ public class AttributesTest {
   }
 
   @Test
-  public void get() {
-  }
+  public void get() {}
 
   @Test
   public void columns() {
@@ -25,14 +24,11 @@ public class AttributesTest {
   }
 
   @Test
-  public void put() {
-  }
+  public void put() {}
 
   @Test
-  public void forEach() {
-  }
+  public void forEach() {}
 
   @Test
-  public void computeIfAbsent() {
-  }
+  public void computeIfAbsent() {}
 }

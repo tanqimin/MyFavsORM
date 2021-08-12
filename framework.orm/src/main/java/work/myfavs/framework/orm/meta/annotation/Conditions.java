@@ -10,5 +10,4 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Conditions {
 
   Condition[] value();
-
 }

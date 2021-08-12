@@ -6,17 +6,12 @@ import java.sql.SQLException;
 import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-/**
- * Created by tanqimin on 2016/1/29.
- */
-public class BooleanPropertyHandler
-    extends PropertyHandler<Boolean> {
+/** Created by tanqimin on 2016/1/29. */
+public class BooleanPropertyHandler extends PropertyHandler<Boolean> {
 
   private boolean isPrimitive;
 
-  public BooleanPropertyHandler() {
-
-  }
+  public BooleanPropertyHandler() {}
 
   public BooleanPropertyHandler(boolean isPrimitive) {
 
@@ -24,9 +19,7 @@ public class BooleanPropertyHandler
   }
 
   @Override
-  public Boolean convert(ResultSet rs,
-                         String columnName,
-                         Class<Boolean> clazz)
+  public Boolean convert(ResultSet rs, String columnName, Class<Boolean> clazz)
       throws SQLException {
 
     boolean i = rs.getBoolean(columnName);
@@ -42,9 +35,7 @@ public class BooleanPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps,
-                           int paramIndex,
-                           Boolean param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Boolean param)
       throws SQLException {
 
     if (param == null) {
@@ -53,5 +44,4 @@ public class BooleanPropertyHandler
     }
     ps.setBoolean(paramIndex, param);
   }
-
 }

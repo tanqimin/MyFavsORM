@@ -50,29 +50,19 @@ public class CondTest {
   }
 
   @Test
-  public void gt() {
-
-  }
+  public void gt() {}
 
   @Test
-  public void ge() {
-
-  }
+  public void ge() {}
 
   @Test
-  public void lt() {
-
-  }
+  public void lt() {}
 
   @Test
-  public void le() {
-
-  }
+  public void le() {}
 
   @Test
-  public void between() {
-
-  }
+  public void between() {}
 
   @Test
   public void in() {
@@ -94,8 +84,7 @@ public class CondTest {
     Assert.assertEquals(cond.sql.toString(), " code IN (?,?)");
     Assert.assertEquals(2, cond.params.size());
 
-    Sql sql = Sql.Select("*")
-        .from("dept");
+    Sql sql = Sql.Select("*").from("dept");
     cond = Cond.in("code", sql);
     Assert.assertEquals(cond.sql.toString(), " code IN (SELECT * FROM dept)");
   }
@@ -119,10 +108,8 @@ public class CondTest {
     Assert.assertEquals(cond.sql.toString(), " code NOT IN (?,?)");
     Assert.assertEquals(2, cond.params.size());
 
-    Sql sql = Sql.Select("*")
-        .from("dept");
+    Sql sql = Sql.Select("*").from("dept");
     cond = Cond.notIn("code", sql);
     Assert.assertEquals(cond.sql.toString(), " code NOT IN (SELECT * FROM dept)");
   }
-
 }

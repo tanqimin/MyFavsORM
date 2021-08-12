@@ -8,5 +8,4 @@ public class PathUtil {
 
     return StrUtil.replace(packageName, ".", "/");
   }
-
 }

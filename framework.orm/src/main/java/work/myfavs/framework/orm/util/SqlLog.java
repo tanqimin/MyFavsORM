@@ -11,20 +11,18 @@ import org.slf4j.LoggerFactory;
 
 public class SqlLog {
 
-  private final static Logger log = LoggerFactory.getLogger(SqlLog.class);
+  private static final Logger log = LoggerFactory.getLogger(SqlLog.class);
 
-  private boolean showSql;
-  private boolean showResult;
+  private final boolean showSql;
+  private final boolean showResult;
 
-  public SqlLog(boolean showSql,
-      boolean showResult) {
+  public SqlLog(boolean showSql, boolean showResult) {
 
-    this.showSql    = showSql;
+    this.showSql = showSql;
     this.showResult = showResult;
   }
 
-  public void showSql(String sql,
-      Collection params) {
+  public void showSql(String sql, Collection params) {
 
     if (showSql && log.isDebugEnabled()) {
       StringBuilder logStr = new StringBuilder();
@@ -57,8 +55,7 @@ public class SqlLog {
     return logStr.toString();
   }
 
-  public void showBatchSql(String sql,
-      Collection<Collection> paramsList) {
+  public void showBatchSql(String sql, Collection<Collection> paramsList) {
 
     if (showSql && log.isDebugEnabled()) {
       StringBuilder logStr = new StringBuilder();

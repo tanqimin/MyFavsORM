@@ -5,16 +5,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * SQL 语句基类
- */
+/** SQL 语句基类 */
 @SuppressWarnings("unchecked")
-abstract public class Clause {
+public abstract class Clause {
 
   protected StringBuilder sql;
   protected List params;
 
-  //region Getter && Setter
+  // region Getter && Setter
   public StringBuilder getSql() {
 
     return sql;
@@ -34,9 +32,9 @@ abstract public class Clause {
 
     this.params = new ArrayList(params);
   }
-  //endregion
+  // endregion
 
-  //region Constructor
+  // region Constructor
   public Clause() {
 
     sql = new StringBuilder();
@@ -49,15 +47,14 @@ abstract public class Clause {
     this.sql.append(sql);
   }
 
-  public Clause(String sql,
-      Collection params) {
+  public Clause(String sql, Collection params) {
 
     this(sql);
     if (params != null && params.size() > 0) {
       this.params.addAll(params);
     }
   }
-  //endregion
+  // endregion
 
   public String getSqlString() {
 

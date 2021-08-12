@@ -18,49 +18,30 @@ public class ClassMeta implements Serializable {
 
   private static final long serialVersionUID = -540703036198571358L;
 
-  //region Attributes
+  // region Attributes
 
-  /**
-   * 类型
-   */
-  private Class<?> clazz;
-  /**
-   * 类名
-   */
-  private String className;
-  /**
-   * 数据表名
-   */
-  private String tableName;
-  /**
-   * 主键生成策略
-   */
+  /** 类型 */
+  private final Class<?> clazz;
+  /** 类名 */
+  private final String   className;
+  /** 数据表名 */
+  private       String   tableName;
+  /** 主键生成策略 */
   private GenerationType strategy;
-  /**
-   * 主键
-   */
+  /** 主键 */
   private Attribute primaryKey;
-  /**
-   * 是否启用逻辑删除？
-   */
+  /** 是否启用逻辑删除？ */
   private boolean enableLogicalDelete;
-  /**
-   * 逻辑删除字段（数据库字段）
-   */
-  private String logicalDeleteField;
-  /**
-   * 更新字段
-   */
-  private Attributes updateAttributes = new Attributes();
-  /**
-   * 查询字段
-   */
-  private Attributes queryAttributes = new Attributes();
+  /** 逻辑删除字段（数据库字段） */
+  private       String     logicalDeleteField;
+  /** 更新字段 */
+  private final Attributes updateAttributes = new Attributes();
+  /** 查询字段 */
+  private final Attributes queryAttributes  = new Attributes();
 
-  //endregion
+  // endregion
 
-  //region Getter && Setter
-
+  // region Getter && Setter
 
   public Class<?> getClazz() {
     return clazz;
@@ -109,9 +90,9 @@ public class ClassMeta implements Serializable {
     return logicalDeleteField;
   }
 
-  //endregion
+  // endregion
 
-  //region Constructor
+  // region Constructor
 
   /**
    * 构造方法
@@ -125,9 +106,10 @@ public class ClassMeta implements Serializable {
     final Table table = clazz.getAnnotation(Table.class);
     if (table != null) {
       this.strategy = table.strategy();
-      this.tableName = StrUtil.isEmpty(table.value())
-          ? StrUtil.toUnderlineCase(clazz.getSimpleName())
-          : table.value();
+      this.tableName =
+          StrUtil.isEmpty(table.value())
+              ? StrUtil.toUnderlineCase(clazz.getSimpleName())
+              : table.value();
       this.enableLogicalDelete = StrUtil.isNotEmpty(table.logicalDeleteField());
       this.logicalDeleteField = table.logicalDeleteField();
     }
@@ -157,7 +139,7 @@ public class ClassMeta implements Serializable {
       }
     }
   }
-  //endregion
+  // endregion
 
   /**
    * 解析指定类为类元数据

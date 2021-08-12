@@ -1,17 +1,18 @@
 package work.myfavs.framework.orm.generator.meta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class GeneratorMeta {
 
-  /**
-   * 类型匹配，用于匹配数据库类型与JAVA类型的映射
-   */
-  private Map<String, TypeDefinition> typeMapper       = new TreeMap<>();
-  /**
-   * 实体表定义
-   */
-  private List<TableDefinition>       tableDefinitions = new ArrayList<>();
+  /** 类型匹配，用于匹配数据库类型与JAVA类型的映射 */
+  private Map<String, TypeDefinition> typeMapper = new TreeMap<>();
+  /** 实体表定义 */
+  private List<TableDefinition> tableDefinitions = new ArrayList<>();
 
   public Map<String, TypeDefinition> getTypeMapper() {
 
@@ -46,5 +47,4 @@ public class GeneratorMeta {
     }
     return entities;
   }
-
 }

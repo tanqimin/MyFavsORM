@@ -9,12 +9,10 @@ import work.myfavs.framework.orm.util.exception.DBException;
 
 public abstract class GeneratorMetaFactory {
 
-  private GeneratorMeta   generatorMeta   = null;
+  private GeneratorMeta generatorMeta = null;
   private GeneratorConfig generatorConfig = null;
 
-  protected GeneratorMetaFactory() {
-
-  }
+  protected GeneratorMetaFactory() {}
 
   public static GeneratorMetaFactory createInstance(GeneratorConfig generatorConfig) {
 
@@ -56,6 +54,5 @@ public abstract class GeneratorMetaFactory {
    *
    * @return GeneratorMeta
    */
-  abstract protected GeneratorMeta createGeneratorMeta();
-
+  protected abstract GeneratorMeta createGeneratorMeta();
 }

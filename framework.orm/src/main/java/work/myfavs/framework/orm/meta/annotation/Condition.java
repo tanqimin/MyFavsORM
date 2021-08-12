@@ -5,9 +5,7 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.RetentionPolicy;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 
-/**
- * 用于构造查询条件
- */
+/** 用于构造查询条件 */
 @java.lang.annotation.Inherited
 @java.lang.annotation.Target({ElementType.FIELD})
 @java.lang.annotation.Retention(RetentionPolicy.RUNTIME)
@@ -42,5 +40,4 @@ public @interface Condition {
    * @return 组名
    */
   String group() default "DEFAULT";
-
 }

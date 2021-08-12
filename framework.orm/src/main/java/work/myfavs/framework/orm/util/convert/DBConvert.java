@@ -12,49 +12,42 @@ import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.Attributes;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 
-/**
- * 数据库类型转换
- */
+/** 数据库类型转换 */
 public class DBConvert {
 
   /**
    * 把ResultSet转换为指定类型的List
    *
    * @param modelClass Class
-   * @param rs         ResultSet
-   * @param <TModel>   Class TModel
+   * @param rs ResultSet
+   * @param <TModel> Class TModel
    * @return List
    * @throws SQLException SQLException
    */
-  public static <TModel> List<TModel> toList(Class<TModel> modelClass,
-      ResultSet rs)
+  public static <TModel> List<TModel> toList(Class<TModel> modelClass, ResultSet rs)
       throws SQLException {
 
     if (modelClass == Record.class) {
       return toRecord(modelClass, rs);
     }
 
-    final Attributes attrMetas = Metadata.get(modelClass)
-        .getQueryAttributes();
+    final Attributes attrMetas = Metadata.get(modelClass).getQueryAttributes();
 
-    if (attrMetas.isEmpty() && rs.getMetaData()
-        .getColumnCount() == 1) {
+    if (attrMetas.isEmpty() && rs.getMetaData().getColumnCount() == 1) {
       return toScalar(modelClass, rs);
     }
 
     return toEntity(modelClass, rs, attrMetas);
   }
 
-  private static <TModel> List<TModel> toEntity(Class<TModel> modelClass,
-      ResultSet rs,
-      Attributes attributes)
-      throws SQLException {
+  private static <TModel> List<TModel> toEntity(
+      Class<TModel> modelClass, ResultSet rs, Attributes attributes) throws SQLException {
 
     final List<TModel> list = new ArrayList<>();
     final ResultSetMetaData metaData = rs.getMetaData();
     final int columnCount = metaData.getColumnCount();
 
-    //找出与查询结果匹配的字段
+    // 找出与查询结果匹配的字段
     final List<Attribute> existsAttrs = new ArrayList<>();
     for (int i = 1; i <= columnCount; i++) {
       if (attributes.containsColumn(metaData.getColumnLabel(i))) {
@@ -73,8 +66,7 @@ public class DBConvert {
     return list;
   }
 
-  private static <TModel> List<TModel> toScalar(Class<TModel> modelClass,
-      ResultSet rs)
+  private static <TModel> List<TModel> toScalar(Class<TModel> modelClass, ResultSet rs)
       throws SQLException {
 
     final List<TModel> list = new ArrayList<>();
@@ -87,8 +79,7 @@ public class DBConvert {
     return list;
   }
 
-  private static <TModel> List<TModel> toRecord(Class<TModel> modelClass,
-      ResultSet rs)
+  private static <TModel> List<TModel> toRecord(Class<TModel> modelClass, ResultSet rs)
       throws SQLException {
 
     final List<TModel> list = new ArrayList<>();
@@ -107,5 +98,4 @@ public class DBConvert {
 
     return list;
   }
-
 }

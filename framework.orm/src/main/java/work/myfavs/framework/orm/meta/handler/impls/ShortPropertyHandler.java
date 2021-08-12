@@ -21,14 +21,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class ShortPropertyHandler
-    extends PropertyHandler<Short> {
+public class ShortPropertyHandler extends PropertyHandler<Short> {
 
   private boolean isPrimitive;
 
-  public ShortPropertyHandler() {
-
-  }
+  public ShortPropertyHandler() {}
 
   public ShortPropertyHandler(boolean isPrimitive) {
 
@@ -36,10 +33,7 @@ public class ShortPropertyHandler
   }
 
   @Override
-  public Short convert(ResultSet rs,
-                       String columnName,
-                       Class<Short> clazz)
-      throws SQLException {
+  public Short convert(ResultSet rs, String columnName, Class<Short> clazz) throws SQLException {
 
     short i = rs.getShort(columnName);
     if (rs.wasNull()) {
@@ -53,12 +47,8 @@ public class ShortPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps,
-                           int paramIndex,
-                           Short param)
-      throws SQLException {
+  public void addParameter(PreparedStatement ps, int paramIndex, Short param) throws SQLException {
 
     ps.setShort(paramIndex, param);
   }
-
 }

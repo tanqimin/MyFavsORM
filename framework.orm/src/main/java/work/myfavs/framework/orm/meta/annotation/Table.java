@@ -6,6 +6,7 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 /**
  * 用于标记实体名称与数据表名称之间的映射关系
+ *
  * <p>
  *
  * @author tanqimin
@@ -25,6 +26,7 @@ public @interface Table {
 
   /**
    * 主键生成策略
+   *
    * <pre>
    * UUID : 值由系统字段生成;
    * IDENTITY : 数据库自增，值由数据库生成;

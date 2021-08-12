@@ -111,9 +111,9 @@ public interface RecordValueGetter<K> {
   /**
    * 获得Enum类型的值
    *
-   * @param <E>   枚举类型
+   * @param <E> 枚举类型
    * @param clazz Enum的Class
-   * @param attr   attr
+   * @param attr attr
    * @return Enum类型的值，无则返回Null
    */
   <E extends Enum<E>> E getEnum(Class<E> clazz, K attr);

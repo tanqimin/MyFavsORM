@@ -46,5 +46,4 @@ public class Prop {
     final String str = getStr(key);
     return StrUtil.isEmpty(str) ? null : Boolean.parseBoolean(str);
   }
-
 }

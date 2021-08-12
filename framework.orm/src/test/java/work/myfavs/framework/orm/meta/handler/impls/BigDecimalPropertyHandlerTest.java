@@ -8,14 +8,14 @@ public class BigDecimalPropertyHandlerTest {
 
   @Test
   public void convert() {
-    final Type type = ((ParameterizedType) BigDecimalPropertyHandler.class
-        .getGenericSuperclass()).getActualTypeArguments()[0];
+    final Type type =
+        ((ParameterizedType) BigDecimalPropertyHandler.class.getGenericSuperclass())
+            .getActualTypeArguments()[0];
 
     final Class<?> clazz = (Class<?>) type;
     System.out.println(clazz.getName());
   }
 
   @Test
-  public void addParameter() {
-  }
+  public void addParameter() {}
 }

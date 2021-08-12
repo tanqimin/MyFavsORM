@@ -6,17 +6,12 @@ import java.sql.SQLException;
 import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-/**
- * Created by tanqimin on 2016/1/29.
- */
-public class BytePropertyHandler
-    extends PropertyHandler<Byte> {
+/** Created by tanqimin on 2016/1/29. */
+public class BytePropertyHandler extends PropertyHandler<Byte> {
 
   private boolean isPrimitive;
 
-  public BytePropertyHandler() {
-
-  }
+  public BytePropertyHandler() {}
 
   public BytePropertyHandler(boolean isPrimitive) {
 
@@ -24,10 +19,7 @@ public class BytePropertyHandler
   }
 
   @Override
-  public Byte convert(ResultSet rs,
-                      String columnName,
-                      Class<Byte> clazz)
-      throws SQLException {
+  public Byte convert(ResultSet rs, String columnName, Class<Byte> clazz) throws SQLException {
 
     byte i = rs.getByte(columnName);
     if (rs.wasNull()) {
@@ -41,10 +33,7 @@ public class BytePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps,
-                           int paramIndex,
-                           Byte param)
-      throws SQLException {
+  public void addParameter(PreparedStatement ps, int paramIndex, Byte param) throws SQLException {
 
     if (param == null) {
       ps.setNull(paramIndex, Types.VARBINARY);
@@ -52,5 +41,4 @@ public class BytePropertyHandler
     }
     ps.setByte(paramIndex, param);
   }
-
 }

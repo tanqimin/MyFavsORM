@@ -22,14 +22,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class IntegerPropertyHandler
-    extends PropertyHandler<Integer> {
+public class IntegerPropertyHandler extends PropertyHandler<Integer> {
 
   private boolean isPrimitive;
 
-  public IntegerPropertyHandler() {
-
-  }
+  public IntegerPropertyHandler() {}
 
   public IntegerPropertyHandler(boolean isPrimitive) {
 
@@ -37,9 +34,7 @@ public class IntegerPropertyHandler
   }
 
   @Override
-  public Integer convert(ResultSet rs,
-                         String columnName,
-                         Class<Integer> clazz)
+  public Integer convert(ResultSet rs, String columnName, Class<Integer> clazz)
       throws SQLException {
 
     int i = rs.getInt(columnName);
@@ -54,9 +49,7 @@ public class IntegerPropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps,
-                           int paramIndex,
-                           Integer param)
+  public void addParameter(PreparedStatement ps, int paramIndex, Integer param)
       throws SQLException {
 
     if (param == null) {
@@ -65,5 +58,4 @@ public class IntegerPropertyHandler
     }
     ps.setInt(paramIndex, param);
   }
-
 }

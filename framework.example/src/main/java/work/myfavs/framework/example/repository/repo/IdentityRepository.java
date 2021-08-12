@@ -9,12 +9,9 @@ import work.myfavs.framework.example.repository.BaseRepository;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
-/**
- * Identity Repository PS: 此文件通过代码生成器生成
- */
+/** Identity Repository PS: 此文件通过代码生成器生成 */
 @Repository
-public class IdentityRepository
-    extends BaseRepository<Identity> {
+public class IdentityRepository extends BaseRepository<Identity> {
 
   /**
    * 构造方法

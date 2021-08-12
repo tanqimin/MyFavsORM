@@ -1,8 +1,6 @@
 package work.myfavs.framework.orm.meta.enumeration;
 
-/**
- * 用于描述@Cond中的Operator
- */
+/** 用于描述@Cond中的Operator */
 public enum Operator {
   EQUALS,
   NOT_EQUALS,
@@ -16,7 +14,7 @@ public enum Operator {
   BETWEEN_START,
   BETWEEN_END
 
-/*  ,
+  /*  ,
   IN,
   NOT_IN,
   EXISTS,

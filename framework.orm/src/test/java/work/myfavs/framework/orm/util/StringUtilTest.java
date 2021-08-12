@@ -14,10 +14,9 @@ public class StringUtilTest {
     String str2 = StrUtil.format("HELLO, \\{}{}", "WORLD");
     Assert.assertEquals("HELLO, {}WORLD", str2);
     String nullStr = null;
-    String str3    = StrUtil.format("HELLO, {}", nullStr);
+    String str3 = StrUtil.format("HELLO, {}", nullStr);
     Assert.assertEquals("HELLO, null", str3);
   }
-
 
   @Test
   public void camel() {
@@ -32,5 +31,4 @@ public class StringUtilTest {
     String str = "orderLine";
     Assert.assertEquals("order_line", StrUtil.toUnderlineCase(str));
   }
-
 }

@@ -10,45 +10,29 @@ import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
-/**
- * Uuid 实体类
- * PS: 此文件通过代码生成器生成，修改此文件会有被覆盖的风险
- */
+/** Uuid 实体类 PS: 此文件通过代码生成器生成，修改此文件会有被覆盖的风险 */
 @Table(value = Uuid.META.TABLE, strategy = GenerationType.UUID)
-public class Uuid
-    implements Serializable {
+public class Uuid implements Serializable {
 
-  /**
-   * ID
-   */
+  /** ID */
   @Column(value = Uuid.META.COLUMNS.id)
   @PrimaryKey
-  private String     id      = null;
-  /**
-   * 创建时间
-   */
+  private String id = null;
+  /** 创建时间 */
   @Column(value = Uuid.META.COLUMNS.created)
-  private Date       created = null;
-  /**
-   * 名称
-   */
+  private Date created = null;
+  /** 名称 */
   @Column(value = Uuid.META.COLUMNS.name)
-  private String     name    = null;
-  /**
-   * 是否停用
-   */
+  private String name = null;
+  /** 是否停用 */
   @Column(value = Uuid.META.COLUMNS.disable)
-  private Boolean    disable = false;
-  /**
-   * 价格
-   */
+  private Boolean disable = false;
+  /** 价格 */
   @Column(value = Uuid.META.COLUMNS.price)
-  private BigDecimal price   = BigDecimal.ZERO;
-  /**
-   * 类型
-   */
+  private BigDecimal price = BigDecimal.ZERO;
+  /** 类型 */
   @Column(value = Uuid.META.COLUMNS.type)
-  private TypeEnum   type    = null;
+  private TypeEnum type = null;
 
   public String getId() {
 
@@ -110,46 +94,27 @@ public class Uuid
     this.type = type;
   }
 
-  /**
-   * 元数据
-   */
+  /** 元数据 */
   public enum META {
     ;
-    /**
-     * 表名
-     */
+    /** 表名 */
     public static final String TABLE = "tb_uuid";
 
-    /**
-     * 字段
-     */
+    /** 字段 */
     public interface COLUMNS {
 
-      /**
-       * ID
-       */
-      String id      = "id";
-      /**
-       * 创建时间
-       */
+      /** ID */
+      String id = "id";
+      /** 创建时间 */
       String created = "created";
-      /**
-       * 名称
-       */
-      String name    = "name";
-      /**
-       * 是否停用
-       */
+      /** 名称 */
+      String name = "name";
+      /** 是否停用 */
       String disable = "disable";
-      /**
-       * 价格
-       */
-      String price   = "price";
-      /**
-       * 类型
-       */
-      String type    = "type";
-
+      /** 价格 */
+      String price = "price";
+      /** 类型 */
+      String type = "type";
     }
   }
 
@@ -175,7 +140,24 @@ public class Uuid
   @Override
   public String toString() {
 
-    return "Uuid { " + "id = " + id + ", " + "created = " + created + ", " + "name = " + name + ", " + "disable = " + disable + ", " + "price = " + price + ", " + "type = " + type + " }";
+    return "Uuid { "
+        + "id = "
+        + id
+        + ", "
+        + "created = "
+        + created
+        + ", "
+        + "name = "
+        + name
+        + ", "
+        + "disable = "
+        + disable
+        + ", "
+        + "price = "
+        + price
+        + ", "
+        + "type = "
+        + type
+        + " }";
   }
-
 }

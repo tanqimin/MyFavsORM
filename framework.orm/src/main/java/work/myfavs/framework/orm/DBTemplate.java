@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm;
 
-
 import cn.hutool.core.io.FileUtil;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -17,7 +16,6 @@ import work.myfavs.framework.orm.util.PKGenerator;
 import work.myfavs.framework.orm.util.SqlLog;
 import work.myfavs.framework.orm.util.exception.DBException;
 
-
 /**
  * 数据库配置
  *
@@ -25,7 +23,7 @@ import work.myfavs.framework.orm.util.exception.DBException;
  */
 public class DBTemplate {
 
-  private final static Map<String, DBTemplate> POOL = new ConcurrentHashMap<>();
+  private static final Map<String, DBTemplate> POOL = new ConcurrentHashMap<>();
 
   public static DBTemplate get(String dsName) {
     if (POOL.containsKey(dsName)) {
@@ -36,34 +34,22 @@ public class DBTemplate {
     throw new DBException("The DataSource named {} not exists.", dsName);
   }
 
-  //region Attributes
-  /**
-   * 数据源名称
-   */
-  private String      dsName;
-  /**
-   * 数据源
-   */
-  private DataSource  dataSource;
-  /**
-   * 数据库配置
-   */
-  private DBConfig    dbConfig;
-  /**
-   * 数据库连接工厂
-   */
-  private ConnFactory connectionFactory;
-  /**
-   * SQL语句日志配置
-   */
-  private SqlLog      sqlLog;
-  /**
-   * 主键生成器
-   */
-  private PKGenerator pkGenerator;
-  //endregion
+  // region Attributes
+  /** 数据源名称 */
+  private final String     dsName;
+  /** 数据源 */
+  private final DataSource dataSource;
+  /** 数据库配置 */
+  private final DBConfig   dbConfig;
+  /** 数据库连接工厂 */
+  private final ConnFactory connectionFactory;
+  /** SQL语句日志配置 */
+  private final SqlLog      sqlLog;
+  /** 主键生成器 */
+  private final PKGenerator pkGenerator;
+  // endregion
 
-  //region Constructor
+  // region Constructor
 
   /**
    * 构造方法
@@ -72,13 +58,14 @@ public class DBTemplate {
    */
   private DBTemplate(Builder builder) {
 
-    this.dsName            = builder.dsName;
-    this.dataSource        = builder.dataSource;
-    this.dbConfig          = builder.config;
+    this.dsName = builder.dsName;
+    this.dataSource = builder.dataSource;
+    this.dbConfig = builder.config;
     this.connectionFactory = createConnFactory(builder.connectionFactory, builder.dataSource);
-    this.sqlLog            = new SqlLog(this.dbConfig.getShowSql(), this.dbConfig.getShowResult());
-    this.pkGenerator       = new PKGenerator(this.dbConfig.getWorkerId(), this.dbConfig.getDataCenterId());
-    //注册 PropertyHandler
+    this.sqlLog = new SqlLog(this.dbConfig.getShowSql(), this.dbConfig.getShowResult());
+    this.pkGenerator =
+        new PKGenerator(this.dbConfig.getWorkerId(), this.dbConfig.getDataCenterId());
+    // 注册 PropertyHandler
     registerMapper(builder.mapper);
   }
 
@@ -96,7 +83,7 @@ public class DBTemplate {
       PropertyHandlerFactory.register(entry.getKey(), entry.getValue());
     }
   }
-  //endregion
+  // endregion
 
   /**
    * 获取数据源名称
@@ -148,27 +135,29 @@ public class DBTemplate {
   /**
    * 获取数据库连接工厂
    *
-   * @param cls        数据库连接工厂类型
+   * @param cls 数据库连接工厂类型
    * @param dataSource 数据源
    * @return 数据库连接工厂
    */
-  private ConnFactory createConnFactory(Class<? extends ConnFactory> cls,
-      DataSource dataSource) {
+  private ConnFactory createConnFactory(Class<? extends ConnFactory> cls, DataSource dataSource) {
 
     try {
       final Constructor<? extends ConnFactory> constructor = cls.getConstructor(DataSource.class);
       return constructor.newInstance(dataSource);
-    } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+    } catch (NoSuchMethodException
+        | IllegalAccessException
+        | InstantiationException
+        | InvocationTargetException e) {
       throw new DBException(e, "Fail to create ConnectionFactory instance, error message:");
     }
   }
 
   public static class Builder {
 
-    private String     dsName;
-    private DataSource dataSource;
-    private DBConfig   config;
-    public  Mapper     mapper = new Mapper();
+    private final String     dsName;
+    private       DataSource dataSource;
+    private DBConfig config;
+    public Mapper mapper = new Mapper();
 
     public Builder() {
       this(DBConfig.DEFAULT_DATASOURCE_NAME);
@@ -215,29 +204,27 @@ public class DBTemplate {
         this.config = new DBConfig();
       }
 
-      return DBTemplate.POOL.computeIfAbsent(dsName, ds -> {
-        return new DBTemplate(this);
-      });
+      return DBTemplate.POOL.computeIfAbsent(
+          dsName,
+          ds -> {
+            return new DBTemplate(this);
+          });
     }
-
   }
 
   public static class Mapper {
 
-    private Map<Class<?>, PropertyHandler> map;
+    private final Map<Class<?>, PropertyHandler> map;
 
     private Mapper() {
 
       map = new HashMap<>();
     }
 
-    public Mapper register(Class<?> clazz,
-        PropertyHandler propertyHandler) {
+    public Mapper register(Class<?> clazz, PropertyHandler propertyHandler) {
 
       map.put(clazz, propertyHandler);
       return this;
     }
-
   }
-
 }

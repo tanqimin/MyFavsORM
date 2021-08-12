@@ -6,8 +6,8 @@ import work.myfavs.framework.orm.generator.meta.column.ColumnDefinition;
 
 public class TableDefinition {
 
-  private String                 tableName;
-  private String                 className;
+  private String tableName;
+  private String className;
   private List<ColumnDefinition> columns = new ArrayList<>();
 
   public String getTableName() {
@@ -39,5 +39,4 @@ public class TableDefinition {
 
     this.columns = columns;
   }
-
 }

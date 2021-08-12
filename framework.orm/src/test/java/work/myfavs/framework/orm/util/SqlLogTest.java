@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public class SqlLogTest {
 
-  private final static Logger log = LoggerFactory.getLogger(SqlLogTest.class);
+  private static final Logger log = LoggerFactory.getLogger(SqlLogTest.class);
 
   @Test
   public void showResult() {
@@ -19,9 +19,7 @@ public class SqlLogTest {
     Person p3 = new Man("tam", 22, "worker");
 
     List<Person> personList = new ArrayList<>();
-    for (int i = 0;
-         i < 1000000;
-         i++) {
+    for (int i = 0; i < 1000000; i++) {
       personList.add(new Person("name" + i, 18));
     }
 
@@ -29,8 +27,8 @@ public class SqlLogTest {
     stopWatch.start();
     StringBuilder sb = new StringBuilder();
     for (Person person : personList) {
-//      sb.append(JSON.parseObj(person)
-//                        .toString());
+      //      sb.append(JSON.parseObj(person)
+      //                        .toString());
       sb.append("\n");
     }
     stopWatch.stop();
@@ -41,7 +39,7 @@ public class SqlLogTest {
   class Person {
 
     private String name;
-    private int    age;
+    private int age;
 
     public String getName() {
 
@@ -63,21 +61,16 @@ public class SqlLogTest {
       this.age = age;
     }
 
-    public Person(String name,
-                  int age) {
+    public Person(String name, int age) {
 
       this.name = name;
       this.age = age;
     }
-
   }
 
-  class Man
-      extends Person {
+  class Man extends Person {
 
-    public Man(String name,
-               int age,
-               String job) {
+    public Man(String name, int age, String job) {
 
       super(name, age);
       this.job = job;
@@ -94,7 +87,5 @@ public class SqlLogTest {
 
       this.job = job;
     }
-
   }
-
 }

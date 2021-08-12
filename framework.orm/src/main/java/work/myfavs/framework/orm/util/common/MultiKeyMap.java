@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 /**
  * 包含两个Key(Key1,Key2)的类似Map的数据结构封装 Key1和Key2在各自的范围内不允许重复，且不为null
  *
- * @param <TKey1>  Key1
- * @param <TKey2>  Key2
+ * @param <TKey1> Key1
+ * @param <TKey2> Key2
  * @param <TValue> Value
  */
 public class MultiKeyMap<TKey1, TKey2, TValue> implements Serializable {
 
-  private Set<Tuple3<TKey1, TKey2, TValue>> data = new HashSet<>();
+  private final Set<Tuple3<TKey1, TKey2, TValue>> data = new HashSet<>();
 
   /**
    * 获取集合大小
@@ -151,8 +151,8 @@ public class MultiKeyMap<TKey1, TKey2, TValue> implements Serializable {
   /**
    * 如果存在Key1键，则替换原来的Value，并返回旧Value， 否则把Value添加到新集合中，并返回null
    *
-   * @param key1  Key1
-   * @param key2  Key2
+   * @param key1 Key1
+   * @param key2 Key2
    * @param value 值
    * @return 返回添加前的值
    */
@@ -183,8 +183,8 @@ public class MultiKeyMap<TKey1, TKey2, TValue> implements Serializable {
   /**
    * 如果存在Key2键，则替换原来的Value，并返回旧Value， 否则把Value添加到新集合中，并返回null
    *
-   * @param key1  Key1
-   * @param key2  Key2
+   * @param key1 Key1
+   * @param key2 Key2
    * @param value 值
    * @return 返回添加前的值
    */

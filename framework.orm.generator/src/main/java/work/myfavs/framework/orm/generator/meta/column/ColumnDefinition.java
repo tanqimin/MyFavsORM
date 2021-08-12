@@ -5,41 +5,24 @@ import java.io.Serializable;
 import work.myfavs.framework.orm.generator.meta.TypeDefinition;
 import work.myfavs.framework.orm.generator.util.GeneratorUtil;
 
-public class ColumnDefinition
-    implements Serializable {
+public class ColumnDefinition implements Serializable {
 
-  /**
-   * 表名
-   */
-  private String         table;
-  /**
-   * 字段名
-   */
-  private String         column;
-  /**
-   * 是否主键？
-   */
-  private Boolean        primaryKey;
-  /**
-   * 是否可为Null
-   */
-  private Boolean        nullable;
-  /**
-   * 排序ID
-   */
-  private Integer        index;
-  /**
-   * 数据库类型
-   */
-  private String         dataType;
-  /**
-   * 类型定义
-   */
+  /** 表名 */
+  private String table;
+  /** 字段名 */
+  private String column;
+  /** 是否主键？ */
+  private Boolean primaryKey;
+  /** 是否可为Null */
+  private Boolean nullable;
+  /** 排序ID */
+  private Integer index;
+  /** 数据库类型 */
+  private String dataType;
+  /** 类型定义 */
   private TypeDefinition typeDefinition;
-  /**
-   * 注释
-   */
-  private String         comment;
+  /** 注释 */
+  private String comment;
 
   public String getClassName() {
 
@@ -139,5 +122,4 @@ public class ColumnDefinition
 
     this.comment = comment;
   }
-
 }

@@ -6,13 +6,9 @@ import work.myfavs.framework.example.domain.entity.Snowflake;
 import work.myfavs.framework.example.repository.BaseRepository;
 import work.myfavs.framework.orm.DBTemplate;
 
-/**
- * Snowfake Repository
- * PS: 此文件通过代码生成器生成
- */
+/** Snowfake Repository PS: 此文件通过代码生成器生成 */
 @Repository
-public class SnowflakeRepository
-    extends BaseRepository<Snowflake> {
+public class SnowflakeRepository extends BaseRepository<Snowflake> {
 
   /**
    * 构造方法
@@ -24,5 +20,4 @@ public class SnowflakeRepository
 
     super(dbTemplate);
   }
-
 }

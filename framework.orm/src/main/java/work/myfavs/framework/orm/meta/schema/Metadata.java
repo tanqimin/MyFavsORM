@@ -12,13 +12,11 @@ import org.slf4j.LoggerFactory;
  */
 public class Metadata {
 
-  private final static Logger log = LoggerFactory.getLogger(Metadata.class);
+  private static final Logger log = LoggerFactory.getLogger(Metadata.class);
 
-  private final static Map<String, ClassMeta> CLASS_META_CACHE = new ConcurrentHashMap<>();
+  private static final Map<String, ClassMeta> CLASS_META_CACHE = new ConcurrentHashMap<>();
 
-  private Metadata() {
-
-  }
+  private Metadata() {}
 
   /**
    * 解析指定类为类元数据，并放入缓存中
@@ -28,8 +26,7 @@ public class Metadata {
    */
   public static ClassMeta get(Class<?> clazz) {
 
-    return CLASS_META_CACHE.computeIfAbsent(clazz.getName(),
-        className -> ClassMeta.createInstance(clazz));
+    return CLASS_META_CACHE.computeIfAbsent(
+        clazz.getName(), className -> ClassMeta.createInstance(clazz));
   }
-
 }

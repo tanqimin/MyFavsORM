@@ -9,22 +9,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
-/**
- * SQL 语句构建 注意：此处为了解决静态方法与普通方法不能重名的问题，所有静态方法均以大写字母开头
- */
+/** SQL 语句构建 注意：此处为了解决静态方法与普通方法不能重名的问题，所有静态方法均以大写字母开头 */
 @SuppressWarnings(value = "unchecked")
-public class Sql
-    extends Clause
-    implements Serializable {
+public class Sql extends Clause implements Serializable {
 
-  //region Constructor
+  // region Constructor
 
-  /**
-   * 构造方法
-   */
-  public Sql() {
-
-  }
+  /** 构造方法 */
+  public Sql() {}
 
   /**
    * 构造方法
@@ -54,11 +46,10 @@ public class Sql
   /**
    * 构造方法
    *
-   * @param sql    SQL 语句
+   * @param sql SQL 语句
    * @param params 参数
    */
-  public Sql(String sql,
-      Collection params) {
+  public Sql(String sql, Collection params) {
 
     super(sql, params);
   }
@@ -66,7 +57,7 @@ public class Sql
   public Sql(Sql sql) {
     super(sql.getSqlString(), sql.getParams());
   }
-  //endregion
+  // endregion
 
   public static Sql New(String sql) {
 
@@ -101,14 +92,12 @@ public class Sql
   /**
    * 追加拼接 SQL
    *
-   * @param sql    SQL 语句
-   * @param param  参数
+   * @param sql SQL 语句
+   * @param param 参数
    * @param params 更多的参数
    * @return 拼接后的 SQL
    */
-  public Sql append(String sql,
-      Object param,
-      Object... params) {
+  public Sql append(String sql, Object param, Object... params) {
 
     this.sql.append(sql);
     this.params.add(param);
@@ -119,12 +108,11 @@ public class Sql
   /**
    * 追加拼接 SQL
    *
-   * @param sql    SQL 语句
+   * @param sql SQL 语句
    * @param params 参数集合
    * @return 拼接后的 SQL
    */
-  public Sql append(String sql,
-      Collection params) {
+  public Sql append(String sql, Collection params) {
 
     this.sql.append(sql);
     this.params.addAll(params);
@@ -156,14 +144,12 @@ public class Sql
   /**
    * 追加拼接 SQL
    *
-   * @param sql    SQL 语句
-   * @param param  参数
+   * @param sql SQL 语句
+   * @param param 参数
    * @param params 更多的参数
    * @return 拼接后的 SQL
    */
-  public Sql appendLine(String sql,
-                    Object param,
-                    Object... params) {
+  public Sql appendLine(String sql, Object param, Object... params) {
 
     return this.append(sql.concat(System.lineSeparator()), param, params);
   }
@@ -171,12 +157,11 @@ public class Sql
   /**
    * 追加拼接 SQL
    *
-   * @param sql    SQL 语句
+   * @param sql SQL 语句
    * @param params 参数集合
    * @return 拼接后的 SQL
    */
-  public Sql appendLine(String sql,
-                    Collection params) {
+  public Sql appendLine(String sql, Collection params) {
 
     return this.append(sql.concat(System.lineSeparator()), params);
   }
@@ -194,12 +179,11 @@ public class Sql
   /**
    * 创建 SELECT {field}, {fields[1]}... 语句
    *
-   * @param field  字段
+   * @param field 字段
    * @param fields 更多的字段
    * @return SQL
    */
-  public static Sql Select(String field,
-      String... fields) {
+  public static Sql Select(String field, String... fields) {
 
     Sql sql = new Sql(StrUtil.format("SELECT {}", field));
     if (fields != null && fields.length > 0) {
@@ -217,20 +201,18 @@ public class Sql
    */
   public Sql selectAll() {
 
-    this.append(" ")
-        .append(SelectAll());
+    this.append(" ").append(SelectAll());
     return this;
   }
 
   /**
    * 拼接 SELECT {field}, {fields[1]}... 语句
    *
-   * @param field  字段
+   * @param field 字段
    * @param fields 更多字段
    * @return SQL
    */
-  public Sql select(String field,
-      String... fields) {
+  public Sql select(String field, String... fields) {
 
     this.append(StrUtil.format(" SELECT {}", field));
     if (fields != null && fields.length > 0) {
@@ -256,11 +238,10 @@ public class Sql
    * 拼接 FROM 语句
    *
    * @param tableName 表名
-   * @param alias     表别名
+   * @param alias 表别名
    * @return SQL
    */
-  public Sql from(String tableName,
-      String alias) {
+  public Sql from(String tableName, String alias) {
 
     return this.append(StrUtil.format(" FROM {} {}", tableName, alias));
   }
@@ -268,12 +249,11 @@ public class Sql
   /**
    * 拼接 FROM 语句
    *
-   * @param sql   SQL
+   * @param sql SQL
    * @param alias 表别名
    * @return SQL
    */
-  public Sql from(Sql sql,
-      String alias) {
+  public Sql from(Sql sql, String alias) {
 
     return this.append(StrUtil.format(" FROM ({}) {}", sql.sql, alias), sql.params);
   }
@@ -282,25 +262,20 @@ public class Sql
    * 拼接 FROM 语句
    *
    * @param supplier Supplier
-   * @param alias    表别名
+   * @param alias 表别名
    * @return SQL
    */
-  public Sql from(Supplier<Sql> supplier,
-      String alias) {
+  public Sql from(Supplier<Sql> supplier, String alias) {
 
     return this.from(supplier.get(), alias);
   }
 
-  private Sql join(String tableName,
-      String alias,
-      String onClause) {
+  private Sql join(String tableName, String alias, String onClause) {
 
     return this.append(StrUtil.format(" JOIN {} {} ON {}", tableName, alias, onClause));
   }
 
-  private Sql join(Sql sql,
-      String alias,
-      String onClause) {
+  private Sql join(Sql sql, String alias, String onClause) {
 
     return this.append(StrUtil.format(" JOIN ({}) {} ON {}", sql.sql, alias, onClause), sql.params);
   }
@@ -309,192 +284,156 @@ public class Sql
    * 拼接 LEFT JOIN 语句
    *
    * @param tableName 表名
-   * @param alias     表别名
-   * @param onClause  ON语句
+   * @param alias 表别名
+   * @param onClause ON语句
    * @return SQL
    */
-  public Sql leftJoin(String tableName,
-      String alias,
-      String onClause) {
+  public Sql leftJoin(String tableName, String alias, String onClause) {
 
-    return this.append(" LEFT")
-        .join(tableName, alias, onClause);
+    return this.append(" LEFT").join(tableName, alias, onClause);
   }
 
   /**
    * 拼接 LEFT JOIN 语句
    *
-   * @param sql      SQL
-   * @param alias    表别名
+   * @param sql SQL
+   * @param alias 表别名
    * @param onClause ON语句
    * @return SQL
    */
-  public Sql leftJoin(Sql sql,
-      String alias,
-      String onClause) {
+  public Sql leftJoin(Sql sql, String alias, String onClause) {
 
-    return this.append(" LEFT")
-        .join(sql, alias, onClause);
+    return this.append(" LEFT").join(sql, alias, onClause);
   }
 
   /**
    * 拼接 LEFT JOIN 语句
    *
    * @param supplier Supplier
-   * @param alias    表别名
+   * @param alias 表别名
    * @param onClause ON语句
    * @return SQL
    */
-  public Sql leftJoin(Supplier<Sql> supplier,
-      String alias,
-      String onClause) {
+  public Sql leftJoin(Supplier<Sql> supplier, String alias, String onClause) {
 
-    return this.append(" LEFT")
-        .join(supplier.get(), alias, onClause);
+    return this.append(" LEFT").join(supplier.get(), alias, onClause);
   }
 
   /**
    * 拼接 RIGHT JOIN 语句
    *
    * @param tableName 表名
-   * @param alias     表别名
-   * @param onClause  ON语句
+   * @param alias 表别名
+   * @param onClause ON语句
    * @return SQL
    */
-  public Sql rightJoin(String tableName,
-      String alias,
-      String onClause) {
+  public Sql rightJoin(String tableName, String alias, String onClause) {
 
-    return this.append(" RIGHT")
-        .join(tableName, alias, onClause);
+    return this.append(" RIGHT").join(tableName, alias, onClause);
   }
 
   /**
    * 拼接 RIGHT JOIN 语句
    *
-   * @param sql      SQL
-   * @param alias    表别名
+   * @param sql SQL
+   * @param alias 表别名
    * @param onClause ON语句
    * @return SQL
    */
-  public Sql rightJoin(Sql sql,
-      String alias,
-      String onClause) {
+  public Sql rightJoin(Sql sql, String alias, String onClause) {
 
-    return this.append(" RIGHT")
-        .join(sql, alias, onClause);
+    return this.append(" RIGHT").join(sql, alias, onClause);
   }
 
   /**
    * 拼接 RIGHT JOIN 语句
    *
    * @param supplier Supplier
-   * @param alias    表别名
+   * @param alias 表别名
    * @param onClause ON语句
    * @return SQL
    */
-  public Sql rightJoin(Supplier<Sql> supplier,
-      String alias,
-      String onClause) {
+  public Sql rightJoin(Supplier<Sql> supplier, String alias, String onClause) {
 
-    return this.append(" RIGHT")
-        .join(supplier.get(), alias, onClause);
+    return this.append(" RIGHT").join(supplier.get(), alias, onClause);
   }
 
   /**
    * 拼接 INNER JOIN 语句
    *
    * @param tableName 表名
-   * @param alias     表别名
-   * @param onClause  ON语句
+   * @param alias 表别名
+   * @param onClause ON语句
    * @return SQL
    */
-  public Sql innerJoin(String tableName,
-      String alias,
-      String onClause) {
+  public Sql innerJoin(String tableName, String alias, String onClause) {
 
-    return this.append(" INNER")
-        .join(tableName, alias, onClause);
+    return this.append(" INNER").join(tableName, alias, onClause);
   }
 
   /**
    * 拼接 INNER JOIN 语句
    *
-   * @param sql      SQL
-   * @param alias    表别名
+   * @param sql SQL
+   * @param alias 表别名
    * @param onClause ON语句
    * @return SQL
    */
-  public Sql innerJoin(Sql sql,
-      String alias,
-      String onClause) {
+  public Sql innerJoin(Sql sql, String alias, String onClause) {
 
-    return this.append(" INNER")
-        .join(sql, alias, onClause);
+    return this.append(" INNER").join(sql, alias, onClause);
   }
 
   /**
    * 拼接 INNER JOIN 语句
    *
    * @param supplier Supplier
-   * @param alias    表别名
+   * @param alias 表别名
    * @param onClause ON语句
    * @return SQL
    */
-  public Sql innerJoin(Supplier<Sql> supplier,
-      String alias,
-      String onClause) {
+  public Sql innerJoin(Supplier<Sql> supplier, String alias, String onClause) {
 
-    return this.append(" INNER")
-        .join(supplier.get(), alias, onClause);
+    return this.append(" INNER").join(supplier.get(), alias, onClause);
   }
 
   /**
    * 拼接 FULL JOIN 语句
    *
    * @param tableName 表名
-   * @param alias     表别名
-   * @param onClause  ON语句
+   * @param alias 表别名
+   * @param onClause ON语句
    * @return SQL
    */
-  public Sql fullJoin(String tableName,
-      String alias,
-      String onClause) {
+  public Sql fullJoin(String tableName, String alias, String onClause) {
 
-    return this.append(" FULL")
-        .join(tableName, alias, onClause);
+    return this.append(" FULL").join(tableName, alias, onClause);
   }
 
   /**
    * 拼接 FULL JOIN 语句
    *
-   * @param sql      SQL
-   * @param alias    表别名
+   * @param sql SQL
+   * @param alias 表别名
    * @param onClause ON语句
    * @return SQL
    */
-  public Sql fullJoin(Sql sql,
-      String alias,
-      String onClause) {
+  public Sql fullJoin(Sql sql, String alias, String onClause) {
 
-    return this.append(" FULL")
-        .join(sql, alias, onClause);
+    return this.append(" FULL").join(sql, alias, onClause);
   }
 
   /**
    * 拼接 FULL JOIN 语句
    *
    * @param supplier Supplier
-   * @param alias    表别名
+   * @param alias 表别名
    * @param onClause ON语句
    * @return SQL
    */
-  public Sql fullJoin(Supplier<Sql> supplier,
-      String alias,
-      String onClause) {
+  public Sql fullJoin(Supplier<Sql> supplier, String alias, String onClause) {
 
-    return this.append(" FULL")
-        .join(supplier.get(), alias, onClause);
+    return this.append(" FULL").join(supplier.get(), alias, onClause);
   }
 
   /**
@@ -532,12 +471,11 @@ public class Sql
   /**
    * 拼接 WHERE {sql} 语句
    *
-   * @param sql    SQL 语句
+   * @param sql SQL 语句
    * @param params 参数
    * @return SQL
    */
-  public Sql where(String sql,
-      Collection params) {
+  public Sql where(String sql, Collection params) {
 
     return this.append(StrUtil.format(" WHERE {}", sql), params);
   }
@@ -627,18 +565,15 @@ public class Sql
   /**
    * 拼接 GROUP BY {field}, {fields[1]}... 语句
    *
-   * @param field  字段
+   * @param field 字段
    * @param fields 更多字段
    * @return SQL
    */
-  public Sql groupBy(String field,
-      String... fields) {
+  public Sql groupBy(String field, String... fields) {
 
     this.append(StrUtil.format(" GROUP BY {}", field));
     if (fields != null && fields.length > 0) {
-      for (int i = 0;
-          i < fields.length;
-          i++) {
+      for (int i = 0; i < fields.length; i++) {
         this.append(StrUtil.format(",{}", fields[i]));
       }
     }
@@ -669,12 +604,11 @@ public class Sql
   /**
    * 拼接 HAVING {sql} 语句
    *
-   * @param sql    SQL语句
+   * @param sql SQL语句
    * @param params 参数
    * @return SQL
    */
-  public Sql having(String sql,
-      Collection params) {
+  public Sql having(String sql, Collection params) {
 
     return this.append(StrUtil.format(" HAVING {}", sql), params);
   }
@@ -695,18 +629,15 @@ public class Sql
   /**
    * 拼接 ORDER BY {field}, {fields[1]}... 语句
    *
-   * @param field  字段，可包含排序方法，如 code DESC
+   * @param field 字段，可包含排序方法，如 code DESC
    * @param fields 更多字段
    * @return SQL
    */
-  public Sql orderBy(String field,
-      String... fields) {
+  public Sql orderBy(String field, String... fields) {
 
     this.append(StrUtil.format(" ORDER BY {}", field));
     if (fields != null && fields.length > 0) {
-      for (int i = 0;
-          i < fields.length;
-          i++) {
+      for (int i = 0; i < fields.length; i++) {
         this.append(StrUtil.format(",{}", fields[i]));
       }
     }
@@ -728,11 +659,10 @@ public class Sql
    * 拼接 LIMIT {offset} {row} 语句
    *
    * @param offset 起始记录偏移量
-   * @param row    返回行数
+   * @param row 返回行数
    * @return SQL
    */
-  public Sql limit(int offset,
-      int row) {
+  public Sql limit(int offset, int row) {
 
     return this.append(StrUtil.format(" LIMIT {},{}", offset, row));
   }
@@ -740,20 +670,16 @@ public class Sql
   /**
    * 创建 INSERT INT {table} ({field}, {fields[1]...}) 语句
    *
-   * @param table  表名
-   * @param field  字段
+   * @param table 表名
+   * @param field 字段
    * @param fields 更多字段
    * @return SQL
    */
-  public static Sql Insert(String table,
-      String field,
-      String... fields) {
+  public static Sql Insert(String table, String field, String... fields) {
 
     Sql sql = new Sql(StrUtil.format("INSERT INTO {} ({}", table, field));
     if (fields != null && fields.length > 0) {
-      for (int i = 0;
-          i < fields.length;
-          i++) {
+      for (int i = 0; i < fields.length; i++) {
         sql.append(StrUtil.format(",{}", fields[i]));
       }
     }
@@ -764,11 +690,10 @@ public class Sql
    * 创建完整 INSERT 语句
    *
    * @param table 表
-   * @param map   INSERT的字段名、值
+   * @param map INSERT的字段名、值
    * @return SQL
    */
-  public static Sql Insert(String table,
-      Map<String, Object> map) {
+  public static Sql Insert(String table, Map<String, Object> map) {
 
     Sql insertSql;
     Sql valuesSql;
@@ -782,20 +707,17 @@ public class Sql
       insertSql.sql.deleteCharAt(insertSql.sql.lastIndexOf(","));
       valuesSql.sql.deleteCharAt(valuesSql.sql.lastIndexOf(","));
     }
-    return insertSql.append(")")
-        .append(valuesSql)
-        .append(")");
+    return insertSql.append(")").append(valuesSql).append(")");
   }
 
   /**
    * 拼接 VALUES ({param}, {param[1]}...) 语句
    *
-   * @param param  参数
+   * @param param 参数
    * @param params 更多参数
    * @return SQL
    */
-  public Sql values(Object param,
-      Object... params) {
+  public Sql values(Object param, Object... params) {
 
     this.append(StrUtil.format(" VALUES (?"), param);
     if (params != null && params.length > 0) {
@@ -836,8 +758,7 @@ public class Sql
    * @param param 参数
    * @return SQL
    */
-  public Sql set(String field,
-      Object param) {
+  public Sql set(String field, Object param) {
 
     return this.append(StrUtil.format(" SET {} = ?", field), param);
   }
@@ -882,8 +803,7 @@ public class Sql
    * @param alias 表别名
    * @return SQL
    */
-  public static Sql Delete(String table,
-      String alias) {
+  public static Sql Delete(String table, String alias) {
 
     return new Sql(StrUtil.format("DELETE {} FROM {} {}", alias, table, alias));
   }
@@ -893,5 +813,4 @@ public class Sql
 
     return this.getSqlString();
   }
-
 }

@@ -12,20 +12,18 @@ import work.myfavs.framework.orm.DBTemplate;
  *
  * @author tanqimin
  */
-public class PageBase<TModel>
-    extends HashMap<String, Object> {
+public class PageBase<TModel> extends HashMap<String, Object> {
 
   protected final DBTemplate dbTemplate;
-  protected final String     pageDataField;
-  protected final String     pageCurrentField;
-  protected final String     pageSizeField;
-
+  protected final String pageDataField;
+  protected final String pageCurrentField;
+  protected final String pageSizeField;
 
   public PageBase(DBTemplate dbTemplate) {
-    this.dbTemplate           = dbTemplate;
-    this.pageDataField        = dbTemplate.getDbConfig().getPageDataField();
-    this.pageCurrentField     = dbTemplate.getDbConfig().getPageCurrentField();
-    this.pageSizeField        = dbTemplate.getDbConfig().getPageSizeField();
+    this.dbTemplate = dbTemplate;
+    this.pageDataField = dbTemplate.getDbConfig().getPageDataField();
+    this.pageCurrentField = dbTemplate.getDbConfig().getPageCurrentField();
+    this.pageSizeField = dbTemplate.getDbConfig().getPageSizeField();
   }
 
   public List<TModel> getData() {
@@ -56,13 +54,11 @@ public class PageBase<TModel>
   protected <TOther> List<TOther> convertData(Function<TModel, TOther> fun) {
 
     List<TOther> list = new ArrayList<>();
-    for (Iterator<TModel> iterator = this.getData().iterator();
-        iterator.hasNext(); ) {
-      TModel item  = iterator.next();
+    for (Iterator<TModel> iterator = this.getData().iterator(); iterator.hasNext(); ) {
+      TModel item = iterator.next();
       TOther apply = fun.apply(item);
       list.add(apply);
     }
     return list;
   }
-
 }

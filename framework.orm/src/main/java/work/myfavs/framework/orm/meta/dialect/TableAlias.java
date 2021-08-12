@@ -12,7 +12,7 @@ import java.util.function.Supplier;
  */
 public class TableAlias {
 
-  private final static ThreadLocal<String> TABLE_ALIAS_POOL = new ThreadLocal<>();
+  private static final ThreadLocal<String> TABLE_ALIAS_POOL = new ThreadLocal<>();
 
   public static String get() {
     return TABLE_ALIAS_POOL.get();

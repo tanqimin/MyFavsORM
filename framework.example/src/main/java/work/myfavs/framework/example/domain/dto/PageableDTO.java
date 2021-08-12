@@ -2,12 +2,11 @@ package work.myfavs.framework.example.domain.dto;
 
 import work.myfavs.framework.orm.meta.pagination.IPageable;
 
-public class PageableDTO
-    implements IPageable {
+public class PageableDTO implements IPageable {
 
   private boolean enablePage = false;
-  private int     currentPage;
-  private int     pageSize;
+  private int currentPage;
+  private int pageSize;
 
   public boolean getEnablePage() {
 
@@ -38,5 +37,4 @@ public class PageableDTO
 
     this.pageSize = pageSize;
   }
-
 }

@@ -6,13 +6,9 @@ import work.myfavs.framework.example.domain.entity.Uuid;
 import work.myfavs.framework.example.repository.BaseRepository;
 import work.myfavs.framework.orm.DBTemplate;
 
-/**
- * Uuid Repository
- * PS: 此文件通过代码生成器生成
- */
+/** Uuid Repository PS: 此文件通过代码生成器生成 */
 @Repository
-public class UuidRepository
-    extends BaseRepository<Uuid> {
+public class UuidRepository extends BaseRepository<Uuid> {
 
   /**
    * 构造方法
@@ -24,5 +20,4 @@ public class UuidRepository
 
     super(dbTemplate);
   }
-
 }

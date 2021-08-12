@@ -3,7 +3,12 @@ package work.myfavs.framework.orm.meta.schema;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
@@ -28,7 +33,6 @@ public class Attributes {
    * 根据实体属性名获取Attribute
    *
    * @param fieldName 实体属性名
-   *
    * @return Attribute
    */
   public Attribute getAttributeByFieldName(String fieldName) {
@@ -53,7 +57,6 @@ public class Attributes {
    * 根据数据库字段名获取Attribute
    *
    * @param columnName 数据库字段名
-   *
    * @return Attribute
    */
   public Attribute getAttribute(String columnName) {
@@ -89,15 +92,13 @@ public class Attributes {
 
     readLock.lock();
     try {
-      return map.keySet()
-                .toArray(new String[]{});
+      return map.keySet().toArray(new String[] {});
     } finally {
       readLock.unlock();
     }
   }
 
-  public Attribute put(String columnName,
-                       Attribute value) {
+  public Attribute put(String columnName, Attribute value) {
 
     Assert.notBlank(columnName);
     Assert.notNull(value);
@@ -121,8 +122,7 @@ public class Attributes {
     }
   }
 
-  public Attribute computeIfAbsent(String columnName,
-                                   Function<String, Attribute> mappingFunction) {
+  public Attribute computeIfAbsent(String columnName, Function<String, Attribute> mappingFunction) {
 
     Assert.notBlank(columnName);
 
@@ -157,7 +157,6 @@ public class Attributes {
     }
   }
 
-
   public int size() {
 
     readLock.lock();
@@ -177,5 +176,4 @@ public class Attributes {
       readLock.unlock();
     }
   }
-
 }

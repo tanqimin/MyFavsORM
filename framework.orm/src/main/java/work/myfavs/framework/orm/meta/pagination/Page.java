@@ -10,18 +10,17 @@ import work.myfavs.framework.orm.DBTemplate;
  * @param <TModel> 简单分页对象泛型
  * @author tanqimin
  */
-public class Page<TModel>
-    extends PageBase<TModel> {
+public class Page<TModel> extends PageBase<TModel> {
 
   protected final String pageTotalPageField;
   protected final String pageTotalRecordField;
 
-  //region Attributes
-  private long totalPages   = 1L;
-  private long totalRecords = 0L;
-  //endregion
+  // region Attributes
+  private final long totalPages   = 1L;
+  private final long totalRecords = 0L;
+  // endregion
 
-  //region Getter && Setter
+  // region Getter && Setter
   public long getTotalPages() {
     return (long) this.get(pageTotalPageField);
   }
@@ -37,26 +36,26 @@ public class Page<TModel>
   public void setTotalRecords(long totalRecords) {
     this.put(pageTotalRecordField, totalRecords);
   }
-  //endregion
+  // endregion
 
-  //region Constructor
+  // region Constructor
 
   public Page(DBTemplate dbTemplate) {
     super(dbTemplate);
-    this.pageTotalPageField   = dbTemplate.getDbConfig().getPageTotalPageField();
+    this.pageTotalPageField = dbTemplate.getDbConfig().getPageTotalPageField();
     this.pageTotalRecordField = dbTemplate.getDbConfig().getPageTotalRecordField();
 
     this.setTotalPages(1L);
     this.setTotalRecords(0L);
   }
 
-  //endregion
+  // endregion
 
   /**
    * 创建分页对象
    *
    * @param dbTemplate DBTemplate
-   * @param <TModel>   分页对象数据类型泛型
+   * @param <TModel> 分页对象数据类型泛型
    * @return 分页对象
    */
   public static <TModel> Page<TModel> createInstance(DBTemplate dbTemplate) {
@@ -67,16 +66,17 @@ public class Page<TModel>
   /**
    * 创建分页对象
    *
-   * @param dbTemplate   DBTemplate
-   * @param data         分页数据
-   * @param currentPage  当前页码
-   * @param pageSize     每页记录数
-   * @param totalPages   总页数
+   * @param dbTemplate DBTemplate
+   * @param data 分页数据
+   * @param currentPage 当前页码
+   * @param pageSize 每页记录数
+   * @param totalPages 总页数
    * @param totalRecords 总记录数
-   * @param <TModel>     分页对象数据类型泛型
+   * @param <TModel> 分页对象数据类型泛型
    * @return 分页对象
    */
-  public static <TModel> Page<TModel> createInstance(DBTemplate dbTemplate,
+  public static <TModel> Page<TModel> createInstance(
+      DBTemplate dbTemplate,
       List<TModel> data,
       long currentPage,
       long pageSize,
@@ -95,20 +95,25 @@ public class Page<TModel>
   /**
    * 转换分页对象数据
    *
-   * @param data     分页数据
+   * @param data 分页数据
    * @param <TOther> 分页数据类型泛型
    * @return 新分页数据
    */
   public <TOther> Page<TOther> convert(List<TOther> data) {
 
-    return createInstance(super.dbTemplate, data, this.getCurrentPage(), this.getPageSize(), this.totalPages,
+    return createInstance(
+        super.dbTemplate,
+        data,
+        this.getCurrentPage(),
+        this.getPageSize(),
+        this.totalPages,
         this.totalRecords);
   }
 
   /**
    * 转换分页对象数据
    *
-   * @param fun      转换Function
+   * @param fun 转换Function
    * @param <TOther> 分页数据类型泛型
    * @return 新分页数据
    */
@@ -116,5 +121,4 @@ public class Page<TModel>
 
     return convert(convertData(fun));
   }
-
 }

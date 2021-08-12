@@ -22,14 +22,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class DoublePropertyHandler
-    extends PropertyHandler<Double> {
+public class DoublePropertyHandler extends PropertyHandler<Double> {
 
   private boolean isPrimitive;
 
-  public DoublePropertyHandler() {
-
-  }
+  public DoublePropertyHandler() {}
 
   public DoublePropertyHandler(boolean isPrimitive) {
 
@@ -37,10 +34,7 @@ public class DoublePropertyHandler
   }
 
   @Override
-  public Double convert(ResultSet rs,
-                        String columnName,
-                        Class<Double> clazz)
-      throws SQLException {
+  public Double convert(ResultSet rs, String columnName, Class<Double> clazz) throws SQLException {
 
     double i = rs.getDouble(columnName);
     if (rs.wasNull()) {
@@ -54,10 +48,7 @@ public class DoublePropertyHandler
   }
 
   @Override
-  public void addParameter(PreparedStatement ps,
-                           int paramIndex,
-                           Double param)
-      throws SQLException {
+  public void addParameter(PreparedStatement ps, int paramIndex, Double param) throws SQLException {
 
     if (param == null) {
       ps.setNull(paramIndex, Types.DOUBLE);
@@ -65,5 +56,4 @@ public class DoublePropertyHandler
     }
     ps.setDouble(paramIndex, param);
   }
-
 }

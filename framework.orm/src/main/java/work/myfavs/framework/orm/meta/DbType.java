@@ -7,11 +7,10 @@ package work.myfavs.framework.orm.meta;
  */
 public class DbType {
 
-  public final static String SQL_SERVER      = "sqlserver";
-  public final static String SQL_SERVER_2012 = "sqlserver2012";
-  public final static String MYSQL           = "mysql";
-  public final static String POSTGRE_SQL     = "postgresql";
-  public final static String ORACLE          = "oracle";
-  public final static String H2              = "h2";
-
+  public static final String SQL_SERVER = "sqlserver";
+  public static final String SQL_SERVER_2012 = "sqlserver2012";
+  public static final String MYSQL = "mysql";
+  public static final String POSTGRE_SQL = "postgresql";
+  public static final String ORACLE = "oracle";
+  public static final String H2 = "h2";
 }

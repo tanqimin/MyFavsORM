@@ -8,7 +8,7 @@ import javax.sql.DataSource;
  *
  * @author tanqimin
  */
-abstract public class ConnFactory {
+public abstract class ConnFactory {
 
   protected DataSource dataSource;
 
@@ -22,20 +22,19 @@ abstract public class ConnFactory {
    *
    * @return 数据库链接
    */
-  abstract public Connection openConnection();
+  public abstract Connection openConnection();
 
   /**
    * 获取当前数据库链接
    *
    * @return 数据库链接
    */
-  abstract public Connection getCurrentConnection();
+  public abstract Connection getCurrentConnection();
 
   /**
    * 关闭数据库链接
    *
    * @param connection 数据库链接
    */
-  abstract public void closeConnection(Connection connection);
-
+  public abstract void closeConnection(Connection connection);
 }

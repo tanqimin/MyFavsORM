@@ -9,15 +9,14 @@ import work.myfavs.framework.orm.DBTemplate;
  *
  * @param <TModel> 简单分页对象泛型
  */
-public class PageLite<TModel>
-    extends PageBase<TModel> {
+public class PageLite<TModel> extends PageBase<TModel> {
 
   protected final String  pageHasNextField;
-  //region Attributes
-  private         boolean hasNext = false;
-  //endregion
+  // region Attributes
+  private final   boolean hasNext = false;
+  // endregion
 
-  //region Getter && Setter
+  // region Getter && Setter
 
   public boolean isHasNext() {
     return (boolean) this.get(pageHasNextField);
@@ -26,9 +25,9 @@ public class PageLite<TModel>
   public void setHasNext(boolean hasNext) {
     this.put(pageHasNextField, hasNext);
   }
-  //endregion
+  // endregion
 
-  //region Constructor
+  // region Constructor
 
   public PageLite(DBTemplate dbTemplate) {
     super(dbTemplate);
@@ -36,13 +35,13 @@ public class PageLite<TModel>
     this.setHasNext(false);
   }
 
-  //endregion
+  // endregion
 
   /**
    * 创建简单分页对象实例
    *
    * @param dbTemplate DBTemplate
-   * @param <TModel>   简单分页对象泛型
+   * @param <TModel> 简单分页对象泛型
    * @return 简单分页对象
    */
   public static <TModel> PageLite<TModel> createInstance(DBTemplate dbTemplate) {
@@ -53,17 +52,15 @@ public class PageLite<TModel>
   /**
    * 创建简单分页对象实例
    *
-   * @param dbTemplate  DBTemplate
-   * @param data        分页数据
+   * @param dbTemplate DBTemplate
+   * @param data 分页数据
    * @param currentPage 当前页码
-   * @param pageSize    每页记录数
-   * @param <TModel>    简单分页对象泛型
+   * @param pageSize 每页记录数
+   * @param <TModel> 简单分页对象泛型
    * @return 简单分页对象
    */
-  public static <TModel> PageLite<TModel> createInstance(DBTemplate dbTemplate,
-      List<TModel> data,
-      long currentPage,
-      long pageSize) {
+  public static <TModel> PageLite<TModel> createInstance(
+      DBTemplate dbTemplate, List<TModel> data, long currentPage, long pageSize) {
 
     PageLite<TModel> instance = createInstance(dbTemplate);
     instance.setData(data);
@@ -78,7 +75,7 @@ public class PageLite<TModel>
   /**
    * 转换简单分页对象数据
    *
-   * @param data     分页数据
+   * @param data 分页数据
    * @param <TOther> 分页数据类型泛型
    * @return 新分页数据
    */
@@ -90,7 +87,7 @@ public class PageLite<TModel>
   /**
    * 转换简单分页对象数据
    *
-   * @param fun      转换Function
+   * @param fun 转换Function
    * @param <TOther> 分页数据类型泛型
    * @return 新分页数据
    */
@@ -98,6 +95,4 @@ public class PageLite<TModel>
 
     return convert(convertData(fun));
   }
-
-
 }

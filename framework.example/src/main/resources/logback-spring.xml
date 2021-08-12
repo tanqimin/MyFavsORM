@@ -119,7 +119,8 @@
   </root>
 
   <!--请求参数日志单独配置-->
-  <logger name="com.iotlead.hardware.api.business.impls.ApiLogService" level="INFO" additivity="false">
+  <logger name="com.iotlead.hardware.api.business.impls.ApiLogService" level="INFO"
+    additivity="false">
     <appender-ref ref="STDOUT"/>
     <appender-ref ref="FILEREQLOG"/>
   </logger>

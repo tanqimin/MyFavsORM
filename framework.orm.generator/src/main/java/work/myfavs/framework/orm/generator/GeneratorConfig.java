@@ -16,17 +16,17 @@ public class GeneratorConfig {
   private String jdbcUser;
   private String jdbcPwd;
 
-  private String templateDir = "";                                                      //模板路径
-  private String tablePrefix = "";                                                      //忽略的表前缀
+  private String templateDir = ""; // 模板路径
+  private String tablePrefix = ""; // 忽略的表前缀
 
-  private boolean genEntity           = true;
+  private boolean genEntity = true;
   private boolean coverEntityIfExists = true;
-  private String  entityPackage       = "";
+  private String entityPackage = "";
 
-  private boolean        genRepository           = false;
-  private boolean        coverRepositoryIfExists = false;
-  private String         repositoryPackage       = "";
-  private GenerationType generationType          = GenerationType.SNOW_FLAKE;
+  private boolean genRepository = false;
+  private boolean coverRepositoryIfExists = false;
+  private String repositoryPackage = "";
+  private GenerationType generationType = GenerationType.SNOW_FLAKE;
 
   public Map<String, TypeDefinition> getTypeMapper() {
 
@@ -176,5 +176,4 @@ public class GeneratorConfig {
     }
     return importsList;
   }
-
 }
