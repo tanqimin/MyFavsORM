@@ -1305,6 +1305,7 @@ public class DB {
           } else if (strategy == GenerationType.SNOW_FLAKE) {
             pkVal = snowFlakeId();
           }
+          ReflectUtil.setFieldValue(entity, pkFieldName, pkVal);
         }
         if (insertClauseCompleted == false) {
           insertClause.append(primaryKey.getColumnName() + ",");
