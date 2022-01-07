@@ -1,20 +1,18 @@
 package work.myfavs.framework.orm;
 
-import cn.hutool.core.io.FileUtil;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import javax.sql.DataSource;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.PKGenerator;
 import work.myfavs.framework.orm.util.SqlLog;
 import work.myfavs.framework.orm.util.exception.DBException;
+
+import javax.sql.DataSource;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 /**
  * 数据库配置
@@ -23,28 +21,17 @@ import work.myfavs.framework.orm.util.exception.DBException;
  */
 public class DBTemplate {
 
-  private static final Map<String, DBTemplate> POOL = new ConcurrentHashMap<>();
-
-  public static DBTemplate get(String dsName) {
-    if (POOL.containsKey(dsName)) {
-      return POOL.get(dsName);
-    }
-    FileUtil.exist("classpath://myfavs.properties");
-    Properties properties = new Properties();
-    throw new DBException("The DataSource named {} not exists.", dsName);
-  }
-
   // region Attributes
   /** 数据源名称 */
-  private final String     dsName;
+  private final String dsName;
   /** 数据源 */
   private final DataSource dataSource;
   /** 数据库配置 */
-  private final DBConfig   dbConfig;
+  private final DBConfig dbConfig;
   /** 数据库连接工厂 */
   private final ConnFactory connectionFactory;
   /** SQL语句日志配置 */
-  private final SqlLog      sqlLog;
+  private final SqlLog sqlLog;
   /** 主键生成器 */
   private final PKGenerator pkGenerator;
   // endregion
@@ -154,8 +141,8 @@ public class DBTemplate {
 
   public static class Builder {
 
-    private final String     dsName;
-    private       DataSource dataSource;
+    private final String dsName;
+    private DataSource dataSource;
     private DBConfig config;
     public Mapper mapper = new Mapper();
 
@@ -204,11 +191,7 @@ public class DBTemplate {
         this.config = new DBConfig();
       }
 
-      return DBTemplate.POOL.computeIfAbsent(
-          dsName,
-          ds -> {
-            return new DBTemplate(this);
-          });
+      return DBTemplateContext.add(dsName, new DBTemplate(this));
     }
   }
 

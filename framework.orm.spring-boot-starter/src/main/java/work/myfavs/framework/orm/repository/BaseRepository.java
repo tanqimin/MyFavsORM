@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.DBTemplateContext;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
 /**
@@ -22,6 +23,14 @@ public abstract class BaseRepository {
   public BaseRepository(DBTemplate dbTemplate) {
 
     this.dbTemplate = dbTemplate;
+  }
+
+  public void setDbTemplate(DBTemplate dbTemplate) {
+    this.dbTemplate = dbTemplate;
+  }
+
+  public void setDbTemplate(String dsName) {
+    this.dbTemplate = DBTemplateContext.get(dsName);
   }
 
   /**
