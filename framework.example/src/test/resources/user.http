@@ -1,0 +1,17 @@
+POST /user/save HTTP/1.1
+Host: 127.0.0.1:9527
+Content-Type: application/json
+Cache-control: no-cache
+
+{
+  "username": "tanqimin",
+  "email": "karl_tam@126.com",
+  "password": "123456",
+  "userType": "ADMIN",
+  "created": "2022-02-11 12:00:00",
+  "modified": "2022-02-11 12:00:01"
+}
+
+#######
+
+GET http://127.0.0.1:9527/user/find-by-page

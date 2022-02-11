@@ -1,10 +1,10 @@
 package work.myfavs.framework.example.domain.enums;
 
-public enum TypeEnum {
-  FOOD("食品"),
-  DRINK("饮品");
+public enum UserTypeEnum {
+  ADMIN("管理员"),
+  USER("普通用户");
 
-  TypeEnum(String description) {
+  UserTypeEnum(String description) {
 
     this.description = description;
   }
