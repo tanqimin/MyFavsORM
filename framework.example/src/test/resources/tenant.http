@@ -1,0 +1,10 @@
+GET http://127.0.0.1:9527/user/find-by-page
+tenant-info: master
+
+#################
+GET http://127.0.0.1:9527/user/find-by-page
+tenant-info: tenant1
+
+#################
+GET http://127.0.0.1:9527/user/find-by-page
+tenant-info: tenant2
