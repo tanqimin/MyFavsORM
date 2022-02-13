@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 @Order(1)
 public class DataSourceAspect {
 
-  Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(DataSourceAspect.class);
 
   @Pointcut("@annotation(org.springframework.web.bind.annotation.RequestMapping)")
   private void cutController() {}
@@ -32,7 +32,8 @@ public class DataSourceAspect {
     if (attributes == null) return;
     HttpServletRequest request = attributes.getRequest();
     // 租户标识
-    String sign = request.getHeader("tenant-info");
+    String sign = request.getHeader("tenant-name");
+    logger.debug("当前租户(tenant-name): " + sign);
     if (StrUtil.isNotEmpty(sign)) {
       DynamicDataSourceContextHolder.setDataSource(sign);
     } else {
