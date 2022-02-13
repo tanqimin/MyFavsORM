@@ -58,6 +58,6 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1492150022916149248, '2022-02-11 12:00:00', '2022-02-11 12:00:01', 'master', 'karl_tan@126.com', '123456', 'ADMIN');
+INSERT INTO `user` VALUES (1492150022916149248, '2022-02-11 12:00:00', '2022-02-11 12:00:01', 'master', 'karl_tan@master.com', '123456', 'ADMIN');
 
 SET FOREIGN_KEY_CHECKS = 1;

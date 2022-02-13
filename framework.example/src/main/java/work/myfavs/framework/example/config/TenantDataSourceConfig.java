@@ -19,14 +19,12 @@ import work.myfavs.framework.orm.meta.handler.impls.*;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Configuration
 public class TenantDataSourceConfig {
   private static final Logger logger = LoggerFactory.getLogger(TenantDataSourceConfig.class);
+
 
   @Bean(name = "primaryDataSource", initMethod = "init", destroyMethod = "close")
   @ConfigurationProperties("spring.datasource.primary")
@@ -52,9 +50,12 @@ public class TenantDataSourceConfig {
 
     Map<Object, Object> customDataSources = new HashMap<>();
 
+    if(DynamicDataSource.connectProperties == null)
+      DynamicDataSource.connectProperties = primaryDataSource.getConnectProperties();
+
     for (Tenant tenant : tenants) {
       DruidDataSource ds = new DruidDataSource();
-      ds.setConnectProperties(primaryDataSource.getConnectProperties());
+      ds.setConnectProperties(DynamicDataSource.connectProperties);
       ds.setDriverClassName(tenant.getJdbcClass());
       ds.setUrl(tenant.getJdbcUrl());
       ds.setUsername(tenant.getJdbcUser());
