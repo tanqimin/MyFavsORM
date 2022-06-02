@@ -1,7 +1,7 @@
 package work.myfavs.framework.orm;
 
-import cn.hutool.core.bean.BeanDesc.PropDesc;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.PropDesc;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;

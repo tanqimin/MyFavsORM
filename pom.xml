@@ -1,231 +1,230 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>work.myfavs</groupId>
-  <artifactId>framework</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+    <groupId>work.myfavs</groupId>
+    <artifactId>framework</artifactId>
+    <version>0.3.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-  <properties>
-    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <properties>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
-    <spring-jdbc.version>5.2.5.RELEASE</spring-jdbc.version>
-    <slf4j.version>1.7.30</slf4j.version>
-    <druid.version>1.1.22</druid.version>
-    <HikariCP.version>3.4.2</HikariCP.version>
-    <mysql-jdbc.version>8.0.19</mysql-jdbc.version>
-    <hutool.version>5.3.1</hutool.version>
-    <beetl.version>3.1.3.RELEASE</beetl.version>
-    <junit.version>4.13.1</junit.version>
-    <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-    <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-    <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-    <vavr.version>0.10.2</vavr.version>
-    <fastjson.version>1.2.68</fastjson.version>
-  </properties>
+        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
+        <spring-jdbc.version>5.2.5.RELEASE</spring-jdbc.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <druid.version>1.1.22</druid.version>
+        <HikariCP.version>3.4.2</HikariCP.version>
+        <mysql-jdbc.version>8.0.19</mysql-jdbc.version>
+        <hutool.version>5.8.2</hutool.version>
+        <beetl.version>3.1.3.RELEASE</beetl.version>
+        <junit.version>4.13.1</junit.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+        <vavr.version>0.10.2</vavr.version>
+    </properties>
 
-  <!--私服仓库-->
-  <distributionManagement>
-    <repository>
-      <id>maven-releases</id>
-      <name>Nexus Release Repository</name>
-      <url>http://192.168.8.11:3081/repository/maven-releases/</url>
-    </repository>
-    <snapshotRepository>
-      <id>maven-snapshots</id>
-      <name>Nexus Snapshot Repository</name>
-      <url>http://192.168.8.11:3081/repository/maven-snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
+    <!--私服仓库-->
+    <distributionManagement>
+        <repository>
+            <id>maven-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://192.168.8.11:3081/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://192.168.8.11:3081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter</artifactId>
-        <version>${spring-boot.version}</version>
-      </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-configuration-processor</artifactId>
-        <version>${spring-boot.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-configuration-processor</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-aop</artifactId>
-        <version>${spring-boot.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-        <version>${spring-boot.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-tomcat</artifactId>
-        <version>${spring-boot.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-        <version>${spring-jdbc.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${spring-jdbc.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>com.alibaba</groupId>
-        <artifactId>druid-spring-boot-starter</artifactId>
-        <version>${druid.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>com.zaxxer</groupId>
-        <artifactId>HikariCP</artifactId>
-        <version>${HikariCP.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${HikariCP.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>${mysql-jdbc.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-jdbc.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>cn.hutool</groupId>
-        <artifactId>hutool-core</artifactId>
-        <version>${hutool.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-core</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
 
-      <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
-      <dependency>
-        <groupId>com.alibaba</groupId>
-        <artifactId>fastjson</artifactId>
-        <version>${fastjson.version}</version>
-      </dependency>
+            <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-json -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-json</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
 
-      <!-- https://mvnrepository.com/artifact/io.vavr/vavr -->
-      <dependency>
-        <groupId>io.vavr</groupId>
-        <artifactId>vavr</artifactId>
-        <version>${vavr.version}</version>
-        <scope>provided</scope>
-      </dependency>
+            <!-- https://mvnrepository.com/artifact/io.vavr/vavr -->
+            <dependency>
+                <groupId>io.vavr</groupId>
+                <artifactId>vavr</artifactId>
+                <version>${vavr.version}</version>
+                <scope>provided</scope>
+            </dependency>
 
 
-      <dependency>
-        <groupId>com.ibeetl</groupId>
-        <artifactId>beetl</artifactId>
-        <version>${beetl.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>com.ibeetl</groupId>
+                <artifactId>beetl</artifactId>
+                <version>${beetl.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>${maven-jar-plugin.version}</version>
-          <configuration>
-            <archive>
-              <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-            </archive>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>${maven-compiler-plugin.version}</version>
-          <configuration>
-            <source>8</source>
-            <target>8</target>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>${maven-source-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>attach-sources</id>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
-  <profiles>
-    <profile>
-      <id>doclint-java8-disable</id>
-      <!-- 指定profile只在JDK版本大于等于1.8时有效-->
-      <activation>
-        <jdk>[1.8,)</jdk>
-      </activation>
-
-      <build>
+    <build>
         <pluginManagement>
-          <plugins>
-            <!--引入javadoc插件 -->
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <version>2.9</version>
-              <configuration>
-                <!-- 禁用java 8 的DocLint新特性，以确保当javadoc有编译错误时，也能正常生成javadoc jar包-->
-                <additionalparam>-Xdoclint:none</additionalparam>
-              </configuration>
-            </plugin>
-          </plugins>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                    <configuration>
+                        <archive>
+                            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <source>8</source>
+                        <target>8</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven-source-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
         </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
-  <modules>
-    <module>framework.orm</module>
-    <module>framework.orm.generator</module>
-    <module>framework.orm.spring-boot-starter</module>
-    <module>framework.example</module>
-  </modules>
+    <profiles>
+        <profile>
+            <id>doclint-java8-disable</id>
+            <!-- 指定profile只在JDK版本大于等于1.8时有效-->
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <!--引入javadoc插件 -->
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <version>2.9</version>
+                            <configuration>
+                                <!-- 禁用java 8 的DocLint新特性，以确保当javadoc有编译错误时，也能正常生成javadoc jar包-->
+                                <additionalparam>-Xdoclint:none</additionalparam>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
+
+    <modules>
+        <module>framework.orm</module>
+        <module>framework.orm.generator</module>
+        <module>framework.orm.spring-boot-starter</module>
+        <module>framework.example</module>
+    </modules>
 </project>

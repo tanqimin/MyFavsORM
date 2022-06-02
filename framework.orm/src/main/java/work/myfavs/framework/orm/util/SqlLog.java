@@ -2,10 +2,11 @@ package work.myfavs.framework.orm.util;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import cn.hutool.json.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +116,7 @@ public class SqlLog {
     logStr.append(System.lineSeparator());
     for (Iterator<TView> iterator = result.iterator(); iterator.hasNext(); ) {
       TView next = iterator.next();
-      logStr.append(JSON.toJSONString(next));
+      logStr.append(JSONUtil.toJsonStr(next));
       logStr.append(System.lineSeparator());
     }
     logStr.append(System.lineSeparator());
@@ -139,7 +140,7 @@ public class SqlLog {
     logStr.append("################# MYFAVS ORM SHOW RESULT #################");
     logStr.append(System.lineSeparator());
     logStr.append(System.lineSeparator());
-    logStr.append(" QUERY RESULT:" + JSON.toJSONString(result));
+    logStr.append(" QUERY RESULT:").append(JSONUtil.toJsonStr(result));
 
     logStr.append(System.lineSeparator());
     logStr.append(System.lineSeparator());
