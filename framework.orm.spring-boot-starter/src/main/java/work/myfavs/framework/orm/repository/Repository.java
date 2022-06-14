@@ -250,6 +250,18 @@ public class Repository<TModel> extends Query {
   }
 
   /**
+   * 执行一个SQL语句
+   *
+   * @param sql SQL
+   * @param queryTimeout 超时时间
+   * @return 影响行数
+   */
+  public int execute(Sql sql, int queryTimeout) {
+
+    return DB.conn(this.dbTemplate).execute(sql, queryTimeout);
+  }
+
+  /**
    * 执行多个SQL语句
    *
    * @param sqlList SQL集合
@@ -258,6 +270,18 @@ public class Repository<TModel> extends Query {
   public int[] execute(List<Sql> sqlList) {
 
     return DB.conn(this.dbTemplate).execute(sqlList);
+  }
+
+  /**
+   * 执行多个SQL语句
+   *
+   * @param sqlList SQL集合
+   * @param queryTimeout 超时时间
+   * @return 返回多个影响行数
+   */
+  public int[] execute(List<Sql> sqlList, int queryTimeout) {
+
+    return DB.conn(this.dbTemplate).execute(sqlList, queryTimeout);
   }
 
   /**
@@ -270,6 +294,19 @@ public class Repository<TModel> extends Query {
   public int execute(String sql, Collection params) {
 
     return DB.conn(this.dbTemplate).execute(sql, params);
+  }
+
+  /**
+   * 执行一个SQL语句
+   *
+   * @param sql SQL语句
+   * @param params 参数
+   * @param queryTimeout 超时时间
+   * @return 影响行数
+   */
+  public int execute(String sql, Collection params, int queryTimeout) {
+
+    return DB.conn(this.dbTemplate).execute(sql, params, queryTimeout);
   }
 
   /**
