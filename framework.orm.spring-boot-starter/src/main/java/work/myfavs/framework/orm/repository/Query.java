@@ -490,4 +490,34 @@ public class Query extends BaseRepository {
 
     return this.findPage(Record.class, sql, pageable);
   }
+
+  /**
+   * 创建分页对象
+   *
+   * @param data 分页数据
+   * @param currentPage 当前页码
+   * @param pageSize 每页记录数
+   * @param totalPages 总页数
+   * @param totalRecords 总记录数
+   * @param <TView> 分页对象数据类型泛型
+   * @return 分页对象
+   */
+  public <TView> Page<TView> createPage(
+      List<TView> data, long currentPage, long pageSize, long totalPages, long totalRecords) {
+    return Page.createInstance(
+        this.dbTemplate, data, currentPage, pageSize, totalPages, totalRecords);
+  }
+
+  /**
+   * 创建简单分页对象实例
+   *
+   * @param data 分页数据
+   * @param currentPage 当前页码
+   * @param pageSize 每页记录数
+   * @param <TView> 简单分页对象泛型
+   * @return 简单分页对象
+   */
+  public <TView> PageLite<TView> createPageLite(List<TView> data, long currentPage, long pageSize) {
+    return PageLite.createInstance(this.dbTemplate, data, currentPage, pageSize);
+  }
 }
