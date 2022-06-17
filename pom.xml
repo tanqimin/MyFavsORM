@@ -13,19 +13,19 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
-        <spring-jdbc.version>5.2.5.RELEASE</spring-jdbc.version>
-        <slf4j.version>1.7.30</slf4j.version>
+        <spring-boot.version>2.5.12</spring-boot.version>
+        <spring-jdbc.version>5.3.21</spring-jdbc.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <druid.version>1.1.22</druid.version>
-        <HikariCP.version>3.4.2</HikariCP.version>
-        <mysql-jdbc.version>8.0.19</mysql-jdbc.version>
-        <hutool.version>5.8.2</hutool.version>
-        <beetl.version>3.1.3.RELEASE</beetl.version>
-        <junit.version>4.13.1</junit.version>
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <HikariCP.version>5.0.1</HikariCP.version>
+        <mysql-jdbc.version>8.0.29</mysql-jdbc.version>
+        <hutool.version>5.8.3</hutool.version>
+        <beetl.version>3.10.0.RELEASE</beetl.version>
+        <junit.version>4.13.2</junit.version>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <vavr.version>0.10.2</vavr.version>
+        <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
+        <vavr.version>0.10.4</vavr.version>
     </properties>
 
     <!--私服仓库-->

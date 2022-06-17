@@ -5,28 +5,12 @@ import cn.hutool.core.bean.PropDesc;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
-import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.meta.dialect.TableAlias;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.pagination.IPageable;
@@ -36,10 +20,18 @@ import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.Attributes;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.SqlLog;
-import work.myfavs.framework.orm.util.convert.DBConvert;
 import work.myfavs.framework.orm.util.exception.DBException;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * 数据库操作对象
@@ -50,11 +42,14 @@ import work.myfavs.framework.orm.util.exception.DBException;
 public class DB {
 
   private static final Logger log = LoggerFactory.getLogger(DB.class);
-
+  private final SqlLog sqlLog;
   private final DBTemplate dbTemplate;
+  private final IDatabase database;
 
   private DB(DBTemplate dbTemplate) {
     this.dbTemplate = dbTemplate;
+    database = new Database(dbTemplate);
+    sqlLog = new SqlLog(database.dbConfig().getShowSql(), database.dbConfig().getShowResult());
   }
 
   public static DB conn(DBTemplate dbTemplate) {
@@ -62,7 +57,7 @@ public class DB {
   }
 
   public static DB conn(String dsName) {
-    return conn(DBTemplateContext.get(dsName));
+    return new DB(DBTemplateContext.get(dsName));
   }
 
   public static DB conn() {
@@ -70,107 +65,31 @@ public class DB {
   }
 
   public <R> R tx(Function<DB, R> function) {
-    try {
-      open();
-      return function.apply(this);
-    } catch (Exception e) {
-      rollback();
-      throw new DBException(e);
-    } finally {
-      close();
-    }
+    DB db = this;
+    return database.tx(() -> function.apply(db));
   }
 
   public void tx(Consumer<DB> consumer) {
-    try {
-      open();
-      consumer.accept(this);
-    } catch (Exception e) {
-      rollback();
-      throw new DBException(e);
-    } finally {
-      close();
-    }
+    DB db = this;
+    database.tx(() -> consumer.accept(db));
   }
 
-  /**
-   * 获取数据库方言
-   *
-   * @return 数据库方言
-   */
-  private IDialect getDialect() {
-
-    return getDBConfig().getDialect();
+  public <R> R tx(Supplier<R> supplier) {
+    return database.tx(supplier);
   }
 
-  /**
-   * 获取ORM配置
-   *
-   * @return ORM配置
-   */
-  private DBConfig getDBConfig() {
-    return dbTemplate.getDbConfig();
+  public void tx(Runnable runnable) {
+    this.database.tx(runnable);
   }
 
   /**
    * 是否使用SQL Server数据库
    *
-   * @return
+   * @return 如果当前数据库为SQL Server，返回true，否则返回false
    */
   private boolean isSqlServer() {
-    return StrUtil.equals(getDBConfig().getDbType(), DbType.SQL_SERVER)
-        || StrUtil.equals(getDBConfig().getDbType(), DbType.SQL_SERVER_2012);
-  }
-
-  /**
-   * 获取数据库连接工厂
-   *
-   * @return 数据库连接工厂
-   */
-  private ConnFactory getConnFactory() {
-    return dbTemplate.getConnectionFactory();
-  }
-
-  /**
-   * 打开数据库连接
-   *
-   * @return 数据库连接
-   */
-  public Connection open() {
-
-    return getConnFactory().openConnection();
-  }
-
-  /** 关闭数据库连接 */
-  public void close() {
-
-    getConnFactory().closeConnection(getConnFactory().getCurrentConnection());
-  }
-
-  /** 提交事务 */
-  public void commit() {
-
-    log.debug("Try to commit transaction.");
-    try {
-      this.getConnFactory().getCurrentConnection().commit();
-    } catch (SQLException e) {
-      throw new DBException(e, "Fail to commit transaction, error message:");
-    }
-
-    log.debug("Transaction committed successfully.");
-  }
-
-  /** 回滚事务 */
-  public void rollback() {
-
-    log.debug("Try to rollback transaction.");
-    try {
-      this.getConnFactory().getCurrentConnection().rollback();
-    } catch (SQLException e) {
-      throw new DBException(e, "Fail to rollback transaction, error message:");
-    }
-
-    log.debug("The transaction rollback was successful.");
+    return StrUtil.equals(this.database.dbConfig().getDbType(), DbType.SQL_SERVER)
+        || StrUtil.equals(this.database.dbConfig().getDbType(), DbType.SQL_SERVER_2012);
   }
 
   /**
@@ -182,22 +101,27 @@ public class DB {
    * @return TResult
    */
   public <TResult> TResult call(String sql, Function<CallableStatement, TResult> func) {
-    Connection conn = null;
-    CallableStatement cs = null;
+    sqlLog.showSql(sql, null);
+    TResult result = this.database.call(sql, func);
+    sqlLog.showResult(result);
+    return result;
+  }
 
-    try {
-      conn = this.open();
-      cs = conn.prepareCall(sql);
-      getSqlLog().showSql(sql, null);
-      final TResult result = func.apply(cs);
-      getSqlLog().showResult(result);
-      return result;
-    } catch (SQLException e) {
-      throw new DBException(e);
-    } finally {
-      DBUtil.close(cs);
-      this.close();
-    }
+  /**
+   * 调用存储过程
+   *
+   * @param sql 调用存储过程语句，如：{ call proc_name(?,?,?)}
+   * @param func func
+   * @param queryTimeout 超时时间
+   * @param <TResult> 结果
+   * @return TResult
+   */
+  public <TResult> TResult call(
+      String sql, Function<CallableStatement, TResult> func, int queryTimeout) {
+    sqlLog.showSql(sql, null);
+    TResult result = this.database.call(sql, func, queryTimeout);
+    sqlLog.showResult(result);
+    return result;
   }
 
   /**
@@ -211,31 +135,9 @@ public class DB {
    */
   public <TView> List<TView> find(Class<TView> viewClass, String sql, Collection params) {
 
-    Metadata.get(viewClass);
-
-    Connection conn = null;
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    List<TView> result;
-
-    getSqlLog().showSql(sql, params);
-
-    try {
-      conn = this.open();
-      pstmt = DBUtil.getPstForQuery(conn, sql, params);
-      pstmt.setQueryTimeout(getDBConfig().getQueryTimeout());
-      pstmt.setFetchSize(getDBConfig().getFetchSize());
-      rs = pstmt.executeQuery();
-
-      result = DBConvert.toList(viewClass, rs);
-    } catch (SQLException e) {
-      throw new DBException(e);
-    } finally {
-      DBUtil.close(pstmt, rs);
-      this.close();
-    }
-
-    getSqlLog().showResult(result);
+    sqlLog.showSql(sql, params);
+    List<TView> result = database.find(viewClass, sql, params);
+    sqlLog.showResult(result);
     return result;
   }
 
@@ -335,7 +237,7 @@ public class DB {
   public <TView> List<TView> findTop(
       Class<TView> viewClass, int top, String sql, Collection params) {
 
-    Sql querySql = this.getDialect().selectTop(1, top, sql, params);
+    Sql querySql = database.dialect().selectTop(1, top, sql, params);
     return this.find(viewClass, querySql);
   }
 
@@ -446,7 +348,8 @@ public class DB {
     Attribute primaryKey = classMeta.checkPrimaryKey();
 
     Sql sql =
-        this.getDialect()
+        this.database
+            .dialect()
             .select(viewClass)
             .where(Cond.eq(primaryKey.getColumnName(), id))
             .and(Cond.logicalDeleteCond(classMeta));
@@ -466,7 +369,8 @@ public class DB {
   public <TView> TView getByField(Class<TView> viewClass, String field, Object param) {
 
     Sql sql =
-        this.getDialect()
+        this.database
+            .dialect()
             .select(viewClass)
             .where(Cond.eq(field, param, false))
             .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
@@ -484,7 +388,8 @@ public class DB {
   public <TView> TView getByCond(Class<TView> viewClass, Cond cond) {
 
     Sql sql =
-        this.getDialect()
+        this.database
+            .dialect()
             .select(viewClass)
             .where()
             .and(cond)
@@ -533,7 +438,8 @@ public class DB {
     ClassMeta classMeta = Metadata.get(viewClass);
     Attribute primaryKey = classMeta.checkPrimaryKey();
     Sql sql =
-        this.getDialect()
+        this.database
+            .dialect()
             .select(viewClass)
             .where()
             .and(Cond.in(primaryKey.getColumnName(), ids, false))
@@ -553,7 +459,8 @@ public class DB {
   public <TView> List<TView> findByField(Class<TView> viewClass, String field, Object param) {
 
     Sql sql =
-        this.getDialect()
+        this.database
+            .dialect()
             .select(viewClass)
             .where(Cond.eq(field, param, false))
             .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
@@ -572,7 +479,8 @@ public class DB {
   public <TView> List<TView> findByField(Class<TView> viewClass, String field, Collection params) {
 
     Sql sql =
-        this.getDialect()
+        this.database
+            .dialect()
             .select(viewClass)
             .where()
             .and(Cond.in(field, params, false))
@@ -591,7 +499,8 @@ public class DB {
   public <TView> List<TView> findByCond(Class<TView> viewClass, Cond cond) {
 
     Sql sql =
-        this.getDialect()
+        this.database
+            .dialect()
             .select(viewClass)
             .where()
             .and(cond)
@@ -636,7 +545,8 @@ public class DB {
    */
   public long count(String sql, Collection params) {
 
-    return this.get(Number.class, getDialect().count(sql, params)).longValue();
+    Sql countSql = this.database.dialect().count(sql, params);
+    return this.get(Number.class, countSql).longValue();
   }
 
   /**
@@ -661,7 +571,8 @@ public class DB {
   public <TView> long countByCond(Class<TView> viewClass, Cond cond) {
 
     Sql sql =
-        getDialect()
+        this.database
+            .dialect()
             .count(viewClass)
             .where()
             .and(cond)
@@ -707,7 +618,8 @@ public class DB {
 
     Attribute primaryKey = Metadata.get(modelClass).checkPrimaryKey();
     Object pkVal = ReflectUtil.getFieldValue(entity, primaryKey.getFieldName());
-    Sql existSql = getDialect().count(modelClass).where(Cond.eq(primaryKey.getColumnName(), pkVal));
+    Sql existSql =
+        this.database.dialect().count(modelClass).where(Cond.eq(primaryKey.getColumnName(), pkVal));
     return exists(existSql);
   }
 
@@ -758,7 +670,7 @@ public class DB {
         throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
       }
 
-      long maxPageSize = this.getDBConfig().getMaxPageSize();
+      long maxPageSize = this.database.dbConfig().getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
         throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
       }
@@ -766,7 +678,7 @@ public class DB {
       pagSize = -1;
     }
 
-    querySql = getDialect().selectTop(currentPage, pagSize, sql, params);
+    querySql = this.database.dialect().selectTop(currentPage, pagSize, sql, params);
     data = this.find(viewClass, querySql);
 
     return PageLite.createInstance(this.dbTemplate, data, currentPage, pagSize);
@@ -924,7 +836,7 @@ public class DB {
         throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
       }
 
-      long maxPageSize = this.getDBConfig().getMaxPageSize();
+      long maxPageSize = this.database.dbConfig().getMaxPageSize();
       if (maxPageSize > 0L && pagSize > maxPageSize) {
         throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
       }
@@ -932,7 +844,7 @@ public class DB {
       pagSize = -1;
     }
 
-    querySql = getDialect().selectTop(currentPage, pagSize, sql, params);
+    querySql = this.database.dialect().selectTop(currentPage, pagSize, sql, params);
     data = this.find(viewClass, querySql);
 
     if (!enablePage) {
@@ -1090,26 +1002,10 @@ public class DB {
    * @return 影响行数
    */
   public int execute(String sql, Collection params, int queryTimeOut) {
-    int result = 0;
 
-    getSqlLog().showSql(sql, params);
-
-    Connection conn = null;
-    PreparedStatement pstmt = null;
-
-    try {
-      conn = this.open();
-      pstmt = DBUtil.getPstForUpdate(conn, false, sql, params);
-      pstmt.setQueryTimeout(queryTimeOut);
-      result = DBUtil.executeUpdate(pstmt);
-    } catch (Exception ex) {
-      throw new DBException(ex);
-    } finally {
-      DBUtil.close(pstmt);
-      this.close();
-    }
-
-    getSqlLog().showAffectedRows(result);
+    sqlLog.showSql(sql, params);
+    int result = this.database.execute(sql, params, queryTimeOut);
+    this.sqlLog.showAffectedRows(result);
     return result;
   }
 
@@ -1122,7 +1018,7 @@ public class DB {
    */
   public int execute(String sql, Collection params) {
 
-    return execute(sql, params, getDBConfig().getQueryTimeout());
+    return execute(sql, params, this.database.dbConfig().getQueryTimeout());
   }
 
   /**
@@ -1145,7 +1041,7 @@ public class DB {
    */
   public int execute(Sql sql) {
 
-    return this.execute(sql, getDBConfig().getQueryTimeout());
+    return this.execute(sql, this.database.dbConfig().getQueryTimeout());
   }
 
   /**
@@ -1179,7 +1075,7 @@ public class DB {
     int[] results = new int[sqlCnt];
 
     return tx(
-        db -> {
+        () -> {
           for (int i = 0; i < sqlCnt; i++) {
             results[i] = execute(sqlList.get(i), queryTimeout);
           }
@@ -1208,10 +1104,7 @@ public class DB {
     String pkFieldName;
     boolean autoGeneratedPK = false;
 
-    Sql sql = null;
-    Connection conn = null;
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
+    Sql sql;
 
     pkFieldName = primaryKey.getFieldName();
     strategy = classMeta.getStrategy();
@@ -1238,31 +1131,24 @@ public class DB {
       }
     }
 
-    sql = getDialect().insert(modelClass, entity);
+    sql = this.database.dialect().insert(modelClass, entity);
 
-    try {
-      getSqlLog().showSql(sql.getSqlString(), sql.getParams());
-
-      conn = this.open();
-      pstmt = DBUtil.getPstForUpdate(conn, autoGeneratedPK, sql.getSqlString(), sql.getParams());
-      pstmt.setQueryTimeout(getDBConfig().getQueryTimeout());
-      result = DBUtil.executeUpdate(pstmt);
-
-      getSqlLog().showAffectedRows(result);
-
-      if (autoGeneratedPK) {
-        rs = pstmt.getGeneratedKeys();
-        if (rs.next()) {
-          ReflectUtil.setFieldValue(entity, pkFieldName, rs.getObject(1));
-        }
-      }
-    } catch (Exception ex) {
-      throw new DBException(ex);
-    } finally {
-      DBUtil.close(pstmt, rs);
-      this.close();
-    }
-
+    this.sqlLog.showSql(sql.getSqlString(), sql.getParams());
+    result =
+        this.database.create(
+            sql.getSqlString(),
+            sql.getParams(),
+            autoGeneratedPK,
+            rs -> {
+              try {
+                if (rs.next()) {
+                  ReflectUtil.setFieldValue(entity, pkFieldName, rs.getObject(1));
+                }
+              } catch (SQLException e) {
+                throw new DBException(e);
+              }
+            });
+    this.sqlLog.showAffectedRows(result);
     return result;
   }
 
@@ -1285,7 +1171,7 @@ public class DB {
 
     ClassMeta classMeta = Metadata.get(modelClass);
 
-    final boolean isMySQL = this.getDBConfig().getDbType().equals(DbType.MYSQL);
+    final boolean isMySQL = this.database.dbConfig().getDbType().equals(DbType.MYSQL);
     final boolean isIdentity = classMeta.getStrategy().equals(GenerationType.IDENTITY);
 
     if (!isMySQL) {
@@ -1329,7 +1215,7 @@ public class DB {
 
     final List<Sql> sqlList = new ArrayList<>();
 
-    final int batchSize = this.getDBConfig().getBatchSize();
+    final int batchSize = this.database.dbConfig().getBatchSize();
     final List<List<TModel>> batchList = CollectionUtil.split(entities, batchSize);
 
     for (Iterator<List<TModel>> ei = batchList.iterator(); ei.hasNext(); ) {
@@ -1408,7 +1294,7 @@ public class DB {
     pkFieldName = primaryKey.getFieldName();
     strategy = classMeta.getStrategy();
     updateAttributes = classMeta.getUpdateAttributes();
-    sql = getDialect().insert(classMeta.getClazz());
+    sql = this.database.dialect().insert(classMeta.getClazz());
     paramsList = new LinkedList<>();
 
     if (strategy == GenerationType.IDENTITY) {
@@ -1449,36 +1335,26 @@ public class DB {
 
       paramsList.add(params);
     }
-    getSqlLog().showBatchSql(sql.getSqlString(), paramsList);
+    this.sqlLog.showBatchSql(sql.getSqlString(), paramsList);
 
-    Connection conn = null;
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
+    result =
+        this.database.createBatch(
+            sql.getSqlString(),
+            paramsList,
+            autoGeneratedPK,
+            rs -> {
+              try {
+                for (TModel tModel : entities) {
+                  if (rs.next()) {
+                    ReflectUtil.setFieldValue(tModel, pkFieldName, rs.getObject(1));
+                  }
+                }
+              } catch (SQLException e) {
+                throw new DBException(e);
+              }
+            });
 
-    try {
-
-      conn = this.open();
-      pstmt = DBUtil.getPstForUpdate(conn, autoGeneratedPK, sql.getSqlString());
-      pstmt.setQueryTimeout(getDBConfig().getQueryTimeout());
-      result = DBUtil.executeBatch(pstmt, paramsList, this.getDBConfig().getBatchSize());
-
-      if (autoGeneratedPK) {
-        rs = pstmt.getGeneratedKeys();
-        for (Iterator<TModel> iterator = entities.iterator(); iterator.hasNext(); ) {
-          TModel tModel = iterator.next();
-          if (rs.next()) {
-            ReflectUtil.setFieldValue(tModel, pkFieldName, rs.getObject(1));
-          }
-        }
-      }
-    } catch (SQLException e) {
-      throw new DBException(e);
-    } finally {
-      DBUtil.close(pstmt, rs);
-      this.close();
-    }
-
-    getSqlLog().showAffectedRows(result);
+    this.sqlLog.showAffectedRows(result);
     return result;
   }
 
@@ -1500,7 +1376,8 @@ public class DB {
       return 0;
     }
     Sql sql =
-        getDialect()
+        this.database
+            .dialect()
             .update(modelClass, entity, false)
             .and(Cond.logicalDeleteCond(Metadata.get(modelClass)));
     return execute(sql);
@@ -1520,7 +1397,8 @@ public class DB {
       return 0;
     }
     Sql sql =
-        getDialect()
+        this.database
+            .dialect()
             .update(modelClass, entity, true)
             .and(Cond.logicalDeleteCond(Metadata.get(modelClass)));
     return execute(sql);
@@ -1575,7 +1453,7 @@ public class DB {
       throw new DBException("Could not match update attributes.");
     }
 
-    final int batchSize = getDBConfig().getBatchSize();
+    final int batchSize = this.database.dbConfig().getBatchSize();
     final List<List<TModel>> batchList = CollectionUtil.split(entities, batchSize);
     String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     List<Sql> batchSqls = new ArrayList<>();
@@ -1681,23 +1559,10 @@ public class DB {
       paramsList.add(params);
     }
 
-    try {
+    this.sqlLog.showBatchSql(sql.getSqlString(), paramsList);
+    result = database.updateBatch(sql.getSqlString(), paramsList);
 
-      getSqlLog().showBatchSql(sql.getSqlString(), paramsList);
-
-      conn = this.open();
-      pstmt = DBUtil.getPstForUpdate(conn, false, sql.getSqlString());
-      pstmt.setQueryTimeout(getDBConfig().getQueryTimeout());
-      result = DBUtil.executeBatch(pstmt, paramsList, getDBConfig().getBatchSize());
-
-      getSqlLog().showAffectedRows(result);
-    } catch (SQLException e) {
-      throw new DBException(e);
-    } finally {
-      DBUtil.close(pstmt);
-      this.close();
-    }
-
+    this.sqlLog.showAffectedRows(result);
     return result;
   }
 
@@ -1876,10 +1741,5 @@ public class DB {
     }
 
     return execute(sql);
-  }
-
-  private SqlLog getSqlLog() {
-
-    return this.dbTemplate.getSqlLog();
   }
 }

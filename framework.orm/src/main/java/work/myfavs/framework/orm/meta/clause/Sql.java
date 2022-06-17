@@ -78,6 +78,18 @@ public class Sql extends Clause implements Serializable {
   }
 
   /**
+   * 追加拼接 条件
+   *
+   * @param cond Cond对象
+   * @return 拼接后的 SQL
+   */
+  public Sql append(Cond cond) {
+    this.sql.append(cond.sql);
+    this.params.addAll(cond.params);
+    return this;
+  }
+
+  /**
    * 追加拼接 SQL
    *
    * @param sql SQL 语句
@@ -127,7 +139,17 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql appendLine(Sql sql) {
 
-    return this.append(sql.append(System.lineSeparator()));
+    return this.append(sql).append(System.lineSeparator());
+  }
+
+  /**
+   * 追加拼接 条件
+   *
+   * @param cond Cond对象
+   * @return 拼接后的 SQL
+   */
+  public Sql appendLine(Cond cond) {
+    return this.append(cond).append(System.lineSeparator());
   }
 
   /**
@@ -138,7 +160,7 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql appendLine(String sql) {
 
-    return this.append(sql.concat(System.lineSeparator()));
+    return this.append(sql).append(System.lineSeparator());
   }
 
   /**
@@ -151,7 +173,7 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql appendLine(String sql, Object param, Object... params) {
 
-    return this.append(sql.concat(System.lineSeparator()), param, params);
+    return this.append(sql, param, params).append(System.lineSeparator());
   }
 
   /**
@@ -163,7 +185,7 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql appendLine(String sql, Collection params) {
 
-    return this.append(sql.concat(System.lineSeparator()), params);
+    return this.append(sql, params).append(System.lineSeparator());
   }
 
   /**

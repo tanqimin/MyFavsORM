@@ -3,7 +3,6 @@ package work.myfavs.framework.orm;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.PKGenerator;
-import work.myfavs.framework.orm.util.SqlLog;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import javax.sql.DataSource;
@@ -30,8 +29,6 @@ public class DBTemplate {
   private final DBConfig dbConfig;
   /** 数据库连接工厂 */
   private final ConnFactory connectionFactory;
-  /** SQL语句日志配置 */
-  private final SqlLog sqlLog;
   /** 主键生成器 */
   private final PKGenerator pkGenerator;
   // endregion
@@ -49,7 +46,6 @@ public class DBTemplate {
     this.dataSource = builder.dataSource;
     this.dbConfig = builder.config;
     this.connectionFactory = createConnFactory(builder.connectionFactory, builder.dataSource);
-    this.sqlLog = new SqlLog(this.dbConfig.getShowSql(), this.dbConfig.getShowResult());
     this.pkGenerator =
         new PKGenerator(this.dbConfig.getWorkerId(), this.dbConfig.getDataCenterId());
     // 注册 PropertyHandler
@@ -109,10 +105,6 @@ public class DBTemplate {
   public DBConfig getDbConfig() {
 
     return dbConfig;
-  }
-
-  public SqlLog getSqlLog() {
-    return sqlLog;
   }
 
   public PKGenerator getPkGenerator() {
