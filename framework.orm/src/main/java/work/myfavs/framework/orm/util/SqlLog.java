@@ -28,7 +28,7 @@ public class SqlLog {
     if (showSql && log.isDebugEnabled()) {
       StringBuilder logStr = new StringBuilder();
       logStr.append(System.lineSeparator());
-      logStr.append("################# MYFAVS ORM SHOW SQL #################");
+      logStr.append("----------------- MYFAVS ORM SHOW SQL -----------------");
       logStr.append(System.lineSeparator());
       logStr.append(System.lineSeparator());
       logStr.append(StrUtil.format("          SQL: {}", sql));
@@ -37,7 +37,7 @@ public class SqlLog {
       logStr.append(StrUtil.format("   PARAMETERS: {}", showParams(params)));
       logStr.append(System.lineSeparator());
       logStr.append(System.lineSeparator());
-      logStr.append("#######################################################");
+      logStr.append("-------------------------------------------------------");
       log.debug(logStr.toString());
     }
   }
@@ -61,7 +61,7 @@ public class SqlLog {
     if (showSql && log.isDebugEnabled()) {
       StringBuilder logStr = new StringBuilder();
       logStr.append(System.lineSeparator());
-      logStr.append("################# MYFAVS ORM SHOW BATCH SQL #################");
+      logStr.append("----------------- MYFAVS ORM SHOW BATCH SQL -----------------");
       logStr.append(System.lineSeparator());
       logStr.append(System.lineSeparator());
       logStr.append(StrUtil.format("          SQL: {}", sql));
@@ -78,7 +78,7 @@ public class SqlLog {
         }
         logStr.append(System.lineSeparator());
       }
-      logStr.append("#############################################################");
+      logStr.append("-------------------------------------------------------------");
       log.debug(logStr.toString());
     }
   }
@@ -87,13 +87,13 @@ public class SqlLog {
 
     if (showResult && log.isDebugEnabled()) {
       StringBuilder logStr = new StringBuilder();
-      logStr.append("################# MYFAVS ORM AFFECTED ROWS #################");
+      logStr.append("----------------- MYFAVS ORM AFFECTED ROWS -----------------");
       logStr.append(System.lineSeparator());
       logStr.append(System.lineSeparator());
       logStr.append(StrUtil.format("AFFECTED ROWS: {}", result));
       logStr.append(System.lineSeparator());
       logStr.append(System.lineSeparator());
-      logStr.append("############################################################");
+      logStr.append("------------------------------------------------------------");
       log.debug(logStr.toString());
     }
   }
@@ -108,7 +108,7 @@ public class SqlLog {
 
     StringBuilder logStr = new StringBuilder();
     logStr.append(System.lineSeparator());
-    logStr.append("################# MYFAVS ORM SHOW RESULT #################");
+    logStr.append("----------------- MYFAVS ORM SHOW RESULT -----------------");
     logStr.append(System.lineSeparator());
     logStr.append(System.lineSeparator());
     logStr.append(" QUERY RESULT:");
@@ -123,7 +123,7 @@ public class SqlLog {
     logStr.append(StrUtil.format("TOTAL RECORDS: {}", result.size()));
     logStr.append(System.lineSeparator());
     logStr.append(System.lineSeparator());
-    logStr.append("##########################################################");
+    logStr.append("----------------------------------------------------------");
     log.debug(logStr.toString());
   }
 
@@ -137,14 +137,14 @@ public class SqlLog {
 
     StringBuilder logStr = new StringBuilder();
     logStr.append(System.lineSeparator());
-    logStr.append("################# MYFAVS ORM SHOW RESULT #################");
+    logStr.append("----------------- MYFAVS ORM SHOW RESULT -----------------");
     logStr.append(System.lineSeparator());
     logStr.append(System.lineSeparator());
     logStr.append(" QUERY RESULT:").append(JSONUtil.toJsonStr(result));
 
     logStr.append(System.lineSeparator());
     logStr.append(System.lineSeparator());
-    logStr.append("##########################################################");
+    logStr.append("----------------------------------------------------------");
     log.debug(logStr.toString());
   }
 }
