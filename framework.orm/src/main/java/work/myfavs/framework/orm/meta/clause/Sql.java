@@ -565,6 +565,17 @@ public class Sql extends Clause implements Serializable {
   }
 
   /**
+   * 把当前Sql放入 SELECT * FROM (sql) alias 的子查询中
+   *
+   * @param alias 别名
+   * @return SQL
+   */
+  public Sql asSubQuery(String alias) {
+    this.sql.insert(0, "SELECT * FROM (").append(") ").append(alias);
+    return this;
+  }
+
+  /**
    * 拼接 UNION 语句
    *
    * @return SQL
