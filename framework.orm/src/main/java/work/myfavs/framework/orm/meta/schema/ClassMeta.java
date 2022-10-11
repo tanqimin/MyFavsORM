@@ -2,12 +2,13 @@ package work.myfavs.framework.orm.meta.schema;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.List;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.exception.DBException;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * 类元数据
@@ -23,9 +24,9 @@ public class ClassMeta implements Serializable {
   /** 类型 */
   private final Class<?> clazz;
   /** 类名 */
-  private final String   className;
+  private final String className;
   /** 数据表名 */
-  private       String   tableName;
+  private String tableName;
   /** 主键生成策略 */
   private GenerationType strategy;
   /** 主键 */
@@ -33,11 +34,11 @@ public class ClassMeta implements Serializable {
   /** 是否启用逻辑删除？ */
   private boolean enableLogicalDelete;
   /** 逻辑删除字段（数据库字段） */
-  private       String     logicalDeleteField;
+  private String logicalDeleteField;
   /** 更新字段 */
   private final Attributes updateAttributes = new Attributes();
   /** 查询字段 */
-  private final Attributes queryAttributes  = new Attributes();
+  private final Attributes queryAttributes = new Attributes();
 
   // endregion
 
@@ -162,6 +163,24 @@ public class ClassMeta implements Serializable {
       throw new DBException("The view class [{}] could not contain primary key", getClassName());
     }
     return primaryKey;
+  }
+
+  /**
+   * 检查主键，如果不为 null，则返回主键字段名
+   *
+   * @return 主键字段名
+   */
+  public String getPrimaryKeyFieldName() {
+    return checkPrimaryKey().getFieldName();
+  }
+
+  /**
+   * 检查主键，如果不为 null，返回主键数据库列名
+   *
+   * @return 主键数据库列名
+   */
+  public String getPrimaryKeyColumnName() {
+    return checkPrimaryKey().getColumnName();
   }
 
   /**

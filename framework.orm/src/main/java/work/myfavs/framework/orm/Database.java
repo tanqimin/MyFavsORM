@@ -13,6 +13,8 @@ import work.myfavs.framework.orm.util.func.ThrowingSupplier;
 import java.sql.*;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class Database implements IDatabase {
 
@@ -156,12 +158,31 @@ public class Database implements IDatabase {
 
   @Override
   public int execute(String sql, Collection params, int queryTimeOut) {
+
     Connection conn;
     PreparedStatement pstmt = null;
 
     try {
       conn = this.open();
       pstmt = DBUtil.getPstForUpdate(conn, false, sql, params);
+      pstmt.setQueryTimeout(queryTimeOut);
+      return DBUtil.executeUpdate(pstmt);
+    } catch (Exception ex) {
+      throw new DBException(ex);
+    } finally {
+      DBUtil.close(pstmt);
+      this.close();
+    }
+  }
+
+  public int execute(String sql, ThrowingConsumer<PreparedStatement, SQLException> consumer, int queryTimeOut){
+    Connection conn;
+    PreparedStatement pstmt = null;
+
+    try {
+      conn = this.open();
+      pstmt = DBUtil.getPstForUpdate(conn, false, sql);
+      consumer.accept(pstmt);
       pstmt.setQueryTimeout(queryTimeOut);
       return DBUtil.executeUpdate(pstmt);
     } catch (Exception ex) {

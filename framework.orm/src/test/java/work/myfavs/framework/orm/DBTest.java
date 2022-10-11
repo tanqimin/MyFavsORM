@@ -10,7 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import work.myfavs.framework.orm.DBTemplate.Builder;
-import work.myfavs.framework.orm.entity.Snowfake;
+import work.myfavs.framework.orm.entity.Snowflake;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.TableAlias;
@@ -18,7 +18,7 @@ import work.myfavs.framework.orm.meta.dialect.TableAlias;
 public class DBTest {
 
   String url =
-      "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
+      "jdbc:mysql://127.0.0.1:3306/myfavs_test?allowPublicKeyRetrieval=true&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
   String user = "root";
   String password = "root";
 
@@ -28,13 +28,12 @@ public class DBTest {
   public void setUp() throws Exception {
 
     HikariConfig configuration = new HikariConfig();
-    configuration.setDriverClassName("com.mysql.jdbc.Driver");
+    configuration.setDriverClassName("com.mysql.cj.jdbc.Driver");
     configuration.setJdbcUrl(url);
     configuration.setUsername(user);
     configuration.setPassword(password);
     configuration.setAutoCommit(false);
     DataSource dataSource = new HikariDataSource(configuration);
-
     this.dbTemplate =
         new Builder()
             .dataSource(dataSource)
@@ -47,53 +46,53 @@ public class DBTest {
 
   @Test
   public void find() {
-    List<Snowfake> snowfakes = DB.conn().find(Snowfake.class, "SELECT * FROM tb_snowflake", null);
-    Assert.assertNotNull(snowfakes);
-    Assert.assertTrue(snowfakes.size() > 0);
+    List<Snowflake> snowflakes = DB.conn().find(Snowflake.class, "SELECT * FROM tb_snowflake", null);
+    Assert.assertNotNull(snowflakes);
+    Assert.assertTrue(snowflakes.size() > 0);
   }
 
   @Test
   public void getByCondition() {
 
-    Snowfake snowfake = new Snowfake();
-    snowfake.setName("UUI%");
-    snowfake.setType(TypeEnum.DRINK);
+    Snowflake snowflake = new Snowflake();
+    snowflake.setName("UUI%");
+    snowflake.setType(TypeEnum.DRINK);
 
     DB.conn()
         .tx(
             db -> {
-              Snowfake res =
+              Snowflake res =
                   TableAlias.function(
-                      "tb_snowfake_123123", s -> db.getByCondition(Snowfake.class, snowfake));
+                      "tb_snowfake_123123", s -> db.getByCondition(Snowflake.class, snowflake));
 
               TableAlias.clear();
               Assert.assertNotNull(res);
-              List<Snowfake> ress = db.findByCondition(Snowfake.class, snowfake, "SNOW_DTO");
+              List<Snowflake> ress = db.findByCondition(Snowflake.class, snowflake, "SNOW_DTO");
               Assert.assertNotNull(ress);
             });
   }
 
   @Test
   public void testTransaction() {
-    Snowfake snowfake = new Snowfake();
-    snowfake.setCreated(new Date());
-    snowfake.setName("snowfake");
-    snowfake.setDisable(false);
-    snowfake.setPrice(new BigDecimal(100));
-    snowfake.setType(TypeEnum.DRINK);
+    Snowflake snowflake = new Snowflake();
+    snowflake.setCreated(new Date());
+    snowflake.setName("snowfake");
+    snowflake.setDisable(false);
+    snowflake.setPrice(new BigDecimal(100));
+    snowflake.setType(TypeEnum.DRINK);
 
     DB.conn()
         .tx(
             db -> {
               long count = getCount(db);
-              db.create(Snowfake.class, snowfake);
+              db.create(Snowflake.class, snowflake);
               Assert.assertEquals(++count, getCount(db));
             });
   }
 
   private long getCount(DB db) {
 
-    return db.count(new Sql("SELECT * FROM tb_snowfake"));
+    return db.count(new Sql("SELECT * FROM tb_snowflake"));
   }
 
   @Test
@@ -186,15 +185,15 @@ public class DBTest {
   @Test
   public void create() {
 
-    Snowfake snowfake = new Snowfake();
-    snowfake.setCreated(new Date());
-    snowfake.setName("create test");
-    snowfake.setDisable(false);
-    snowfake.setPrice(new BigDecimal(199));
-    snowfake.setType(TypeEnum.DRINK);
-    snowfake.setConfig("");
+    Snowflake snowflake = new Snowflake();
+    snowflake.setCreated(new Date());
+    snowflake.setName("create test");
+    snowflake.setDisable(false);
+    snowflake.setPrice(new BigDecimal(199));
+    snowflake.setType(TypeEnum.DRINK);
+    snowflake.setConfig("");
 
-    DB.conn().create(Snowfake.class, snowfake);
+    DB.conn().create(Snowflake.class, snowflake);
   }
 
   @Test

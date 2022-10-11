@@ -2,6 +2,7 @@ package work.myfavs.framework.orm;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.PropDesc;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -1525,9 +1526,6 @@ public class DB {
     Collection<Collection> paramsList;
     Collection params;
 
-    Connection conn = null;
-    PreparedStatement pstmt = null;
-
     sql = Sql.Update(classMeta.getTableName()).append(" SET ");
     for (Attribute updateAttribute : updAttrs) {
       sql.append(StrUtil.format("{} = ?,", updateAttribute.getColumnName()));
@@ -1601,17 +1599,14 @@ public class DB {
    */
   public <TModel> int delete(Class<TModel> modelClass, TModel entity) {
 
-    String pkFieldName;
-    Object pkVal;
-
-    if (entity == null) {
+    if (Objects.isNull(entity)) {
       return 0;
     }
-    Attribute primaryKey = Metadata.get(modelClass).checkPrimaryKey();
-    pkFieldName = primaryKey.getFieldName();
-    pkVal = ReflectUtil.getFieldValue(entity, pkFieldName);
 
-    return deleteById(modelClass, pkVal);
+    ClassMeta classMeta = ClassMeta.createInstance(modelClass);
+    Object pkVal = getPrimaryKeyValue(classMeta, entity);
+
+    return deleteById(classMeta, pkVal);
   }
 
   /**
@@ -1624,16 +1619,14 @@ public class DB {
    */
   public <TModel> int delete(Class<TModel> modelClass, Collection<TModel> entities) {
 
-    String pkFieldName;
-    Object pkVal;
-    List ids;
-
-    if (entities == null || entities.size() == 0) {
+    if (CollUtil.isEmpty(entities)) {
       return 0;
     }
-    Attribute primaryKey = Metadata.get(modelClass).checkPrimaryKey();
-    pkFieldName = primaryKey.getFieldName();
-    ids = new ArrayList<>();
+
+    String pkFieldName = Metadata.get(modelClass).getPrimaryKeyFieldName();
+    List ids = new ArrayList<>();
+
+    Object pkVal;
     for (TModel entity : entities) {
       pkVal = ReflectUtil.getFieldValue(entity, pkFieldName);
       if (pkVal == null) {
@@ -1641,10 +1634,6 @@ public class DB {
       }
 
       ids.add(pkVal);
-    }
-
-    if (ids.isEmpty()) {
-      return 0;
     }
 
     return deleteByIds(modelClass, ids);
@@ -1660,16 +1649,16 @@ public class DB {
    */
   public <TModel> int deleteByIds(Class<TModel> modelClass, Collection ids) {
 
-    if (ids == null || ids.size() == 0) {
+    if (CollUtil.isEmpty(ids)) {
       return 0;
     }
 
     ClassMeta classMeta = Metadata.get(modelClass);
     Attribute primaryKey = classMeta.checkPrimaryKey();
     String pkColumnName = primaryKey.getColumnName();
-    String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
-    Sql sql = Sql.Delete(tableName).where().and(Cond.in(pkColumnName, new ArrayList(ids), false));
-    return execute(sql);
+    Cond deleteCond = Cond.in(pkColumnName, new ArrayList(ids), false);
+
+    return deleteByCond(classMeta, deleteCond);
   }
 
   /**
@@ -1686,22 +1675,14 @@ public class DB {
       return 0;
     }
     ClassMeta classMeta = Metadata.get(modelClass);
-    Attribute primaryKey = classMeta.checkPrimaryKey();
-    String pkColumnName = primaryKey.getColumnName();
+    return deleteById(classMeta, id);
+  }
 
-    Sql sql;
-    String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
-    if (classMeta.isEnableLogicalDelete()) {
-      sql =
-          Sql.Update(tableName)
-              .set(StrUtil.format("{} = {}", classMeta.getLogicalDeleteField(), pkColumnName))
-              .where(Cond.eq(pkColumnName, id))
-              .and(Cond.logicalDeleteCond(classMeta));
-    } else {
-      sql = Sql.Delete(tableName).where(Cond.eq(pkColumnName, id));
-    }
+  private int deleteById(ClassMeta classMeta, Object id) {
+    String pkColumnName = classMeta.getPrimaryKeyColumnName();
+    Cond deleteCond = Cond.eq(pkColumnName, id);
 
-    return execute(sql);
+    return deleteByCond(classMeta, deleteCond);
   }
 
   /**
@@ -1719,6 +1700,10 @@ public class DB {
     }
 
     ClassMeta classMeta = Metadata.get(modelClass);
+    return deleteByCond(classMeta, cond);
+  }
+
+  private int deleteByCond(ClassMeta classMeta, Cond deleteCond) {
     Sql sql;
     String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     if (classMeta.isEnableLogicalDelete()) {
@@ -1729,13 +1714,17 @@ public class DB {
                       "{} = {}",
                       classMeta.getLogicalDeleteField(),
                       classMeta.getPrimaryKey().getColumnName()))
-              .where()
-              .and(cond)
-              .and(Cond.eq(classMeta.getLogicalDeleteField(), 0));
+              .where(deleteCond)
+              .and(Cond.logicalDeleteCond(classMeta));
     } else {
-      sql = Sql.Delete(tableName).where().and(cond);
+      sql = Sql.Delete(tableName).where(deleteCond);
     }
 
     return execute(sql);
+  }
+
+  private <TModel> Object getPrimaryKeyValue(ClassMeta classMeta, TModel entity) {
+    String pkFieldName = classMeta.getPrimaryKeyFieldName();
+    return ReflectUtil.getFieldValue(entity, pkFieldName);
   }
 }

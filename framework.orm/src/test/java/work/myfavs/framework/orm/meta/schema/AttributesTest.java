@@ -2,7 +2,7 @@ package work.myfavs.framework.orm.meta.schema;
 
 import org.junit.Before;
 import org.junit.Test;
-import work.myfavs.framework.orm.entity.Snowfake;
+import work.myfavs.framework.orm.entity.Snowflake;
 
 public class AttributesTest {
 
@@ -10,7 +10,7 @@ public class AttributesTest {
 
   @Before
   public void setUp() throws Exception {
-    attributes = Metadata.get(Snowfake.class).getQueryAttributes();
+    attributes = Metadata.get(Snowflake.class).getQueryAttributes();
   }
 
   @Test
