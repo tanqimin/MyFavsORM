@@ -1,6 +1,8 @@
 package work.myfavs.framework.orm.meta.clause;
 
 import cn.hutool.core.util.StrUtil;
+import work.myfavs.framework.orm.util.exception.DBException;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -653,8 +655,9 @@ public class Sql extends Clause implements Serializable {
    * @return SQL
    */
   public Sql orderBy(String field) {
-    if (StrUtil.isNotEmpty(field)) {
-      this.append(StrUtil.format(" ORDER BY {}", field));
+    final String orderByField = checkInjection(field);
+    if (StrUtil.isNotEmpty(orderByField)) {
+      this.append(StrUtil.format(" ORDER BY {}", orderByField));
     }
     return this;
   }
@@ -668,10 +671,14 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql orderBy(String field, String... fields) {
 
-    this.append(StrUtil.format(" ORDER BY {}", field));
+    if (StrUtil.isEmpty(field)) throw new DBException("参数 field 不能为空");
+
+    final String orderByField = checkInjection(field);
+
+    this.append(StrUtil.format(" ORDER BY {}", orderByField));
     if (fields != null && fields.length > 0) {
       for (int i = 0; i < fields.length; i++) {
-        this.append(StrUtil.format(",{}", fields[i]));
+        this.append(StrUtil.format(",{}", checkInjection(fields[i])));
       }
     }
     return this;
@@ -684,8 +691,8 @@ public class Sql extends Clause implements Serializable {
    * @return SQL
    */
   public Sql limit(int row) {
-
-    return this.append(StrUtil.format(" LIMIT {}", row));
+    final String rowStr = checkInjection(StrUtil.toString(row));
+    return this.append(StrUtil.format(" LIMIT {}", rowStr));
   }
 
   /**
@@ -696,8 +703,9 @@ public class Sql extends Clause implements Serializable {
    * @return SQL
    */
   public Sql limit(int offset, int row) {
-
-    return this.append(StrUtil.format(" LIMIT {},{}", offset, row));
+    final String offsetStr = checkInjection(StrUtil.toString(offset));
+    final String rowStr = checkInjection(StrUtil.toString(row));
+    return this.append(StrUtil.format(" LIMIT {},{}", offsetStr, rowStr));
   }
 
   /**

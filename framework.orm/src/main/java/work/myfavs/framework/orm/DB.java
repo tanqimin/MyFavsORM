@@ -29,8 +29,6 @@ import work.myfavs.framework.orm.util.func.ThrowingRunnable;
 import work.myfavs.framework.orm.util.func.ThrowingSupplier;
 
 import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;

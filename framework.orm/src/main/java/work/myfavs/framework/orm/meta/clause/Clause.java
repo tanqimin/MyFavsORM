@@ -1,6 +1,8 @@
 package work.myfavs.framework.orm.meta.clause;
 
 import cn.hutool.core.util.StrUtil;
+import work.myfavs.framework.orm.util.exception.DBException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public abstract class Clause {
 
+  protected static String SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
   protected StringBuilder sql;
   protected List params;
 
@@ -69,5 +72,13 @@ public abstract class Clause {
   public Clause deleteLastChar(String str) {
     this.sql.deleteCharAt(this.sql.lastIndexOf(str));
     return this;
+  }
+
+  protected static String checkInjection(String sql) {
+    if (StrUtil.isNotEmpty(sql) && !sql.matches(SQL_PATTERN)) {
+      throw new DBException("参数 {} 存在非法字符串", sql);
+    }
+
+    return sql;
   }
 }
