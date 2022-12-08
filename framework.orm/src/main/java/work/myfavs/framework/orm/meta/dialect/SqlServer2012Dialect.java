@@ -30,6 +30,6 @@ public class SqlServer2012Dialect extends DefaultDialect {
     }
 
     int offset = pageSize * (currentPage - 1);
-    return querySql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY", offset, pageSize);
+    return querySql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY", offset, pageSize);
   }
 }

@@ -294,7 +294,7 @@ public class DB {
    */
   public <TView> TView get(Class<TView> viewClass, String sql, Collection params) {
 
-    Iterator<TView> iterator = this.findTop(viewClass, 1, sql, params).iterator();
+    Iterator<TView> iterator = this.find(viewClass, sql, params).iterator();
     if (iterator.hasNext()) {
       return iterator.next();
     }
