@@ -4,9 +4,13 @@ server:
     uri-encoding: utf-8
   servlet:
     context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 spring:
   application:
-    name: myfavs-test
+    name: myfavs-example
   jmx:
     default-domain: ${spring.application.name}
   datasource:
@@ -54,14 +58,9 @@ spring:
         allow:
         deny:
   profiles:
-    active: dev
+    active: mysql
   session:
     store-type: none
-  http:
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
   servlet:
     multipart:
       max-file-size: 200MB
