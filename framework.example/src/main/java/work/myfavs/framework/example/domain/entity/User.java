@@ -8,7 +8,7 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 import java.util.Date;
 
-@Table(value = "user", strategy = GenerationType.SNOW_FLAKE)
+@Table(value = "tb_user", strategy = GenerationType.SNOW_FLAKE)
 public class User {
   @Column @PrimaryKey private Long id;
   @Column private Date created;

@@ -18,10 +18,10 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for user
+-- Table structure for tb_user
 -- ----------------------------
-DROP TABLE IF EXISTS `user`;
-CREATE TABLE `user`  (
+DROP TABLE IF EXISTS `tb_user`;
+CREATE TABLE `tb_user`  (
                          `id` bigint NOT NULL,
                          `created` datetime NULL DEFAULT NULL,
                          `modified` datetime NULL DEFAULT NULL,
@@ -33,8 +33,8 @@ CREATE TABLE `user`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Records of user
+-- Records of tb_user
 -- ----------------------------
-INSERT INTO `user` VALUES (1492150022916149248, '2022-02-11 12:00:00', '2022-02-11 12:00:01', 'tenant2_user1', 'tenant2_user1@myfavs_tenant2.com', '123456', 'ADMIN');
+INSERT INTO `tb_user` VALUES (1492150022916149248, '2022-02-11 12:00:00', '2022-02-11 12:00:01', 'tenant2_user1', 'tenant2_user1@myfavs_tenant2.com', '123456', 'ADMIN');
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -23,6 +23,6 @@ public class UserService extends BaseService {
   }
 
   public Page<User> findByPage() {
-    return userRepository.findPage(User.class, new Sql("SELECT * FROM USER"), true, 1, 10);
+    return userRepository.findPage(User.class, new Sql("SELECT * FROM tb_user"), true, 1, 10);
   }
 }

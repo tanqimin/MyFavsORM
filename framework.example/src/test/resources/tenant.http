@@ -1,16 +1,1 @@
-POST http://127.0.0.1:9527/tenant/save
-Content-Type: application/json
-Cache-control: no-cache
-
-{
-  "tenant": "tenant3",
-  "jdbcClass": "com.mysql.cj.jdbc.Driver",
-  "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/tenant3?allowPublicKeyRetrieval=true&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8",
-  "jdbcUser": "root",
-  "jdbcPassword": "root",
-  "created": "2022-02-11 12:00:00",
-  "modified": "2022-02-11 12:00:01"
-}
-
-#################
 GET http://127.0.0.1:9527/tenant/find-by-page

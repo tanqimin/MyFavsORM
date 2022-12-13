@@ -18,10 +18,10 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for tenant
+-- Table structure for tb_tenant
 -- ----------------------------
-DROP TABLE IF EXISTS `tenant`;
-CREATE TABLE `tenant`  (
+DROP TABLE IF EXISTS `tb_tenant`;
+CREATE TABLE `tb_tenant`  (
                            `id` bigint NOT NULL,
                            `created` datetime NULL DEFAULT NULL,
                            `modified` datetime NULL DEFAULT NULL,
@@ -34,17 +34,17 @@ CREATE TABLE `tenant`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of tenant
+-- Records of tb_tenant
 -- ----------------------------
-INSERT INTO `tenant` VALUES (1492150022916149249, '2022-02-12 21:29:20', '2022-02-12 21:29:22', 'myfavs_master', 'jdbc:mysql://127.0.0.1:3306/myfavs_master?allowPublicKeyRetrieval=true&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8', 'root', 'root', 'com.mysql.cj.jdbc.Driver');
-INSERT INTO `tenant` VALUES (1492150022916149250, '2022-02-12 21:29:20', '2022-02-12 21:29:22', 'myfavs_tenant1', 'jdbc:mysql://127.0.0.1:3306/myfavs_tenant1?allowPublicKeyRetrieval=true&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8', 'root', 'root', 'com.mysql.cj.jdbc.Driver');
-INSERT INTO `tenant` VALUES (1492150022916149251, '2022-02-12 21:29:20', '2022-02-12 21:29:22', 'myfavs_tenant2', 'jdbc:mysql://127.0.0.1:3306/myfavs_tenant2?allowPublicKeyRetrieval=true&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8', 'root', 'root', 'com.mysql.cj.jdbc.Driver');
+INSERT INTO `tb_tenant` VALUES (1492150022916149249, '2022-02-12 21:29:20', '2022-02-12 21:29:22', 'myfavs_master', 'jdbc:mysql://127.0.0.1:3306/myfavs_master?allowPublicKeyRetrieval=true&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8', 'root', 'root', 'com.mysql.cj.jdbc.Driver');
+INSERT INTO `tb_tenant` VALUES (1492150022916149250, '2022-02-12 21:29:20', '2022-02-12 21:29:22', 'myfavs_tenant1', 'jdbc:mysql://127.0.0.1:3306/myfavs_tenant1?allowPublicKeyRetrieval=true&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8', 'root', 'root', 'com.mysql.cj.jdbc.Driver');
+INSERT INTO `tb_tenant` VALUES (1492150022916149251, '2022-02-12 21:29:20', '2022-02-12 21:29:22', 'myfavs_tenant2', 'jdbc:mysql://127.0.0.1:3306/myfavs_tenant2?allowPublicKeyRetrieval=true&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8', 'root', 'root', 'com.mysql.cj.jdbc.Driver');
 
 -- ----------------------------
--- Table structure for user
+-- Table structure for tb_user
 -- ----------------------------
-DROP TABLE IF EXISTS `user`;
-CREATE TABLE `user`  (
+DROP TABLE IF EXISTS `tb_user`;
+CREATE TABLE `tb_user`  (
                          `id` bigint NOT NULL,
                          `created` datetime NULL DEFAULT NULL,
                          `modified` datetime NULL DEFAULT NULL,
@@ -56,8 +56,8 @@ CREATE TABLE `user`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of user
+-- Records of tb_user
 -- ----------------------------
-INSERT INTO `user` VALUES (1492150022916149248, '2022-02-11 12:00:00', '2022-02-11 12:00:01', 'master_user1', 'master_user1@myfavs_master.com', '123456', 'ADMIN');
+INSERT INTO `tb_user` VALUES (1492150022916149248, '2022-02-11 12:00:00', '2022-02-11 12:00:01', 'master_user1', 'master_user1@myfavs_master.com', '123456', 'ADMIN');
 
 SET FOREIGN_KEY_CHECKS = 1;

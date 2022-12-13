@@ -58,7 +58,7 @@ spring:
         allow:
         deny:
   profiles:
-    active: mysql
+    active: mssql
   session:
     store-type: none
   servlet:

@@ -46,7 +46,7 @@ public class TenantDataSourceConfig {
 
     DBTemplate dbTemplate = this.buildDbTemplate(primaryDataSource, JdbcConnFactory.class);
     DB db = DB.conn(dbTemplate);
-    List<Tenant> tenants = db.find(Tenant.class, new Sql("SELECT * FROM tenant"));
+    List<Tenant> tenants = db.find(Tenant.class, new Sql("SELECT * FROM tb_tenant"));
 
     Map<Object, Object> customDataSources = new HashMap<>();
 
@@ -90,7 +90,7 @@ public class TenantDataSourceConfig {
         .config(
             config ->
                 config
-                    .setDbType(DbType.MYSQL)
+                    .setDbType(DbType.SQL_SERVER)
                     .setBatchSize(200)
                     .setFetchSize(100)
                     .setQueryTimeout(120)

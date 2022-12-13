@@ -7,11 +7,11 @@ spring:
     charset: utf-8
   datasource:
     primary:
-      db-type: mysql #sqlserver
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/myfavs_master?allowPublicKeyRetrieval=true&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
-      username: root
-      password: root
+      db-type: sqlserver
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      url: jdbc:sqlserver://192.168.8.246:1433;DatabaseName=myfavs_master;sendStringParametersAsUnicode=false;encrypt=false
+      username: sa
+      password: sa
     druid:
       default-auto-commit: false
 #      url: jdbc:mysql://192.168.8.34:13307/sstest?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true&cachePrepStmts=true&prepStmtCacheSize=250&prepStmtCacheSqlLimit=2048&useServerPrepStmts=true&useLocalSessionState=true&rewriteBatchedStatements=true&cacheResultSetMetadata=true&cacheServerConfiguration=true&elideSetAutoCommits=true&maintainTimeStats=false

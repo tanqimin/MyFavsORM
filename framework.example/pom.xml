@@ -67,9 +67,15 @@
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+<!--    <dependency>-->
+<!--      <groupId>mysql</groupId>-->
+<!--      <artifactId>mysql-connector-java</artifactId>-->
+<!--    </dependency>-->
+
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>mssql-jdbc</artifactId>
+      <version>12.1.0.jre8-preview</version>
     </dependency>
 
     <dependency>
