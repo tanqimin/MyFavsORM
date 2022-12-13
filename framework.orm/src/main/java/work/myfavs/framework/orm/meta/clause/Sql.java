@@ -57,7 +57,7 @@ public class Sql extends Clause implements Serializable {
   }
 
   public Sql(Sql sql) {
-    super(sql.getSqlString(), sql.getParams());
+    super(sql.toString(), sql.getParams());
   }
   // endregion
 
@@ -852,6 +852,6 @@ public class Sql extends Clause implements Serializable {
   @Override
   public String toString() {
 
-    return this.getSqlString();
+    return this.sql.toString();
   }
 }

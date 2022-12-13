@@ -59,11 +59,6 @@ public abstract class Clause {
   }
   // endregion
 
-  public String getSqlString() {
-
-    return StrUtil.toString(sql);
-  }
-
   @Override
   public String toString() {
     return StrUtil.toString(sql);

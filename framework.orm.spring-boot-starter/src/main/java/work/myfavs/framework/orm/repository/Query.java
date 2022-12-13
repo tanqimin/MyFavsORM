@@ -305,7 +305,7 @@ public class Query extends BaseRepository {
       Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPageLite(
-        viewClass, sql.getSqlString(), sql.getParams(), enablePage, currentPage, pageSize);
+        viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
   /**
@@ -403,7 +403,7 @@ public class Query extends BaseRepository {
       Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return findPage(
-        viewClass, sql.getSqlString(), sql.getParams(), enablePage, currentPage, pageSize);
+        viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
   /**

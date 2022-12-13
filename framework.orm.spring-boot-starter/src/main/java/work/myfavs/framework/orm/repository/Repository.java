@@ -149,7 +149,7 @@ public class Repository<TModel> extends Query {
    * @return Map，Key为主键值， Value为实体对象
    */
   public <TKey> Map<TKey, TModel> findMap(Sql sql) {
-    return this.findMap(sql.getSqlString(), sql.getParams());
+    return this.findMap(sql.toString(), sql.getParams());
   }
 
   /**
@@ -250,7 +250,7 @@ public class Repository<TModel> extends Query {
    */
   public int execute(Sql sql) {
 
-    return this.execute(sql.getSqlString(), sql.getParams());
+    return this.execute(sql.toString(), sql.getParams());
   }
 
   /**

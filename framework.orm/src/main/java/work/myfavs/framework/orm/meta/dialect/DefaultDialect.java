@@ -102,8 +102,8 @@ public abstract class DefaultDialect implements IDialect {
               insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
               valuesSql.append(StrUtil.format("0,"));
             }
-            insertSql.getSql().deleteCharAt(insertSql.getSqlString().lastIndexOf(","));
-            valuesSql.getSql().deleteCharAt(valuesSql.getSqlString().lastIndexOf(","));
+            insertSql.getSql().deleteCharAt(insertSql.toString().lastIndexOf(","));
+            valuesSql.getSql().deleteCharAt(valuesSql.toString().lastIndexOf(","));
           }
 
           return insertSql.append(")").append(valuesSql).append(")");
