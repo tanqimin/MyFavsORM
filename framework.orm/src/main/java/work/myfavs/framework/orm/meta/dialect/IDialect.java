@@ -1,17 +1,11 @@
 package work.myfavs.framework.orm.meta.dialect;
 
-import java.util.Collection;
 import work.myfavs.framework.orm.meta.clause.Sql;
+
+import java.util.Collection;
 
 /** 通用数据库方言接口 Created by tanqimin on 2015/11/3. */
 public interface IDialect {
-
-  /**
-   * 获取数据库方言名称
-   *
-   * @return 数据库方言名称
-   */
-  String getDialectName();
 
   /**
    * 获取插入语句（带参数）
@@ -60,6 +54,16 @@ public interface IDialect {
   <TModel> Sql count(Class<TModel> clazz);
 
   /**
+   * 返回查询前n条记录的语句
+   *
+   * @param limit 返回的记录数
+   * @param sql SQL语句
+   * @param params 参数
+   * @return Sql对象
+   */
+  Sql selectTop(int limit, String sql, Collection params);
+
+  /**
    * 返回分页查询语句 如果 pageSize = -1L，则不分页
    *
    * @param currentPage 当前页码
@@ -68,7 +72,7 @@ public interface IDialect {
    * @param params 参数
    * @return Sql对象
    */
-  Sql selectTop(int currentPage, int pageSize, String sql, Collection params);
+  Sql selectPage(int currentPage, int pageSize, String sql, Collection params);
 
   /**
    * 获取更新语句

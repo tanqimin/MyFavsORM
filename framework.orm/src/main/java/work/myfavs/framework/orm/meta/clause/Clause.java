@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 /** SQL 语句基类 */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class Clause {
 
   protected static String SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";

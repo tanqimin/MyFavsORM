@@ -34,6 +34,6 @@ public class TenantService extends BaseService {
   }
 
   public Page<Tenant> findByPage() {
-    return tenantRepository.findPage(Tenant.class, new Sql("SELECT * FROM tb_tenant"), true, 1, 10);
+    return tenantRepository.findPage(Tenant.class, new Sql("WITH QUERY AS (SELECT * FROM tb_tenant) SELECT * FROM QUERY"), true, 1, 10);
   }
 }

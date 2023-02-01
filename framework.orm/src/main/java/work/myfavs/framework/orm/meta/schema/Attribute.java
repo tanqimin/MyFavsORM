@@ -1,15 +1,16 @@
 package work.myfavs.framework.orm.meta.schema;
 
 import cn.hutool.core.util.StrUtil;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.exception.DBException;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * 数据库列元数据
@@ -34,6 +35,7 @@ public class Attribute implements Serializable {
   private boolean primaryKey = false;
 
   /** 类型处理器 */
+  @SuppressWarnings("rawtypes")
   private PropertyHandler propertyHandler = null;
   // endregion
 

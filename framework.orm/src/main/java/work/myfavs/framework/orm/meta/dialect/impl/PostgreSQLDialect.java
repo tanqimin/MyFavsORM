@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.meta.dialect;
+package work.myfavs.framework.orm.meta.dialect.impl;
 
 import work.myfavs.framework.orm.meta.DbType;
 

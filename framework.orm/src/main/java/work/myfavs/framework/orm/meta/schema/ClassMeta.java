@@ -95,11 +95,7 @@ public class ClassMeta implements Serializable {
 
   // region Constructor
 
-  /**
-   * 构造方法
-   *
-   * @param clazz
-   */
+  /** 构造方法 */
   private ClassMeta(Class<?> clazz) {
     this.clazz = clazz;
     this.className = clazz.getName();
@@ -117,7 +113,7 @@ public class ClassMeta implements Serializable {
 
     final Field[] fields = ReflectUtil.getFields(clazz);
 
-    if (fields == null || fields.length <= 0) {
+    if (fields == null) {
       return;
     }
 

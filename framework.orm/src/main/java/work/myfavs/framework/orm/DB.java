@@ -240,7 +240,7 @@ public class DB {
   public <TView> List<TView> findTop(
       Class<TView> viewClass, int top, String sql, Collection params) {
 
-    Sql querySql = database.dialect().selectTop(1, top, sql, params);
+    Sql querySql = database.dialect().selectPage(1, top, sql, params);
     return this.find(viewClass, querySql);
   }
 
@@ -681,7 +681,7 @@ public class DB {
       pagSize = -1;
     }
 
-    querySql = this.database.dialect().selectTop(currentPage, pagSize, sql, params);
+    querySql = this.database.dialect().selectPage(currentPage, pagSize, sql, params);
     data = this.find(viewClass, querySql);
 
     return PageLite.createInstance(this.dbTemplate, data, currentPage, pagSize);
@@ -847,7 +847,7 @@ public class DB {
       pagSize = -1;
     }
 
-    querySql = this.database.dialect().selectTop(currentPage, pagSize, sql, params);
+    querySql = this.database.dialect().selectPage(currentPage, pagSize, sql, params);
     data = this.find(viewClass, querySql);
 
     if (!enablePage) {
