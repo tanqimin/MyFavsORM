@@ -46,6 +46,7 @@ public class DB {
   private final DBTemplate dbTemplate;
   private final IDatabase database;
 
+  private static final int MAX_PARAM_SIZE_FOR_MSSQL = 1000;
   private DB(DBTemplate dbTemplate) {
     this.dbTemplate = dbTemplate;
     database = new Database(dbTemplate);
@@ -1654,8 +1655,20 @@ public class DB {
     ClassMeta classMeta = Metadata.get(modelClass);
     Attribute primaryKey = classMeta.checkPrimaryKey();
     String pkColumnName = primaryKey.getColumnName();
-    Cond deleteCond = Cond.in(pkColumnName, new ArrayList(ids), false);
 
+    if (isSqlServer()) {
+      if (ids.size() > MAX_PARAM_SIZE_FOR_MSSQL) {
+        int ret = 0;
+        List<List> splitParams = CollUtil.split(ids, MAX_PARAM_SIZE_FOR_MSSQL);
+        for (List splitParam : splitParams) {
+          Cond deleteCond = Cond.in(pkColumnName, splitParam, false);
+          ret += deleteByCond(classMeta, deleteCond);
+        }
+        return ret;
+      }
+    }
+
+    Cond deleteCond = Cond.in(pkColumnName, new ArrayList(ids), false);
     return deleteByCond(classMeta, deleteCond);
   }
 
