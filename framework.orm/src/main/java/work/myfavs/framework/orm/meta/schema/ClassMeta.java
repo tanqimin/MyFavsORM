@@ -4,6 +4,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
+import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.io.Serializable;
@@ -105,7 +106,7 @@ public class ClassMeta implements Serializable {
       this.strategy = table.strategy();
       this.tableName =
           StrUtil.isEmpty(table.value())
-              ? StrUtil.toUnderlineCase(clazz.getSimpleName())
+              ? StringUtil.toUnderlineCase(clazz.getSimpleName())
               : table.value();
       this.enableLogicalDelete = StrUtil.isNotEmpty(table.logicalDeleteField());
       this.logicalDeleteField = table.logicalDeleteField();

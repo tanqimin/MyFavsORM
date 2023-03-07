@@ -5,6 +5,7 @@ import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
+import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.io.Serializable;
@@ -90,7 +91,7 @@ public class Attribute implements Serializable {
       attribute.primaryKey = isPrimaryKey(field);
       attribute.columnName =
           StrUtil.isEmpty(column.value())
-              ? StrUtil.toUnderlineCase(field.getName())
+              ? StringUtil.toUnderlineCase(field.getName())
               : column.value();
       attribute.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
     }
