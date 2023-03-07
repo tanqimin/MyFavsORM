@@ -4,6 +4,13 @@ import cn.hutool.core.util.StrUtil;
 
 public class StringUtil extends StrUtil {
 
+  /**
+   * 转换成下划线分割 StrUtil中不会单独对数字分割，如customFieldValue01 会处理为 custom_field_value01 当前方法对数字进行分割，会处理为
+   * custom_field_value_01
+   *
+   * @param str 待处理的字符串
+   * @return
+   */
   public static String toUnderlineCase(CharSequence str) {
     final StringBuilder result = new StringBuilder();
     boolean lastUppercase = false;
