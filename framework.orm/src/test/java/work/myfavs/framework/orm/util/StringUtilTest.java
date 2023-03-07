@@ -31,4 +31,15 @@ public class StringUtilTest {
     String str = "orderLine";
     Assert.assertEquals("order_line", StrUtil.toUnderlineCase(str));
   }
+
+  @Test
+  public void toUnderlineCase() {
+    String s1 = "customFieldValue01";
+    String s2 = "customFIEldValue01";
+    Assert.assertEquals("custom_field_value_01", StringUtil.toUnderlineCase(s1));
+    Assert.assertEquals("custom_fi_eld_value_01", StringUtil.toUnderlineCase(s2));
+    Assert.assertEquals("custom_field_value01", StrUtil.toUnderlineCase(s1));
+
+    Assert.assertEquals(s1, StrUtil.toCamelCase(StringUtil.toUnderlineCase(s1)));
+  }
 }
