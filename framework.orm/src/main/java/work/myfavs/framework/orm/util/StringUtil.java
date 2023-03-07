@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 
 public class StringUtil extends StrUtil {
 
-
   public static String toUnderlineCase(CharSequence str) {
     final StringBuilder result = new StringBuilder();
     boolean lastUppercase = false;
@@ -18,7 +17,7 @@ public class StringUtil extends StrUtil {
         } else {
           ch = '_';
         }
-      } else if (Character.isUpperCase(ch) || Character.isDigit(ch)) {
+      } else if (Character.isUpperCase(ch)) {
         ch = Character.toLowerCase(ch);
         // is start?
         if (i > 0) {
@@ -41,7 +40,19 @@ public class StringUtil extends StrUtil {
           }
         }
         lastUppercase = true;
+      } else if (Character.isDigit(ch)) {
+        if (i > 0) {
+          if (!lastUppercase) {
+            if (lastEntry != '_') {
+              result.append('_');
+            }
+          }
+        }
+        lastUppercase = true;
       } else {
+        if (Character.isDigit(lastEntry)) {
+          result.append('_');
+        }
         lastUppercase = false;
       }
 
