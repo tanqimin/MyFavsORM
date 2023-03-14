@@ -13,6 +13,7 @@ spring:
     name: myfavs-example
   jmx:
     default-domain: ${spring.application.name}
+    enabled: false
   datasource:
     druid:
       validation-query: select 1

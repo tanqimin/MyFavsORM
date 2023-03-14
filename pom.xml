@@ -123,7 +123,6 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-reload4j</artifactId>
                 <version>${slf4j.version}</version>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -136,13 +135,6 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-json</artifactId>
                 <version>${hutool.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.jsqlparser</groupId>
-                <artifactId>jsqlparser</artifactId>
-                <version>${jsqlparser.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
