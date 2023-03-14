@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 /** SQL 语句构建 注意：此处为了解决静态方法与普通方法不能重名的问题，所有静态方法均以大写字母开头 */
-@SuppressWarnings(value = "unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class Sql extends Clause implements Serializable {
 
   // region Constructor
@@ -64,6 +64,16 @@ public class Sql extends Clause implements Serializable {
   public static Sql New(String sql) {
 
     return new Sql(sql);
+  }
+
+  public Sql addParam(Object param) {
+    this.params.add(param);
+    return this;
+  }
+
+  public Sql addParams(Collection params) {
+    this.params.addAll(params);
+    return this;
   }
 
   /**

@@ -1,9 +1,12 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import cn.hutool.core.util.StrUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.WeakHashMap;
 
 /**
  * 元数据构建
@@ -14,7 +17,8 @@ public class Metadata {
 
   private static final Logger log = LoggerFactory.getLogger(Metadata.class);
 
-  private static final Map<String, ClassMeta> CLASS_META_CACHE = new ConcurrentHashMap<>();
+  private static final Map<String, ClassMeta> CLASS_META_CACHE = new WeakHashMap<>();
+  private static final Object SYNC_LOCK = new Object();
 
   private Metadata() {}
 
@@ -26,7 +30,19 @@ public class Metadata {
    */
   public static ClassMeta get(Class<?> clazz) {
 
-    return CLASS_META_CACHE.computeIfAbsent(
-        clazz.getName(), className -> ClassMeta.createInstance(clazz));
+
+    ClassMeta classMeta = CLASS_META_CACHE.get(clazz.getName());
+    if (Objects.isNull(classMeta)) {
+      synchronized (SYNC_LOCK) {
+        classMeta = CLASS_META_CACHE.get(clazz.getName());
+        if (Objects.isNull(classMeta)) {
+          if (log.isDebugEnabled())
+            log.debug(StrUtil.format("ClassMeta : {} keys not exists.", clazz.getName()));
+          classMeta = ClassMeta.createInstance(clazz);
+          CLASS_META_CACHE.put(clazz.getName(), classMeta);
+        }
+      }
+    }
+    return classMeta;
   }
 }

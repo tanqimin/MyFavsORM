@@ -47,6 +47,7 @@ public class DB {
   private final IDatabase database;
 
   private static final int MAX_PARAM_SIZE_FOR_MSSQL = 1000;
+
   private DB(DBTemplate dbTemplate) {
     this.dbTemplate = dbTemplate;
     database = new Database(dbTemplate);
@@ -241,7 +242,7 @@ public class DB {
   public <TView> List<TView> findTop(
       Class<TView> viewClass, int top, String sql, Collection params) {
 
-    Sql querySql = database.dialect().selectTop(1, top, sql, params);
+    Sql querySql = database.dialect().selectPage(1, top, sql, params);
     return this.find(viewClass, querySql);
   }
 
@@ -660,32 +661,41 @@ public class DB {
       int currentPage,
       int pageSize) {
 
-    int pagSize;
-    Sql querySql;
-    List<TView> data;
+    Sql querySql = new Sql(sql, params);
 
-    pagSize = pageSize;
     if (enablePage) {
-      if (currentPage < 1) {
-        throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
-      }
-
-      if (pageSize < 1) {
-        throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
-      }
-
-      long maxPageSize = this.database.dbConfig().getMaxPageSize();
-      if (maxPageSize > 0L && pagSize > maxPageSize) {
-        throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
-      }
-    } else {
-      pagSize = -1;
+      querySql = createPageSql(currentPage, pageSize, sql, params);
     }
 
-    querySql = this.database.dialect().selectTop(currentPage, pagSize, sql, params);
-    data = this.find(viewClass, querySql);
+    List<TView> data = this.find(viewClass, querySql);
 
-    return PageLite.createInstance(this.dbTemplate, data, currentPage, pagSize);
+    return PageLite.createInstance(this.dbTemplate, data, currentPage, pageSize);
+  }
+
+  /**
+   * 创建分页SQL
+   *
+   * @param currentPage 当前页码
+   * @param pageSize 每页记录数
+   * @param sql SQL语句
+   * @param params 参数
+   * @return 分页SQL
+   */
+  private Sql createPageSql(int currentPage, int pageSize, String sql, Collection params) {
+    if (currentPage < 1) {
+      throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
+    }
+
+    if (pageSize < 1) {
+      throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
+    }
+
+    long maxPageSize = this.database.dbConfig().getMaxPageSize();
+    if (maxPageSize > 0L && pageSize > maxPageSize) {
+      throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
+    }
+
+    return this.database.dialect().selectPage(currentPage, pageSize, sql, params);
   }
 
   /**
@@ -823,52 +833,29 @@ public class DB {
       int currentPage,
       int pageSize) {
 
-    int pagSize;
-    long totalPages;
-    long totalRecords;
-    Sql querySql;
-    List<TView> data;
-
-    pagSize = pageSize;
+    long totalPages = 1;
+    long totalRecords = 0;
+    Sql querySql = new Sql(sql, params);
 
     if (enablePage) {
-      if (currentPage < 1) {
-        throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
+      totalRecords = this.count(sql, params);
+      totalPages = totalRecords / pageSize;
+
+      if (totalRecords % pageSize != 0) {
+        totalPages++;
       }
 
-      if (pageSize < 1) {
-        throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
-      }
-
-      long maxPageSize = this.database.dbConfig().getMaxPageSize();
-      if (maxPageSize > 0L && pagSize > maxPageSize) {
-        throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
-      }
-    } else {
-      pagSize = -1;
+      querySql = createPageSql(currentPage, pageSize, sql, params);
     }
 
-    querySql = this.database.dialect().selectTop(currentPage, pagSize, sql, params);
-    data = this.find(viewClass, querySql);
+    List<TView> data = this.find(viewClass, querySql);
 
     if (!enablePage) {
       totalRecords = data.size();
-      totalPages = 1;
-    } else {
-      totalRecords = this.count(sql, params);
-      totalPages = totalRecords / pagSize;
-
-      if (totalRecords % pagSize != 0) {
-        totalPages++;
-      }
     }
 
-    //    if (enablePage && totalPages > 0 && currentPage > totalPages) {
-    //      return findPage(viewClass, sql, params, true, totalPages, pagSize);
-    //    }
-
     return Page.createInstance(
-        this.dbTemplate, data, currentPage, pagSize, totalPages, totalRecords);
+        this.dbTemplate, data, currentPage, pageSize, totalPages, totalRecords);
   }
 
   /**
@@ -885,8 +872,7 @@ public class DB {
   public <TView> Page<TView> findPage(
       Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
-    return findPage(
-        viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
+    return findPage(viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
   /**

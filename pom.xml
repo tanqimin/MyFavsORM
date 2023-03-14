@@ -6,26 +6,29 @@
 
     <groupId>work.myfavs</groupId>
     <artifactId>framework</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <java.version>11</java.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
-        <spring-boot.version>2.5.12</spring-boot.version>
-        <spring-jdbc.version>5.3.21</spring-jdbc.version>
+        <spring-boot.version>2.7.6</spring-boot.version>
+        <spring-jdbc.version>5.3.24</spring-jdbc.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <druid.version>1.1.22</druid.version>
+        <druid.version>1.2.15</druid.version>
         <HikariCP.version>5.0.1</HikariCP.version>
-        <mysql-jdbc.version>8.0.29</mysql-jdbc.version>
-        <hutool.version>5.8.3</hutool.version>
-        <beetl.version>3.10.0.RELEASE</beetl.version>
+        <mysql-jdbc.version>8.0.31</mysql-jdbc.version>
+        <hutool.version>5.8.10</hutool.version>
+        <beetl.version>3.13.0.RELEASE</beetl.version>
         <junit.version>4.13.2</junit.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
-        <vavr.version>0.10.4</vavr.version>
+        <jsqlparser.version>4.5</jsqlparser.version>
     </properties>
 
     <!--私服仓库-->
@@ -75,6 +78,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jdbc</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jdbc</artifactId>
                 <version>${spring-jdbc.version}</version>
@@ -83,6 +92,13 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
                 <version>${druid.version}</version>
             </dependency>
 
@@ -105,26 +121,29 @@
             </dependency>
 
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-core</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-json -->
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-json</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/io.vavr/vavr -->
             <dependency>
-                <groupId>io.vavr</groupId>
-                <artifactId>vavr</artifactId>
-                <version>${vavr.version}</version>
+                <groupId>com.github.jsqlparser</groupId>
+                <artifactId>jsqlparser</artifactId>
+                <version>${jsqlparser.version}</version>
                 <scope>provided</scope>
             </dependency>
-
 
             <dependency>
                 <groupId>com.ibeetl</groupId>

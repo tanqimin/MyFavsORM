@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Properties;
 import work.myfavs.framework.orm.util.exception.DBException;
 
@@ -21,11 +22,11 @@ public class Prop {
     if (properties == null) {
       properties = new Properties();
       final File file = FileUtil.file("myfavs.properties");
-      if (file.exists() == false) {
+      if (!file.exists()) {
         throw new DBException("Can not found file named myfavs.properties in the class path.");
       }
       try {
-        properties.load(new FileInputStream(file));
+        properties.load(Files.newInputStream(file.toPath()));
       } catch (IOException e) {
         throw new DBException(e);
       }

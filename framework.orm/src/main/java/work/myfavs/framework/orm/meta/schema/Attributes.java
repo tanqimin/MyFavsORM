@@ -1,15 +1,13 @@
 package work.myfavs.framework.orm.meta.schema;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+
+import java.util.*;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -23,7 +21,7 @@ public class Attributes {
 
   private final Map<String, Attribute> map = new TreeMap<>();
 
-  private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+  private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
   private final Lock readLock = readWriteLock.readLock();
 
@@ -43,7 +41,7 @@ public class Attributes {
 
     try {
       for (Attribute value : map.values()) {
-        if (StrUtil.equals(value.getFieldName(), fieldName, true)) {
+        if (StrUtil.equalsIgnoreCase(value.getFieldName(), fieldName)) {
           return value;
         }
       }
@@ -75,7 +73,7 @@ public class Attributes {
   public List<Attribute> getAttributes(String[] columnNames) {
 
     if (ArrayUtil.isEmpty(columnNames)) {
-      return new ArrayList<>(map.values());
+      return CollUtil.list(true, map.values());
     }
 
     List<Attribute> res = new LinkedList<>();

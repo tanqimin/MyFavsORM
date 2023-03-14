@@ -2,9 +2,7 @@ package work.myfavs.framework.orm.meta.dialect;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.alibaba.druid.sql.PagerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -15,39 +13,24 @@ import work.myfavs.framework.orm.meta.schema.Attributes;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 
+import java.util.Collection;
+import java.util.Objects;
+
 /**
  * 默认数据库方言实现
  *
  * @author tanqimin
  */
-public abstract class DefaultDialect implements IDialect {
+@SuppressWarnings("rawtypes")
+public abstract class DefaultDialect extends AbstractDialect implements IDialect {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDialect.class);
-
-  protected final Pattern P_SELECT = Pattern.compile("^\\s*SELECT\\s+", Pattern.CASE_INSENSITIVE);
-  protected final Pattern P_ORDER =
-      Pattern.compile("\\s+ORDER\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  protected final Pattern P_GROUP =
-      Pattern.compile("\\s+GROUP\\s+BY\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  protected final Pattern P_HAVING =
-      Pattern.compile("\\s+HAVING\\s+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  protected final Pattern P_SELECT_SINGLE =
-      Pattern.compile(
-          "^\\s*SELECT\\s+((COUNT)\\([\\s\\S]*\\)\\s*,?)+((\\s*)|(\\s+FROM[\\s\\S]*))?$",
-          Pattern.CASE_INSENSITIVE);
 
   protected static <TModel> String getTableName(Class<TModel> clazz) {
     return TableAlias.getOpt().orElse(Metadata.get(clazz).getTableName());
   }
 
-  /**
-   * 获取数据库方言名称
-   *
-   * @return 数据库方言名称
-   */
-  @Override
-  public abstract String getDialectName();
-
+  @SuppressWarnings("unchecked")
   @Override
   public <TModel> Sql insert(Class<TModel> clazz, TModel model) {
 
@@ -63,9 +46,8 @@ public abstract class DefaultDialect implements IDialect {
 
     if (updateAttributes.size() > 0) {
       updateAttributes.forEach(
-          (col, attr) -> {
-            sql.getParams().add(ReflectUtil.getFieldValue(model, attr.getFieldName()));
-          });
+          (col, attr) ->
+              sql.getParams().add(ReflectUtil.getFieldValue(model, attr.getFieldName())));
     }
 
     return sql;
@@ -102,11 +84,14 @@ public abstract class DefaultDialect implements IDialect {
               insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
               valuesSql.append(StrUtil.format("0,"));
             }
-            insertSql.getSql().deleteCharAt(insertSql.toString().lastIndexOf(","));
-            valuesSql.getSql().deleteCharAt(valuesSql.toString().lastIndexOf(","));
+            insertSql.deleteLastChar(",");
+            valuesSql.deleteLastChar(",");
           }
 
-          return insertSql.append(")").append(valuesSql).append(")");
+          insertSql.append(")");
+          valuesSql.append(")");
+
+          return new Sql().append(insertSql).append(valuesSql);
         });
   }
 
@@ -132,13 +117,13 @@ public abstract class DefaultDialect implements IDialect {
           (col, attr) -> {
             final Object fieldValue = ReflectUtil.getFieldValue(model, attr.getFieldName());
             // 忽略属性为null的字段生成
-            if (fieldValue == null && ignoreNullValue) {
+            if (ignoreNullValue && Objects.isNull(fieldValue)) {
               return;
             }
             sql.append(StrUtil.format(" {} = ?,", attr.getColumnName()), fieldValue);
           });
 
-      sql.getSql().deleteCharAt(sql.getSql().lastIndexOf(","));
+      sql.deleteLastChar(",");
     }
     sql.append(
         StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()),
@@ -157,13 +142,7 @@ public abstract class DefaultDialect implements IDialect {
 
   @Override
   public Sql count(String sql, Collection params) {
-
-    Matcher om = P_ORDER.matcher(sql);
-    if (om.find()) {
-      sql = sql.substring(0, om.start());
-    }
-
-    return new Sql(StrUtil.format("SELECT COUNT(*) FROM ({}) count_alias", sql), params);
+    return new Sql(PagerUtils.count(sql, getDruidDbType()), params);
   }
 
   @Override

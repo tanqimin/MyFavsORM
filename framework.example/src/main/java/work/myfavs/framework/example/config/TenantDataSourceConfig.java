@@ -90,7 +90,7 @@ public class TenantDataSourceConfig {
         .config(
             config ->
                 config
-                    .setDbType(DbType.SQL_SERVER)
+                    .setDbType(DbType.SQL_SERVER_2012)
                     .setBatchSize(200)
                     .setFetchSize(100)
                     .setQueryTimeout(120)
