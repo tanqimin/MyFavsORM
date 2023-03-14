@@ -22,7 +22,7 @@
         <druid.version>1.2.15</druid.version>
         <HikariCP.version>5.0.1</HikariCP.version>
         <mysql-jdbc.version>8.0.31</mysql-jdbc.version>
-        <hutool.version>5.8.10</hutool.version>
+        <hutool.version>5.8.11</hutool.version>
         <beetl.version>3.13.0.RELEASE</beetl.version>
         <junit.version>4.13.2</junit.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
