@@ -20,9 +20,14 @@ public class ObjectPropertyHandler extends PropertyHandler<Object> {
   public void addParameter(PreparedStatement ps, int paramIndex, Object param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.SMALLINT);
+      ps.setNull(paramIndex, Types.VARCHAR);
       return;
     }
     ps.setObject(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.VARCHAR;
   }
 }

@@ -22,9 +22,14 @@ public class DatePropertyHandler extends PropertyHandler<Date> {
   public void addParameter(PreparedStatement ps, int paramIndex, Date param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.TIMESTAMP);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setTimestamp(paramIndex, new Timestamp(param.getTime()));
   }
+
+    @Override
+    public int getSqlType() {
+    return Types.TIMESTAMP;
+    }
 }

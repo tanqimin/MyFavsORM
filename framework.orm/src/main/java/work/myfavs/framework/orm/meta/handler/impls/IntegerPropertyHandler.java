@@ -53,9 +53,14 @@ public class IntegerPropertyHandler extends PropertyHandler<Integer> {
       throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.INTEGER);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setInt(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.INTEGER;
   }
 }

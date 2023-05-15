@@ -14,10 +14,27 @@ import work.myfavs.framework.orm.util.exception.DBException;
 /** 数据库工具类 */
 public class DBUtil {
 
+  /**
+   * 创建用于查询的PreparedStatement
+   *
+   * @param conn Connection
+   * @param sql SQL语句
+   * @return PreparedStatement
+   * @throws SQLException
+   */
   public static PreparedStatement getPstForQuery(Connection conn, String sql) throws SQLException {
     return conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
   }
 
+  /**
+   * 创建用于查询的PreparedStatement
+   *
+   * @param conn Connection
+   * @param sql SQL语句
+   * @param params 查询参数
+   * @return PreparedStatement
+   * @throws SQLException
+   */
   public static PreparedStatement getPstForQuery(Connection conn, String sql, Collection params)
       throws SQLException {
 

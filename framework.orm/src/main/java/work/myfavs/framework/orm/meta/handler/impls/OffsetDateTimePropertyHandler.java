@@ -3,6 +3,7 @@ package work.myfavs.framework.orm.meta.handler.impls;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.time.OffsetDateTime;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
@@ -26,6 +27,15 @@ public class OffsetDateTimePropertyHandler extends PropertyHandler<OffsetDateTim
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, OffsetDateTime param)
       throws SQLException {
+    if (param == null) {
+      ps.setNull(paramIndex, getSqlType());
+      return;
+    }
     ps.setObject(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.TIMESTAMP_WITH_TIMEZONE;
   }
 }

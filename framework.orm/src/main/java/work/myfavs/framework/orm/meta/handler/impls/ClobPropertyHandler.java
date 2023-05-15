@@ -21,9 +21,14 @@ public class ClobPropertyHandler extends PropertyHandler<Clob> {
   public void addParameter(PreparedStatement ps, int paramIndex, Clob param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.CLOB);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setClob(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.CLOB;
   }
 }

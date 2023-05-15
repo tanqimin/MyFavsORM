@@ -21,9 +21,14 @@ public class BlobPropertyHandler extends PropertyHandler<Blob> {
   public void addParameter(PreparedStatement ps, int paramIndex, Blob param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.BLOB);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setBlob(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.BLOB;
   }
 }

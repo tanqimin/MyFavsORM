@@ -51,9 +51,14 @@ public class DoublePropertyHandler extends PropertyHandler<Double> {
   public void addParameter(PreparedStatement ps, int paramIndex, Double param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.DOUBLE);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setDouble(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.DOUBLE;
   }
 }

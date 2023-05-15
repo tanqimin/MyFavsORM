@@ -1,17 +1,16 @@
 package work.myfavs.framework.orm.meta.schema;
 
 import cn.hutool.core.util.StrUtil;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * 数据库列元数据
@@ -30,6 +29,8 @@ public class Attribute implements Serializable {
   private String fieldName;
   /** 类 属性类型 */
   private Class<?> fieldType;
+  /** java.sql.Types 类型 */
+  private int sqlType;
   /** 是否只读？ */
   private boolean readonly = false;
   /** 是否主键？ */
@@ -54,6 +55,10 @@ public class Attribute implements Serializable {
   public Class<?> getFieldType() {
 
     return fieldType;
+  }
+
+  public int getSqlType() {
+    return sqlType;
   }
 
   public boolean isReadonly() {
@@ -94,6 +99,7 @@ public class Attribute implements Serializable {
               ? StringUtil.toUnderlineCase(field.getName())
               : column.value();
       attribute.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
+      attribute.sqlType = attribute.propertyHandler.getSqlType();
     }
     return attribute;
   }

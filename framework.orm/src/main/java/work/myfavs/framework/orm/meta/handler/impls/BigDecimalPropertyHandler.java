@@ -26,9 +26,14 @@ public class BigDecimalPropertyHandler extends PropertyHandler<BigDecimal> {
       throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.DECIMAL);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setBigDecimal(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.DECIMAL;
   }
 }

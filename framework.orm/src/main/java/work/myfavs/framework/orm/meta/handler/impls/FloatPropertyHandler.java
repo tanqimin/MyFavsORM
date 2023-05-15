@@ -51,9 +51,14 @@ public class FloatPropertyHandler extends PropertyHandler<Float> {
   public void addParameter(PreparedStatement ps, int paramIndex, Float param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.FLOAT);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setFloat(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.FLOAT;
   }
 }

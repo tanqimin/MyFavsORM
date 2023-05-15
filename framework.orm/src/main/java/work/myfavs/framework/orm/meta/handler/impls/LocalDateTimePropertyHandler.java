@@ -26,9 +26,14 @@ public class LocalDateTimePropertyHandler extends PropertyHandler<LocalDateTime>
       throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.TIMESTAMP);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setTimestamp(paramIndex, Timestamp.valueOf(param));
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.TIMESTAMP;
   }
 }

@@ -1,18 +1,14 @@
 package work.myfavs.framework.orm.repository;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-import work.myfavs.framework.orm.util.func.ThrowingFunction;
-
-import java.lang.reflect.ParameterizedType;
-import java.sql.CallableStatement;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 仓储基类
@@ -311,35 +307,6 @@ public class Repository<TModel> extends Query {
   public int execute(String sql, Collection params, int queryTimeout) {
 
     return DB.conn(this.dbTemplate).execute(sql, params, queryTimeout);
-  }
-
-  /**
-   * 调用存储过程
-   *
-   * @param sql 调用存储过程语句，如：{ call proc_name(?,?,?)}
-   * @param func func
-   * @param <TResult> 结果
-   * @return TResult
-   */
-  public <TResult> TResult call(
-      String sql, ThrowingFunction<CallableStatement, TResult, SQLException> func) {
-    return DB.conn(this.dbTemplate).call(sql, func);
-  }
-
-  /**
-   * 调用存储过程
-   *
-   * @param sql 调用存储过程语句，如：{ call proc_name(?,?,?)}
-   * @param func func
-   * @param queryTimeout 超时时间
-   * @param <TResult> 结果
-   * @return TResult
-   */
-  public <TResult> TResult call(
-      String sql,
-      ThrowingFunction<CallableStatement, TResult, SQLException> func,
-      int queryTimeout) {
-    return DB.conn(this.dbTemplate).call(sql, func, queryTimeout);
   }
 
   /**

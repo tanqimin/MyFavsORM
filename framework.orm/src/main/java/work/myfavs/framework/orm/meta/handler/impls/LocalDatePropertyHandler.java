@@ -26,9 +26,14 @@ public class LocalDatePropertyHandler extends PropertyHandler<LocalDate> {
       throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.DATE);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setDate(paramIndex, Date.valueOf(param));
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.DATE;
   }
 }

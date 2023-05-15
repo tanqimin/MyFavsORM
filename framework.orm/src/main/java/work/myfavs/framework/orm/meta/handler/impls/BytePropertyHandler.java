@@ -36,9 +36,14 @@ public class BytePropertyHandler extends PropertyHandler<Byte> {
   public void addParameter(PreparedStatement ps, int paramIndex, Byte param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.VARBINARY);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setByte(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.VARBINARY;
   }
 }

@@ -21,9 +21,14 @@ public class ByteArrayPropertyHandler extends PropertyHandler<byte[]> {
   public void addParameter(PreparedStatement ps, int paramIndex, byte[] param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.VARBINARY);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setBytes(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.VARBINARY;
   }
 }

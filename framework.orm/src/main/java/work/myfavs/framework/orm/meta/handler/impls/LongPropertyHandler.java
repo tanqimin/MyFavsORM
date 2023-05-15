@@ -51,9 +51,14 @@ public class LongPropertyHandler extends PropertyHandler<Long> {
   public void addParameter(PreparedStatement ps, int paramIndex, Long param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.BIGINT);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setLong(paramIndex, param);
   }
+
+    @Override
+    public int getSqlType() {
+        return Types.BIGINT;
+    }
 }

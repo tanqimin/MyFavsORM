@@ -6,6 +6,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.DbType;
@@ -27,11 +30,6 @@ import work.myfavs.framework.orm.util.func.ThrowingConsumer;
 import work.myfavs.framework.orm.util.func.ThrowingFunction;
 import work.myfavs.framework.orm.util.func.ThrowingRunnable;
 import work.myfavs.framework.orm.util.func.ThrowingSupplier;
-
-import java.sql.CallableStatement;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 数据库操作对象
@@ -92,41 +90,6 @@ public class DB {
   private boolean isSqlServer() {
     return StrUtil.equals(this.database.dbConfig().getDbType(), DbType.SQL_SERVER)
         || StrUtil.equals(this.database.dbConfig().getDbType(), DbType.SQL_SERVER_2012);
-  }
-
-  /**
-   * 调用存储过程
-   *
-   * @param sql 调用存储过程语句，如：{ call proc_name(?,?,?)}
-   * @param func func
-   * @param <TResult> 结果
-   * @return TResult
-   */
-  public <TResult> TResult call(
-      String sql, ThrowingFunction<CallableStatement, TResult, SQLException> func) {
-    sqlLog.showSql(sql, null);
-    TResult result = this.database.call(sql, func);
-    sqlLog.showResult(result);
-    return result;
-  }
-
-  /**
-   * 调用存储过程
-   *
-   * @param sql 调用存储过程语句，如：{ call proc_name(?,?,?)}
-   * @param func func
-   * @param queryTimeout 超时时间
-   * @param <TResult> 结果
-   * @return TResult
-   */
-  public <TResult> TResult call(
-      String sql,
-      ThrowingFunction<CallableStatement, TResult, SQLException> func,
-      int queryTimeout) {
-    sqlLog.showSql(sql, null);
-    TResult result = this.database.call(sql, func, queryTimeout);
-    sqlLog.showResult(result);
-    return result;
   }
 
   /**
@@ -348,6 +311,9 @@ public class DB {
    * @return 记录
    */
   public <TView> TView getById(Class<TView> viewClass, Object id) {
+    if (Objects.isNull(id)) {
+      return null;
+    }
 
     ClassMeta classMeta = Metadata.get(viewClass);
     Attribute primaryKey = classMeta.checkPrimaryKey();

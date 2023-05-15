@@ -39,9 +39,14 @@ public class BooleanPropertyHandler extends PropertyHandler<Boolean> {
       throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.BOOLEAN);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setBoolean(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.BOOLEAN;
   }
 }

@@ -2,14 +2,13 @@ package work.myfavs.framework.orm.meta.schema;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.List;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.List;
 
 /**
  * 类元数据

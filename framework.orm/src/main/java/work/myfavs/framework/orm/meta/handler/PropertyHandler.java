@@ -32,4 +32,6 @@ public abstract class PropertyHandler<T> {
    */
   public abstract void addParameter(PreparedStatement ps, int paramIndex, T param)
       throws SQLException;
+
+  public abstract int getSqlType();
 }

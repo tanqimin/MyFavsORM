@@ -35,9 +35,14 @@ public class StringPropertyHandler extends PropertyHandler<String> {
   public void addParameter(PreparedStatement ps, int paramIndex, String param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.VARCHAR);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setString(paramIndex, param);
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.VARCHAR;
   }
 }

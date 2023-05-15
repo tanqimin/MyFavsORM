@@ -31,9 +31,14 @@ public class LocalTimePropertyHandler extends PropertyHandler<LocalTime> {
       throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.TIME);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setTime(paramIndex, Time.valueOf(param));
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.TIME;
   }
 }

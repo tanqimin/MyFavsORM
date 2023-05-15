@@ -1,5 +1,8 @@
 package work.myfavs.framework.orm;
 
+import java.sql.*;
+import java.util.Collection;
+import java.util.List;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.DBUtil;
@@ -9,12 +12,6 @@ import work.myfavs.framework.orm.util.func.ThrowingConsumer;
 import work.myfavs.framework.orm.util.func.ThrowingFunction;
 import work.myfavs.framework.orm.util.func.ThrowingRunnable;
 import work.myfavs.framework.orm.util.func.ThrowingSupplier;
-
-import java.sql.*;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class Database implements IDatabase {
 
@@ -39,19 +36,11 @@ public class Database implements IDatabase {
     return this.dbTemplate.getConnectionFactory();
   }
 
-  /**
-   * 打开数据库连接
-   *
-   * @return 数据库连接
-   */
   public Connection open() {
-
     return connFactory().openConnection();
   }
 
-  /** 关闭数据库连接 */
   public void close() {
-
     connFactory().closeConnection(connFactory().getCurrentConnection());
   }
 
@@ -65,6 +54,22 @@ public class Database implements IDatabase {
     }
   }
 
+  public Savepoint setSavepoint() {
+    try {
+      return this.connFactory().getCurrentConnection().setSavepoint();
+    } catch (SQLException e) {
+      throw new DBException(e, "Fail to set save point, error message:");
+    }
+  }
+
+  public Savepoint setSavepoint(String name) {
+    try {
+      return this.connFactory().getCurrentConnection().setSavepoint(name);
+    } catch (SQLException e) {
+      throw new DBException(e, "Fail to set save point, error message:");
+    }
+  }
+
   /** 回滚事务 */
   public void rollback() {
 
@@ -75,11 +80,43 @@ public class Database implements IDatabase {
     }
   }
 
+  public void rollback(Savepoint savepoint) {
+    try {
+      this.connFactory().getCurrentConnection().rollback(savepoint);
+    } catch (SQLException e) {
+      throw new DBException(e, "Fail to rollback transaction, error message:");
+    }
+  }
+
   @Override
-  public <R> R tx(ThrowingSupplier<R, SQLException> supplier) {
+  public <TResult> TResult tx(ThrowingFunction<Connection, TResult, SQLException> func) {
+    try {
+      return func.apply(open());
+    } catch (Exception e) {
+      rollback();
+      throw new DBException(e);
+    } finally {
+      close();
+    }
+  }
+
+  @Override
+  public <TResult> TResult tx(ThrowingSupplier<TResult, SQLException> supplier) {
     try {
       open();
       return supplier.get();
+    } catch (Exception e) {
+      rollback();
+      throw new DBException(e);
+    } finally {
+      close();
+    }
+  }
+
+  @Override
+  public void tx(ThrowingConsumer<Connection, SQLException> consumer) {
+    try {
+      consumer.accept(open());
     } catch (Exception e) {
       rollback();
       throw new DBException(e);
@@ -98,33 +135,6 @@ public class Database implements IDatabase {
       throw new DBException(e);
     } finally {
       close();
-    }
-  }
-
-  @Override
-  public <TResult> TResult call(
-      String sql, ThrowingFunction<CallableStatement, TResult, SQLException> func) {
-    return call(sql, func, dbConfig().getQueryTimeout());
-  }
-
-  @Override
-  public <TResult> TResult call(
-      String sql,
-      ThrowingFunction<CallableStatement, TResult, SQLException> func,
-      int queryTimeout) {
-    Connection conn;
-    CallableStatement cs = null;
-
-    try {
-      conn = this.open();
-      cs = conn.prepareCall(sql);
-      cs.setQueryTimeout(queryTimeout);
-      return func.apply(cs);
-    } catch (SQLException e) {
-      throw new DBException(e);
-    } finally {
-      DBUtil.close(cs);
-      this.close();
     }
   }
 
@@ -175,7 +185,8 @@ public class Database implements IDatabase {
     }
   }
 
-  public int execute(String sql, ThrowingConsumer<PreparedStatement, SQLException> consumer, int queryTimeOut){
+  public int execute(
+      String sql, ThrowingConsumer<PreparedStatement, SQLException> consumer, int queryTimeOut) {
     Connection conn;
     PreparedStatement pstmt = null;
 

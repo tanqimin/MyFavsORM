@@ -23,9 +23,14 @@ public class UUIDPropertyHandler extends PropertyHandler<UUID> {
   public void addParameter(PreparedStatement ps, int paramIndex, UUID param) throws SQLException {
 
     if (param == null) {
-      ps.setNull(paramIndex, Types.VARCHAR);
+      ps.setNull(paramIndex, getSqlType());
       return;
     }
     ps.setString(paramIndex, param.toString());
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.VARCHAR;
   }
 }

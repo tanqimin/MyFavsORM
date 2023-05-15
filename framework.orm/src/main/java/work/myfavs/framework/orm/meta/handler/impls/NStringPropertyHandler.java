@@ -22,42 +22,27 @@ import java.sql.SQLException;
 import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class ShortPropertyHandler extends PropertyHandler<Short> {
+public class NStringPropertyHandler extends PropertyHandler<String> {
 
-  private boolean isPrimitive;
+  @Override
+  public String convert(ResultSet rs, String columnName, Class<String> clazz) throws SQLException {
 
-  public ShortPropertyHandler() {}
-
-  public ShortPropertyHandler(boolean isPrimitive) {
-
-    this.isPrimitive = isPrimitive;
+    final String str = rs.getNString(columnName);
+    return rs.wasNull() ? null : str;
   }
 
   @Override
-  public Short convert(ResultSet rs, String columnName, Class<Short> clazz) throws SQLException {
+  public void addParameter(PreparedStatement ps, int paramIndex, String param) throws SQLException {
 
-    short i = rs.getShort(columnName);
-    if (rs.wasNull()) {
-      if (isPrimitive) {
-        return 0;
-      } else {
-        return null;
-      }
-    }
-    return i;
-  }
-
-  @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Short param) throws SQLException {
     if (param == null) {
       ps.setNull(paramIndex, getSqlType());
       return;
     }
-    ps.setShort(paramIndex, param);
+    ps.setNString(paramIndex, param);
   }
 
   @Override
   public int getSqlType() {
-    return Types.SMALLINT;
+    return Types.NVARCHAR;
   }
 }
