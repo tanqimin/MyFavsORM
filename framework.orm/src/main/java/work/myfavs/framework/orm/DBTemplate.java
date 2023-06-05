@@ -1,23 +1,24 @@
 package work.myfavs.framework.orm;
 
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
-import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
-import work.myfavs.framework.orm.util.PKGenerator;
-import work.myfavs.framework.orm.util.exception.DBException;
-
-import javax.sql.DataSource;
+import com.google.common.base.Preconditions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import javax.sql.DataSource;
+import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
+import work.myfavs.framework.orm.util.PKGenerator;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
  * 数据库配置
  *
  * @author tanqimin
  */
+@SuppressWarnings("rawtypes")
 public class DBTemplate {
 
   // region Attributes
@@ -41,7 +42,6 @@ public class DBTemplate {
    * @param builder Builder
    */
   private DBTemplate(Builder builder) {
-
     this.dsName = builder.dsName;
     this.dataSource = builder.dataSource;
     this.dbConfig = builder.config;
@@ -55,7 +55,7 @@ public class DBTemplate {
   /**
    * 注册 PropertyHandler
    *
-   * @param mapper
+   * @param mapper Mapper
    */
   private void registerMapper(Mapper mapper) {
     if (mapper == null || mapper.map.isEmpty()) {
@@ -175,9 +175,7 @@ public class DBTemplate {
 
     public DBTemplate build() {
 
-      if (this.dataSource == null) {
-        throw new DBException("Please set a dataSource.");
-      }
+      Preconditions.checkNotNull(this.dataSource, "Please set a dataSource.");
 
       if (this.config == null) {
         this.config = new DBConfig();

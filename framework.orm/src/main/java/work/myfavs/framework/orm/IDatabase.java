@@ -3,7 +3,6 @@ package work.myfavs.framework.orm;
 import java.sql.*;
 import java.util.Collection;
 import java.util.List;
-import work.myfavs.framework.orm.meta.dialect.IDialect;
 import work.myfavs.framework.orm.util.func.ThrowingConsumer;
 import work.myfavs.framework.orm.util.func.ThrowingFunction;
 import work.myfavs.framework.orm.util.func.ThrowingRunnable;
@@ -12,28 +11,6 @@ import work.myfavs.framework.orm.util.func.ThrowingSupplier;
 /** 数据库操作接口 */
 @SuppressWarnings("rawtypes")
 public interface IDatabase {
-
-  /**
-   * 获取ORM配置
-   *
-   * @return ORM配置
-   */
-  DBConfig dbConfig();
-
-  /**
-   * 获取数据库方言
-   *
-   * @return 数据库方言
-   */
-  IDialect dialect();
-
-  /**
-   * 获取数据库连接工厂
-   *
-   * @return 数据库连接工厂
-   */
-  ConnFactory connFactory();
-
   /**
    * 打开数据库连接
    *

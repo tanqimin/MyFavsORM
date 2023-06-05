@@ -8,7 +8,7 @@ import work.myfavs.framework.orm.meta.DbType;
 public class SqlServer2012Dialect extends SqlServerDialect {
 
   @Override
-  public String getDialectName() {
+  public String dbType() {
 
     return DbType.SQL_SERVER_2012;
   }

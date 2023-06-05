@@ -3,8 +3,6 @@ package work.myfavs.framework.orm;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
@@ -14,9 +12,6 @@ import work.myfavs.framework.orm.util.exception.DBException;
  * @author tanqimin
  */
 public class JdbcConnFactory extends ConnFactory {
-
-  private static final Logger log = LoggerFactory.getLogger(JdbcConnFactory.class);
-
   private final ThreadLocal<Connection> connectionHolder = new ThreadLocal<>();
   private final ThreadLocal<Integer> connectionDeepHolder = new ThreadLocal<>();
 
@@ -51,7 +46,10 @@ public class JdbcConnFactory extends ConnFactory {
 
     final Integer connDeep = connectionDeepHolder.get();
     if (connDeep == 1) {
-      Connection conn = connection == null ? getCurrentConnection() : connection;
+      Connection conn = connection;
+      if (conn == null) {
+        conn = getCurrentConnection();
+      }
       releaseConnection(conn);
       connectionHolder.remove();
       connectionDeepHolder.remove();
@@ -81,7 +79,10 @@ public class JdbcConnFactory extends ConnFactory {
    */
   protected void releaseConnection(Connection conn) {
 
-    DBUtil.commit(conn);
-    DBUtil.close(conn);
+    try {
+      DBUtil.commit(conn);
+    } finally {
+      DBUtil.close(conn);
+    }
   }
 }

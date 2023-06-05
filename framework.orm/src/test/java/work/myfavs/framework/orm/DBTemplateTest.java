@@ -1,39 +1,32 @@
 package work.myfavs.framework.orm;
 
-import com.zaxxer.hikari.HikariDataSource;
-import java.sql.SQLException;
 import org.junit.Assert;
 import org.junit.Test;
-import work.myfavs.framework.orm.DBTemplate.Builder;
-import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.meta.handler.impls.StringPropertyHandler;
 
-public class DBTemplateTest {
+public class DBTemplateTest extends AbstractTest {
 
   @Test
-  public void builder() throws SQLException {
+  public void getDsName() {
+    Assert.assertEquals(DBConfig.DEFAULT_DATASOURCE_NAME, dbTemplate.getDsName());
+  }
 
-    DBTemplate db1 =
-        new Builder("ds1")
-            .dataSource(new HikariDataSource())
-            .config(config -> config.setDbType(DbType.SQL_SERVER))
-            .mapping(
-                mapper -> {
-                  mapper.register(String.class, new StringPropertyHandler());
-                })
-            .build();
+  @Test
+  public void getDataSource() {
+    Assert.assertNotNull(dbTemplate.getDataSource());
+  }
 
-    DBTemplate db2 =
-        new Builder("ds2")
-            .dataSource(new HikariDataSource())
-            .config(config -> config.setDbType(DbType.MYSQL))
-            .mapping(
-                mapper -> {
-                  mapper.register(String.class, new StringPropertyHandler());
-                })
-            .build();
+  @Test
+  public void getConnectionFactory() {
+    Assert.assertNotNull(dbTemplate.getConnectionFactory());
+  }
 
-    Assert.assertEquals(DbType.SQL_SERVER, db1.getDbConfig().getDbType());
-    Assert.assertEquals(DbType.MYSQL, db2.getDbConfig().getDbType());
+  @Test
+  public void getDbConfig() {
+    Assert.assertNotNull(dbTemplate.getDbConfig());
+  }
+
+  @Test
+  public void getPkGenerator() {
+    Assert.assertNotNull(dbTemplate.getPkGenerator());
   }
 }

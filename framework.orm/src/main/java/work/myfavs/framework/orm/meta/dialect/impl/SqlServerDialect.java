@@ -11,11 +11,11 @@ import com.alibaba.druid.sql.ast.statement.SQLSubqueryTableSource;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.SQLServerSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.SQLServerTop;
 import com.alibaba.druid.util.JdbcConstants;
+import java.util.Collection;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.DefaultDialect;
-
-import java.util.Collection;
+import work.myfavs.framework.orm.util.DruidUtil;
 
 /**
  * @author tanqimin
@@ -27,7 +27,7 @@ public class SqlServerDialect extends DefaultDialect {
   private static final String TABLE_ALIAS = "_paginate";
 
   @Override
-  public String getDialectName() {
+  public String dbType() {
 
     return DbType.SQL_SERVER;
   }
@@ -46,7 +46,7 @@ public class SqlServerDialect extends DefaultDialect {
   }
 
   private SQLSelectStatement limit(String sql, int offset, int count) {
-    SQLSelectStatement selectStmt = createSQLSelectStatement(sql);
+    SQLSelectStatement selectStmt = DruidUtil.createSQLSelectStatement(this.dbType(), sql);
     SQLSelect select = selectStmt.getSelect();
 
     SQLServerSelectQueryBlock queryBlock = (SQLServerSelectQueryBlock) select.getQuery();
@@ -54,11 +54,11 @@ public class SqlServerDialect extends DefaultDialect {
       queryBlock.setTop(new SQLServerTop(new SQLNumberExpr(count)));
       return selectStmt;
     }
-    //构建 ROW_NUMBER() OVER (ORDER BY ...) AS _rn 列
+    // 构建 ROW_NUMBER() OVER (ORDER BY ...) AS _rn 列
     SQLSelectItem rowNumSelectItem = createRowNumberSQLSelectItem(queryBlock);
     queryBlock.getSelectList().add(rowNumSelectItem);
 
-    //构建外层查询语句
+    // 构建外层查询语句
     SQLServerSelectQueryBlock countQueryBlock = new SQLServerSelectQueryBlock();
     countQueryBlock.getSelectList().add(new SQLSelectItem(new SQLAllColumnExpr()));
     countQueryBlock.setFrom(new SQLSubqueryTableSource(queryBlock.clone(), TABLE_ALIAS));

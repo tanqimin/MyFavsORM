@@ -5,11 +5,11 @@ import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import java.util.Collection;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.DefaultDialect;
-
-import java.util.Collection;
+import work.myfavs.framework.orm.util.DruidUtil;
 
 /**
  * @author tanqimin
@@ -18,7 +18,7 @@ import java.util.Collection;
 public class MySqlDialect extends DefaultDialect {
 
   @Override
-  public String getDialectName() {
+  public String dbType() {
 
     return DbType.MYSQL;
   }
@@ -37,7 +37,7 @@ public class MySqlDialect extends DefaultDialect {
   }
 
   private SQLSelectStatement limit(String sql, int offset, int count) {
-    SQLSelectStatement selectStmt = createSQLSelectStatement(sql);
+    SQLSelectStatement selectStmt = DruidUtil.createSQLSelectStatement(this.dbType(), sql);
     SQLSelect select = selectStmt.getSelect();
 
     SQLSelectQueryBlock queryBlock = (SQLSelectQueryBlock) select.getQuery();

@@ -7,11 +7,11 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSubqueryTableSource;
 import com.alibaba.druid.sql.dialect.oracle.ast.stmt.OracleSelectQueryBlock;
 import com.alibaba.druid.util.JdbcConstants;
+import java.util.Collection;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.DefaultDialect;
-
-import java.util.Collection;
+import work.myfavs.framework.orm.util.DruidUtil;
 
 /**
  * Oracle方言实现
@@ -26,7 +26,7 @@ public class OracleDialect extends DefaultDialect {
   private static final String COL_ROW_NUM = "_rn";
 
   @Override
-  public String getDialectName() {
+  public String dbType() {
 
     return DbType.ORACLE;
   }
@@ -45,7 +45,7 @@ public class OracleDialect extends DefaultDialect {
   }
 
   private SQLSelectStatement limit(String sql, int offset, int count) {
-    SQLSelectStatement selectStmt = createSQLSelectStatement(sql);
+    SQLSelectStatement selectStmt = DruidUtil.createSQLSelectStatement(this.dbType(), sql);
     SQLSelect select = selectStmt.getSelect();
 
     int maxRow = count + offset;

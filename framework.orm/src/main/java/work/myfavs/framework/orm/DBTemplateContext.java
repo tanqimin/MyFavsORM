@@ -1,13 +1,10 @@
 package work.myfavs.framework.orm;
 
-import work.myfavs.framework.orm.util.exception.DBException;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import work.myfavs.framework.orm.util.exception.DBException;
 
-/**
- * 
- */
+/** */
 public class DBTemplateContext {
   private static final Map<String, DBTemplate> POOL = new ConcurrentHashMap<>();
 
@@ -19,7 +16,6 @@ public class DBTemplateContext {
   }
 
   public static DBTemplate add(String dsName, DBTemplate dbTemplate) {
-    //    return POOL.computeIfAbsent(dsName, key -> dbTemplate);
     POOL.put(dsName, dbTemplate);
     return dbTemplate;
   }

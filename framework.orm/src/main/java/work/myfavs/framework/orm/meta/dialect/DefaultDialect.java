@@ -3,6 +3,8 @@ package work.myfavs.framework.orm.meta.dialect;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.sql.PagerUtils;
+import java.util.Collection;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -12,9 +14,7 @@ import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.Attributes;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-
-import java.util.Collection;
-import java.util.Objects;
+import work.myfavs.framework.orm.util.DruidUtil;
 
 /**
  * 默认数据库方言实现
@@ -142,7 +142,7 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
 
   @Override
   public Sql count(String sql, Collection params) {
-    return new Sql(PagerUtils.count(sql, getDruidDbType()), params);
+    return new Sql(PagerUtils.count(sql, DruidUtil.convert(dbType())), params);
   }
 
   @Override

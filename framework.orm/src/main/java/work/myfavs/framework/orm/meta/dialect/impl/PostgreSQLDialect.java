@@ -6,7 +6,7 @@ import work.myfavs.framework.orm.meta.DbType;
 public class PostgreSQLDialect extends MySqlDialect {
 
   @Override
-  public String getDialectName() {
+  public String dbType() {
 
     return DbType.POSTGRE_SQL;
   }
