@@ -1,18 +1,12 @@
 package work.myfavs.framework.orm.meta.clause;
 
 import cn.hutool.core.util.StrUtil;
+import java.io.Serializable;
+import java.util.*;
+import java.util.function.Supplier;
 import work.myfavs.framework.orm.util.exception.DBException;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Supplier;
-
 /** SQL 语句构建 注意：此处为了解决静态方法与普通方法不能重名的问题，所有静态方法均以大写字母开头 */
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class Sql extends Clause implements Serializable {
 
   // region Constructor
@@ -34,13 +28,11 @@ public class Sql extends Clause implements Serializable {
     super(sql, toCollection(param1, params));
   }
 
-  private static Collection toCollection(Object param1, Object... params) {
-    Collection pars = new ArrayList();
+  private static Collection<Object> toCollection(Object param1, Object... params) {
+    Collection<Object> pars = new ArrayList<>();
     pars.add(param1);
-    if (params != null && params.length > 0) {
-      for (Object param : params) {
-        pars.add(param);
-      }
+    if (params != null) {
+      Collections.addAll(pars, params);
     }
     return pars;
   }
@@ -51,7 +43,7 @@ public class Sql extends Clause implements Serializable {
    * @param sql SQL 语句
    * @param params 参数
    */
-  public Sql(String sql, Collection params) {
+  public Sql(String sql, Collection<?> params) {
 
     super(sql, params);
   }
@@ -71,7 +63,7 @@ public class Sql extends Clause implements Serializable {
     return this;
   }
 
-  public Sql addParams(Collection params) {
+  public Sql addParams(Collection<?> params) {
     this.params.addAll(params);
     return this;
   }
@@ -136,7 +128,7 @@ public class Sql extends Clause implements Serializable {
    * @param params 参数集合
    * @return 拼接后的 SQL
    */
-  public Sql append(String sql, Collection params) {
+  public Sql append(String sql, Collection<?> params) {
 
     this.sql.append(sql);
     this.params.addAll(params);
@@ -195,7 +187,7 @@ public class Sql extends Clause implements Serializable {
    * @param params 参数集合
    * @return 拼接后的 SQL
    */
-  public Sql appendLine(String sql, Collection params) {
+  public Sql appendLine(String sql, Collection<?> params) {
 
     return this.append(sql, params).append(System.lineSeparator());
   }
@@ -220,7 +212,7 @@ public class Sql extends Clause implements Serializable {
   public static Sql Select(String field, String... fields) {
 
     Sql sql = new Sql(StrUtil.format("SELECT {}", field));
-    if (fields != null && fields.length > 0) {
+    if (fields != null) {
       for (String s : fields) {
         sql.append(StrUtil.format(",{}", s));
       }
@@ -249,7 +241,7 @@ public class Sql extends Clause implements Serializable {
   public Sql select(String field, String... fields) {
 
     this.append(StrUtil.format(" SELECT {}", field));
-    if (fields != null && fields.length > 0) {
+    if (fields != null) {
       for (String s : fields) {
         this.append(StrUtil.format(",{}", s));
       }
@@ -509,7 +501,7 @@ public class Sql extends Clause implements Serializable {
    * @param params 参数
    * @return SQL
    */
-  public Sql where(String sql, Collection params) {
+  public Sql where(String sql, Collection<?> params) {
 
     return this.append(StrUtil.format(" WHERE {}", sql), params);
   }
@@ -541,7 +533,7 @@ public class Sql extends Clause implements Serializable {
     if (StrUtil.isBlankIfStr(cond.sql)) {
       return this;
     }
-    this.append(StrUtil.format(" AND ({})", cond.sql), cond.params);
+    this.append(StrUtil.format(" AND ({})", StrUtil.trimStart(cond.sql)), cond.params);
     return this;
   }
 
@@ -572,7 +564,7 @@ public class Sql extends Clause implements Serializable {
     if (StrUtil.isBlankIfStr(cond.sql)) {
       return this;
     }
-    this.append(StrUtil.format(" OR ({})", cond.sql), cond.params);
+    this.append(StrUtil.format(" OR ({})", StrUtil.trimStart(cond.sql)), cond.params);
     return this;
   }
 
@@ -617,9 +609,9 @@ public class Sql extends Clause implements Serializable {
   public Sql groupBy(String field, String... fields) {
 
     this.append(StrUtil.format(" GROUP BY {}", field));
-    if (fields != null && fields.length > 0) {
-      for (int i = 0; i < fields.length; i++) {
-        this.append(StrUtil.format(",{}", fields[i]));
+    if (fields != null) {
+      for (String s : fields) {
+        this.append(StrUtil.format(", {}", s));
       }
     }
     return this;
@@ -650,12 +642,18 @@ public class Sql extends Clause implements Serializable {
    * 拼接 HAVING {sql} 语句
    *
    * @param sql SQL语句
-   * @param params 参数
+   * @param param 参数
+   * @param params 参数数组
    * @return SQL
    */
-  public Sql having(String sql, Collection params) {
+  public Sql having(String sql, Object param, Object... params) {
 
-    return this.append(StrUtil.format(" HAVING {}", sql), params);
+    return this.append(StrUtil.format(" HAVING {}", sql), param, params);
+  }
+
+  public Sql having(Cond cond) {
+
+    return this.append(" HAVING").append(cond);
   }
 
   /**
@@ -686,9 +684,9 @@ public class Sql extends Clause implements Serializable {
     final String orderByField = checkInjection(field);
 
     this.append(StrUtil.format(" ORDER BY {}", orderByField));
-    if (fields != null && fields.length > 0) {
-      for (int i = 0; i < fields.length; i++) {
-        this.append(StrUtil.format(",{}", checkInjection(fields[i])));
+    if (fields != null) {
+      for (String s : fields) {
+        this.append(StrUtil.format(", {}", checkInjection(s)));
       }
     }
     return this;
@@ -715,7 +713,7 @@ public class Sql extends Clause implements Serializable {
   public Sql limit(int offset, int row) {
     final String offsetStr = checkInjection(StrUtil.toString(offset));
     final String rowStr = checkInjection(StrUtil.toString(row));
-    return this.append(StrUtil.format(" LIMIT {},{}", offsetStr, rowStr));
+    return this.append(StrUtil.format(" LIMIT {}, {}", offsetStr, rowStr));
   }
 
   /**
@@ -729,36 +727,12 @@ public class Sql extends Clause implements Serializable {
   public static Sql Insert(String table, String field, String... fields) {
 
     Sql sql = new Sql(StrUtil.format("INSERT INTO {} ({}", table, field));
-    if (fields != null && fields.length > 0) {
-      for (int i = 0; i < fields.length; i++) {
-        sql.append(StrUtil.format(",{}", fields[i]));
+    if (fields != null) {
+      for (String s : fields) {
+        sql.append(StrUtil.format(", {}", s));
       }
     }
     return sql.append(")");
-  }
-
-  /**
-   * 创建完整 INSERT 语句
-   *
-   * @param table 表
-   * @param map INSERT的字段名、值
-   * @return SQL
-   */
-  public static Sql Insert(String table, Map<String, Object> map) {
-
-    Sql insertSql;
-    Sql valuesSql;
-    insertSql = new Sql(StrUtil.format("INSERT INTO {} (", table));
-    valuesSql = new Sql(StrUtil.format(" VALUES ("));
-    if (map != null && map.size() > 0) {
-      for (Entry<String, Object> param : map.entrySet()) {
-        insertSql.append(StrUtil.format("{},", param.getKey()));
-        valuesSql.append("?,", param.getValue());
-      }
-      insertSql.sql.deleteCharAt(insertSql.sql.lastIndexOf(","));
-      valuesSql.sql.deleteCharAt(valuesSql.sql.lastIndexOf(","));
-    }
-    return insertSql.append(")").append(valuesSql).append(")");
   }
 
   /**
@@ -771,10 +745,9 @@ public class Sql extends Clause implements Serializable {
   public Sql values(Object param, Object... params) {
 
     this.append(StrUtil.format(" VALUES (?"), param);
-    if (params != null && params.length > 0) {
+    if (params != null) {
       for (Object o : params) {
-
-        this.append(StrUtil.format(",?"), o);
+        this.append(StrUtil.format(", ?"), o);
       }
     }
     return this.append(")");
@@ -812,28 +785,6 @@ public class Sql extends Clause implements Serializable {
   public Sql set(String field, Object param) {
 
     return this.append(StrUtil.format(" SET {} = ?", field), param);
-  }
-
-  /**
-   * 拼接 SET {field1} = ?, {field2} = ? ... 语句
-   *
-   * @param map 包含字段名和参数值的集合
-   * @return SQL
-   */
-  public Sql set(Map<String, Object> map) {
-
-    if (map == null || map.size() == 0) {
-      return this;
-    }
-
-    this.sql.append(" SET");
-    for (Entry<String, Object> param : map.entrySet()) {
-      this.sql.append(StrUtil.format(" {} = ?,", param.getKey()));
-      this.params.add(param.getValue());
-    }
-
-    this.sql.deleteCharAt(this.sql.lastIndexOf(","));
-    return this;
   }
 
   /**

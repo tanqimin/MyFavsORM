@@ -10,8 +10,9 @@ import work.myfavs.framework.orm.meta.enumeration.Operator;
 @java.lang.annotation.Target({ElementType.FIELD})
 @java.lang.annotation.Retention(RetentionPolicy.RUNTIME)
 @java.lang.annotation.Documented
-@Repeatable(value = Conditions.class)
-public @interface Condition {
+@Repeatable(value = Criteria.class)
+public @interface Criterion {
+  interface Default {}
 
   /**
    * 数据库条件参数名称
@@ -39,5 +40,5 @@ public @interface Condition {
    *
    * @return 组名
    */
-  String group() default "DEFAULT";
+  Class<?> group() default Default.class;
 }

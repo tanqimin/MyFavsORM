@@ -1,115 +1,250 @@
 package work.myfavs.framework.orm.meta.clause;
 
+import static org.junit.Assert.*;
+
+import cn.hutool.core.util.StrUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import work.myfavs.framework.orm.entity.*;
+import work.myfavs.framework.orm.entity.enums.TypeEnum;
+import work.myfavs.framework.orm.meta.annotation.Criterion;
+import work.myfavs.framework.orm.meta.enumeration.Operator;
+import work.myfavs.framework.orm.meta.schema.ClassMeta;
 
 public class CondTest {
+  ClassMeta identityClassMeta;
+  ClassMeta snowflakeClassMeta;
+  ClassMeta uuidClassMeta;
+  ClassMeta logicDeleteMeta;
+
+  @Before
+  public void setUp() {
+    identityClassMeta = ClassMeta.createInstance(Identity.class);
+    snowflakeClassMeta = ClassMeta.createInstance(Snowflake.class);
+    uuidClassMeta = ClassMeta.createInstance(Uuid.class);
+    logicDeleteMeta = ClassMeta.createInstance(LogicDelete.class);
+  }
+
+  @After
+  public void tearDown() {}
+
+  @Test
+  public void logicalDeleteCond() {
+    Cond cond = Cond.logicalDeleteCond(logicDeleteMeta);
+    assertEquals(" deleted = ?", cond.toString());
+    assertEquals(1, cond.getParams().size());
+    assertFalse(cond.getParams().get(0) instanceof Boolean);
+  }
 
   @Test
   public void eq() {
+    assertEquals(" id = ?", Cond.eq("id", 0).toString());
+  }
 
-    Cond cond = Cond.eq("code", null, true);
-    Assert.assertEquals(cond.sql.toString(), "");
-
-    cond = Cond.eq("code", null, false);
-    Assert.assertEquals(cond.sql.toString(), " code IS NULL");
-
-    cond = Cond.eq("code", 1, true);
-    Assert.assertEquals(cond.sql.toString(), " code = ?");
-    Assert.assertTrue(cond.params.size() > 0);
+  @Test
+  public void testEq() {
+    assertTrue(StrUtil.equalsIgnoreCase(" id is null", Cond.eq("id", null, false).toString()));
+    assertEquals("", Cond.eq("id", null, true).toString());
   }
 
   @Test
   public void ne() {
+    assertEquals(" id <> ?", Cond.ne("id", 0).toString());
+  }
 
-    Cond cond = Cond.ne("code", null, true);
-    Assert.assertEquals(cond.sql.toString(), "");
-
-    cond = Cond.ne("code", null, false);
-    Assert.assertEquals(cond.sql.toString(), " code IS NOT NULL");
-
-    cond = Cond.ne("code", 1, true);
-    Assert.assertEquals(cond.sql.toString(), " code <> ?");
-    Assert.assertTrue(cond.params.size() > 0);
+  @Test
+  public void testNe() {
+    assertTrue(StrUtil.equalsIgnoreCase(" id is not null", Cond.ne("id", null, false).toString()));
+    assertEquals("", Cond.ne("id", null, true).toString());
   }
 
   @Test
   public void isNull() {
-
-    Cond cond = Cond.isNull("code");
-    Assert.assertEquals(cond.sql.toString(), " code IS NULL");
+    assertTrue(StrUtil.equalsIgnoreCase(" id is null", Cond.eq("id", null, false).toString()));
   }
 
   @Test
   public void isNotNull() {
-
-    Cond cond = Cond.isNotNull("code");
-    Assert.assertEquals(cond.sql.toString(), " code IS NOT NULL");
+    assertTrue(StrUtil.equalsIgnoreCase(" id is not null", Cond.ne("id", null, false).toString()));
   }
 
   @Test
-  public void gt() {}
+  public void gt() {
+    assertTrue(StrUtil.equalsIgnoreCase(" id > ?", Cond.gt("id", 0).toString()));
+    assertEquals("", Cond.gt("id", null).toString());
+  }
 
   @Test
-  public void ge() {}
+  public void ge() {
+    assertTrue(StrUtil.equalsIgnoreCase(" id >= ?", Cond.ge("id", 0).toString()));
+    assertEquals("", Cond.ge("id", null).toString());
+  }
 
   @Test
-  public void lt() {}
+  public void lt() {
+    assertTrue(StrUtil.equalsIgnoreCase(" id < ?", Cond.lt("id", 0).toString()));
+    assertEquals("", Cond.lt("id", null).toString());
+  }
 
   @Test
-  public void le() {}
+  public void le() {
+    assertTrue(StrUtil.equalsIgnoreCase(" id <= ?", Cond.le("id", 0).toString()));
+    assertEquals("", Cond.le("id", null).toString());
+  }
 
   @Test
-  public void between() {}
+  public void like() {
+    assertEquals("", Cond.like("id", null).toString());
+    assertEquals(" id = ?", Cond.like("id", 1).toString());
+    assertEquals(" id LIKE ?", Cond.like("id", "1%").toString());
+  }
+
+  @Test
+  public void between() {
+    assertEquals("", Cond.between("id", null, null).toString());
+    assertEquals(" id >= ?", Cond.between("id", 1, null).toString());
+    assertEquals(" id <= ?", Cond.between("id", null, 2).toString());
+    assertEquals(" id BETWEEN ? AND ?", Cond.between("id", 1, 2).toString());
+  }
 
   @Test
   public void in() {
+    List<Long> list = new ArrayList<>();
+    assertEquals("", Cond.in("id", list).toString());
+    list.add(1L);
+    assertEquals(" id = ?", Cond.in("id", list).toString());
+    list.add(2L);
+    assertEquals(" id IN (?,?)", Cond.in("id", list).toString());
+  }
 
-    List list = new ArrayList();
-    list.add("");
-    Cond cond = Cond.in("code", list);
-    Assert.assertEquals(cond.sql.toString(), "");
+  @Test
+  public void testIn() {
+    List<Long> list = new ArrayList<>();
+    assertEquals(" 1 > 2", Cond.in("id", list, false).toString());
+  }
 
-    cond = Cond.in("code", list, false);
-    Assert.assertEquals(cond.sql.toString(), " 1 > 2");
-
-    list.add("A");
-    cond = Cond.in("code", list);
-    Assert.assertEquals(cond.sql.toString(), " code = ?");
-
-    list.add("B");
-    cond = Cond.in("code", list);
-    Assert.assertEquals(cond.sql.toString(), " code IN (?,?)");
-    Assert.assertEquals(2, cond.params.size());
-
-    Sql sql = Sql.Select("*").from("dept");
-    cond = Cond.in("code", sql);
-    Assert.assertEquals(cond.sql.toString(), " code IN (SELECT * FROM dept)");
+  @Test
+  public void testIn1() {
+    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
+    assertEquals(StrUtil.format(" id IN ({})", sql), Cond.in("id", sql).toString());
   }
 
   @Test
   public void notIn() {
+    List<Long> list = new ArrayList<>();
+    assertEquals("", Cond.notIn("id", list).toString());
+    list.add(1L);
+    assertEquals(" id <> ?", Cond.notIn("id", list).toString());
+    list.add(2L);
+    assertEquals(" id NOT IN (?,?)", Cond.notIn("id", list).toString());
+  }
 
-    List list = new ArrayList();
-    Cond cond = Cond.notIn("code", list);
-    Assert.assertEquals(cond.sql.toString(), "");
+  @Test
+  public void testNotIn() {
+    List<Long> list = new ArrayList<>();
+    assertEquals(" 1 > 2", Cond.notIn("id", list, false).toString());
+  }
 
-    cond = Cond.notIn("code", list, false);
-    Assert.assertEquals(cond.sql.toString(), " 1 > 2");
+  @Test
+  public void testNotIn1() {
+    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
+    assertEquals(StrUtil.format(" id NOT IN ({})", sql), Cond.notIn("id", sql).toString());
+  }
 
-    list.add("A");
-    cond = Cond.notIn("code", list);
-    Assert.assertEquals(cond.sql.toString(), " code <> ?");
+  @Test
+  public void exists() {
+    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
+    assertEquals(StrUtil.format(" EXISTS ({})", sql), Cond.exists(sql).toString());
+  }
 
-    list.add("B");
-    cond = Cond.notIn("code", list);
-    Assert.assertEquals(cond.sql.toString(), " code NOT IN (?,?)");
-    Assert.assertEquals(2, cond.params.size());
+  @Test
+  public void testExists() {
+    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
+    assertEquals(StrUtil.format(" EXISTS ({})", sql), Cond.exists(() -> sql).toString());
+  }
 
-    Sql sql = Sql.Select("*").from("dept");
-    cond = Cond.notIn("code", sql);
-    Assert.assertEquals(cond.sql.toString(), " code NOT IN (SELECT * FROM dept)");
+  @Test
+  public void notExists() {
+    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
+    assertEquals(StrUtil.format(" NOT EXISTS ({})", sql), Cond.notExists(sql).toString());
+  }
+
+  @Test
+  public void testNotExists() {
+    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
+    assertEquals(StrUtil.format(" NOT EXISTS ({})", sql), Cond.notExists(() -> sql).toString());
+  }
+
+  @Test
+  public void and() {}
+
+  @Test
+  public void or() {}
+
+  @Test
+  public void create() {
+    Snowflake snowflake = new Snowflake();
+    snowflake.setName("S1");
+    snowflake.setType(TypeEnum.FOOD);
+
+    Cond cond = Cond.create(snowflake);
+    assertEquals(" name = ? AND type = ?", cond.toString());
+  }
+
+  @Test
+  public void testCreate() {
+    Snowflake snowflake = new Snowflake();
+    snowflake.setName("S1");
+    snowflake.setType(TypeEnum.FOOD);
+
+    Cond cond = Cond.create(snowflake, BaseEntity.Update.class);
+    assertEquals(" name <> ?", cond.toString());
+
+    Person person = new Person();
+    person.setCars(new String[] {"Car1", "Car2"});
+    person.setAlias(Arrays.asList("Alias1", "Alias2"));
+
+    cond = Cond.create(person, Person.In.class);
+    assertEquals(" person_alias IN (?,?)", cond.toString());
+
+    cond = Cond.create(person, Person.NotIn.class);
+    assertEquals(" cars NOT IN (?,?)", cond.toString());
+  }
+
+  @Test
+  public void testToString() {
+    assertEquals(" id = ?", Cond.eq("id", 0).toString());
+  }
+}
+
+class Person {
+  interface In {}
+
+  interface NotIn {}
+
+  @Criterion(operator = Operator.NOT_IN, group = NotIn.class)
+  private String[] cars;
+
+  @Criterion(value = "person_alias", operator = Operator.IN, group = In.class)
+  private List<String> alias;
+
+  public String[] getCars() {
+    return cars;
+  }
+
+  public void setCars(String[] cars) {
+    this.cars = cars;
+  }
+
+  public List<String> getAlias() {
+    return alias;
+  }
+
+  public void setAlias(List<String> alias) {
+    this.alias = alias;
   }
 }

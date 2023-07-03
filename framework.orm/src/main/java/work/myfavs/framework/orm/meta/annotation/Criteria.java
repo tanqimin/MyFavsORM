@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 @java.lang.annotation.Target({ElementType.FIELD})
 @java.lang.annotation.Retention(RetentionPolicy.RUNTIME)
 @java.lang.annotation.Documented
-public @interface Conditions {
+public @interface Criteria {
 
-  Condition[] value();
+  Criterion[] value();
 }

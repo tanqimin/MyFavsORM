@@ -10,8 +10,6 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
@@ -37,10 +35,7 @@ import work.myfavs.framework.orm.util.func.ThrowingSupplier;
  *
  * @author tanqimin
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class DB {
-
-  private static final Logger log = LoggerFactory.getLogger(DB.class);
   private final DBTemplate dbTemplate;
   private final IDatabase database;
   private final DBConfig dbConfig;
@@ -124,7 +119,7 @@ public class DB {
    * @param <TView> 结果集类型泛型
    * @return 结果集
    */
-  public <TView> List<TView> find(Class<TView> viewClass, String sql, Collection params) {
+  public <TView> List<TView> find(Class<TView> viewClass, String sql, Collection<?> params) {
 
     return database.find(viewClass, sql, params);
   }
@@ -162,7 +157,7 @@ public class DB {
    * @param params 参数
    * @return 结果集
    */
-  public List<Record> find(String sql, Collection params) {
+  public List<Record> find(String sql, Collection<?> params) {
 
     return this.find(Record.class, sql, params);
   }
@@ -189,7 +184,7 @@ public class DB {
    * @return Map
    */
   public <TKey, TView> Map<TKey, TView> findMap(
-      Class<TView> viewClass, String keyField, String sql, Collection params) {
+      Class<TView> viewClass, String keyField, String sql, Collection<?> params) {
     final PropDesc prop = BeanUtil.getBeanDesc(viewClass).getProp(keyField);
     if (prop == null) {
       throw new DBException("Class {} not exist Prop named {}", viewClass.getName(), keyField);
@@ -223,7 +218,7 @@ public class DB {
    * @return 结果集
    */
   public <TView> List<TView> findTop(
-      Class<TView> viewClass, int top, String sql, Collection params) {
+      Class<TView> viewClass, int top, String sql, Collection<?> params) {
 
     Sql querySql = dialect.selectPage(1, top, sql, params);
     return this.find(viewClass, querySql);
@@ -251,7 +246,7 @@ public class DB {
    * @param params 参数
    * @return 结果集
    */
-  public List<Record> findTop(int top, String sql, Collection params) {
+  public List<Record> findTop(int top, String sql, Collection<?> params) {
 
     return this.findTop(Record.class, top, sql, params);
   }
@@ -277,7 +272,7 @@ public class DB {
    * @param <TView> 结果集类型泛型
    * @return 记录
    */
-  public <TView> TView get(Class<TView> viewClass, String sql, Collection params) {
+  public <TView> TView get(Class<TView> viewClass, String sql, Collection<?> params) {
 
     Iterator<TView> iterator = this.find(viewClass, sql, params).iterator();
     if (iterator.hasNext()) {
@@ -306,7 +301,7 @@ public class DB {
    * @param params 参数
    * @return 记录
    */
-  public Record get(String sql, Collection params) {
+  public Record get(String sql, Collection<?> params) {
 
     return this.get(Record.class, sql, params);
   }
@@ -386,31 +381,31 @@ public class DB {
   }
 
   /**
-   * 根据@Condition注解生成的条件查询记录
+   * 根据 @Criteria 注解生成的条件查询记录
    *
    * @param viewClass 结果类型
-   * @param object 包含@Condition注解Field的对象
+   * @param object 包含 @Criteria 注解Field的对象
    * @param <TView> 实体类型
    * @return 记录
    */
-  public <TView> TView getByCondition(Class<TView> viewClass, Object object) {
+  public <TView> TView getByCriteria(Class<TView> viewClass, Object object) {
 
     return this.getByCond(viewClass, Cond.create(object));
   }
 
   /**
-   * 根据@Condition注解生成的条件查询记录
+   * 根据 @Criteria 注解生成的条件查询记录
    *
    * @param viewClass 结果类型
-   * @param object 包含@Condition注解Field的对象
-   * @param conditionGroup 条件组名
+   * @param object 包含 @Criteria 注解Field的对象
+   * @param criteriaGroup 条件组名
    * @param <TView> 实体类型
    * @return 记录
    */
-  public <TView> TView getByCondition(
-      Class<TView> viewClass, Object object, String conditionGroup) {
+  public <TView> TView getByCriteria(
+      Class<TView> viewClass, Object object, Class<?> criteriaGroup) {
 
-    return this.getByCond(viewClass, Cond.create(object, conditionGroup));
+    return this.getByCond(viewClass, Cond.create(object, criteriaGroup));
   }
 
   /**
@@ -421,7 +416,7 @@ public class DB {
    * @param <TView> 实体类型
    * @return 实体集合
    */
-  public <TView> List<TView> findByIds(Class<TView> viewClass, Collection ids) {
+  public <TView> List<TView> findByIds(Class<TView> viewClass, Collection<?> ids) {
 
     ClassMeta classMeta = Metadata.get(viewClass);
     Attribute primaryKey = classMeta.checkPrimaryKey();
@@ -462,7 +457,8 @@ public class DB {
    * @param <TView> 实体类型
    * @return 实体集合
    */
-  public <TView> List<TView> findByField(Class<TView> viewClass, String field, Collection params) {
+  public <TView> List<TView> findByField(
+      Class<TView> viewClass, String field, Collection<?> params) {
 
     Sql sql =
         this.dialect
@@ -493,31 +489,31 @@ public class DB {
   }
 
   /**
-   * 根据@Condition注解生成的条件查询实体集合
+   * 根据 @Criterion 注解生成的条件查询实体集合
    *
    * @param viewClass 结果类型
-   * @param object 包含@Condition注解Field的对象
+   * @param object 包含 @Criterion 注解Field的对象
    * @param <TView> 实体类型
    * @return 实体集合
    */
-  public <TView> List<TView> findByCondition(Class<TView> viewClass, Object object) {
+  public <TView> List<TView> findByCriteria(Class<TView> viewClass, Object object) {
 
     return findByCond(viewClass, Cond.create(object));
   }
 
   /**
-   * 根据@Condition注解生成的条件查询实体集合
+   * 根据 @Criteria 注解生成的条件查询实体集合
    *
    * @param viewClass 结果类型
-   * @param object 包含@Condition注解Field的对象
-   * @param conditionGroup 条件组名
+   * @param object 包含 @Criteria 注解Field的对象
+   * @param criteriaGroup 条件组名
    * @param <TView> 实体类型
    * @return 实体集合
    */
-  public <TView> List<TView> findByCondition(
-      Class<TView> viewClass, Object object, String conditionGroup) {
+  public <TView> List<TView> findByCriteria(
+      Class<TView> viewClass, Object object, Class<?> criteriaGroup) {
 
-    return findByCond(viewClass, Cond.create(object, conditionGroup));
+    return findByCond(viewClass, Cond.create(object, criteriaGroup));
   }
 
   /**
@@ -527,7 +523,7 @@ public class DB {
    * @param params 参数
    * @return 行数
    */
-  public long count(String sql, Collection params) {
+  public long count(String sql, Collection<?> params) {
 
     Sql countSql = this.dialect.count(sql, params);
     return this.get(Number.class, countSql).longValue();
@@ -581,7 +577,7 @@ public class DB {
    * @param params 参数
    * @return 查询结果行数大于0返回true，否则返回false
    */
-  public boolean exists(String sql, Collection params) {
+  public boolean exists(String sql, Collection<?> params) {
 
     return this.count(sql, params) > 0L;
   }
@@ -601,6 +597,9 @@ public class DB {
 
     Attribute primaryKey = Metadata.get(modelClass).checkPrimaryKey();
     Object pkVal = ReflectUtil.getFieldValue(entity, primaryKey.getFieldName());
+    if (pkVal == null) {
+      return false;
+    }
     Sql existSql = this.dialect.count(modelClass).where(Cond.eq(primaryKey.getColumnName(), pkVal));
     return exists(existSql);
   }
@@ -633,7 +632,7 @@ public class DB {
   public <TView> PageLite<TView> findPageLite(
       Class<TView> viewClass,
       String sql,
-      Collection params,
+      Collection<?> params,
       boolean enablePage,
       int currentPage,
       int pageSize) {
@@ -658,7 +657,7 @@ public class DB {
    * @param params 参数
    * @return 分页SQL
    */
-  private Sql createPageSql(int currentPage, int pageSize, String sql, Collection params) {
+  private Sql createPageSql(int currentPage, int pageSize, String sql, Collection<?> params) {
     if (currentPage < 1) {
       throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
     }
@@ -704,7 +703,7 @@ public class DB {
    * @return 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(
-      Class<TView> viewClass, String sql, Collection params, IPageable pageable) {
+      Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
 
     return this.findPageLite(
         viewClass,
@@ -746,7 +745,7 @@ public class DB {
    * @return 简单分页结果集
    */
   public PageLite<Record> findPageLite(
-      String sql, Collection params, boolean enablePage, int currentPage, int pageSize) {
+      String sql, Collection<?> params, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPageLite(Record.class, sql, params, enablePage, currentPage, pageSize);
   }
@@ -773,7 +772,7 @@ public class DB {
    * @param pageable 分页对象
    * @return 简单分页结果集
    */
-  public PageLite<Record> findPageLite(String sql, Collection params, IPageable pageable) {
+  public PageLite<Record> findPageLite(String sql, Collection<?> params, IPageable pageable) {
 
     return this.findPageLite(Record.class, sql, params, pageable);
   }
@@ -805,7 +804,7 @@ public class DB {
   public <TView> Page<TView> findPage(
       Class<TView> viewClass,
       String sql,
-      Collection params,
+      Collection<?> params,
       boolean enablePage,
       int currentPage,
       int pageSize) {
@@ -863,7 +862,7 @@ public class DB {
    * @return 分页结果集
    */
   public <TView> Page<TView> findPage(
-      Class<TView> viewClass, String sql, Collection params, IPageable pageable) {
+      Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
 
     return findPage(
         viewClass,
@@ -905,7 +904,7 @@ public class DB {
    * @return 分页结果集
    */
   public Page<Record> findPage(
-      String sql, Collection params, boolean enablePage, int currentPage, int pageSize) {
+      String sql, Collection<?> params, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPage(Record.class, sql, params, enablePage, currentPage, pageSize);
   }
@@ -932,7 +931,7 @@ public class DB {
    * @param pageable 可分页对象
    * @return 分页结果集
    */
-  public Page<Record> findPage(String sql, Collection params, IPageable pageable) {
+  public Page<Record> findPage(String sql, Collection<?> params, IPageable pageable) {
 
     return this.findPage(
         Record.class,
@@ -965,10 +964,10 @@ public class DB {
    *
    * @param sql SQL语句
    * @param params 参数
-   * @param queryTimeOut 超时时间
+   * @param queryTimeOut 超时时间(单位：秒)
    * @return 影响行数
    */
-  public int execute(String sql, Collection params, int queryTimeOut) {
+  public int execute(String sql, Collection<?> params, int queryTimeOut) {
 
     return this.database.execute(sql, params, queryTimeOut);
   }
@@ -980,7 +979,7 @@ public class DB {
    * @param params 参数
    * @return 影响行数
    */
-  public int execute(String sql, Collection params) {
+  public int execute(String sql, Collection<?> params) {
 
     return execute(sql, params, this.dbConfig.getQueryTimeout());
   }
@@ -989,7 +988,7 @@ public class DB {
    * 执行一个SQL语句
    *
    * @param sql SQL
-   * @param queryTimeout 超时时间
+   * @param queryTimeout 超时时间(单位：秒)
    * @return 影响行数
    */
   public int execute(Sql sql, int queryTimeout) {
@@ -1081,18 +1080,7 @@ public class DB {
     if (strategy == GenerationType.IDENTITY) {
       autoGeneratedPK = true;
     } else {
-      Object pkVal = ReflectUtil.getFieldValue(entity, pkFieldName);
-      if (pkVal == null) {
-        if (strategy == GenerationType.ASSIGNED) {
-          throw new DBException("Assigned ID can not be null.");
-        } else if (strategy == GenerationType.UUID) {
-          pkVal = uuid();
-        } else if (strategy == GenerationType.SNOW_FLAKE) {
-          pkVal = snowFlakeId();
-        }
-
-        ReflectUtil.setFieldValue(entity, pkFieldName, pkVal);
-      }
+      getPrimaryKeyValue(strategy, pkFieldName, entity);
     }
 
     sql = this.dialect.insert(modelClass, entity);
@@ -1177,48 +1165,35 @@ public class DB {
     final int batchSize = this.dbConfig.getBatchSize();
     final List<List<TModel>> batchList = CollectionUtil.split(entities, batchSize);
 
-    for (Iterator<List<TModel>> ei = batchList.iterator(); ei.hasNext(); ) {
-      List<TModel> entityList = ei.next();
-
+    for (List<TModel> entityList : batchList) {
       boolean insertClauseCompleted = false;
       String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
       Sql insertClause = Sql.New(StrUtil.format("INSERT INTO {} (", tableName));
       Sql valuesClause = Sql.New(") VALUES ");
 
-      for (Iterator<TModel> mi = entityList.iterator(); mi.hasNext(); ) {
-        TModel entity = mi.next();
+      for (TModel entity : entityList) {
+        Object pkVal = getPrimaryKeyValue(strategy, pkFieldName, entity);
 
-        Object pkVal = ReflectUtil.getFieldValue(entity, pkFieldName);
-        if (pkVal == null) {
-          if (strategy == GenerationType.ASSIGNED) {
-            throw new DBException("Assigned ID can not be null.");
-          } else if (strategy == GenerationType.UUID) {
-            pkVal = uuid();
-          } else if (strategy == GenerationType.SNOW_FLAKE) {
-            pkVal = snowFlakeId();
-          }
-          ReflectUtil.setFieldValue(entity, pkFieldName, pkVal);
-        }
-        if (insertClauseCompleted == false) {
+        if (!insertClauseCompleted) {
           insertClause.append(primaryKey.getColumnName() + ",");
         }
         valuesClause.append("(?,", pkVal);
 
         for (Attribute attr : updateAttributes.values()) {
-          if (insertClauseCompleted == false) {
+          if (!insertClauseCompleted) {
             insertClause.append(attr.getColumnName() + ",");
           }
           valuesClause.append("?,", ReflectUtil.getFieldValue(entity, attr.getFieldName()));
         }
 
         if (classMeta.needAppendLogicalDeleteField()) {
-          if (insertClauseCompleted == false) {
+          if (!insertClauseCompleted) {
             insertClause.append(classMeta.getLogicalDeleteField() + ",");
           }
           valuesClause.append("?,", 0);
         }
 
-        if (insertClauseCompleted == false) {
+        if (!insertClauseCompleted) {
           insertClause.deleteLastChar(",");
           insertClauseCompleted = true;
         }
@@ -1236,17 +1211,33 @@ public class DB {
     return result;
   }
 
+  private <TModel> Object getPrimaryKeyValue(
+      GenerationType strategy, String pkFieldName, TModel entity) {
+    Object pkVal = ReflectUtil.getFieldValue(entity, pkFieldName);
+    if (pkVal == null) {
+      if (strategy == GenerationType.ASSIGNED) {
+        throw new DBException("Assigned ID can not be null.");
+      } else if (strategy == GenerationType.UUID) {
+        pkVal = uuid();
+      } else if (strategy == GenerationType.SNOW_FLAKE) {
+        pkVal = snowFlakeId();
+      }
+      ReflectUtil.setFieldValue(entity, pkFieldName, pkVal);
+    }
+    return pkVal;
+  }
+
   private <TModel> int createInJdbcBatch(ClassMeta classMeta, Collection<TModel> entities) {
 
-    int result = 0;
+    int result;
     GenerationType strategy;
     String pkFieldName;
     Object pkVal;
     boolean autoGeneratedPK = false;
     Attributes updateAttributes;
     Sql sql;
-    Collection<Collection> paramsList;
-    Collection params;
+    Collection<Collection<?>> paramsList;
+    Collection<Object> params;
 
     Attribute primaryKey = classMeta.checkPrimaryKey();
 
@@ -1260,8 +1251,7 @@ public class DB {
       autoGeneratedPK = true;
     }
 
-    for (Iterator<TModel> iterator = entities.iterator(); iterator.hasNext(); ) {
-      TModel entity = iterator.next();
+    for (TModel entity : entities) {
       params = new LinkedList<>();
 
       /*
@@ -1409,16 +1399,14 @@ public class DB {
     String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     List<Sql> batchSqls = new ArrayList<>();
 
-    for (Iterator<List<TModel>> ei = batchList.iterator(); ei.hasNext(); ) {
-      List<TModel> entityList = ei.next();
+    for (List<TModel> entityList : batchList) {
       Sql sql = Sql.Update(tableName).append(" SET ");
 
       List<Object> ids = new ArrayList<>();
       Map<String, Sql> setClauses = new TreeMap<>();
-      for (Iterator<TModel> mi = entityList.iterator(); mi.hasNext(); ) {
-        TModel entity = mi.next();
+      for (TModel entity : entityList) {
         for (Attribute updAttr : updAttrs) {
-          Sql setClause = null;
+          Sql setClause;
           final String columnName = updAttr.getColumnName();
           if (setClauses.containsKey(columnName)) {
             setClause = setClauses.get(columnName);
@@ -1466,7 +1454,7 @@ public class DB {
   private <TModel> int updateByLines(
       Class<TModel> modelClass, Collection<TModel> entities, String[] columns) {
 
-    int result = 0;
+    int result;
 
     ClassMeta classMeta = Metadata.get(modelClass);
     Attribute pk = classMeta.checkPrimaryKey();
@@ -1477,8 +1465,8 @@ public class DB {
     }
 
     Sql sql;
-    Collection<Collection> paramsList;
-    Collection params;
+    Collection<Collection<?>> paramsList;
+    Collection<Object> params;
 
     sql = Sql.Update(classMeta.getTableName()).append(" SET ");
     for (Attribute updateAttribute : updAttrs) {
@@ -1495,8 +1483,7 @@ public class DB {
 
     paramsList = new LinkedList<>();
 
-    for (Iterator<TModel> iterator = entities.iterator(); iterator.hasNext(); ) {
-      TModel entity = iterator.next();
+    for (TModel entity : entities) {
       params = new LinkedList<>();
 
       for (Attribute attributeMeta : updAttrs) {
@@ -1576,7 +1563,7 @@ public class DB {
     }
 
     String pkFieldName = Metadata.get(modelClass).getPrimaryKeyFieldName();
-    List ids = new ArrayList<>();
+    List<Object> ids = new ArrayList<>();
 
     Object pkVal;
     for (TModel entity : entities) {
@@ -1599,7 +1586,7 @@ public class DB {
    * @param <TModel> 实体类型泛型
    * @return 影响行数
    */
-  public <TModel> int deleteByIds(Class<TModel> modelClass, Collection ids) {
+  public <TModel> int deleteByIds(Class<TModel> modelClass, Collection<?> ids) {
 
     if (CollUtil.isEmpty(ids)) {
       return 0;
@@ -1612,8 +1599,8 @@ public class DB {
     if (isSqlServer()) {
       if (ids.size() > MAX_PARAM_SIZE_FOR_MSSQL) {
         int ret = 0;
-        List<List> splitParams = CollUtil.split(ids, MAX_PARAM_SIZE_FOR_MSSQL);
-        for (List splitParam : splitParams) {
+        List<? extends List<?>> splitParams = CollUtil.split(ids, MAX_PARAM_SIZE_FOR_MSSQL);
+        for (List<?> splitParam : splitParams) {
           Cond deleteCond = Cond.in(pkColumnName, splitParam, false);
           ret += deleteByCond(classMeta, deleteCond);
         }
@@ -1621,7 +1608,7 @@ public class DB {
       }
     }
 
-    Cond deleteCond = Cond.in(pkColumnName, new ArrayList(ids), false);
+    Cond deleteCond = Cond.in(pkColumnName, new ArrayList<>(ids), false);
     return deleteByCond(classMeta, deleteCond);
   }
 
@@ -1665,6 +1652,18 @@ public class DB {
 
     ClassMeta classMeta = Metadata.get(modelClass);
     return deleteByCond(classMeta, cond);
+  }
+
+  /**
+   * 快速截断表数据
+   *
+   * @param modelClass 实体类型
+   * @param <TModel> 实体类型泛型
+   */
+  public <TModel> void truncate(Class<TModel> modelClass) {
+    ClassMeta classMeta = Metadata.get(modelClass);
+    String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
+    execute(new Sql(StrUtil.format("TRUNCATE TABLE {}", tableName)));
   }
 
   private int deleteByCond(ClassMeta classMeta, Cond deleteCond) {

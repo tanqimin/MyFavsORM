@@ -5,8 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.sql.PagerUtils;
 import java.util.Collection;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.SqlCache.Opt;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
@@ -21,16 +19,11 @@ import work.myfavs.framework.orm.util.DruidUtil;
  *
  * @author tanqimin
  */
-@SuppressWarnings("rawtypes")
 public abstract class DefaultDialect extends AbstractDialect implements IDialect {
-
-  private static final Logger log = LoggerFactory.getLogger(DefaultDialect.class);
-
   protected static <TModel> String getTableName(Class<TModel> clazz) {
     return TableAlias.getOpt().orElse(Metadata.get(clazz).getTableName());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public <TModel> Sql insert(Class<TModel> clazz, TModel model) {
 
@@ -141,7 +134,7 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
   }
 
   @Override
-  public Sql count(String sql, Collection params) {
+  public Sql count(String sql, Collection<?> params) {
     return new Sql(PagerUtils.count(sql, DruidUtil.convert(dbType())), params);
   }
 

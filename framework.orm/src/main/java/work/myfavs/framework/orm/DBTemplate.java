@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm;
 
-import com.google.common.base.Preconditions;
+import cn.hutool.core.lang.Assert;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -175,7 +175,7 @@ public class DBTemplate {
 
     public DBTemplate build() {
 
-      Preconditions.checkNotNull(this.dataSource, "Please set a dataSource.");
+      Assert.notNull(this.dataSource, "DataSource is required.");
 
       if (this.config == null) {
         this.config = new DBConfig();

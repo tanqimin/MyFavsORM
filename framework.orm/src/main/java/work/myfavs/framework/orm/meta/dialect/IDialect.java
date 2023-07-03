@@ -1,8 +1,7 @@
 package work.myfavs.framework.orm.meta.dialect;
 
-import work.myfavs.framework.orm.meta.clause.Sql;
-
 import java.util.Collection;
+import work.myfavs.framework.orm.meta.clause.Sql;
 
 /** 通用数据库方言接口 Created by tanqimin on 2015/11/3. */
 public interface IDialect {
@@ -42,7 +41,7 @@ public interface IDialect {
    * @param params 参数
    * @return 返回行数语句
    */
-  Sql count(String sql, Collection params);
+  Sql count(String sql, Collection<?> params);
 
   /**
    * 获取返回行数语句
@@ -61,7 +60,7 @@ public interface IDialect {
    * @param params 参数
    * @return Sql对象
    */
-  Sql selectTop(int limit, String sql, Collection params);
+  Sql selectTop(int limit, String sql, Collection<?> params);
 
   /**
    * 返回分页查询语句 如果 pageSize = -1L，则不分页
@@ -72,7 +71,7 @@ public interface IDialect {
    * @param params 参数
    * @return Sql对象
    */
-  Sql selectPage(int currentPage, int pageSize, String sql, Collection params);
+  Sql selectPage(int currentPage, int pageSize, String sql, Collection<?> params);
 
   /**
    * 获取更新语句

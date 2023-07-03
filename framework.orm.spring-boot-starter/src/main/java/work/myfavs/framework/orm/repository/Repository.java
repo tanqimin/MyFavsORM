@@ -77,7 +77,7 @@ public class Repository<TModel> extends Query {
    */
   public TModel getByCondition(Object object) {
 
-    return DB.conn(this.dbTemplate).getByCondition(modelClass, object);
+    return DB.conn(this.dbTemplate).getByCriteria(modelClass, object);
   }
 
   /**
@@ -191,7 +191,7 @@ public class Repository<TModel> extends Query {
    */
   public List<TModel> findByCondition(Object object) {
 
-    return DB.conn(this.dbTemplate).findByCondition(modelClass, object);
+    return DB.conn(this.dbTemplate).findByCriteria(modelClass, object);
   }
 
   /**

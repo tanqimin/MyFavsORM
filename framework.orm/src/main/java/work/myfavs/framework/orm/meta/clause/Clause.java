@@ -1,19 +1,17 @@
 package work.myfavs.framework.orm.meta.clause;
 
 import cn.hutool.core.util.StrUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 /** SQL 语句基类 */
-@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class Clause {
 
   protected static String SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
   protected StringBuilder sql;
-  protected List params;
+  protected List<Object> params;
 
   // region Getter && Setter
   public StringBuilder getSql() {
@@ -26,14 +24,14 @@ public abstract class Clause {
     this.sql = sql;
   }
 
-  public List getParams() {
+  public List<Object> getParams() {
 
     return params;
   }
 
-  public void setParams(Collection params) {
+  public void setParams(Collection<?> params) {
 
-    this.params = new ArrayList(params);
+    this.params = new ArrayList<>(params);
   }
   // endregion
 
@@ -50,7 +48,7 @@ public abstract class Clause {
     this.sql.append(sql);
   }
 
-  public Clause(String sql, Collection params) {
+  public Clause(String sql, Collection<?> params) {
 
     this(sql);
     if (params != null && params.size() > 0) {

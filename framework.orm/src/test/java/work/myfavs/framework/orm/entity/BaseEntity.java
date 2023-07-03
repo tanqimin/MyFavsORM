@@ -5,17 +5,18 @@ import java.math.BigDecimal;
 import java.util.Date;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.annotation.Column;
-import work.myfavs.framework.orm.meta.annotation.Condition;
+import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 
 public abstract class BaseEntity implements Serializable {
+  public interface Update{}
   /** 创建时间 */
   @Column(value = "created")
   private Date created = null;
   /** 名称 */
   @Column(value = "name")
-  @Condition(value = "name", operator = Operator.LIKE, order = 1)
-  @Condition(value = "name", operator = Operator.NOT_EQUALS, order = 1, group = "SNOW_DTO")
+  @Criterion(value = "name", operator = Operator.LIKE, order = 1)
+  @Criterion(value = "name", operator = Operator.NOT_EQUALS, order = 1, group = Update.class)
   private String name = null;
   /** 是否停用 */
   @Column(value = "disable")
@@ -25,7 +26,7 @@ public abstract class BaseEntity implements Serializable {
   private BigDecimal price = BigDecimal.ZERO;
   /** 类型 */
   @Column(value = "type")
-  @Condition(order = 2)
+  @Criterion(order = 2)
   private TypeEnum type = null;
   /** 配置 */
   @Column(value = "config")

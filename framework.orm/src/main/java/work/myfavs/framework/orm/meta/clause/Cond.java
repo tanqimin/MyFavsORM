@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -9,12 +9,12 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
-import work.myfavs.framework.orm.meta.annotation.Condition;
+import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
+import work.myfavs.framework.orm.util.ReflectUtil;
 
 /** SQL 条件构建 */
-@SuppressWarnings("unchecked")
 public class Cond extends Clause {
 
   /** 构造方法 */
@@ -46,7 +46,7 @@ public class Cond extends Clause {
     }
   }
 
-  private Cond(String sql, Collection params) {
+  private Cond(String sql, Collection<?> params) {
 
     super(sql);
     super.params.addAll(params);
@@ -256,7 +256,7 @@ public class Cond extends Clause {
    * @param params 参数
    * @return Cond
    */
-  public static Cond in(String field, Collection params) {
+  public static Cond in(String field, Collection<?> params) {
 
     return in(field, params, true);
   }
@@ -271,18 +271,12 @@ public class Cond extends Clause {
    * @param ignoreEmpty 是否忽略空参数集合
    * @return Cond
    */
-  public static Cond in(String field, Collection params, boolean ignoreEmpty) {
+  public static Cond in(String field, Collection<?> params, boolean ignoreEmpty) {
 
-    Sql inClauseSql;
-    String sql;
-    List sqlParams;
-    int paramCnt;
-
-    inClauseSql = createInClauseParams(params);
-    sql = inClauseSql.sql.toString();
-    sqlParams = inClauseSql.params;
-
-    paramCnt = sqlParams.size();
+    Sql inClauseSql = createInClauseParams(params);
+    String sql = inClauseSql.sql.toString();
+    List<Object> sqlParams = inClauseSql.params;
+    int paramCnt = sqlParams.size();
 
     if (paramCnt == 0) {
       return ignoreEmpty ? new Cond() : new Cond(StrUtil.format(" 1 > 2"));
@@ -314,7 +308,7 @@ public class Cond extends Clause {
    * @param params 参数
    * @return Cond
    */
-  public static Cond notIn(String field, Collection params) {
+  public static Cond notIn(String field, Collection<?> params) {
 
     return notIn(field, params, true);
   }
@@ -329,11 +323,11 @@ public class Cond extends Clause {
    * @param ignoreEmpty 是否忽略空参数集合
    * @return Cond
    */
-  public static Cond notIn(String field, Collection params, boolean ignoreEmpty) {
+  public static Cond notIn(String field, Collection<?> params, boolean ignoreEmpty) {
 
     Sql inClauseSql;
     String sql;
-    List sqlParams;
+    List<Object> sqlParams;
     int paramCnt;
 
     inClauseSql = createInClauseParams(params);
@@ -364,11 +358,11 @@ public class Cond extends Clause {
     return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params);
   }
 
-  private static Sql createInClauseParams(Collection params) {
+  private static Sql createInClauseParams(Collection<?> params) {
 
     Sql sql;
     StringBuilder sqlBuilder;
-    List sqlParams;
+    List<Object> sqlParams;
 
     sqlBuilder = new StringBuilder();
     sqlParams = new ArrayList<>();
@@ -444,7 +438,7 @@ public class Cond extends Clause {
     if (StrUtil.isBlankIfStr(cond.sql)) {
       return this;
     }
-    this.sql.append(StrUtil.format(" AND {}", cond.sql));
+    this.sql.append(StrUtil.format(" AND {}", StrUtil.trimStart(cond.sql)));
     this.params.addAll(cond.params);
     return this;
   }
@@ -460,7 +454,7 @@ public class Cond extends Clause {
     if (StrUtil.isBlankIfStr(cond.sql)) {
       return this;
     }
-    this.sql.append(StrUtil.format(" OR {}", cond.sql));
+    this.sql.append(StrUtil.format(" OR {}", StrUtil.trimStart(cond.sql)));
     this.params.addAll(cond.params);
     return this;
   }
@@ -473,36 +467,34 @@ public class Cond extends Clause {
    */
   public static Cond create(Object object) {
 
-    return create(object, "DEFAULT");
+    return create(object, Criterion.Default.class);
   }
 
   /**
    * 根据@Condition 注解创建Cond
    *
    * @param object 包含@Condition注解Field的对象
-   * @param conditionGroup 条件组名
+   * @param criteriaGroup 条件组名
    * @return Cond
    */
-  public static Cond create(Object object, String conditionGroup) {
+  public static Cond create(Object object, Class<?> criteriaGroup) {
 
     Cond cond = null;
     List<ConditionMatcher> conditionMatchers = new ArrayList<>();
-    final Field[] fields = ReflectUtil.getFields(object.getClass());
+    final Field[] fields = cn.hutool.core.util.ReflectUtil.getFields(object.getClass());
     for (Field field : fields) {
-      final Condition[] annotations = field.getAnnotationsByType(Condition.class);
-      if (annotations != null && annotations.length > 0) {
-        for (Condition annotation : annotations) {
-          if (!StrUtil.equalsIgnoreCase(conditionGroup, annotation.group())) {
-            continue;
-          }
-          ConditionMatcher conditionMatcher = new ConditionMatcher();
-          conditionMatcher.fieldName =
-              StrUtil.isBlank(annotation.value()) ? field.getName() : annotation.value();
-          conditionMatcher.fieldValue = ReflectUtil.getFieldValue(object, field);
-          conditionMatcher.operator = annotation.operator();
-          conditionMatcher.order = annotation.order();
-          conditionMatchers.add(conditionMatcher);
+      final Criterion[] annotations = field.getAnnotationsByType(Criterion.class);
+      for (Criterion annotation : annotations) {
+        if (criteriaGroup != annotation.group()) {
+          continue;
         }
+        ConditionMatcher conditionMatcher = new ConditionMatcher();
+        conditionMatcher.fieldName =
+            StrUtil.isBlank(annotation.value()) ? field.getName() : annotation.value();
+        conditionMatcher.fieldValue = cn.hutool.core.util.ReflectUtil.getFieldValue(object, field);
+        conditionMatcher.operator = annotation.operator();
+        conditionMatcher.order = annotation.order();
+        conditionMatchers.add(conditionMatcher);
       }
     }
 
@@ -550,6 +542,28 @@ public class Cond extends Clause {
       case BETWEEN_END:
       case LESS_THAN_OR_EQUALS:
         return Cond.le(fieldName, paramVal);
+      case IN:
+        if (paramVal == null) return new Cond();
+        if (ArrayUtil.isArray(paramVal)) {
+          return Cond.in(fieldName, ReflectUtil.toObjectList(paramVal));
+        }
+
+        if (paramVal instanceof Collection<?>) {
+          return Cond.in(fieldName, (Collection<?>) paramVal);
+        }
+
+        throw new IllegalArgumentException("The Operator.IN only support array or collection");
+      case NOT_IN:
+        if (paramVal == null) return new Cond();
+        if (ArrayUtil.isArray(paramVal)) {
+          return Cond.notIn(fieldName, ReflectUtil.toObjectList(paramVal));
+        }
+
+        if (paramVal instanceof Collection<?>) {
+          return Cond.notIn(fieldName, (Collection<?>) paramVal);
+        }
+
+        throw new IllegalArgumentException("The Operator.NOT_IN only support array or collection");
       default:
         throw new IllegalArgumentException("The operator is not supported");
     }

@@ -12,11 +12,11 @@ public enum Operator {
   LESS_THAN,
   LESS_THAN_OR_EQUALS,
   BETWEEN_START,
-  BETWEEN_END
-
-  /*  ,
+  BETWEEN_END,
   IN,
-  NOT_IN,
+  NOT_IN
+  /*
   EXISTS,
-  NOT_EXISTS*/
+  NOT_EXISTS
+  */
 }
