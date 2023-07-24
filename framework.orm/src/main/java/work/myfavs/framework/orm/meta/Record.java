@@ -13,7 +13,6 @@ import java.util.LinkedHashMap;
 import work.myfavs.framework.orm.util.common.RecordValueGetter;
 
 /** ORM查询记录对象 */
-@SuppressWarnings("unchecked")
 public class Record extends LinkedHashMap<String, Object> implements RecordValueGetter<String> {
 
   private static final long serialVersionUID = 4437164782221886837L;
@@ -47,6 +46,7 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * @param <T> 属性类型
    * @return 属性值
    */
+  @SuppressWarnings("unchecked")
   public <T> T get(String attr, T defaultValue) {
     final Object obj = super.get(attr);
     if (obj == null) {
@@ -211,7 +211,7 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * @return Bean
    */
   public <T> T toBean(Class<T> tClass) {
-    return BeanUtil.mapToBean(this, tClass, false);
+    return BeanUtil.toBean(this, tClass);
   }
 
   /**
@@ -222,7 +222,7 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * @return Bean
    */
   public <T> T toBeanIgnoreCase(Class<T> tClass) {
-    return BeanUtil.mapToBeanIgnoreCase(this, tClass, false);
+    return BeanUtil.toBeanIgnoreCase(this, tClass, false);
   }
 
   /**
