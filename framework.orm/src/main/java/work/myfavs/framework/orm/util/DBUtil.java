@@ -31,8 +31,8 @@ public class DBUtil {
    * @return PreparedStatement
    * @throws SQLException SQLException
    */
-  public static PreparedStatement getPstForQuery(
-      Connection conn, String sql, Collection<?> params) throws SQLException {
+  public static PreparedStatement getPstForQuery(Connection conn, String sql, Collection<?> params)
+      throws SQLException {
 
     final PreparedStatement pst = getPstForQuery(conn, sql);
     return setParams(pst, params);
@@ -56,8 +56,7 @@ public class DBUtil {
   }
 
   public static int executeBatch(
-      PreparedStatement pst, Collection<Collection<?>> params, int batchSize)
-      throws SQLException {
+      PreparedStatement pst, Collection<Collection<?>> params, int batchSize) throws SQLException {
     int result = 0, execIdx = 0;
     for (Collection<?> param : params) {
       setParams(pst, param);
@@ -105,6 +104,7 @@ public class DBUtil {
    */
   public static void commit(Connection connection) {
     try {
+      if (connection == null || connection.isClosed()) return;
       if (!connection.getAutoCommit()) {
         connection.commit();
       }
@@ -155,7 +155,7 @@ public class DBUtil {
     if (connection == null) return;
 
     try {
-      connection.close();
+      if (!connection.isClosed()) connection.close();
     } catch (SQLException e) {
       throw new DBException(e);
     }
@@ -169,7 +169,7 @@ public class DBUtil {
   public static void close(Statement statement) {
     if (statement == null) return;
     try {
-      statement.close();
+      if (!statement.isClosed()) statement.close();
     } catch (SQLException e) {
       throw new DBException(e, "Fail to close the statement");
     }
@@ -183,7 +183,7 @@ public class DBUtil {
   public static void close(ResultSet resultSet) {
     if (resultSet == null) return;
     try {
-      resultSet.close();
+      if (!resultSet.isClosed()) resultSet.close();
     } catch (SQLException e) {
       throw new DBException(e, "Fail to close the resultSet");
     }

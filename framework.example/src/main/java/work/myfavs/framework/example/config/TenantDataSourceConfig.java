@@ -2,6 +2,9 @@ package work.myfavs.framework.example.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
+import java.math.BigDecimal;
+import java.util.*;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,14 +20,9 @@ import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.handler.impls.*;
 
-import javax.sql.DataSource;
-import java.math.BigDecimal;
-import java.util.*;
-
 @Configuration
 public class TenantDataSourceConfig {
   private static final Logger logger = LoggerFactory.getLogger(TenantDataSourceConfig.class);
-
 
   @Bean(name = "primaryDataSource", initMethod = "init", destroyMethod = "close")
   @ConfigurationProperties("spring.datasource.primary")
@@ -50,7 +48,7 @@ public class TenantDataSourceConfig {
 
     Map<Object, Object> customDataSources = new HashMap<>();
 
-    if(DynamicDataSource.connectProperties == null)
+    if (DynamicDataSource.connectProperties == null)
       DynamicDataSource.connectProperties = primaryDataSource.getConnectProperties();
 
     for (Tenant tenant : tenants) {
@@ -101,7 +99,9 @@ public class TenantDataSourceConfig {
                     .setPageSizeField("pageSize")
                     .setPageTotalPageField("totalPage")
                     .setPageTotalRecordField("totalRow")
-                    .setPageHasNextField("next"))
+                    .setPageHasNextField("next")
+                    .setShowSql(true)
+                    .setShowResult(true))
         .mapping(
             mapper ->
                 mapper

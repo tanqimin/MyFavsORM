@@ -7,7 +7,7 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.DefaultDialectTest;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
 
-public class SqlServerDialectTest extends DefaultDialectTest {
+public class SqlServer2012DialectTest extends DefaultDialectTest {
 
   @Test
   public void getDialectName() {
@@ -49,21 +49,21 @@ public class SqlServerDialectTest extends DefaultDialectTest {
 
     Assert.equals(
         selectPage1.toString(),
-        "SELECT * FROM ( SELECT *, ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP) AS _rn FROM TABLE_NAME ) _paginate WHERE _rn BETWEEN 11 AND 20");
+        "SELECT * FROM TABLE_NAME ORDER BY CURRENT_TIMESTAMP OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
     Assert.equals(
         selectPage2.toString(),
-        "SELECT * FROM ( SELECT *, ROW_NUMBER() OVER (ORDER BY col1) AS _rn FROM TABLE_NAME ) _paginate WHERE _rn BETWEEN 21 AND 30");
+        "SELECT * FROM TABLE_NAME ORDER BY col1 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
     Assert.equals(
         selectPage3.toString(),
-        "WITH QUERY AS ( SELECT * FROM TABLE_NAME ) SELECT * FROM ( SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS _rn FROM QUERY WHERE col1 = ? ) _paginate WHERE _rn BETWEEN 61 AND 80");
+        "WITH QUERY AS ( SELECT * FROM TABLE_NAME ) SELECT * FROM QUERY WHERE col1 = ? ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
     Assert.equals(
         selectPage4.toString(),
-        "SELECT * FROM ( SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS _rn FROM ( SELECT * FROM TABLE_NAME ) QUERY WHERE col1 = ? ) _paginate WHERE _rn BETWEEN 61 AND 80");
+        "SELECT * FROM ( SELECT * FROM TABLE_NAME ) QUERY WHERE col1 = ? ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
     //    perform(100, 10_000, () -> getDialect().selectPage(2, 10, CASE1, null));
   }
 
   @Override
   protected IDialect getDialect() {
-    return super.sqlServerDialect;
+    return super.sqlServer2012Dialect;
   }
 }

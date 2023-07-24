@@ -3,6 +3,7 @@ package work.myfavs.framework.orm.util;
 import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.util.JdbcConstants;
 import java.util.List;
@@ -37,5 +38,13 @@ public class DruidUtil {
     SQLStatement stmt = stmtList.get(0);
     if (!(stmt instanceof SQLSelectStatement)) throw new DBException("Unsupported sql:" + sql);
     return (SQLSelectStatement) stmt;
+  }
+
+  public static SQLSelect createSQLSelect(String dbType, String sql) {
+    return createSQLSelectStatement(dbType, sql).getSelect();
+  }
+
+  public static SQLSelect createSQLSelect(DbType dbType, String sql) {
+    return createSQLSelectStatement(dbType, sql).getSelect();
   }
 }

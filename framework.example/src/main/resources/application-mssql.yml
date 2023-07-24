@@ -7,7 +7,7 @@ spring:
     charset: utf-8
   datasource:
     primary:
-      db-type: sqlserver
+      db-type: sqlserver2012
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
       url: jdbc:sqlserver://192.168.8.246:1433;DatabaseName=myfavs_master;sendStringParametersAsUnicode=false;encrypt=false
       username: sa

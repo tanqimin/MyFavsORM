@@ -33,8 +33,11 @@ public class SqlServerDialect extends DefaultDialect {
 
   @Override
   public Sql selectTop(int limit, String sql, Collection<?> params) {
-    String querySql = limit(sql, 0, limit).toUnformattedString();
-    return new Sql(querySql, params);
+    SQLSelectStatement selectStmt = DruidUtil.createSQLSelectStatement(this.dbType(), sql);
+    SQLServerSelectQueryBlock queryBlock =
+            (SQLServerSelectQueryBlock) selectStmt.getSelect().getQuery();
+    queryBlock.setTop(new SQLServerTop(new SQLNumberExpr(limit)));
+    return new Sql(selectStmt.toUnformattedString(), params);
   }
 
   @Override
@@ -49,10 +52,7 @@ public class SqlServerDialect extends DefaultDialect {
     SQLSelect select = selectStmt.getSelect();
 
     SQLServerSelectQueryBlock queryBlock = (SQLServerSelectQueryBlock) select.getQuery();
-    if (offset <= 0) {
-      queryBlock.setTop(new SQLServerTop(new SQLNumberExpr(count)));
-      return selectStmt;
-    }
+
     // 构建 ROW_NUMBER() OVER (ORDER BY ...) AS _rn 列
     SQLSelectItem rowNumSelectItem = createRowNumberSQLSelectItem(queryBlock);
     queryBlock.getSelectList().add(rowNumSelectItem);
@@ -61,7 +61,7 @@ public class SqlServerDialect extends DefaultDialect {
     SQLServerSelectQueryBlock countQueryBlock = new SQLServerSelectQueryBlock();
     countQueryBlock.getSelectList().add(new SQLSelectItem(new SQLAllColumnExpr()));
     countQueryBlock.setFrom(new SQLSubqueryTableSource(queryBlock.clone(), TABLE_ALIAS));
-    countQueryBlock.setWhere(createPageCondition(offset, count));
+    countQueryBlock.setWhere(createBetweenExpr(offset, count));
 
     select.setQuery(countQueryBlock);
     return selectStmt;
@@ -78,6 +78,13 @@ public class SqlServerDialect extends DefaultDialect {
     if (queryBlock.getOrderBy() == null)
       return new SQLOver(new SQLOrderBy(SQLUtils.toSQLExpr("CURRENT_TIMESTAMP")));
     return new SQLOver(queryBlock.getOrderBy());
+  }
+
+  private static SQLBetweenExpr createBetweenExpr(int offset, int count) {
+    return new SQLBetweenExpr(
+        new SQLIdentifierExpr(COL_ROW_NUM),
+        new SQLNumberExpr(offset + 1),
+        new SQLNumberExpr(count + offset));
   }
 
   private static SQLBinaryOpExpr createPageCondition(int offset, int count) {
