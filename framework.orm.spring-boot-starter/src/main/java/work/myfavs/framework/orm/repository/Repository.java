@@ -15,7 +15,6 @@ import work.myfavs.framework.orm.meta.schema.Metadata;
  *
  * @param <TModel> 实体类
  */
-@SuppressWarnings("unchecked")
 public class Repository<TModel> extends Query {
 
   protected Class<TModel> modelClass;
@@ -87,9 +86,9 @@ public class Repository<TModel> extends Query {
    * @param params 参数
    * @return 记录
    */
-  public TModel get(String sql, Collection params) {
+  public TModel get(String sql, Collection<?> params) {
 
-    return super.get(this.modelClass, sql, params);
+    return super.get(this.modelClass, new Sql(sql, params));
   }
 
   /**
@@ -110,9 +109,9 @@ public class Repository<TModel> extends Query {
    * @param params 参数
    * @return 实体集合
    */
-  public List<TModel> find(String sql, Collection params) {
+  public List<TModel> find(String sql, Collection<?> params) {
 
-    return super.find(modelClass, sql, params);
+    return super.find(modelClass, new Sql(sql, params));
   }
 
   /**
@@ -133,7 +132,7 @@ public class Repository<TModel> extends Query {
    * @param params 参数
    * @return Map，Key为主键值， Value为实体对象
    */
-  public <TKey> Map<TKey, TModel> findMap(String sql, Collection params) {
+  public <TKey> Map<TKey, TModel> findMap(String sql, Collection<?> params) {
     final String fieldName = Metadata.get(modelClass).getPrimaryKey().getFieldName();
     return findMap(modelClass, fieldName, sql, params);
   }
@@ -167,7 +166,7 @@ public class Repository<TModel> extends Query {
    * @param params 参数集合
    * @return 实体集合
    */
-  public List<TModel> findByField(String field, Collection params) {
+  public List<TModel> findByField(String field, Collection<?> params) {
 
     return DB.conn(this.dbTemplate).findByField(modelClass, field, params);
   }
@@ -200,7 +199,7 @@ public class Repository<TModel> extends Query {
    * @param ids 主键ID集合
    * @return 实体集合
    */
-  public List<TModel> findByIds(Collection ids) {
+  public List<TModel> findByIds(Collection<?> ids) {
 
     return DB.conn(this.dbTemplate).findByIds(modelClass, ids);
   }
@@ -291,7 +290,7 @@ public class Repository<TModel> extends Query {
    * @param params 参数
    * @return 影响行数
    */
-  public int execute(String sql, Collection params) {
+  public int execute(String sql, Collection<?> params) {
 
     return DB.conn(this.dbTemplate).execute(sql, params);
   }
@@ -304,7 +303,7 @@ public class Repository<TModel> extends Query {
    * @param queryTimeout 超时时间
    * @return 影响行数
    */
-  public int execute(String sql, Collection params, int queryTimeout) {
+  public int execute(String sql, Collection<?> params, int queryTimeout) {
 
     return DB.conn(this.dbTemplate).execute(sql, params, queryTimeout);
   }
@@ -448,7 +447,7 @@ public class Repository<TModel> extends Query {
    * @param ids ID集合
    * @return 影响行数
    */
-  public int deleteByIds(Collection ids) {
+  public int deleteByIds(Collection<?> ids) {
 
     return DB.conn(this.dbTemplate).deleteByIds(modelClass, ids);
   }

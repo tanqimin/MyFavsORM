@@ -13,7 +13,6 @@ import work.myfavs.framework.orm.meta.clause.Sql;
  *
  * @author tanqimin
  */
-@SuppressWarnings("unchecked")
 public abstract class BaseRepository {
 
   protected DBTemplate dbTemplate;
@@ -42,7 +41,7 @@ public abstract class BaseRepository {
    * @param <TView> 结果集类型泛型
    * @return 结果集
    */
-  protected <TView> List<TView> find(Class<TView> viewClass, String sql, Collection params) {
+  protected <TView> List<TView> find(Class<TView> viewClass, String sql, Collection<?> params) {
 
     return DB.conn(this.dbTemplate).find(viewClass, sql, params);
   }
@@ -71,7 +70,7 @@ public abstract class BaseRepository {
    * @return Map
    */
   protected <TKey, TView> Map<TKey, TView> findMap(
-      Class<TView> viewClass, String keyField, String sql, Collection params) {
+      Class<TView> viewClass, String keyField, String sql, Collection<?> params) {
     return DB.conn(this.dbTemplate).findMap(viewClass, keyField, sql, params);
   }
 
@@ -100,7 +99,7 @@ public abstract class BaseRepository {
    * @return 结果集
    */
   protected <TView> List<TView> findTop(
-      Class<TView> viewClass, int top, String sql, Collection params) {
+      Class<TView> viewClass, int top, String sql, Collection<?> params) {
 
     return DB.conn(this.dbTemplate).findTop(viewClass, top, sql, params);
   }
@@ -128,7 +127,7 @@ public abstract class BaseRepository {
    * @param <TView> 结果集类型泛型
    * @return 记录
    */
-  protected <TView> TView get(Class<TView> viewClass, String sql, Collection params) {
+  protected <TView> TView get(Class<TView> viewClass, String sql, Collection<?> params) {
 
     return DB.conn(this.dbTemplate).get(viewClass, sql, params);
   }
@@ -153,7 +152,7 @@ public abstract class BaseRepository {
    * @param params 参数
    * @return 行数
    */
-  protected long count(String sql, Collection params) {
+  protected long count(String sql, Collection<?> params) {
 
     return DB.conn(this.dbTemplate).count(sql, params);
   }

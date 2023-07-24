@@ -205,13 +205,15 @@ public class CondTest {
     assertEquals(" name <> ?", cond.toString());
 
     Person person = new Person();
+    person.setName("Person1");
     person.setCars(new String[] {"Car1", "Car2"});
     person.setAlias(Arrays.asList("Alias1", "Alias2"));
 
-    cond = Cond.create(person, Person.In.class);
-    assertEquals(" person_alias IN (?,?)", cond.toString());
+    cond = Cond.create(person, Person.PersonQuery.class);
+    System.out.println(cond.toString());
+    assertEquals(" person_alias IN (?,?) AND person_name = ?", cond.toString());
 
-    cond = Cond.create(person, Person.NotIn.class);
+    cond = Cond.create(person, Person.PersonList.class);
     assertEquals(" cars NOT IN (?,?)", cond.toString());
   }
 
@@ -222,15 +224,27 @@ public class CondTest {
 }
 
 class Person {
-  interface In {}
+  interface PersonQuery {}
 
-  interface NotIn {}
+  interface PersonList {}
 
-  @Criterion(operator = Operator.NOT_IN, group = NotIn.class)
+  @Criterion(value = "person_name", operator = Operator.EQUALS, order = 2, group = PersonQuery.class)
+  private String name;
+
+  @Criterion(operator = Operator.NOT_IN, group = PersonList.class)
   private String[] cars;
 
-  @Criterion(value = "person_alias", operator = Operator.IN, group = In.class)
+  @Criterion(value = "person_alias", operator = Operator.IN, group = PersonQuery.class)
   private List<String> alias;
+
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
   public String[] getCars() {
     return cars;
