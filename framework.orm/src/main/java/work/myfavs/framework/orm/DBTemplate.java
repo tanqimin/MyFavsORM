@@ -1,8 +1,7 @@
 package work.myfavs.framework.orm;
 
 import cn.hutool.core.lang.Assert;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import cn.hutool.core.util.ReflectUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,7 +10,6 @@ import javax.sql.DataSource;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.PKGenerator;
-import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
  * 数据库配置
@@ -119,16 +117,7 @@ public class DBTemplate {
    * @return 数据库连接工厂
    */
   private ConnFactory createConnFactory(Class<? extends ConnFactory> cls, DataSource dataSource) {
-
-    try {
-      final Constructor<? extends ConnFactory> constructor = cls.getConstructor(DataSource.class);
-      return constructor.newInstance(dataSource);
-    } catch (NoSuchMethodException
-        | IllegalAccessException
-        | InstantiationException
-        | InvocationTargetException e) {
-      throw new DBException(e, "Fail to create ConnectionFactory instance, error message:");
-    }
+    return ReflectUtil.newInstance(cls, dataSource);
   }
 
   public static class Builder {

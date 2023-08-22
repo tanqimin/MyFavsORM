@@ -28,8 +28,7 @@ public class Repository<TModel> extends Query {
   public Repository(DBTemplate dbTemplate) {
 
     super(dbTemplate);
-    this.modelClass =
-        (Class<TModel>)
+    this.modelClass = (Class<TModel>)
             ((ParameterizedType) this.getClass().getGenericSuperclass())
                 .getActualTypeArguments()[0];
   }

@@ -1,6 +1,7 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.function.Supplier;
 import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
-import work.myfavs.framework.orm.util.ReflectUtil;
+import work.myfavs.framework.orm.util.convert.ObjectConvert;
 
 /** SQL 条件构建 */
 public class Cond extends Clause {
@@ -366,7 +367,7 @@ public class Cond extends Clause {
 
     sqlBuilder = new StringBuilder();
     sqlParams = new ArrayList<>();
-    if (params != null && params.size() > 0) {
+    if (CollUtil.isNotEmpty(params)) {
       for (Object param : params) {
         if (StrUtil.isBlankIfStr(param)) {
           continue;
@@ -374,7 +375,7 @@ public class Cond extends Clause {
         sqlBuilder.append("?,");
         sqlParams.add(param);
       }
-      if (sqlParams.size() > 0) {
+      if (!sqlParams.isEmpty()) {
         sqlBuilder.deleteCharAt(sqlBuilder.lastIndexOf(","));
       }
     }
@@ -481,7 +482,7 @@ public class Cond extends Clause {
 
     Cond cond = null;
     List<ConditionMatcher> conditionMatchers = new ArrayList<>();
-    final Field[] fields = cn.hutool.core.util.ReflectUtil.getFields(object.getClass());
+    final Field[] fields = ReflectUtil.getFields(object.getClass());
     for (Field field : fields) {
       final Criterion[] annotations = field.getAnnotationsByType(Criterion.class);
       for (Criterion annotation : annotations) {
@@ -491,7 +492,7 @@ public class Cond extends Clause {
         ConditionMatcher conditionMatcher = new ConditionMatcher();
         conditionMatcher.fieldName =
             StrUtil.isBlank(annotation.value()) ? field.getName() : annotation.value();
-        conditionMatcher.fieldValue = cn.hutool.core.util.ReflectUtil.getFieldValue(object, field);
+        conditionMatcher.fieldValue = ReflectUtil.getFieldValue(object, field);
         conditionMatcher.operator = annotation.operator();
         conditionMatcher.order = annotation.order();
         conditionMatchers.add(conditionMatcher);
@@ -543,27 +544,13 @@ public class Cond extends Clause {
       case LESS_THAN_OR_EQUALS:
         return Cond.le(fieldName, paramVal);
       case IN:
-        if (paramVal == null) return new Cond();
-        if (ArrayUtil.isArray(paramVal)) {
-          return Cond.in(fieldName, ReflectUtil.toObjectList(paramVal));
-        }
-
-        if (paramVal instanceof Collection<?>) {
-          return Cond.in(fieldName, (Collection<?>) paramVal);
-        }
-
-        throw new IllegalArgumentException("The Operator.IN only support array or collection");
+        Collection<?> inParam = ObjectConvert.toCollection(paramVal);
+        if(inParam.isEmpty()) return new Cond();
+        return Cond.in(fieldName, inParam);
       case NOT_IN:
-        if (paramVal == null) return new Cond();
-        if (ArrayUtil.isArray(paramVal)) {
-          return Cond.notIn(fieldName, ReflectUtil.toObjectList(paramVal));
-        }
-
-        if (paramVal instanceof Collection<?>) {
-          return Cond.notIn(fieldName, (Collection<?>) paramVal);
-        }
-
-        throw new IllegalArgumentException("The Operator.NOT_IN only support array or collection");
+        Collection<?> notInParam = ObjectConvert.toCollection(paramVal);
+        if(notInParam.isEmpty()) return new Cond();
+        return Cond.notIn(fieldName, notInParam);
       default:
         throw new IllegalArgumentException("The operator is not supported");
     }
