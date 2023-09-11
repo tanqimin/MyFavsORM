@@ -10,15 +10,15 @@ import work.myfavs.framework.orm.util.func.ThrowingSupplier;
 
 /** 数据库操作接口 */
 public interface IDatabase {
-  /**
+/*  *//**
    * 打开数据库连接
    *
    * @return 数据库连接
-   */
+   *//*
   Connection open();
 
-  /** 关闭数据库连接 */
-  void close();
+  *//** 关闭数据库连接 *//*
+  void close();*/
 
   /** 提交事务 */
   void commit();

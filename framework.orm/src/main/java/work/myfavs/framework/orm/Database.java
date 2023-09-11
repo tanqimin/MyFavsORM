@@ -22,83 +22,96 @@ public class Database implements IDatabase {
     this.connFactory = dbTemplate.getConnectionFactory();
   }
 
-  public Connection open() {
+  private Connection openConnection() {
     return this.connFactory.openConnection();
   }
 
-  public void close() {
-    this.connFactory.closeConnection(this.connFactory.getCurrentConnection());
+  private Connection getCurrentConnection() {
+    return this.connFactory.getCurrentConnection();
+  }
+
+  private void closeCollection() {
+    this.connFactory.closeConnection(getCurrentConnection());
+  }
+
+  private void close(ResultSet resultSet, Statement statement){
+    DBUtil.close(resultSet, statement, this::closeCollection);
+  }
+
+  private void close(Statement statement){
+    DBUtil.close(null, statement, this::closeCollection);
   }
 
   /** 提交事务 */
   public void commit() {
-    DBUtil.commit(this.connFactory.getCurrentConnection());
+    DBUtil.commit(getCurrentConnection());
   }
 
   public Savepoint setSavepoint() {
-    return DBUtil.setSavepoint(this.connFactory.getCurrentConnection());
+    return DBUtil.setSavepoint(getCurrentConnection());
   }
 
   public Savepoint setSavepoint(String name) {
-    return DBUtil.setSavepoint(this.connFactory.getCurrentConnection(), name);
+    return DBUtil.setSavepoint(getCurrentConnection(), name);
   }
 
   /** 回滚事务 */
   public void rollback() {
-    DBUtil.rollback(this.connFactory.getCurrentConnection());
+    DBUtil.rollback(getCurrentConnection());
   }
 
   public void rollback(Savepoint savepoint) {
-    DBUtil.rollback(this.connFactory.getCurrentConnection(), savepoint);
+    DBUtil.rollback(getCurrentConnection(), savepoint);
   }
 
   @Override
   public <TResult> TResult tx(ThrowingFunction<Connection, TResult, SQLException> func) {
     try {
-      return func.apply(open());
+      Connection conn = openConnection();
+      return func.apply(conn);
     } catch (Exception e) {
       rollback();
       throw new DBException(e);
     } finally {
-      close();
+      this.closeCollection();
     }
   }
 
   @Override
   public <TResult> TResult tx(ThrowingSupplier<TResult, SQLException> supplier) {
     try {
-      open();
+      this.openConnection();
       return supplier.get();
     } catch (Exception e) {
       rollback();
       throw new DBException(e);
     } finally {
-      close();
+      this.closeCollection();
     }
   }
 
   @Override
   public void tx(ThrowingConsumer<Connection, SQLException> consumer) {
     try {
-      consumer.accept(open());
+      consumer.accept(this.openConnection());
     } catch (Exception e) {
       rollback();
       throw new DBException(e);
     } finally {
-      close();
+      this.closeCollection();
     }
   }
 
   @Override
   public void tx(ThrowingRunnable<SQLException> runnable) {
     try {
-      open();
+      this.openConnection();
       runnable.run();
     } catch (Exception e) {
       rollback();
       throw new DBException(e);
     } finally {
-      close();
+      this.closeCollection();
     }
   }
 
@@ -113,7 +126,7 @@ public class Database implements IDatabase {
     List<TView> result;
 
     try {
-      conn = this.open();
+      conn = this.openConnection();
       statement = DBUtil.getPstForQuery(conn, sql, params);
       statement.setQueryTimeout(this.dbConfig.getQueryTimeout());
       statement.setFetchSize(this.dbConfig.getFetchSize());
@@ -123,8 +136,7 @@ public class Database implements IDatabase {
     } catch (SQLException e) {
       throw new DBException(e);
     } finally {
-      DBUtil.close(statement, rs);
-      this.close();
+      this.close(rs, statement);
     }
 
     return result;
@@ -137,15 +149,14 @@ public class Database implements IDatabase {
     PreparedStatement statement = null;
 
     try {
-      conn = this.open();
+      conn = this.openConnection();
       statement = DBUtil.getPstForUpdate(conn, false, sql, params);
       statement.setQueryTimeout(queryTimeOut);
       return DBUtil.executeUpdate(statement);
     } catch (Exception ex) {
       throw new DBException(ex);
     } finally {
-      DBUtil.close(statement);
-      this.close();
+      this.close(statement);
     }
   }
 
@@ -155,7 +166,7 @@ public class Database implements IDatabase {
     PreparedStatement statement = null;
 
     try {
-      conn = this.open();
+      conn = this.openConnection();
       statement = DBUtil.getPstForUpdate(conn, false, sql);
       consumer.accept(statement);
       statement.setQueryTimeout(queryTimeOut);
@@ -163,8 +174,7 @@ public class Database implements IDatabase {
     } catch (Exception ex) {
       throw new DBException(ex);
     } finally {
-      DBUtil.close(statement);
-      this.close();
+      this.close(statement);
     }
   }
 
@@ -180,7 +190,7 @@ public class Database implements IDatabase {
     ResultSet rs = null;
 
     try {
-      conn = this.open();
+      conn = this.openConnection();
       statement = DBUtil.getPstForUpdate(conn, autoGeneratedPK, sql, params);
       statement.setQueryTimeout(this.dbConfig.getQueryTimeout());
       result = DBUtil.executeUpdate(statement);
@@ -194,8 +204,7 @@ public class Database implements IDatabase {
     } catch (Exception ex) {
       throw new DBException(ex);
     } finally {
-      DBUtil.close(statement, rs);
-      this.close();
+      this.close(rs, statement);
     }
   }
 
@@ -212,7 +221,7 @@ public class Database implements IDatabase {
 
     try {
 
-      conn = this.open();
+      conn = this.openConnection();
       statement = DBUtil.getPstForUpdate(conn, autoGeneratedPK, sql);
       statement.setQueryTimeout(this.dbConfig.getQueryTimeout());
       result = DBUtil.executeBatch(statement, paramsList, this.dbConfig.getBatchSize());
@@ -226,8 +235,7 @@ public class Database implements IDatabase {
     } catch (SQLException e) {
       throw new DBException(e);
     } finally {
-      DBUtil.close(statement, rs);
-      this.close();
+      this.close(rs, statement);
     }
   }
 
@@ -237,7 +245,7 @@ public class Database implements IDatabase {
     PreparedStatement statement = null;
 
     try {
-      conn = this.open();
+      conn = this.openConnection();
       statement = DBUtil.getPstForUpdate(conn, false, sql);
       statement.setQueryTimeout(this.dbConfig.getQueryTimeout());
       return DBUtil.executeBatch(statement, paramsList, this.dbConfig.getBatchSize());
@@ -245,8 +253,7 @@ public class Database implements IDatabase {
     } catch (SQLException e) {
       throw new DBException(e);
     } finally {
-      DBUtil.close(statement);
-      this.close();
+      this.close(statement);
     }
   }
 }

@@ -4,12 +4,15 @@ import cn.hutool.core.collection.CollectionUtil;
 import java.sql.*;
 import java.util.Collection;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.func.ThrowingRunnable;
 
 /** 数据库工具类 */
 public class DBUtil {
-
+  private static final Logger log = LoggerFactory.getLogger(DBUtil.class);
   /**
    * 创建用于查询的PreparedStatement
    *
@@ -130,6 +133,7 @@ public class DBUtil {
   }
 
   public static void rollback(Connection connection) {
+    assert Objects.nonNull(connection);
     rollback(connection, null);
   }
 
@@ -151,14 +155,9 @@ public class DBUtil {
    *
    * @param connection Connection
    */
-  public static void close(Connection connection) {
+  public static void close(Connection connection) throws SQLException {
     if (connection == null) return;
-
-    try {
-      if (!connection.isClosed()) connection.close();
-    } catch (SQLException e) {
-      throw new DBException(e);
-    }
+    if (!connection.isClosed()) connection.close();
   }
 
   /**
@@ -166,13 +165,9 @@ public class DBUtil {
    *
    * @param statement Statement
    */
-  public static void close(Statement statement) {
+  public static void close(Statement statement) throws SQLException {
     if (statement == null) return;
-    try {
-      if (!statement.isClosed()) statement.close();
-    } catch (SQLException e) {
-      throw new DBException(e, "Fail to close the statement");
-    }
+    if (!statement.isClosed()) statement.close();
   }
 
   /**
@@ -180,61 +175,40 @@ public class DBUtil {
    *
    * @param resultSet ResultSet
    */
-  public static void close(ResultSet resultSet) {
+  public static void close(ResultSet resultSet) throws SQLException {
     if (resultSet == null) return;
-    try {
-      if (!resultSet.isClosed()) resultSet.close();
-    } catch (SQLException e) {
-      throw new DBException(e, "Fail to close the resultSet");
-    }
+    if (!resultSet.isClosed()) resultSet.close();
   }
 
   /**
    * 关闭 Connection、Statement、ResultSet
    *
-   * @param connection Connection
-   * @param statement Statement
    * @param resultSet ResultSet
+   * @param statement Statement
+   * @param connection Connection
    */
-  public static void close(Connection connection, Statement statement, ResultSet resultSet) {
+  public static void close(ResultSet resultSet, Statement statement, Connection connection) {
+    close(resultSet, statement, () -> DBUtil.close(connection));
+  }
 
+  public static void close(
+      ResultSet resultSet, Statement statement, ThrowingRunnable<Exception> connectionRunnable) {
     try {
       close(resultSet);
+    } catch (SQLException e) {
+      throw new DBException(e, "Fail to close the result set");
     } finally {
       try {
         close(statement);
+      } catch (SQLException e) {
+        throw new DBException(e, "Fail to close the statement");
       } finally {
-        close(connection);
+        try {
+          connectionRunnable.run();
+        } catch (Exception e) {
+          throw new DBException(e, "Fail to close the connection");
+        }
       }
-    }
-  }
-
-  /**
-   * 关闭Connection、Statement
-   *
-   * @param connection Connection
-   * @param statement Statement
-   */
-  public static void close(Connection connection, Statement statement) {
-
-    try {
-      close(statement);
-    } finally {
-      close(connection);
-    }
-  }
-
-  /**
-   * Statement、ResultSet
-   *
-   * @param statement Statement
-   * @param resultSet ResultSet
-   */
-  public static void close(Statement statement, ResultSet resultSet) {
-    try {
-      close(resultSet);
-    } finally {
-      close(statement);
     }
   }
 }

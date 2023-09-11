@@ -63,7 +63,7 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
     } catch (SQLException e) {
       throw new DBException(e);
     } finally {
-      DBUtil.close(conn, ps, rs);
+      DBUtil.close(rs, ps, conn);
     }
   }
 

@@ -82,7 +82,11 @@ public class JdbcConnFactory extends ConnFactory {
     try {
       DBUtil.commit(conn);
     } finally {
-      DBUtil.close(conn);
+      try {
+        DBUtil.close(conn);
+      } catch (SQLException e) {
+        throw new DBException(e, "Fail to close connection");
+      }
     }
   }
 }

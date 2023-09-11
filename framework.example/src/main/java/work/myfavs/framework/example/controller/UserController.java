@@ -2,6 +2,7 @@ package work.myfavs.framework.example.controller;
 
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +23,11 @@ public class UserController {
   public ResponseEntity<Long> saveUser(RequestEntity<User> entity) {
     User user = userService.saveUser(entity.getBody());
     return ResponseEntity.ok().body(user.getId());
+  }
+
+  @RequestMapping(value = "/update/{id}", method = RequestMethod.POST)
+  public ResponseEntity<Long> updateUser(@PathVariable Long id, RequestEntity<User> entity){
+    return ResponseEntity.ok().body(userService.updateUser(id, entity.getBody()));
   }
 
   @RequestMapping(value = "/find-by-page")

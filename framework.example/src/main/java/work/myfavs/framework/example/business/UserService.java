@@ -1,5 +1,7 @@
 package work.myfavs.framework.example.business;
 
+import cn.hutool.core.date.DateTime;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import work.myfavs.framework.example.domain.entity.User;
@@ -24,5 +26,17 @@ public class UserService extends BaseService {
 
   public Page<User> findByPage() {
     return userRepository.findPage(User.class, new Sql("SELECT * FROM tb_user"), true, 1, 10);
+  }
+
+  @Transactional(rollbackFor = Exception.class)
+  public Long updateUser(Long id, User entity) {
+    User user = userRepository.getById(id);
+    if(Objects.isNull(user)) return 0L;
+    user.setUsername(entity.getUsername());
+    user.setPassword(entity.getPassword());
+    user.setEmail(entity.getEmail());
+    user.setModified(DateTime.now());
+
+    return new Long(userRepository.update(user));
   }
 }

@@ -22,16 +22,6 @@ public class DatabaseProxy implements IDatabase {
   }
 
   @Override
-  public Connection open() {
-    return this.database.open();
-  }
-
-  @Override
-  public void close() {
-    this.database.close();
-  }
-
-  @Override
   public void commit() {
     this.database.commit();
   }

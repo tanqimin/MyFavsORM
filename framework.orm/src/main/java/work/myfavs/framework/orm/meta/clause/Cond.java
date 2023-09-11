@@ -4,11 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
@@ -297,7 +293,7 @@ public class Cond extends Clause {
    * @return Cond
    */
   public static Cond in(String field, Sql sql) {
-
+    if( Objects.isNull(sql)) return new Cond();
     return new Cond(StrUtil.format(" {} IN ({})", field, sql.sql), sql.params);
   }
 
@@ -355,7 +351,7 @@ public class Cond extends Clause {
    * @return Cond
    */
   public static Cond notIn(String field, Sql sql) {
-
+    if( Objects.isNull(sql)) return new Cond();
     return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params);
   }
 
@@ -391,7 +387,7 @@ public class Cond extends Clause {
    * @return Cond
    */
   public static Cond exists(Sql subSql) {
-
+    if( Objects.isNull(subSql)) return new Cond();
     return new Cond(StrUtil.format(" EXISTS ({})", subSql.sql), subSql.params.toArray());
   }
 
@@ -413,7 +409,7 @@ public class Cond extends Clause {
    * @return Cond
    */
   public static Cond notExists(Sql subSql) {
-
+    if( Objects.isNull(subSql)) return new Cond();
     return new Cond(StrUtil.format(" NOT EXISTS ({})", subSql.sql), subSql.params.toArray());
   }
 

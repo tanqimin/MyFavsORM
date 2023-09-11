@@ -100,8 +100,8 @@ public class TenantDataSourceConfig {
                     .setPageTotalPageField("totalPage")
                     .setPageTotalRecordField("totalRow")
                     .setPageHasNextField("next")
-                    .setShowSql(true)
-                    .setShowResult(true))
+                    .setShowSql(false)
+                    .setShowResult(false))
         .mapping(
             mapper ->
                 mapper
