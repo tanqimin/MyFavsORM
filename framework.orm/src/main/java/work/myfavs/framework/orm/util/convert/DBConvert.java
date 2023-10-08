@@ -67,6 +67,7 @@ public class DBConvert {
     return list;
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private static <TModel> List<TModel> toScalar(Class<TModel> modelClass, ResultSet rs)
       throws SQLException {
 
