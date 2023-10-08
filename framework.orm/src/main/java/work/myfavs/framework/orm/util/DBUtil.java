@@ -13,6 +13,7 @@ import work.myfavs.framework.orm.util.func.ThrowingRunnable;
 /** 数据库工具类 */
 public class DBUtil {
   private static final Logger log = LoggerFactory.getLogger(DBUtil.class);
+
   /**
    * 创建用于查询的PreparedStatement
    *
@@ -84,13 +85,16 @@ public class DBUtil {
    */
   private static PreparedStatement setParams(
       PreparedStatement preparedStatement, Collection<?> params) throws SQLException {
-    if (CollectionUtil.isEmpty(params)) {
-      return preparedStatement;
-    }
+    if (CollectionUtil.isEmpty(params)) return preparedStatement;
 
     int index = 1;
     for (Object param : params) {
-      PropertyHandlerFactory.addParameter(preparedStatement, index++, param);
+      if (Objects.isNull(param)) {
+        preparedStatement.setObject(index++, null);
+        continue;
+      }
+      PropertyHandlerFactory.getInstance(param.getClass())
+          .addParameter(preparedStatement, index++, param);
     }
 
     return preparedStatement;

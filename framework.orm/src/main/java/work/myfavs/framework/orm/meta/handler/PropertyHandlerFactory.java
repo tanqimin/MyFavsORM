@@ -3,16 +3,10 @@ package work.myfavs.framework.orm.meta.handler;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
+import java.util.*;
 import work.myfavs.framework.orm.meta.handler.impls.BigDecimalPropertyHandler;
 import work.myfavs.framework.orm.meta.handler.impls.BlobPropertyHandler;
 import work.myfavs.framework.orm.meta.handler.impls.BooleanPropertyHandler;
@@ -84,42 +78,13 @@ public class PropertyHandlerFactory {
    * @param clazz Class
    * @param propertyHandler PropertyHandler
    */
+  @SuppressWarnings("rawtypes")
   public static void register(Class<?> clazz, PropertyHandler propertyHandler) {
 
     HANDLER_MAP.put(clazz.getName(), propertyHandler);
   }
 
-  /**
-   * 注册解析器类型
-   *
-   * @param map Map
-   */
-  public static void register(Map<Class<?>, PropertyHandler> map) {
-
-    for (Entry<Class<?>, PropertyHandler> entry : map.entrySet()) {
-      HANDLER_MAP.put(entry.getKey().getName(), entry.getValue());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T> T convert(ResultSet rs, String columnName, Class<T> tClass)
-      throws SQLException {
-
-    return (T) getInstance(tClass).convert(rs, columnName, tClass);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static void addParameter(PreparedStatement ps, int index, Object param)
-      throws SQLException {
-
-    if (param == null) {
-      ps.setObject(index, null);
-      return;
-    }
-
-    getInstance(param.getClass()).addParameter(ps, index, param);
-  }
-
+  @SuppressWarnings("rawtypes")
   public static PropertyHandler getInstance(Class<?> clazz) {
 
     String clazzName = clazz.getName();

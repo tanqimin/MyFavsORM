@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import work.myfavs.framework.orm.meta.Record;
+import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.Attributes;
@@ -72,9 +73,10 @@ public class DBConvert {
     final List<TModel> list = new ArrayList<>();
     final ResultSetMetaData metaData = rs.getMetaData();
 
+    PropertyHandler propertyHandler = PropertyHandlerFactory.getInstance(modelClass);
     while (rs.next()) {
       String colName = metaData.getColumnLabel(1);
-      list.add(PropertyHandlerFactory.convert(rs, colName, modelClass));
+      list.add((TModel) propertyHandler.convert(rs, colName, modelClass));
     }
     return list;
   }
