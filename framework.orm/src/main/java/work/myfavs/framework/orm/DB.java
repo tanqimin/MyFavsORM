@@ -6,10 +6,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.util.*;
-import java.util.stream.Collectors;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
@@ -30,6 +26,12 @@ import work.myfavs.framework.orm.util.func.ThrowingFunction;
 import work.myfavs.framework.orm.util.func.ThrowingRunnable;
 import work.myfavs.framework.orm.util.func.ThrowingSupplier;
 
+import java.sql.SQLException;
+import java.sql.Savepoint;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 /**
  * 数据库操作对象
  *
@@ -37,9 +39,9 @@ import work.myfavs.framework.orm.util.func.ThrowingSupplier;
  */
 public class DB {
   private final DBTemplate dbTemplate;
-  private final IDatabase database;
-  private final DBConfig dbConfig;
-  private final IDialect dialect;
+  private final IDatabase  database;
+  private final DBConfig   dbConfig;
+  private final IDialect   dialect;
 
   private static final int MAX_PARAM_SIZE_FOR_MSSQL = 1000;
 
@@ -114,9 +116,9 @@ public class DB {
    * 执行SQL，返回多行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param <TView>   结果集类型泛型
    * @return 结果集
    */
   public <TView> List<TView> find(Class<TView> viewClass, String sql, Collection<?> params) {
@@ -128,8 +130,8 @@ public class DB {
    * 执行SQL，并返回多行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL语句
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL语句
+   * @param <TView>   结果集类型泛型
    * @return 结果集
    */
   public <TView> List<TView> find(Class<TView> viewClass, String sql) {
@@ -141,8 +143,8 @@ public class DB {
    * 执行SQL，返回多行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL
+   * @param <TView>   结果集类型泛型
    * @return 结果集
    */
   public <TView> List<TView> find(Class<TView> viewClass, Sql sql) {
@@ -153,13 +155,13 @@ public class DB {
   /**
    * 执行SQL， 并返回多行记录
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 结果集
    */
-  public List<Record> find(String sql, Collection<?> params) {
+  public List<Record> findRecords(String sql, Collection<?> params) {
 
-    return this.find(Record.class, sql, params);
+    return this.database.findRecords(sql, params);
   }
 
   /**
@@ -168,19 +170,19 @@ public class DB {
    * @param sql SQL
    * @return 结果集
    */
-  public List<Record> find(Sql sql) {
+  public List<Record> findRecords(Sql sql) {
 
-    return this.find(Record.class, sql);
+    return this.findRecords(sql.toString(), sql.getParams());
   }
 
   /**
    * 执行SQL，并返回Map
    *
    * @param viewClass 结果集类型
-   * @param keyField 返回Map的Key的字段，必须是viewClass中存在的字段
-   * @param sql SQL语句
-   * @param params SQL参数
-   * @param <TView> 结果集类型泛型
+   * @param keyField  返回Map的Key的字段，必须是viewClass中存在的字段
+   * @param sql       SQL语句
+   * @param params    SQL参数
+   * @param <TView>   结果集类型泛型
    * @return Map
    */
   public <TKey, TView> Map<TKey, TView> findMap(
@@ -191,16 +193,16 @@ public class DB {
     }
 
     return this.find(viewClass, sql, params).parallelStream()
-        .collect(Collectors.toMap(tView -> BeanUtil.getProperty(tView, keyField), tView -> tView));
+               .collect(Collectors.toMap(tView -> BeanUtil.getProperty(tView, keyField), tView -> tView));
   }
 
   /**
    * 执行SQL，并返回Map
    *
    * @param viewClass 结果集类型
-   * @param keyField 返回Map的Key的字段，必须是viewClass中存在的字段
-   * @param sql SQL
-   * @param <TView> 结果集类型泛型
+   * @param keyField  返回Map的Key的字段，必须是viewClass中存在的字段
+   * @param sql       SQL
+   * @param <TView>   结果集类型泛型
    * @return Map
    */
   public <TKey, TView> Map<TKey, TView> findMap(Class<TView> viewClass, String keyField, Sql sql) {
@@ -211,16 +213,16 @@ public class DB {
    * 执行SQL，返回指定行数的结果集
    *
    * @param viewClass 结果集类型
-   * @param top 行数
-   * @param sql SQL语句
-   * @param params 参数
-   * @param <TView> 结果集类型泛型
+   * @param top       行数
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param <TView>   结果集类型泛型
    * @return 结果集
    */
   public <TView> List<TView> findTop(
       Class<TView> viewClass, int top, String sql, Collection<?> params) {
 
-    Sql querySql = dialect.selectPage(1, top, sql, params);
+    Sql querySql = dialect.selectTop(top, sql, params);
     return this.find(viewClass, querySql);
   }
 
@@ -228,9 +230,9 @@ public class DB {
    * 执行SQL，返回指定行数的结果集
    *
    * @param viewClass 结果集类型
-   * @param top 行数
-   * @param sql SQL
-   * @param <TView> 结果集类型泛型
+   * @param top       行数
+   * @param sql       SQL
+   * @param <TView>   结果集类型泛型
    * @return 结果集
    */
   public <TView> List<TView> findTop(Class<TView> viewClass, int top, Sql sql) {
@@ -241,14 +243,15 @@ public class DB {
   /**
    * 执行SQL，返回指定行数的结果集
    *
-   * @param top 行数
-   * @param sql SQL语句
+   * @param top    行数
+   * @param sql    SQL语句
    * @param params 参数
    * @return 结果集
    */
-  public List<Record> findTop(int top, String sql, Collection<?> params) {
+  public List<Record> findRecordsTop(int top, String sql, Collection<?> params) {
 
-    return this.findTop(Record.class, top, sql, params);
+    Sql querySql = dialect.selectTop(top, sql, params);
+    return this.findRecords(querySql);
   }
 
   /**
@@ -258,18 +261,18 @@ public class DB {
    * @param sql SQL
    * @return 结果集
    */
-  public List<Record> findTop(int top, Sql sql) {
+  public List<Record> findRecordsTop(int top, Sql sql) {
 
-    return this.findTop(Record.class, top, sql);
+    return this.findRecordsTop(top, sql.toString(), sql.getParams());
   }
 
   /**
    * 执行 SQL ,并返回 1 行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param <TView>   结果集类型泛型
    * @return 记录
    */
   public <TView> TView get(Class<TView> viewClass, String sql, Collection<?> params) {
@@ -285,8 +288,8 @@ public class DB {
    * 执行 SQL ,并返回 1 行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL
+   * @param <TView>   结果集类型泛型
    * @return 记录
    */
   public <TView> TView get(Class<TView> viewClass, Sql sql) {
@@ -297,13 +300,14 @@ public class DB {
   /**
    * 执行 SQL ,并返回 1 行记录
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 记录
    */
-  public Record get(String sql, Collection<?> params) {
+  public Record getRecord(String sql, Collection<?> params) {
 
-    return this.get(Record.class, sql, params);
+    Iterator<Record> iterator = this.findRecordsTop(1, sql, params).iterator();
+    return iterator.hasNext() ? iterator.next() : null;
   }
 
   /**
@@ -312,17 +316,17 @@ public class DB {
    * @param sql SQL
    * @return 记录
    */
-  public Record get(Sql sql) {
+  public Record getRecord(Sql sql) {
 
-    return this.get(Record.class, sql);
+    return this.getRecord(sql.toString(), sql.getParams());
   }
 
   /**
    * 根据主键获取记录
    *
    * @param viewClass 结果类型
-   * @param id 主键
-   * @param <TView> 实体类型
+   * @param id        主键
+   * @param <TView>   实体类型
    * @return 记录
    */
   public <TView> TView getById(Class<TView> viewClass, Object id) {
@@ -330,7 +334,7 @@ public class DB {
       return null;
     }
 
-    ClassMeta classMeta = Metadata.get(viewClass);
+    ClassMeta classMeta  = Metadata.get(viewClass);
     Attribute primaryKey = classMeta.checkPrimaryKey();
 
     Sql sql =
@@ -346,9 +350,9 @@ public class DB {
    * 根据指定字段获取记录
    *
    * @param viewClass 结果类型
-   * @param field 字段名
-   * @param param 参数
-   * @param <TView> 实体类型
+   * @param field     字段名
+   * @param param     参数
+   * @param <TView>   实体类型
    * @return 记录
    */
   public <TView> TView getByField(Class<TView> viewClass, String field, Object param) {
@@ -365,8 +369,8 @@ public class DB {
    * 根据条件获取记录
    *
    * @param viewClass 结果类型
-   * @param cond 条件
-   * @param <TView> 实体类型
+   * @param cond      条件
+   * @param <TView>   实体类型
    * @return 记录
    */
   public <TView> TView getByCond(Class<TView> viewClass, Cond cond) {
@@ -384,8 +388,8 @@ public class DB {
    * 根据 @Criteria 注解生成的条件查询记录
    *
    * @param viewClass 结果类型
-   * @param object 包含 @Criteria 注解Field的对象
-   * @param <TView> 实体类型
+   * @param object    包含 @Criteria 注解Field的对象
+   * @param <TView>   实体类型
    * @return 记录
    */
   public <TView> TView getByCriteria(Class<TView> viewClass, Object object) {
@@ -396,10 +400,10 @@ public class DB {
   /**
    * 根据 @Criteria 注解生成的条件查询记录
    *
-   * @param viewClass 结果类型
-   * @param object 包含 @Criteria 注解Field的对象
+   * @param viewClass     结果类型
+   * @param object        包含 @Criteria 注解Field的对象
    * @param criteriaGroup 条件组名
-   * @param <TView> 实体类型
+   * @param <TView>       实体类型
    * @return 记录
    */
   public <TView> TView getByCriteria(
@@ -412,13 +416,13 @@ public class DB {
    * 根据多个主键ID查询实体集合
    *
    * @param viewClass 结果类型
-   * @param ids 主键ID集合
-   * @param <TView> 实体类型
+   * @param ids       主键ID集合
+   * @param <TView>   实体类型
    * @return 实体集合
    */
   public <TView> List<TView> findByIds(Class<TView> viewClass, Collection<?> ids) {
 
-    ClassMeta classMeta = Metadata.get(viewClass);
+    ClassMeta classMeta  = Metadata.get(viewClass);
     Attribute primaryKey = classMeta.checkPrimaryKey();
     Sql sql =
         this.dialect
@@ -433,9 +437,9 @@ public class DB {
    * 根据字段查询实体集合
    *
    * @param viewClass 结果类型
-   * @param field 字段名
-   * @param param 参数
-   * @param <TView> 实体类型
+   * @param field     字段名
+   * @param param     参数
+   * @param <TView>   实体类型
    * @return 实体集合
    */
   public <TView> List<TView> findByField(Class<TView> viewClass, String field, Object param) {
@@ -452,9 +456,9 @@ public class DB {
    * 根据字段查询实体集合
    *
    * @param viewClass 结果类型
-   * @param field 字段名
-   * @param params 参数集合
-   * @param <TView> 实体类型
+   * @param field     字段名
+   * @param params    参数集合
+   * @param <TView>   实体类型
    * @return 实体集合
    */
   public <TView> List<TView> findByField(
@@ -473,8 +477,8 @@ public class DB {
    * 根据条件查询实体集合
    *
    * @param viewClass 结果类型
-   * @param cond 查询条件
-   * @param <TView> 实体类型
+   * @param cond      查询条件
+   * @param <TView>   实体类型
    * @return 实体集合
    */
   public <TView> List<TView> findByCond(Class<TView> viewClass, Cond cond) {
@@ -492,8 +496,8 @@ public class DB {
    * 根据 @Criterion 注解生成的条件查询实体集合
    *
    * @param viewClass 结果类型
-   * @param object 包含 @Criterion 注解Field的对象
-   * @param <TView> 实体类型
+   * @param object    包含 @Criterion 注解Field的对象
+   * @param <TView>   实体类型
    * @return 实体集合
    */
   public <TView> List<TView> findByCriteria(Class<TView> viewClass, Object object) {
@@ -504,10 +508,10 @@ public class DB {
   /**
    * 根据 @Criteria 注解生成的条件查询实体集合
    *
-   * @param viewClass 结果类型
-   * @param object 包含 @Criteria 注解Field的对象
+   * @param viewClass     结果类型
+   * @param object        包含 @Criteria 注解Field的对象
    * @param criteriaGroup 条件组名
-   * @param <TView> 实体类型
+   * @param <TView>       实体类型
    * @return 实体集合
    */
   public <TView> List<TView> findByCriteria(
@@ -519,14 +523,14 @@ public class DB {
   /**
    * 获取 SQL 的行数
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 行数
    */
   public long count(String sql, Collection<?> params) {
 
     Sql countSql = this.dialect.count(sql, params);
-    return this.get(Number.class, countSql).longValue();
+    return this.get(Long.class, countSql);
   }
 
   /**
@@ -544,8 +548,8 @@ public class DB {
    * 根据条件获取查询的行数
    *
    * @param viewClass 查询的数据表、视图对应的Java View类型
-   * @param cond 条件
-   * @param <TView> 查询的数据表、视图对应的Java View类型
+   * @param cond      条件
+   * @param <TView>   查询的数据表、视图对应的Java View类型
    * @return 行数
    */
   public <TView> long countByCond(Class<TView> viewClass, Cond cond) {
@@ -556,7 +560,7 @@ public class DB {
             .where()
             .and(cond)
             .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
-    return this.get(Number.class, sql).longValue();
+    return this.get(Long.class, sql);
   }
 
   /**
@@ -573,7 +577,7 @@ public class DB {
   /**
    * 根据传入的SQL判断是否存在符合条件的数据
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 查询结果行数大于0返回true，否则返回false
    */
@@ -586,8 +590,8 @@ public class DB {
    * 判断实体（根据ID）是否存在
    *
    * @param modelClass 实体类型
-   * @param entity 实体
-   * @param <TModel> 实体类型泛型
+   * @param entity     实体
+   * @param <TModel>   实体类型泛型
    * @return 存在返回true，不存在返回false
    */
   public <TModel> boolean exists(Class<TModel> modelClass, TModel entity) {
@@ -596,7 +600,7 @@ public class DB {
     }
 
     Attribute primaryKey = Metadata.get(modelClass).checkPrimaryKey();
-    Object pkVal = ReflectUtil.getFieldValue(entity, primaryKey.getFieldName());
+    Object    pkVal      = ReflectUtil.getFieldValue(entity, primaryKey.getFieldName());
     if (pkVal == null) {
       return false;
     }
@@ -608,8 +612,8 @@ public class DB {
    * 根据条件判断是否存在符合条件的数据
    *
    * @param viewClass 查询的数据表、视图对应的Java View类型
-   * @param cond 条件
-   * @param <TView> 查询的数据表、视图对应的Java View类型
+   * @param cond      条件
+   * @param <TView>   查询的数据表、视图对应的Java View类型
    * @return 查询结果行数大于0返回true，否则返回false
    */
   public <TView> boolean existsByCond(Class<TView> viewClass, Cond cond) {
@@ -620,13 +624,13 @@ public class DB {
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param viewClass 返回的数据类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param enablePage 是否启用分页
+   * @param viewClass   返回的数据类型
+   * @param sql         SQL语句
+   * @param params      参数
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param <TView> 结果类型泛型
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
    * @return 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(
@@ -637,14 +641,22 @@ public class DB {
       int currentPage,
       int pageSize) {
 
-    Sql querySql = new Sql(sql, params);
+    return this.findPageLite(sql, params, enablePage, currentPage, pageSize, querySql -> this.find(viewClass, querySql));
+  }
 
+  private <TView> PageLite<TView> findPageLite(
+      String sql,
+      Collection<?> params,
+      boolean enablePage,
+      int currentPage,
+      int pageSize,
+      Function<Sql, List<TView>> function) {
+
+    Sql querySql = new Sql(sql, params);
     if (enablePage) {
       querySql = createPageSql(currentPage, pageSize, sql, params);
     }
-
-    List<TView> data = this.find(viewClass, querySql);
-
+    List<TView> data = function.apply(querySql);
     return PageLite.createInstance(this.dbTemplate, data, currentPage, pageSize);
   }
 
@@ -652,9 +664,9 @@ public class DB {
    * 创建分页SQL
    *
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param sql SQL语句
-   * @param params 参数
+   * @param pageSize    每页记录数
+   * @param sql         SQL语句
+   * @param params      参数
    * @return 分页SQL
    */
   private Sql createPageSql(int currentPage, int pageSize, String sql, Collection<?> params) {
@@ -677,16 +689,20 @@ public class DB {
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param viewClass 返回的数据类型
-   * @param sql SQL
-   * @param enablePage 是否启用分页
+   * @param viewClass   返回的数据类型
+   * @param sql         SQL
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param <TView> 结果类型泛型
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
    * @return 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(
-      Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
+      Class<TView> viewClass,
+      Sql sql,
+      boolean enablePage,
+      int currentPage,
+      int pageSize) {
 
     return this.findPageLite(
         viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
@@ -696,10 +712,10 @@ public class DB {
    * 执行 SQL 语句，返回简单分页结果集
    *
    * @param viewClass 返回的数据类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param pageable 分页对象
-   * @param <TView> 结果类型泛型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param pageable  分页对象
+   * @param <TView>   结果类型泛型
    * @return 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(
@@ -718,12 +734,15 @@ public class DB {
    * 执行 SQL 语句，返回简单分页结果集
    *
    * @param viewClass 返回的数据类型
-   * @param sql SQL
-   * @param pageable 分页对象
-   * @param <TView> 结果类型泛型
+   * @param sql       SQL
+   * @param pageable  分页对象
+   * @param <TView>   结果类型泛型
    * @return 简单分页结果集
    */
-  public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, IPageable pageable) {
+  public <TView> PageLite<TView> findPageLite(
+      Class<TView> viewClass,
+      Sql sql,
+      IPageable pageable) {
 
     return this.findPageLite(
         viewClass,
@@ -737,68 +756,71 @@ public class DB {
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param sql SQL语句
-   * @param params 参数
-   * @param enablePage 是否启用分页
+   * @param sql         SQL语句
+   * @param params      参数
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
+   * @param pageSize    每页记录数
    * @return 简单分页结果集
    */
-  public PageLite<Record> findPageLite(
-      String sql, Collection<?> params, boolean enablePage, int currentPage, int pageSize) {
-
-    return this.findPageLite(Record.class, sql, params, enablePage, currentPage, pageSize);
+  public PageLite<Record> findRecordsPageLite(
+      String sql,
+      Collection<?> params,
+      boolean enablePage,
+      int currentPage,
+      int pageSize) {
+    return this.findPageLite(sql, params, enablePage, currentPage, pageSize, this::findRecords);
   }
 
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param sql SQL
-   * @param enablePage 是否启用分页
+   * @param sql         SQL
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
+   * @param pageSize    每页记录数
    * @return 简单分页结果集
    */
-  public PageLite<Record> findPageLite(Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public PageLite<Record> findRecordsPageLite(Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
-    return this.findPageLite(Record.class, sql, enablePage, currentPage, pageSize);
+    return this.findRecordsPageLite(sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param sql SQL语句
-   * @param params 参数
+   * @param sql      SQL语句
+   * @param params   参数
    * @param pageable 分页对象
    * @return 简单分页结果集
    */
-  public PageLite<Record> findPageLite(String sql, Collection<?> params, IPageable pageable) {
+  public PageLite<Record> findRecordsPageLite(String sql, Collection<?> params, IPageable pageable) {
 
-    return this.findPageLite(Record.class, sql, params, pageable);
+    return this.findRecordsPageLite(sql, params, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
 
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param sql SQL
+   * @param sql      SQL
    * @param pageable 分页对象
    * @return 简单分页结果集
    */
-  public PageLite<Record> findPageLite(Sql sql, IPageable pageable) {
+  public PageLite<Record> findRecordsPageLite(Sql sql, IPageable pageable) {
 
-    return this.findPageLite(Record.class, sql, pageable);
+    return this.findRecordsPageLite(sql.toString(), sql.getParams(), pageable);
   }
 
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param viewClass 返回的数据类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param enablePage 是否启用分页
+   * @param viewClass   返回的数据类型
+   * @param sql         SQL语句
+   * @param params      参数
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param <TView> 结果类型泛型
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
    * @return 分页结果集
    */
   public <TView> Page<TView> findPage(
@@ -809,9 +831,18 @@ public class DB {
       int currentPage,
       int pageSize) {
 
-    long totalPages = 1;
+    return findPage(sql, params, enablePage, currentPage, pageSize, querySql -> DB.this.find(viewClass, querySql));
+  }
+
+  private <TView> Page<TView> findPage(String sql,
+                                       Collection<?> params,
+                                       boolean enablePage,
+                                       int currentPage,
+                                       int pageSize,
+                                       Function<Sql, List<TView>> function) {
+    long totalPages   = 1;
     long totalRecords = 0;
-    Sql querySql = new Sql(sql, params);
+    Sql  querySql     = new Sql(sql, params);
 
     if (enablePage) {
       totalRecords = this.count(sql, params);
@@ -824,7 +855,7 @@ public class DB {
       querySql = createPageSql(currentPage, pageSize, sql, params);
     }
 
-    List<TView> data = this.find(viewClass, querySql);
+    List<TView> data = function.apply(querySql);
 
     if (!enablePage) {
       totalRecords = data.size();
@@ -837,12 +868,12 @@ public class DB {
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param viewClass 返回的数据类型
-   * @param sql SQL
-   * @param enablePage 是否启用分页
+   * @param viewClass   返回的数据类型
+   * @param sql         SQL
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param <TView> 结果类型泛型
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
    * @return 分页结果集
    */
   public <TView> Page<TView> findPage(
@@ -855,10 +886,10 @@ public class DB {
    * 执行 SQL 语句，返回分页结果集
    *
    * @param viewClass 返回的数据类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param pageable 可分页对象
-   * @param <TView> 结果类型泛型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param pageable  可分页对象
+   * @param <TView>   结果类型泛型
    * @return 分页结果集
    */
   public <TView> Page<TView> findPage(
@@ -877,9 +908,9 @@ public class DB {
    * 执行 SQL 语句，返回分页结果集
    *
    * @param viewClass 返回的数据类型
-   * @param sql SQL
-   * @param pageable 可分页对象
-   * @param <TView> 结果类型泛型
+   * @param sql       SQL
+   * @param pageable  可分页对象
+   * @param <TView>   结果类型泛型
    * @return 分页结果集
    */
   public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, IPageable pageable) {
@@ -896,45 +927,44 @@ public class DB {
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param sql SQL语句
-   * @param params 参数
-   * @param enablePage 是否启用分页
+   * @param sql         SQL语句
+   * @param params      参数
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
+   * @param pageSize    每页记录数
    * @return 分页结果集
    */
-  public Page<Record> findPage(
+  public Page<Record> findRecordsPage(
       String sql, Collection<?> params, boolean enablePage, int currentPage, int pageSize) {
 
-    return this.findPage(Record.class, sql, params, enablePage, currentPage, pageSize);
+    return this.findPage(sql, params, enablePage, currentPage, pageSize, this::findRecords);
   }
 
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param sql SQL
-   * @param enablePage 是否启用分页
+   * @param sql         SQL
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
+   * @param pageSize    每页记录数
    * @return 分页结果集
    */
-  public Page<Record> findPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public Page<Record> findRecordsPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
-    return this.findPage(Record.class, sql, enablePage, currentPage, pageSize);
+    return this.findRecordsPage(sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param sql SQL语句
-   * @param params 参数
+   * @param sql      SQL语句
+   * @param params   参数
    * @param pageable 可分页对象
    * @return 分页结果集
    */
-  public Page<Record> findPage(String sql, Collection<?> params, IPageable pageable) {
+  public Page<Record> findRecordsPage(String sql, Collection<?> params, IPageable pageable) {
 
-    return this.findPage(
-        Record.class,
+    return this.findRecordsPage(
         sql,
         params,
         pageable.getEnablePage(),
@@ -945,14 +975,13 @@ public class DB {
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param sql SQL
+   * @param sql      SQL
    * @param pageable 可分页对象
    * @return 分页结果集
    */
-  public Page<Record> findPage(Sql sql, IPageable pageable) {
+  public Page<Record> findRecordsPage(Sql sql, IPageable pageable) {
 
-    return this.findPage(
-        Record.class,
+    return this.findRecordsPage(
         sql,
         pageable.getEnablePage(),
         pageable.getCurrentPage(),
@@ -962,8 +991,8 @@ public class DB {
   /**
    * 执行一个SQL语句
    *
-   * @param sql SQL语句
-   * @param params 参数
+   * @param sql          SQL语句
+   * @param params       参数
    * @param queryTimeOut 超时时间(单位：秒)
    * @return 影响行数
    */
@@ -975,7 +1004,7 @@ public class DB {
   /**
    * 执行一个SQL语句
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 影响行数
    */
@@ -987,7 +1016,7 @@ public class DB {
   /**
    * 执行一个SQL语句
    *
-   * @param sql SQL
+   * @param sql          SQL
    * @param queryTimeout 超时时间(单位：秒)
    * @return 影响行数
    */
@@ -1014,7 +1043,7 @@ public class DB {
    * @return 返回多个影响行数
    */
   public int[] execute(List<Sql> sqlList) {
-    int sqlCnt = sqlList.size();
+    int   sqlCnt  = sqlList.size();
     int[] results = new int[sqlCnt];
 
     return tx(
@@ -1029,12 +1058,12 @@ public class DB {
   /**
    * 执行多个SQL语句
    *
-   * @param sqlList SQL集合
+   * @param sqlList      SQL集合
    * @param queryTimeout 超时时间
    * @return 返回多个影响行数
    */
   public int[] execute(List<Sql> sqlList, int queryTimeout) {
-    int sqlCnt = sqlList.size();
+    int   sqlCnt  = sqlList.size();
     int[] results = new int[sqlCnt];
 
     return tx(
@@ -1050,8 +1079,8 @@ public class DB {
    * 创建实体
    *
    * @param modelClass 实体类型
-   * @param entity 实体
-   * @param <TModel> 实体类型泛型
+   * @param entity     实体
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int create(Class<TModel> modelClass, TModel entity) {
@@ -1061,11 +1090,11 @@ public class DB {
       return result;
     }
 
-    ClassMeta classMeta = Metadata.get(modelClass);
-    Attribute primaryKey = classMeta.checkPrimaryKey();
+    ClassMeta      classMeta       = Metadata.get(modelClass);
+    Attribute      primaryKey      = classMeta.checkPrimaryKey();
     GenerationType strategy;
-    String pkFieldName;
-    boolean autoGeneratedPK = false;
+    String         pkFieldName;
+    boolean        autoGeneratedPK = false;
 
     Sql sql;
 
@@ -1107,8 +1136,8 @@ public class DB {
    * 批量创建实体
    *
    * @param modelClass 实体类型
-   * @param entities 实体集合
-   * @param <TModel> 实体类型泛型
+   * @param entities   实体集合
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int create(Class<TModel> modelClass, Collection<TModel> entities) {
@@ -1118,7 +1147,7 @@ public class DB {
 
     ClassMeta classMeta = Metadata.get(modelClass);
 
-    final boolean isMySQL = this.dbConfig.getDbType().equals(DbType.MYSQL);
+    final boolean isMySQL    = this.dbConfig.getDbType().equals(DbType.MYSQL);
     final boolean isIdentity = classMeta.getStrategy().equals(GenerationType.IDENTITY);
 
     if (!isMySQL) {
@@ -1147,29 +1176,29 @@ public class DB {
    * 使用SQL语句的批量创建方法 insert into table (f1, f2, f3) values (?,?,?),(?,?,?)...(?,?,?)
    *
    * @param classMeta 实体类
-   * @param entities 实体
-   * @param <TModel> 实体类类型
+   * @param entities  实体
+   * @param <TModel>  实体类类型
    * @return 记录数
    */
   private <TModel> int createInSqlBatch(ClassMeta classMeta, Collection<TModel> entities) {
 
     int result = 0;
 
-    final Attributes updateAttributes = classMeta.getUpdateAttributes();
-    final GenerationType strategy = classMeta.getStrategy();
-    final Attribute primaryKey = classMeta.checkPrimaryKey();
-    final String pkFieldName = primaryKey.getFieldName();
+    final Attributes     updateAttributes = classMeta.getUpdateAttributes();
+    final GenerationType strategy         = classMeta.getStrategy();
+    final Attribute      primaryKey       = classMeta.checkPrimaryKey();
+    final String         pkFieldName      = primaryKey.getFieldName();
 
     final List<Sql> sqlList = new ArrayList<>();
 
-    final int batchSize = this.dbConfig.getBatchSize();
+    final int                batchSize = this.dbConfig.getBatchSize();
     final List<List<TModel>> batchList = CollectionUtil.split(entities, batchSize);
 
     for (List<TModel> entityList : batchList) {
       boolean insertClauseCompleted = false;
-      String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
-      Sql insertClause = Sql.New(StrUtil.format("INSERT INTO {} (", tableName));
-      Sql valuesClause = Sql.New(") VALUES ");
+      String  tableName             = TableAlias.getOpt().orElse(classMeta.getTableName());
+      Sql     insertClause          = Sql.New(StrUtil.format("INSERT INTO {} (", tableName));
+      Sql     valuesClause          = Sql.New(") VALUES ");
 
       for (TModel entity : entityList) {
         Object pkVal = getPrimaryKeyValue(strategy, pkFieldName, entity);
@@ -1229,15 +1258,15 @@ public class DB {
 
   private <TModel> int createInJdbcBatch(ClassMeta classMeta, Collection<TModel> entities) {
 
-    int result;
-    GenerationType strategy;
-    String pkFieldName;
-    Object pkVal;
-    boolean autoGeneratedPK = false;
-    Attributes updateAttributes;
-    Sql sql;
+    int                       result;
+    GenerationType            strategy;
+    String                    pkFieldName;
+    Object                    pkVal;
+    boolean                   autoGeneratedPK = false;
+    Attributes                updateAttributes;
+    Sql                       sql;
     Collection<Collection<?>> paramsList;
-    Collection<Object> params;
+    Collection<Object>        params;
 
     Attribute primaryKey = classMeta.checkPrimaryKey();
 
@@ -1309,8 +1338,8 @@ public class DB {
    * 更新实体
    *
    * @param modelClass 实体类型
-   * @param entity 实体
-   * @param <TModel> 实体类型泛型
+   * @param entity     实体
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int update(Class<TModel> modelClass, TModel entity) {
@@ -1329,8 +1358,8 @@ public class DB {
    * 更新实体，忽略Null属性的字段
    *
    * @param modelClass 实体类型
-   * @param entity 实体
-   * @param <TModel> 实体类型泛型
+   * @param entity     实体
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int updateIgnoreNull(Class<TModel> modelClass, TModel entity) {
@@ -1349,9 +1378,9 @@ public class DB {
    * 更新实体
    *
    * @param modelClass 实体类型
-   * @param entity 实体
-   * @param columns 需要更新的列
-   * @param <TModel> 实体类型泛型
+   * @param entity     实体
+   * @param columns    需要更新的列
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int update(Class<TModel> modelClass, TModel entity, String[] columns) {
@@ -1368,9 +1397,9 @@ public class DB {
    * 更新实体
    *
    * @param modelClass 实体类型
-   * @param entities 实体集合
-   * @param columns 需要更新的列
-   * @param <TModel> 实体类型泛型
+   * @param entities   实体集合
+   * @param columns    需要更新的列
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int update(
@@ -1386,27 +1415,27 @@ public class DB {
       return updateByLines(modelClass, entities, columns);
     }
 
-    ClassMeta classMeta = Metadata.get(modelClass);
-    Attribute pk = classMeta.checkPrimaryKey();
-    List<Attribute> updAttrs = classMeta.getUpdateAttributes(columns);
+    ClassMeta       classMeta = Metadata.get(modelClass);
+    Attribute       pk        = classMeta.checkPrimaryKey();
+    List<Attribute> updAttrs  = classMeta.getUpdateAttributes(columns);
 
     if (updAttrs.isEmpty()) {
       throw new DBException("Could not match update attributes.");
     }
 
-    final int batchSize = this.dbConfig.getBatchSize();
+    final int                batchSize = this.dbConfig.getBatchSize();
     final List<List<TModel>> batchList = CollectionUtil.split(entities, batchSize);
-    String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
-    List<Sql> batchSqls = new ArrayList<>();
+    String                   tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
+    List<Sql>                batchSqls = new ArrayList<>();
 
     for (List<TModel> entityList : batchList) {
       Sql sql = Sql.Update(tableName).append(" SET ");
 
-      List<Object> ids = new ArrayList<>();
+      List<Object>     ids        = new ArrayList<>();
       Map<String, Sql> setClauses = new TreeMap<>();
       for (TModel entity : entityList) {
         for (Attribute updAttr : updAttrs) {
-          Sql setClause;
+          Sql          setClause;
           final String columnName = updAttr.getColumnName();
           if (setClauses.containsKey(columnName)) {
             setClause = setClauses.get(columnName);
@@ -1446,9 +1475,9 @@ public class DB {
    * 更新实体
    *
    * @param modelClass 实体类型
-   * @param entities 实体集合
-   * @param columns 需要更新的列
-   * @param <TModel> 实体类型泛型
+   * @param entities   实体集合
+   * @param columns    需要更新的列
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   private <TModel> int updateByLines(
@@ -1456,17 +1485,17 @@ public class DB {
 
     int result;
 
-    ClassMeta classMeta = Metadata.get(modelClass);
-    Attribute pk = classMeta.checkPrimaryKey();
-    List<Attribute> updAttrs = classMeta.getUpdateAttributes(columns);
+    ClassMeta       classMeta = Metadata.get(modelClass);
+    Attribute       pk        = classMeta.checkPrimaryKey();
+    List<Attribute> updAttrs  = classMeta.getUpdateAttributes(columns);
 
     if (updAttrs.isEmpty()) {
       throw new DBException("Could not match update attributes.");
     }
 
-    Sql sql;
+    Sql                       sql;
     Collection<Collection<?>> paramsList;
-    Collection<Object> params;
+    Collection<Object>        params;
 
     sql = Sql.Update(classMeta.getTableName()).append(" SET ");
     for (Attribute updateAttribute : updAttrs) {
@@ -1503,8 +1532,8 @@ public class DB {
    * 更新实体
    *
    * @param modelClass 实体类型
-   * @param entities 实体集合
-   * @param <TModel> 实体类型泛型
+   * @param entities   实体集合
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int update(Class<TModel> modelClass, Collection<TModel> entities) {
@@ -1516,8 +1545,8 @@ public class DB {
    * 如果记录存在更新，不存在则创建
    *
    * @param modelClass 实体类型
-   * @param entity 实体集合
-   * @param <TModel> 实体类型泛型
+   * @param entity     实体集合
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int createOrUpdate(Class<TModel> modelClass, TModel entity) {
@@ -1532,8 +1561,8 @@ public class DB {
    * 删除记录
    *
    * @param modelClass 实体类型
-   * @param entity 实体
-   * @param <TModel> 实体类型泛型
+   * @param entity     实体
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int delete(Class<TModel> modelClass, TModel entity) {
@@ -1543,7 +1572,7 @@ public class DB {
     }
 
     ClassMeta classMeta = ClassMeta.createInstance(modelClass);
-    Object pkVal = getPrimaryKeyValue(classMeta, entity);
+    Object    pkVal     = getPrimaryKeyValue(classMeta, entity);
 
     return deleteById(classMeta, pkVal);
   }
@@ -1552,8 +1581,8 @@ public class DB {
    * 批量删除记录
    *
    * @param modelClass 实体类型
-   * @param entities 实体集合
-   * @param <TModel> 实体类型泛型
+   * @param entities   实体集合
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int delete(Class<TModel> modelClass, Collection<TModel> entities) {
@@ -1562,8 +1591,8 @@ public class DB {
       return 0;
     }
 
-    String pkFieldName = Metadata.get(modelClass).getPrimaryKeyFieldName();
-    List<Object> ids = new ArrayList<>();
+    String       pkFieldName = Metadata.get(modelClass).getPrimaryKeyFieldName();
+    List<Object> ids         = new ArrayList<>();
 
     Object pkVal;
     for (TModel entity : entities) {
@@ -1582,8 +1611,8 @@ public class DB {
    * 根据ID集合删除记录
    *
    * @param modelClass 实体类型
-   * @param ids ID集合
-   * @param <TModel> 实体类型泛型
+   * @param ids        ID集合
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int deleteByIds(Class<TModel> modelClass, Collection<?> ids) {
@@ -1592,13 +1621,13 @@ public class DB {
       return 0;
     }
 
-    ClassMeta classMeta = Metadata.get(modelClass);
-    Attribute primaryKey = classMeta.checkPrimaryKey();
-    String pkColumnName = primaryKey.getColumnName();
+    ClassMeta classMeta    = Metadata.get(modelClass);
+    Attribute primaryKey   = classMeta.checkPrimaryKey();
+    String    pkColumnName = primaryKey.getColumnName();
 
     if (isSqlServer()) {
       if (ids.size() > MAX_PARAM_SIZE_FOR_MSSQL) {
-        int ret = 0;
+        int                     ret         = 0;
         List<? extends List<?>> splitParams = CollUtil.split(ids, MAX_PARAM_SIZE_FOR_MSSQL);
         for (List<?> splitParam : splitParams) {
           Cond deleteCond = Cond.in(pkColumnName, splitParam, false);
@@ -1616,8 +1645,8 @@ public class DB {
    * 根据ID删除记录
    *
    * @param modelClass 实体类型
-   * @param id ID值
-   * @param <TModel> 实体类型泛型
+   * @param id         ID值
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int deleteById(Class<TModel> modelClass, Object id) {
@@ -1631,7 +1660,7 @@ public class DB {
 
   private int deleteById(ClassMeta classMeta, Object id) {
     String pkColumnName = classMeta.getPrimaryKeyColumnName();
-    Cond deleteCond = Cond.eq(pkColumnName, id);
+    Cond   deleteCond   = Cond.eq(pkColumnName, id);
 
     return deleteByCond(classMeta, deleteCond);
   }
@@ -1640,8 +1669,8 @@ public class DB {
    * 根据条件删除记录
    *
    * @param modelClass 实体类型
-   * @param cond 条件值
-   * @param <TModel> 实体类型泛型
+   * @param cond       条件值
+   * @param <TModel>   实体类型泛型
    * @return 影响行数
    */
   public <TModel> int deleteByCond(Class<TModel> modelClass, Cond cond) {
@@ -1658,27 +1687,27 @@ public class DB {
    * 快速截断表数据
    *
    * @param modelClass 实体类型
-   * @param <TModel> 实体类型泛型
+   * @param <TModel>   实体类型泛型
    */
   public <TModel> void truncate(Class<TModel> modelClass) {
     ClassMeta classMeta = Metadata.get(modelClass);
-    String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
+    String    tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     execute(new Sql(StrUtil.format("TRUNCATE TABLE {}", tableName)));
   }
 
   private int deleteByCond(ClassMeta classMeta, Cond deleteCond) {
-    Sql sql;
+    Sql    sql;
     String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     if (classMeta.isEnableLogicalDelete()) {
       sql =
           Sql.Update(tableName)
-              .set(
-                  StrUtil.format(
-                      "{} = {}",
-                      classMeta.getLogicalDeleteField(),
-                      classMeta.getPrimaryKey().getColumnName()))
-              .where(deleteCond)
-              .and(Cond.logicalDeleteCond(classMeta));
+             .set(
+                 StrUtil.format(
+                     "{} = {}",
+                     classMeta.getLogicalDeleteField(),
+                     classMeta.getPrimaryKey().getColumnName()))
+             .where(deleteCond)
+             .and(Cond.logicalDeleteCond(classMeta));
     } else {
       sql = Sql.Delete(tableName).where(deleteCond);
     }

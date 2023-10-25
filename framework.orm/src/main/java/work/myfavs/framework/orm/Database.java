@@ -3,6 +3,8 @@ package work.myfavs.framework.orm;
 import java.sql.*;
 import java.util.Collection;
 import java.util.List;
+
+import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.DBUtil;
 import work.myfavs.framework.orm.util.convert.DBConvert;
@@ -133,6 +135,30 @@ public class Database implements IDatabase {
       rs = statement.executeQuery();
 
       result = DBConvert.toList(viewClass, rs);
+    } catch (SQLException e) {
+      throw new DBException(e);
+    } finally {
+      this.close(rs, statement);
+    }
+
+    return result;
+  }
+
+  @Override
+  public List<Record> findRecords(String sql, Collection<?> params) {
+    Connection conn;
+    PreparedStatement statement = null;
+    ResultSet rs = null;
+    List<Record> result;
+
+    try {
+      conn = this.openConnection();
+      statement = DBUtil.getPstForQuery(conn, sql, params);
+      statement.setQueryTimeout(this.dbConfig.getQueryTimeout());
+      statement.setFetchSize(this.dbConfig.getFetchSize());
+      rs = statement.executeQuery();
+
+      result = DBConvert.toRecords(rs);
     } catch (SQLException e) {
       throw new DBException(e);
     } finally {

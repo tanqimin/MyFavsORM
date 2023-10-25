@@ -13,7 +13,7 @@ import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
 public class AbstractTest {
-  protected static final String DB_TYPE = DbType.SQL_SERVER;
+  protected static final String DB_TYPE = DbType.SQL_SERVER_2012;
   protected static final String DRIVER_CLASS = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
   protected static final String JDBC_URL =
       "jdbc:sqlserver://192.168.8.246:1433;"

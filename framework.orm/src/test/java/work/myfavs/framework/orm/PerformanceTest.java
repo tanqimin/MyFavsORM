@@ -1,13 +1,5 @@
 package work.myfavs.framework.orm;
 
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,12 +22,20 @@ import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
 import work.myfavs.framework.orm.util.JsonUtil;
 import work.myfavs.framework.orm.util.func.ThrowingFunction;
-import work.myfavs.framework.orm.vo.SnowflakeId;
 
-public class DBTest extends AbstractTest
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.sql.Savepoint;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class PerformanceTest extends AbstractTest
     implements ISnowflakeTest, IIdentityTest, IUuidTest, ILogicDeleteTest {
 
-  private static final Logger log = LoggerFactory.getLogger(DBTest.class);
+  private static final Logger log = LoggerFactory.getLogger(PerformanceTest.class);
 
   IPageable pageable =
       new IPageable() {
@@ -142,6 +142,16 @@ public class DBTest extends AbstractTest
   }
 
   @Test
+  public void findScalar() {
+    initSnowflakes();
+    DB.conn().truncate(Snowflake.class);
+    DB.conn().create(Snowflake.class, SNOW_FLAKES);
+
+    List<String> snowflakes = DB.conn().find(String.class, "SELECT name FROM tb_snowflake");
+    Assert.assertEquals(3, snowflakes.size());
+  }
+
+  @Test
   public void findMap() {
     initSnowflakes();
     DB.conn().truncate(Snowflake.class);
@@ -172,19 +182,6 @@ public class DBTest extends AbstractTest
           log.info("key: {}, value: {}", k, JsonUtil.toJsonStr(v));
           Assert.assertTrue(k > 0L);
         });
-  }
-
-  @Test
-  public void findSnowFlakeId() {
-    initSnowflakes();
-    DB.conn().truncate(Snowflake.class);
-    DB.conn().create(Snowflake.class, SNOW_FLAKES);
-
-    List<SnowflakeId> snowflakeIds = DB.conn().find(SnowflakeId.class, "SELECT id FROM tb_snowflake");
-    Assert.assertEquals(3, snowflakeIds.size());
-
-    List<Snowflake> snowflakes = DB.conn().find(Snowflake.class, "SELECT id FROM tb_snowflake");
-    Assert.assertEquals(3, snowflakes.size());
   }
 
   @Test
@@ -223,6 +220,17 @@ public class DBTest extends AbstractTest
     Assert.assertNotNull(record);
     record = DB.conn().getRecord(sql.toString(), sql.getParams());
     Assert.assertNotNull(record);
+  }
+
+  @Test
+  public void getScalar() {
+    initSnowflakes();
+    DB.conn().truncate(Snowflake.class);
+    DB.conn().create(Snowflake.class, SNOW_FLAKES);
+
+    Sql sql = Sql.Select("name").from("tb_snowflake");
+    String snowflake = DB.conn().get(String.class, sql);
+    Assert.assertNotNull(snowflake);
   }
 
   @Test

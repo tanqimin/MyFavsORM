@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.util.Collection;
 import java.util.List;
+
+import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.util.SqlLog;
 import work.myfavs.framework.orm.util.func.ThrowingConsumer;
 import work.myfavs.framework.orm.util.func.ThrowingFunction;
@@ -14,7 +16,7 @@ import work.myfavs.framework.orm.util.func.ThrowingSupplier;
 
 public class DatabaseProxy implements IDatabase {
   private final IDatabase database;
-  private final SqlLog sqlLog;
+  private final SqlLog    sqlLog;
 
   public DatabaseProxy(DBTemplate dbTemplate) {
     this.database = new Database(dbTemplate);
@@ -70,6 +72,14 @@ public class DatabaseProxy implements IDatabase {
   public <TView> List<TView> find(Class<TView> tViewClass, String sql, Collection<?> params) {
     sqlLog.showSql(sql, params);
     List<TView> result = this.database.find(tViewClass, sql, params);
+    sqlLog.showResult(result);
+    return result;
+  }
+
+  @Override
+  public List<Record> findRecords(String sql, Collection<?> params) {
+    sqlLog.showSql(sql, params);
+    List<Record> result = this.database.findRecords(sql, params);
     sqlLog.showResult(result);
     return result;
   }

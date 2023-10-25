@@ -19,7 +19,7 @@ import java.util.function.Function;
  */
 public class Attributes {
 
-  private final Map<String, Attribute> map = new TreeMap<>();
+  private final Map<String, Attribute> map = new LinkedHashMap<>();
 
   private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
@@ -90,7 +90,7 @@ public class Attributes {
 
     readLock.lock();
     try {
-      return map.keySet().toArray(new String[] {});
+      return map.keySet().toArray(new String[]{});
     } finally {
       readLock.unlock();
     }

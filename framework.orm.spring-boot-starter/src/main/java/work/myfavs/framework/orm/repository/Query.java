@@ -1,7 +1,5 @@
 package work.myfavs.framework.orm.repository;
 
-import java.util.Collection;
-import java.util.List;
 import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.Record;
@@ -10,7 +8,12 @@ import work.myfavs.framework.orm.meta.pagination.IPageable;
 import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
 
-/** 查询器基类 */
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * 查询器基类
+ */
 public class Query extends BaseRepository {
 
   /**
@@ -27,8 +30,8 @@ public class Query extends BaseRepository {
    * 执行SQL，并返回多行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL语句
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL语句
+   * @param <TView>   结果集类型泛型
    * @return 结果集
    */
   public <TView> List<TView> find(Class<TView> viewClass, String sql) {
@@ -40,8 +43,8 @@ public class Query extends BaseRepository {
    * 执行SQL， 并返回多行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL
+   * @param <TView>   结果集类型泛型
    * @return 结果集
    */
   @Override
@@ -54,9 +57,9 @@ public class Query extends BaseRepository {
    * 执行SQL， 并返回多行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param <TView>   结果集类型泛型
    * @return 结果集
    */
   @Override
@@ -68,13 +71,13 @@ public class Query extends BaseRepository {
   /**
    * 执行SQL， 并返回多行记录
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 结果集
    */
-  public List<Record> findRecord(String sql, Collection<?> params) {
+  public List<Record> findRecords(String sql, Collection<?> params) {
 
-    return this.find(Record.class, sql, params);
+    return DB.conn(this.dbTemplate).findRecords(sql, params);
   }
 
   /**
@@ -83,19 +86,19 @@ public class Query extends BaseRepository {
    * @param sql SQL
    * @return 结果集
    */
-  public List<Record> findRecord(Sql sql) {
+  public List<Record> findRecords(Sql sql) {
 
-    return this.find(Record.class, sql);
+    return DB.conn(this.dbTemplate).findRecords(sql);
   }
 
   /**
    * 执行SQL，返回指定行数的结果集
    *
    * @param viewClass 结果集类型
-   * @param top 行数
-   * @param sql SQL语句
-   * @param params 参数
-   * @param <TView> 结果集类型泛型
+   * @param top       行数
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param <TView>   结果集类型泛型
    * @return 结果集
    */
   @Override
@@ -109,9 +112,9 @@ public class Query extends BaseRepository {
    * 执行SQL，返回指定行数的结果集
    *
    * @param viewClass 结果集类型
-   * @param top 行数
-   * @param sql SQL
-   * @param <TView> 结果集类型泛型
+   * @param top       行数
+   * @param sql       SQL
+   * @param <TView>   结果集类型泛型
    * @return 结果集
    */
   @Override
@@ -123,14 +126,14 @@ public class Query extends BaseRepository {
   /**
    * 执行SQL，返回指定行数的结果集
    *
-   * @param top 行数
-   * @param sql SQL语句
+   * @param top    行数
+   * @param sql    SQL语句
    * @param params 参数
    * @return 结果集
    */
-  public List<Record> findRecordTop(int top, String sql, Collection<?> params) {
+  public List<Record> findRecordsTop(int top, String sql, Collection<?> params) {
 
-    return this.findTop(Record.class, top, sql, params);
+    return DB.conn(this.dbTemplate).findRecordsTop(top, sql, params);
   }
 
   /**
@@ -140,17 +143,17 @@ public class Query extends BaseRepository {
    * @param sql SQL
    * @return 结果集
    */
-  public List<Record> findRecordTop(int top, Sql sql) {
+  public List<Record> findRecordsTop(int top, Sql sql) {
 
-    return this.findTop(Record.class, top, sql);
+    return DB.conn(this.dbTemplate).findRecordsTop(top, sql);
   }
 
   /**
    * 执行 SQL ,并返回 1 行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL语句
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL语句
+   * @param <TView>   结果集类型泛型
    * @return 记录
    */
   public <TView> TView get(Class<TView> viewClass, String sql) {
@@ -162,8 +165,8 @@ public class Query extends BaseRepository {
    * 执行 SQL ,并返回 1 行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL
+   * @param <TView>   结果集类型泛型
    * @return 记录
    */
   @Override
@@ -176,9 +179,9 @@ public class Query extends BaseRepository {
    * 执行 SQL ,并返回 1 行记录
    *
    * @param viewClass 结果集类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param <TView> 结果集类型泛型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param <TView>   结果集类型泛型
    * @return 记录
    */
   @Override
@@ -190,13 +193,13 @@ public class Query extends BaseRepository {
   /**
    * 执行 SQL ,并返回 1 行记录
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 记录
    */
   public Record getRecord(String sql, Collection<?> params) {
 
-    return this.get(Record.class, sql, params);
+    return DB.conn(this.dbTemplate).getRecord(sql, params);
   }
 
   /**
@@ -207,13 +210,13 @@ public class Query extends BaseRepository {
    */
   public Record getRecord(Sql sql) {
 
-    return this.get(Record.class, sql);
+    return DB.conn(this.dbTemplate).getRecord(sql);
   }
 
   /**
    * 获取 SQL 的行数
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 行数
    */
@@ -239,10 +242,10 @@ public class Query extends BaseRepository {
    * 执行 SQL 语句，返回简单分页结果集
    *
    * @param viewClass 返回的数据类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param pageable 分页对象
-   * @param <TView> 结果类型泛型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param pageable  分页对象
+   * @param <TView>   结果类型泛型
    * @return 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(
@@ -255,9 +258,9 @@ public class Query extends BaseRepository {
    * 执行 SQL 语句，返回简单分页结果集
    *
    * @param viewClass 返回的数据类型
-   * @param sql SQL
-   * @param pageable 分页对象
-   * @param <TView> 结果类型泛型
+   * @param sql       SQL
+   * @param pageable  分页对象
+   * @param <TView>   结果类型泛型
    * @return 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, IPageable pageable) {
@@ -268,13 +271,13 @@ public class Query extends BaseRepository {
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param viewClass 返回的数据类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param enablePage 是否启用分页
+   * @param viewClass   返回的数据类型
+   * @param sql         SQL语句
+   * @param params      参数
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param <TView> 结果类型泛型
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
    * @return 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(
@@ -286,18 +289,18 @@ public class Query extends BaseRepository {
       int pageSize) {
 
     return DB.conn(this.dbTemplate)
-        .findPageLite(viewClass, sql, params, enablePage, currentPage, pageSize);
+             .findPageLite(viewClass, sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param viewClass 返回的数据类型
-   * @param sql SQL
-   * @param enablePage 是否启用分页
+   * @param viewClass   返回的数据类型
+   * @param sql         SQL
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param <TView> 结果类型泛型
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
    * @return 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(
@@ -310,69 +313,69 @@ public class Query extends BaseRepository {
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param sql SQL语句
-   * @param params 参数
-   * @param enablePage 是否启用分页
+   * @param sql         SQL语句
+   * @param params      参数
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
+   * @param pageSize    每页记录数
    * @return 简单分页结果集
    */
-  public PageLite<Record> findRecordPageLite(
+  public PageLite<Record> findRecordsPageLite(
       String sql, Collection<?> params, boolean enablePage, int currentPage, int pageSize) {
 
-    return this.findPageLite(Record.class, sql, params, enablePage, currentPage, pageSize);
+    return DB.conn(this.dbTemplate).findRecordsPageLite(sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param sql SQL
-   * @param enablePage 是否启用分页
+   * @param sql         SQL
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
+   * @param pageSize    每页记录数
    * @return 简单分页结果集
    */
-  public PageLite<Record> findRecordPageLite(
+  public PageLite<Record> findRecordsPageLite(
       Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
-    return this.findPageLite(Record.class, sql, enablePage, currentPage, pageSize);
+    return DB.conn(this.dbTemplate).findRecordsPageLite(sql, enablePage, currentPage, pageSize);
   }
 
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param sql SQL语句
-   * @param params 参数
+   * @param sql      SQL语句
+   * @param params   参数
    * @param pageable 分页对象
    * @return 简单分页结果集
    */
-  public PageLite<Record> findRecordPageLite(String sql, Collection<?> params, IPageable pageable) {
+  public PageLite<Record> findRecordsPageLite(String sql, Collection<?> params, IPageable pageable) {
 
-    return this.findPageLite(Record.class, sql, params, pageable);
+    return DB.conn(this.dbTemplate).findRecordsPageLite(sql, params, pageable);
   }
 
   /**
    * 执行 SQL 语句，返回简单分页结果集
    *
-   * @param sql SQL
+   * @param sql      SQL
    * @param pageable 分页对象
    * @return 简单分页结果集
    */
-  public PageLite<Record> findRecordPageLite(Sql sql, IPageable pageable) {
+  public PageLite<Record> findRecordsPageLite(Sql sql, IPageable pageable) {
 
-    return this.findPageLite(Record.class, sql, pageable);
+    return DB.conn(this.dbTemplate).findRecordsPageLite(sql, pageable);
   }
 
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param viewClass 返回的数据类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param enablePage 是否启用分页
+   * @param viewClass   返回的数据类型
+   * @param sql         SQL语句
+   * @param params      参数
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param <TView> 结果类型泛型
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
    * @return 分页结果集
    */
   public <TView> Page<TView> findPage(
@@ -384,18 +387,18 @@ public class Query extends BaseRepository {
       int pageSize) {
 
     return DB.conn(this.dbTemplate)
-        .findPage(viewClass, sql, params, enablePage, currentPage, pageSize);
+             .findPage(viewClass, sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param viewClass 返回的数据类型
-   * @param sql SQL
-   * @param enablePage 是否启用分页
+   * @param viewClass   返回的数据类型
+   * @param sql         SQL
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param <TView> 结果类型泛型
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
    * @return 分页结果集
    */
   public <TView> Page<TView> findPage(
@@ -408,10 +411,10 @@ public class Query extends BaseRepository {
    * 执行 SQL 语句，返回分页结果集
    *
    * @param viewClass 返回的数据类型
-   * @param sql SQL语句
-   * @param params 参数
-   * @param pageable 是否启用分页
-   * @param <TView> 结果类型泛型
+   * @param sql       SQL语句
+   * @param params    参数
+   * @param pageable  是否启用分页
+   * @param <TView>   结果类型泛型
    * @return 分页结果集
    */
   public <TView> Page<TView> findPage(
@@ -424,9 +427,9 @@ public class Query extends BaseRepository {
    * 执行 SQL 语句，返回分页结果集
    *
    * @param viewClass 返回的数据类型
-   * @param sql SQL
-   * @param pageable 是否启用分页
-   * @param <TView> 结果类型泛型
+   * @param sql       SQL
+   * @param pageable  是否启用分页
+   * @param <TView>   结果类型泛型
    * @return 分页结果集
    */
   public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, IPageable pageable) {
@@ -437,67 +440,67 @@ public class Query extends BaseRepository {
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param sql SQL语句
-   * @param params 参数
-   * @param enablePage 是否启用分页
+   * @param sql         SQL语句
+   * @param params      参数
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
+   * @param pageSize    每页记录数
    * @return 分页结果集
    */
-  public Page<Record> findRecordPage(
+  public Page<Record> findRecordsPage(
       String sql, Collection<?> params, boolean enablePage, int currentPage, int pageSize) {
 
-    return this.findPage(Record.class, sql, params, enablePage, currentPage, pageSize);
+    return DB.conn(this.dbTemplate).findRecordsPage(sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param sql SQL
-   * @param enablePage 是否启用分页
+   * @param sql         SQL
+   * @param enablePage  是否启用分页
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
+   * @param pageSize    每页记录数
    * @return 分页结果集
    */
-  public Page<Record> findRecordPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public Page<Record> findRecordsPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
-    return this.findPage(Record.class, sql, enablePage, currentPage, pageSize);
+    return DB.conn(this.dbTemplate).findRecordsPage(sql, enablePage, currentPage, pageSize);
   }
 
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param sql SQL语句
-   * @param params 参数
+   * @param sql      SQL语句
+   * @param params   参数
    * @param pageable 分页对象
    * @return 分页结果集
    */
-  public Page<Record> findRecordPage(String sql, Collection<?> params, IPageable pageable) {
+  public Page<Record> findRecordsPage(String sql, Collection<?> params, IPageable pageable) {
 
-    return this.findPage(Record.class, sql, params, pageable);
+    return DB.conn(this.dbTemplate).findRecordsPage(sql, params, pageable);
   }
 
   /**
    * 执行 SQL 语句，返回分页结果集
    *
-   * @param sql SQL
+   * @param sql      SQL
    * @param pageable 分页对象
    * @return 分页结果集
    */
-  public Page<Record> findRecordPage(Sql sql, IPageable pageable) {
+  public Page<Record> findRecordsPage(Sql sql, IPageable pageable) {
 
-    return this.findPage(Record.class, sql, pageable);
+    return DB.conn(this.dbTemplate).findRecordsPage(sql, pageable);
   }
 
   /**
    * 创建分页对象
    *
-   * @param data 分页数据
-   * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param totalPages 总页数
+   * @param data         分页数据
+   * @param currentPage  当前页码
+   * @param pageSize     每页记录数
+   * @param totalPages   总页数
    * @param totalRecords 总记录数
-   * @param <TView> 分页对象数据类型泛型
+   * @param <TView>      分页对象数据类型泛型
    * @return 分页对象
    */
   public <TView> Page<TView> createPage(
@@ -509,10 +512,10 @@ public class Query extends BaseRepository {
   /**
    * 创建简单分页对象实例
    *
-   * @param data 分页数据
+   * @param data        分页数据
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param <TView> 简单分页对象泛型
+   * @param pageSize    每页记录数
+   * @param <TView>     简单分页对象泛型
    * @return 简单分页对象
    */
   public <TView> PageLite<TView> createPageLite(List<TView> data, long currentPage, long pageSize) {
