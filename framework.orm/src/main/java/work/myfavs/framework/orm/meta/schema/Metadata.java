@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
@@ -18,7 +17,7 @@ public class Metadata {
 
   private static final Logger log = LoggerFactory.getLogger(Metadata.class);
 
-  private static final Map<String, ClassMeta> CLASS_META_CACHE = new HashMap<>();
+  private static final Map<String, ClassMeta> CLASS_META_CACHE = new WeakHashMap<>();
   private static final Object SYNC_LOCK = new Object();
 
   private Metadata() {}

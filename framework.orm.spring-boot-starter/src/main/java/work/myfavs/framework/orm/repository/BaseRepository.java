@@ -3,11 +3,9 @@ package work.myfavs.framework.orm.repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.DBTemplateContext;
-import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
 /**
@@ -38,9 +36,9 @@ public abstract class BaseRepository {
    * 执行SQL，返回多行记录
    *
    * @param viewClass 结果集类型
-   * @param sql       SQL语句
-   * @param params    参数
-   * @param <TView>   结果集类型泛型
+   * @param sql SQL语句
+   * @param params 参数
+   * @param <TView> 结果集类型泛型
    * @return 结果集
    */
   protected <TView> List<TView> find(Class<TView> viewClass, String sql, Collection<?> params) {
@@ -52,8 +50,8 @@ public abstract class BaseRepository {
    * 执行SQL，返回多行记录
    *
    * @param viewClass 结果集类型
-   * @param sql       SQL
-   * @param <TView>   结果集类型泛型
+   * @param sql SQL
+   * @param <TView> 结果集类型泛型
    * @return 结果集
    */
   protected <TView> List<TView> find(Class<TView> viewClass, Sql sql) {
@@ -65,10 +63,10 @@ public abstract class BaseRepository {
    * 根据SQL查询实体集合
    *
    * @param viewClass 结果集类型
-   * @param keyField  返回Map的Key的字段，必须是viewClass中存在的字段
-   * @param sql       SQL语句
-   * @param params    SQL参数
-   * @param <TView>   结果集类型泛型
+   * @param keyField 返回Map的Key的字段，必须是viewClass中存在的字段
+   * @param sql SQL语句
+   * @param params SQL参数
+   * @param <TView> 结果集类型泛型
    * @return Map
    */
   protected <TKey, TView> Map<TKey, TView> findMap(
@@ -80,9 +78,9 @@ public abstract class BaseRepository {
    * 执行SQL，并返回Map
    *
    * @param viewClass 结果集类型
-   * @param keyField  返回Map的Key的字段，必须是viewClass中存在的字段
-   * @param sql       SQL
-   * @param <TView>   结果集类型泛型
+   * @param keyField 返回Map的Key的字段，必须是viewClass中存在的字段
+   * @param sql SQL
+   * @param <TView> 结果集类型泛型
    * @return Map
    */
   protected <TKey, TView> Map<TKey, TView> findMap(
@@ -94,10 +92,10 @@ public abstract class BaseRepository {
    * 执行SQL，返回指定行数的结果集
    *
    * @param viewClass 结果集类型
-   * @param top       行数
-   * @param sql       SQL语句
-   * @param params    参数
-   * @param <TView>   结果集类型泛型
+   * @param top 行数
+   * @param sql SQL语句
+   * @param params 参数
+   * @param <TView> 结果集类型泛型
    * @return 结果集
    */
   protected <TView> List<TView> findTop(
@@ -110,9 +108,9 @@ public abstract class BaseRepository {
    * 执行SQL，返回指定行数的结果集
    *
    * @param viewClass 结果集类型
-   * @param top       行数
-   * @param sql       SQL
-   * @param <TView>   结果集类型泛型
+   * @param top 行数
+   * @param sql SQL
+   * @param <TView> 结果集类型泛型
    * @return 结果集
    */
   protected <TView> List<TView> findTop(Class<TView> viewClass, int top, Sql sql) {
@@ -124,9 +122,9 @@ public abstract class BaseRepository {
    * 执行 SQL ,并返回 1 行记录
    *
    * @param viewClass 结果集类型
-   * @param sql       SQL语句
-   * @param params    参数
-   * @param <TView>   结果集类型泛型
+   * @param sql SQL语句
+   * @param params 参数
+   * @param <TView> 结果集类型泛型
    * @return 记录
    */
   protected <TView> TView get(Class<TView> viewClass, String sql, Collection<?> params) {
@@ -138,8 +136,8 @@ public abstract class BaseRepository {
    * 执行 SQL ,并返回 1 行记录
    *
    * @param viewClass 结果集类型
-   * @param sql       SQL
-   * @param <TView>   结果集类型泛型
+   * @param sql SQL
+   * @param <TView> 结果集类型泛型
    * @return 记录
    */
   protected <TView> TView get(Class<TView> viewClass, Sql sql) {
@@ -150,7 +148,7 @@ public abstract class BaseRepository {
   /**
    * 获取 SQL 的行数
    *
-   * @param sql    SQL语句
+   * @param sql SQL语句
    * @param params 参数
    * @return 行数
    */

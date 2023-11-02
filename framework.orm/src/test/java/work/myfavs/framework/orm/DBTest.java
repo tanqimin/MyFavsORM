@@ -30,7 +30,6 @@ import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
 import work.myfavs.framework.orm.util.JsonUtil;
 import work.myfavs.framework.orm.util.func.ThrowingFunction;
-import work.myfavs.framework.orm.vo.SnowflakeId;
 
 public class DBTest extends AbstractTest
     implements ISnowflakeTest, IIdentityTest, IUuidTest, ILogicDeleteTest {
@@ -134,10 +133,10 @@ public class DBTest extends AbstractTest
     Assert.assertEquals(3, snowflakes.size());
 
     List<Record> records =
-        DB.conn().findRecords(new Sql("SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1")));
+        DB.conn().find(new Sql("SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1")));
     Assert.assertEquals(1, records.size());
 
-    records = DB.conn().findRecords("SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1"));
+    records = DB.conn().find("SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1"));
     Assert.assertEquals(1, records.size());
   }
 
@@ -175,19 +174,6 @@ public class DBTest extends AbstractTest
   }
 
   @Test
-  public void findSnowFlakeId() {
-    initSnowflakes();
-    DB.conn().truncate(Snowflake.class);
-    DB.conn().create(Snowflake.class, SNOW_FLAKES);
-
-    List<SnowflakeId> snowflakeIds = DB.conn().find(SnowflakeId.class, "SELECT id FROM tb_snowflake");
-    Assert.assertEquals(3, snowflakeIds.size());
-
-    List<Snowflake> snowflakes = DB.conn().find(Snowflake.class, "SELECT id FROM tb_snowflake");
-    Assert.assertEquals(3, snowflakes.size());
-  }
-
-  @Test
   public void findTop() {
     initSnowflakes();
     DB.conn().truncate(Snowflake.class);
@@ -200,11 +186,11 @@ public class DBTest extends AbstractTest
     snowflake = DB.conn().findTop(Snowflake.class, 1, sql.toString(), sql.getParams());
     Assert.assertEquals(1, snowflake.size());
 
-    List<Record> records = DB.conn().findRecordsTop(1, sql);
+    List<Record> records = DB.conn().findTop(1, sql);
 
     Assert.assertEquals(1, records.size());
 
-    records = DB.conn().findRecordsTop(1, sql.toString(), sql.getParams());
+    records = DB.conn().findTop(1, sql.toString(), sql.getParams());
     Assert.assertEquals(1, records.size());
   }
 
@@ -219,9 +205,9 @@ public class DBTest extends AbstractTest
     Assert.assertNotNull(snowflake);
     snowflake = DB.conn().get(Snowflake.class, sql.toString(), sql.getParams());
     Assert.assertNotNull(snowflake);
-    Record record = DB.conn().getRecord(sql);
+    Record record = DB.conn().get(sql);
     Assert.assertNotNull(record);
-    record = DB.conn().getRecord(sql.toString(), sql.getParams());
+    record = DB.conn().get(sql.toString(), sql.getParams());
     Assert.assertNotNull(record);
   }
 
@@ -341,19 +327,19 @@ public class DBTest extends AbstractTest
     Assert.assertTrue(page.isHasNext());
     Assert.assertEquals(2, page.getData().size());
 
-    PageLite<Record> recordPage = DB.conn().findRecordsPageLite(sql, true, 1, 2);
+    PageLite<Record> recordPage = DB.conn().findPageLite(sql, true, 1, 2);
     Assert.assertTrue(recordPage.isHasNext());
     Assert.assertEquals(2, recordPage.getData().size());
 
-    recordPage = DB.conn().findRecordsPageLite(sql.toString(), sql.getParams(), true, 1, 2);
+    recordPage = DB.conn().findPageLite(sql.toString(), sql.getParams(), true, 1, 2);
     Assert.assertTrue(recordPage.isHasNext());
     Assert.assertEquals(2, recordPage.getData().size());
 
-    recordPage = DB.conn().findRecordsPageLite(sql, pageable);
+    recordPage = DB.conn().findPageLite(sql, pageable);
     Assert.assertTrue(recordPage.isHasNext());
     Assert.assertEquals(2, recordPage.getData().size());
 
-    recordPage = DB.conn().findRecordsPageLite(sql.toString(), sql.getParams(), pageable);
+    recordPage = DB.conn().findPageLite(sql.toString(), sql.getParams(), pageable);
     Assert.assertTrue(recordPage.isHasNext());
     Assert.assertEquals(2, recordPage.getData().size());
   }
@@ -385,22 +371,22 @@ public class DBTest extends AbstractTest
     Assert.assertEquals(2L, page.getTotalPages());
     Assert.assertEquals(3L, page.getTotalRecords());
 
-    Page<Record> recordPage = DB.conn().findRecordsPage(sql, true, 1, 2);
+    Page<Record> recordPage = DB.conn().findPage(sql, true, 1, 2);
     Assert.assertEquals(2, recordPage.getData().size());
     Assert.assertEquals(2L, recordPage.getTotalPages());
     Assert.assertEquals(3L, recordPage.getTotalRecords());
 
-    recordPage = DB.conn().findRecordsPage(sql.toString(), sql.getParams(), true, 1, 2);
+    recordPage = DB.conn().findPage(sql.toString(), sql.getParams(), true, 1, 2);
     Assert.assertEquals(2, recordPage.getData().size());
     Assert.assertEquals(2L, recordPage.getTotalPages());
     Assert.assertEquals(3L, recordPage.getTotalRecords());
 
-    recordPage = DB.conn().findRecordsPage(sql, pageable);
+    recordPage = DB.conn().findPage(sql, pageable);
     Assert.assertEquals(2, recordPage.getData().size());
     Assert.assertEquals(2L, recordPage.getTotalPages());
     Assert.assertEquals(3L, recordPage.getTotalRecords());
 
-    recordPage = DB.conn().findRecordsPage(sql.toString(), sql.getParams(), pageable);
+    recordPage = DB.conn().findPage(sql.toString(), sql.getParams(), pageable);
     Assert.assertEquals(2, recordPage.getData().size());
     Assert.assertEquals(2L, recordPage.getTotalPages());
     Assert.assertEquals(3L, recordPage.getTotalRecords());
@@ -521,7 +507,7 @@ public class DBTest extends AbstractTest
     UUIDS.forEach(
         s -> {
           Assert.assertNotNull(s.getId());
-          Assert.assertFalse(s.getId().isEmpty());
+          Assert.assertTrue(s.getId().length() > 0);
         });
 
     IDENTITIES.forEach(
