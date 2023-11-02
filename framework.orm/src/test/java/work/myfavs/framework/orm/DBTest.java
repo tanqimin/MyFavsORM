@@ -347,10 +347,14 @@ public class DBTest extends AbstractTest
   @Test
   public void findPage() {
     initSnowflakes();
+    initUuids();
     DB.conn().truncate(Snowflake.class);
+    DB.conn().truncate(Uuid.class);
     DB.conn().create(Snowflake.class, SNOW_FLAKES);
+    DB.conn().create(Uuid.class, UUIDS);
 
     Sql sql = Sql.SelectAll().from("tb_snowflake").where(Cond.eq("disable", false));
+    Sql sql2 = Sql.Select("id").from("tb_uuid").where(Cond.eq("disable", false));
     Page<Snowflake> page = DB.conn().findPage(Snowflake.class, sql, true, 1, 2);
     Assert.assertEquals(2, page.getData().size());
     Assert.assertEquals(2L, page.getTotalPages());
@@ -370,6 +374,11 @@ public class DBTest extends AbstractTest
     Assert.assertEquals(2, page.getData().size());
     Assert.assertEquals(2L, page.getTotalPages());
     Assert.assertEquals(3L, page.getTotalRecords());
+
+    Page<String> strPage = DB.conn().findPage(String.class, sql2, true, 1, 2);
+    Assert.assertEquals(2, strPage.getData().size());
+    Assert.assertEquals(2L, strPage.getTotalPages());
+    Assert.assertEquals(3L, strPage.getTotalRecords());
 
     Page<Record> recordPage = DB.conn().findPage(sql, true, 1, 2);
     Assert.assertEquals(2, recordPage.getData().size());
