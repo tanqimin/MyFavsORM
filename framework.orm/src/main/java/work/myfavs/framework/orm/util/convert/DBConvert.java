@@ -15,7 +15,14 @@ import work.myfavs.framework.orm.meta.schema.Metadata;
 
 /** 数据库类型转换 */
 public class DBConvert {
-
+  private static final List<Class<?>> primitives = List.of(Integer.class,
+                                                           Long.class,
+                                                           Double.class,
+                                                           String.class,
+                                                           Float.class,
+                                                           Boolean.class,
+                                                           Number.class,
+                                                           Short.class);
   /**
    * 把ResultSet转换为指定类型的List
    *
@@ -32,11 +39,11 @@ public class DBConvert {
       return toRecord(modelClass, rs);
     }
 
-    final Attributes attrMetas = Metadata.get(modelClass).getQueryAttributes();
-
-    if (attrMetas.isEmpty() && rs.getMetaData().getColumnCount() == 1) {
+    if (modelClass.isPrimitive() || primitives.contains(modelClass)) {
       return toScalar(modelClass, rs);
     }
+
+    final Attributes attrMetas = Metadata.get(modelClass).getQueryAttributes();
 
     return toEntity(modelClass, rs, attrMetas);
   }
