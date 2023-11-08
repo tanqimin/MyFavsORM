@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import work.myfavs.framework.orm.meta.annotation.Column;
+import work.myfavs.framework.orm.meta.annotation.LogicDelete;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
@@ -35,6 +36,10 @@ public class Attribute implements Serializable {
   private boolean readonly = false;
   /** 是否主键？ */
   private boolean primaryKey = false;
+  /**
+   * 是否逻辑删除字段？
+   */
+  private boolean logicDelete     = false;
 
   /** 类型处理器 */
   @SuppressWarnings("rawtypes")
@@ -48,12 +53,10 @@ public class Attribute implements Serializable {
   }
 
   public String getFieldName() {
-
     return fieldName;
   }
 
   public Class<?> getFieldType() {
-
     return fieldType;
   }
 
@@ -62,14 +65,17 @@ public class Attribute implements Serializable {
   }
 
   public boolean isReadonly() {
-
     return readonly;
   }
 
   public boolean isPrimaryKey() {
-
     return primaryKey;
   }
+
+  public boolean isLogicDelete() {
+    return logicDelete;
+  }
+
 
   // endregion
 
@@ -94,6 +100,7 @@ public class Attribute implements Serializable {
       attribute.fieldType = field.getType();
       attribute.readonly = column.readonly();
       attribute.primaryKey = isPrimaryKey(field);
+      attribute.logicDelete = isLogicDelete(field);
       attribute.columnName =
           StrUtil.isEmpty(column.value())
               ? StringUtil.toUnderlineCase(field.getName())
@@ -107,7 +114,9 @@ public class Attribute implements Serializable {
   private static boolean isPrimaryKey(Field field) {
     return field.getAnnotation(PrimaryKey.class) != null;
   }
-
+  private static boolean isLogicDelete(Field field) {
+    return field.getAnnotation(LogicDelete.class) != null;
+  }
   public Object value(ResultSet rs) {
 
     try {

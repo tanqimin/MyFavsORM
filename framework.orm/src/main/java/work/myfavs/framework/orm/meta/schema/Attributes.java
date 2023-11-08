@@ -22,10 +22,7 @@ public class Attributes {
   private final Map<String, Attribute> map = new TreeMap<>();
 
   private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-
-  private final Lock readLock = readWriteLock.readLock();
-
-  private final Lock writeLock = readWriteLock.writeLock();
+  private final Lock          writeLock     = readWriteLock.writeLock();
 
   /**
    * 根据实体属性名获取Attribute
@@ -37,16 +34,10 @@ public class Attributes {
 
     Assert.notBlank(fieldName);
 
-    readLock.lock();
-
-    try {
-      for (Attribute value : map.values()) {
-        if (StrUtil.equalsIgnoreCase(value.getFieldName(), fieldName)) {
-          return value;
-        }
+    for (Attribute value : map.values()) {
+      if (StrUtil.equalsIgnoreCase(value.getFieldName(), fieldName)) {
+        return value;
       }
-    } finally {
-      readLock.unlock();
     }
     return null;
   }
@@ -61,13 +52,7 @@ public class Attributes {
 
     Assert.notBlank(columnName);
 
-    final String key = columnName.toUpperCase();
-    readLock.lock();
-    try {
-      return map.get(key);
-    } finally {
-      readLock.unlock();
-    }
+    return map.get(columnName.toUpperCase());
   }
 
   public List<Attribute> getAttributes(String[] columnNames) {
@@ -88,12 +73,7 @@ public class Attributes {
 
   public String[] columns() {
 
-    readLock.lock();
-    try {
-      return map.keySet().toArray(new String[] {});
-    } finally {
-      readLock.unlock();
-    }
+    return map.keySet().toArray(new String[]{});
   }
 
   public Attribute put(String columnName, Attribute value) {
@@ -112,12 +92,7 @@ public class Attributes {
 
   public void forEach(BiConsumer<String, Attribute> action) {
 
-    readLock.lock();
-    try {
-      map.forEach(action);
-    } finally {
-      readLock.unlock();
-    }
+    map.forEach(action);
   }
 
   public Attribute computeIfAbsent(String columnName, Function<String, Attribute> mappingFunction) {
@@ -135,43 +110,23 @@ public class Attributes {
 
   public boolean containsColumn(String columnName) {
 
-    final String key = columnName.toUpperCase();
+    Assert.notBlank(columnName);
 
-    readLock.lock();
-    try {
-      return map.containsKey(key);
-    } finally {
-      readLock.unlock();
-    }
+    return map.containsKey(columnName.toUpperCase());
   }
 
   public Collection<Attribute> values() {
 
-    readLock.lock();
-    try {
-      return map.values();
-    } finally {
-      readLock.unlock();
-    }
+    return map.values();
   }
 
   public int size() {
 
-    readLock.lock();
-    try {
-      return map.size();
-    } finally {
-      readLock.unlock();
-    }
+    return map.size();
   }
 
   public boolean isEmpty() {
 
-    readLock.lock();
-    try {
-      return map.isEmpty();
-    } finally {
-      readLock.unlock();
-    }
+    return map.isEmpty();
   }
 }

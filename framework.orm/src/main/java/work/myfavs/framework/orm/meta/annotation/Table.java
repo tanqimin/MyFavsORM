@@ -1,8 +1,9 @@
 package work.myfavs.framework.orm.meta.annotation;
 
+import work.myfavs.framework.orm.meta.enumeration.GenerationType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
-import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 /**
  * 用于标记实体名称与数据表名称之间的映射关系
@@ -37,11 +38,4 @@ public @interface Table {
    * @return 主键生成策略
    */
   GenerationType strategy() default GenerationType.SNOW_FLAKE;
-
-  /**
-   * 逻辑删除字段
-   *
-   * @return 如果启用，返回true，否则返回false
-   */
-  String logicalDeleteField() default "";
 }

@@ -1186,10 +1186,11 @@ public class DB {
           valuesClause.append("?,", ReflectUtil.getFieldValue(entity, attr.getFieldName()));
         }
 
-        if (classMeta.needAppendLogicalDeleteField()) {
+        if (classMeta.getLogicDelete() != null) {
           if (!insertClauseCompleted) {
-            insertClause.append(classMeta.getLogicalDeleteField() + ",");
+            insertClause.append(classMeta.getLogicDelete().getColumnName() + ",");
           }
+
           valuesClause.append("?,", 0);
         }
 
@@ -1431,8 +1432,8 @@ public class DB {
       sql.deleteLastChar(",");
 
       sql.where().and(Cond.in(pk.getColumnName(), ids));
-      if (classMeta.isEnableLogicalDelete()) {
-        sql.append(StrUtil.format(" AND {} = 0", classMeta.getLogicalDeleteField()));
+      if (classMeta.getLogicDelete() != null) {
+        sql.append(StrUtil.format(" AND {} = 0", classMeta.getLogicDelete().getColumnName()));
       }
       batchSqls.add(sql);
     }
@@ -1477,8 +1478,8 @@ public class DB {
 
     sql.append(StrUtil.format(" WHERE {} = ?", pk.getColumnName()));
 
-    if (classMeta.isEnableLogicalDelete()) {
-      sql.append(StrUtil.format(" AND {} = 0", classMeta.getLogicalDeleteField()));
+    if (classMeta.getLogicDelete() != null) {
+      sql.append(StrUtil.format(" AND {} = 0", classMeta.getLogicDelete().getColumnName()));
     }
 
     paramsList = new LinkedList<>();
@@ -1669,16 +1670,14 @@ public class DB {
   private int deleteByCond(ClassMeta classMeta, Cond deleteCond) {
     Sql sql;
     String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
-    if (classMeta.isEnableLogicalDelete()) {
-      sql =
-          Sql.Update(tableName)
-              .set(
-                  StrUtil.format(
-                      "{} = {}",
-                      classMeta.getLogicalDeleteField(),
-                      classMeta.getPrimaryKey().getColumnName()))
-              .where(deleteCond)
-              .and(Cond.logicalDeleteCond(classMeta));
+    if (classMeta.getLogicDelete() != null) {
+      sql = Sql.Update(tableName)
+               .set(StrUtil.format(
+                   "{} = {}",
+                   classMeta.getLogicDelete().getColumnName(),
+                   classMeta.getPrimaryKey().getColumnName()))
+               .where(deleteCond)
+               .and(Cond.logicalDeleteCond(classMeta));
     } else {
       sql = Sql.Delete(tableName).where(deleteCond);
     }

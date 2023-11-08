@@ -56,12 +56,8 @@ public class Cond extends Clause {
    * @return Cond
    */
   public static Cond logicalDeleteCond(ClassMeta classMeta) {
-
-    if (classMeta.isEnableLogicalDelete()) {
-      return Cond.eq(classMeta.getLogicalDeleteField(), 0);
-    } else {
-      return new Cond();
-    }
+    if (classMeta.getLogicDelete() == null) return new Cond();
+    return Cond.eq(classMeta.getLogicDelete().getColumnName(), 0);
   }
 
   /**

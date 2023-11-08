@@ -8,15 +8,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import work.myfavs.framework.orm.entity.BaseEntity;
-import work.myfavs.framework.orm.entity.Identity;
-import work.myfavs.framework.orm.entity.Snowflake;
-import work.myfavs.framework.orm.entity.Uuid;
+import work.myfavs.framework.orm.entity.*;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.entity.test.IIdentityTest;
 import work.myfavs.framework.orm.entity.test.ILogicDeleteTest;
@@ -97,13 +95,13 @@ public class DBTest extends AbstractTest
     List<Snowflake> txSnowflakes = DB.conn(dbTemplate).tx(func1);
 
     DB.conn(dbTemplate)
-        .tx(
-            db -> {
-              db.delete(Snowflake.class, txSnowflakes);
-              Savepoint savepoint = db.setSavepoint();
-              log.info("savepoint: {}", savepoint.getSavepointId());
-              db.rollback();
-            });
+      .tx(
+          db -> {
+            db.delete(Snowflake.class, txSnowflakes);
+            Savepoint savepoint = db.setSavepoint();
+            log.info("savepoint: {}", savepoint.getSavepointId());
+            db.rollback();
+          });
     Assert.assertEquals(2, txSnowflakes.size());
   }
 
@@ -148,11 +146,11 @@ public class DBTest extends AbstractTest
 
     Map<Long, Snowflake> result =
         DB.conn()
-            .findMap(
-                Snowflake.class,
-                "id",
-                "SELECT * FROM tb_snowflake WHERE disable = ?",
-                List.of(false));
+          .findMap(
+              Snowflake.class,
+              "id",
+              "SELECT * FROM tb_snowflake WHERE disable = ?",
+              List.of(false));
 
     result.forEach(
         (k, v) -> {
@@ -162,10 +160,10 @@ public class DBTest extends AbstractTest
 
     result =
         DB.conn()
-            .findMap(
-                Snowflake.class,
-                "id",
-                new Sql("SELECT * FROM tb_snowflake WHERE disable = ?", List.of(false)));
+          .findMap(
+              Snowflake.class,
+              "id",
+              new Sql("SELECT * FROM tb_snowflake WHERE disable = ?", List.of(false)));
     result.forEach(
         (k, v) -> {
           log.info("key: {}, value: {}", k, JsonUtil.toJsonStr(v));
@@ -179,7 +177,7 @@ public class DBTest extends AbstractTest
     DB.conn().truncate(Snowflake.class);
     DB.conn().create(Snowflake.class, SNOW_FLAKES);
 
-    Sql sql = Sql.SelectAll().from("tb_snowflake");
+    Sql             sql       = Sql.SelectAll().from("tb_snowflake");
     List<Snowflake> snowflake = DB.conn().findTop(Snowflake.class, 1, sql);
     Assert.assertEquals(1, snowflake.size());
 
@@ -200,7 +198,7 @@ public class DBTest extends AbstractTest
     DB.conn().truncate(Snowflake.class);
     DB.conn().create(Snowflake.class, SNOW_FLAKES);
 
-    Sql sql = Sql.SelectAll().from("tb_snowflake");
+    Sql       sql       = Sql.SelectAll().from("tb_snowflake");
     Snowflake snowflake = DB.conn().get(Snowflake.class, sql);
     Assert.assertNotNull(snowflake);
     snowflake = DB.conn().get(Snowflake.class, sql.toString(), sql.getParams());
@@ -217,9 +215,9 @@ public class DBTest extends AbstractTest
     DB.conn().truncate(Snowflake.class);
     DB.conn().create(Snowflake.class, SNOW_FLAKES);
 
-    Sql sql = Sql.SelectAll().from("tb_snowflake").where(Cond.eq("name", "S1"));
-    Snowflake target = DB.conn().get(Snowflake.class, sql);
-    Long snowflakeId = target.getId();
+    Sql       sql         = Sql.SelectAll().from("tb_snowflake").where(Cond.eq("name", "S1"));
+    Snowflake target      = DB.conn().get(Snowflake.class, sql);
+    Long      snowflakeId = target.getId();
 
     Snowflake snowflake = DB.conn().getById(Snowflake.class, snowflakeId);
     Assert.assertNotNull(snowflake);
@@ -272,7 +270,7 @@ public class DBTest extends AbstractTest
     DB.conn().truncate(Uuid.class);
     DB.conn().create(Uuid.class, UUIDS);
 
-    Sql sql = Sql.SelectAll().from("tb_uuid");
+    Sql  sql   = Sql.SelectAll().from("tb_uuid");
     long count = DB.conn().count(sql);
     Assert.assertEquals(3L, count);
 
@@ -289,7 +287,7 @@ public class DBTest extends AbstractTest
     DB.conn().truncate(Identity.class);
     DB.conn().create(Identity.class, IDENTITIES);
 
-    Sql sql = Sql.SelectAll().from("tb_identity").where(Cond.eq("name", "S1"));
+    Sql     sql    = Sql.SelectAll().from("tb_identity").where(Cond.eq("name", "S1"));
     boolean exists = DB.conn().exists(sql);
     Assert.assertTrue(exists);
 
@@ -310,7 +308,7 @@ public class DBTest extends AbstractTest
     DB.conn().truncate(Snowflake.class);
     DB.conn().create(Snowflake.class, SNOW_FLAKES);
 
-    Sql sql = Sql.SelectAll().from("tb_snowflake").where(Cond.eq("disable", false));
+    Sql                 sql  = Sql.SelectAll().from("tb_snowflake").where(Cond.eq("disable", false));
     PageLite<Snowflake> page = DB.conn().findPageLite(Snowflake.class, sql, true, 1, 2);
     Assert.assertTrue(page.isHasNext());
     Assert.assertEquals(2, page.getData().size());
@@ -353,8 +351,8 @@ public class DBTest extends AbstractTest
     DB.conn().create(Snowflake.class, SNOW_FLAKES);
     DB.conn().create(Uuid.class, UUIDS);
 
-    Sql sql = Sql.SelectAll().from("tb_snowflake").where(Cond.eq("disable", false));
-    Sql sql2 = Sql.Select("id").from("tb_uuid").where(Cond.eq("disable", false));
+    Sql             sql  = Sql.SelectAll().from("tb_snowflake").where(Cond.eq("disable", false));
+    Sql             sql2 = Sql.Select("id").from("tb_uuid").where(Cond.eq("disable", false));
     Page<Snowflake> page = DB.conn().findPage(Snowflake.class, sql, true, 1, 2);
     Assert.assertEquals(2, page.getData().size());
     Assert.assertEquals(2L, page.getTotalPages());
@@ -366,6 +364,7 @@ public class DBTest extends AbstractTest
     Assert.assertEquals(3L, page.getTotalRecords());
 
     page = DB.conn().findPage(Snowflake.class, sql, pageable);
+    Sql sqlWithId = Sql.Select("id").from("tb_snowflake").where(Cond.eq("disable", false));
     Assert.assertEquals(2, page.getData().size());
     Assert.assertEquals(2L, page.getTotalPages());
     Assert.assertEquals(3L, page.getTotalRecords());
@@ -487,8 +486,8 @@ public class DBTest extends AbstractTest
 
   @Test
   public void testId() {
-    long snowFlakeId = DB.conn().snowFlakeId();
-    String uuid = DB.conn().uuid();
+    long   snowFlakeId = DB.conn().snowFlakeId();
+    String uuid        = DB.conn().uuid();
     Assert.assertTrue(snowFlakeId > 0);
     Assert.assertNotNull(uuid);
   }
@@ -541,69 +540,69 @@ public class DBTest extends AbstractTest
     DB.conn().create(Identity.class, IDENTITIES);
 
     Snowflake snowflake = DB.conn().getByField(Snowflake.class, "name", "S1");
-    Uuid uuid = DB.conn().getByField(Uuid.class, "name", "S1");
-    Identity identity = DB.conn().getByField(Identity.class, "name", "S1");
+    Uuid      uuid      = DB.conn().getByField(Uuid.class, "name", "S1");
+    Identity  identity  = DB.conn().getByField(Identity.class, "name", "S1");
 
     DB.conn()
-        .tx(
-            db -> {
-              snowflake.setPrice(new BigDecimal("999.00"));
-              uuid.setPrice(new BigDecimal("999.00"));
-              identity.setPrice(new BigDecimal("999.00"));
+      .tx(
+          db -> {
+            snowflake.setPrice(new BigDecimal("999.00"));
+            uuid.setPrice(new BigDecimal("999.00"));
+            identity.setPrice(new BigDecimal("999.00"));
 
-              db.update(Snowflake.class, snowflake);
-              db.update(Uuid.class, uuid);
-              db.update(Identity.class, identity);
+            db.update(Snowflake.class, snowflake);
+            db.update(Uuid.class, uuid);
+            db.update(Identity.class, identity);
 
-              Snowflake dbSnowflake = db.getById(Snowflake.class, snowflake.getId());
-              Uuid dbUuid = db.getById(Uuid.class, uuid.getId());
-              Identity dbIdentity = db.getById(Identity.class, identity.getId());
+            Snowflake dbSnowflake = db.getById(Snowflake.class, snowflake.getId());
+            Uuid      dbUuid      = db.getById(Uuid.class, uuid.getId());
+            Identity  dbIdentity  = db.getById(Identity.class, identity.getId());
 
-              Assert.assertEquals(dbSnowflake.getPrice().compareTo(new BigDecimal("999.00")), 0);
-              Assert.assertEquals(dbUuid.getPrice().compareTo(new BigDecimal("999.00")), 0);
-              Assert.assertEquals(dbIdentity.getPrice().compareTo(new BigDecimal("999.00")), 0);
+            Assert.assertEquals(dbSnowflake.getPrice().compareTo(new BigDecimal("999.00")), 0);
+            Assert.assertEquals(dbUuid.getPrice().compareTo(new BigDecimal("999.00")), 0);
+            Assert.assertEquals(dbIdentity.getPrice().compareTo(new BigDecimal("999.00")), 0);
 
-              Snowflake condSnowflake = new Snowflake();
-              condSnowflake.setId(db.snowFlakeId());
-              condSnowflake.setPrice(new BigDecimal("199.00"));
-              db.updateIgnoreNull(Snowflake.class, condSnowflake);
+            Snowflake condSnowflake = new Snowflake();
+            condSnowflake.setId(db.snowFlakeId());
+            condSnowflake.setPrice(new BigDecimal("199.00"));
+            db.updateIgnoreNull(Snowflake.class, condSnowflake);
 
-              dbSnowflake = db.getById(Snowflake.class, snowflake.getId());
+            dbSnowflake = db.getById(Snowflake.class, snowflake.getId());
 
-              Assert.assertEquals(snowflake.getName(), dbSnowflake.getName());
-              Assert.assertEquals(snowflake.getType(), dbSnowflake.getType());
-              Assert.assertEquals(snowflake.getDisable(), dbSnowflake.getDisable());
-              Assert.assertEquals(snowflake.getCreated(), dbSnowflake.getCreated());
-              Assert.assertEquals(snowflake.getPrice().compareTo(dbSnowflake.getPrice()), 0);
+            Assert.assertEquals(snowflake.getName(), dbSnowflake.getName());
+            Assert.assertEquals(snowflake.getType(), dbSnowflake.getType());
+            Assert.assertEquals(snowflake.getDisable(), dbSnowflake.getDisable());
+            Assert.assertEquals(snowflake.getCreated(), dbSnowflake.getCreated());
+            Assert.assertEquals(snowflake.getPrice().compareTo(dbSnowflake.getPrice()), 0);
 
-              dbUuid.setPrice(new BigDecimal("199.00"));
-              db.update(Uuid.class, dbUuid, new String[] {"price"});
+            dbUuid.setPrice(new BigDecimal("199.00"));
+            db.update(Uuid.class, dbUuid, new String[]{"price"});
 
-              dbUuid = db.getById(Uuid.class, uuid.getId());
-              Assert.assertEquals(dbUuid.getPrice().compareTo(new BigDecimal("199.00")), 0);
+            dbUuid = db.getById(Uuid.class, uuid.getId());
+            Assert.assertEquals(dbUuid.getPrice().compareTo(new BigDecimal("199.00")), 0);
 
-              for (Identity i : IDENTITIES) {
-                i.setPrice(new BigDecimal("1099.00"));
-              }
-              db.update(Identity.class, IDENTITIES, new String[] {"price"});
+            for (Identity i : IDENTITIES) {
+              i.setPrice(new BigDecimal("1099.00"));
+            }
+            db.update(Identity.class, IDENTITIES, new String[]{"price"});
 
-              List<Identity> identities = db.find(Identity.class, "select * from tb_identity");
+            List<Identity> identities = db.find(Identity.class, "select * from tb_identity");
 
-              for (Identity i : identities) {
-                Assert.assertEquals(i.getPrice().compareTo(new BigDecimal("1099.00")), 0);
-              }
+            for (Identity i : identities) {
+              Assert.assertEquals(i.getPrice().compareTo(new BigDecimal("1099.00")), 0);
+            }
 
-              for (Uuid u : UUIDS) {
-                u.setType(TypeEnum.DRINK);
-              }
+            for (Uuid u : UUIDS) {
+              u.setType(TypeEnum.DRINK);
+            }
 
-              db.update(Uuid.class, UUIDS);
+            db.update(Uuid.class, UUIDS);
 
-              List<Uuid> uuids = db.find(Uuid.class, "select * from tb_uuid");
-              for (Uuid u : uuids) {
-                Assert.assertEquals(u.getType(), TypeEnum.DRINK);
-              }
-            });
+            List<Uuid> uuids = db.find(Uuid.class, "select * from tb_uuid");
+            for (Uuid u : uuids) {
+              Assert.assertEquals(u.getType(), TypeEnum.DRINK);
+            }
+          });
   }
 
   @Test
@@ -617,12 +616,12 @@ public class DBTest extends AbstractTest
     DB.conn().truncate(Identity.class);
 
     Snowflake snowflake = SNOW_FLAKES.get(0);
-    Uuid uuid = UUIDS.get(0);
-    Identity identity = IDENTITIES.get(0);
+    Uuid      uuid      = UUIDS.get(0);
+    Identity  identity  = IDENTITIES.get(0);
 
     Snowflake dbSnowflake = DB.conn().getByCond(Snowflake.class, Cond.eq("name", "S1"));
-    Uuid dbUuid = DB.conn().getByCond(Uuid.class, Cond.eq("name", "S1"));
-    Identity dbIdentity = DB.conn().getByCond(Identity.class, Cond.eq("name", "S1"));
+    Uuid      dbUuid      = DB.conn().getByCond(Uuid.class, Cond.eq("name", "S1"));
+    Identity  dbIdentity  = DB.conn().getByCond(Identity.class, Cond.eq("name", "S1"));
 
     Assert.assertNull(dbSnowflake);
     Assert.assertNull(dbUuid);
@@ -662,14 +661,17 @@ public class DBTest extends AbstractTest
     initSnowflakes();
     initUuids();
     initIdentities();
+    initLogicDeletes();
 
     DB.conn().truncate(Snowflake.class);
     DB.conn().truncate(Uuid.class);
     DB.conn().truncate(Identity.class);
+    DB.conn().truncate(LogicDelete.class);
 
     DB.conn().create(Snowflake.class, SNOW_FLAKES);
     DB.conn().create(Uuid.class, UUIDS);
     DB.conn().create(Identity.class, IDENTITIES);
+    DB.conn().create(LogicDelete.class, LOGIC_DELETES);
 
     DB.conn().delete(Snowflake.class, SNOW_FLAKES.get(0));
     DB.conn().deleteById(Snowflake.class, SNOW_FLAKES.get(1).getId());
@@ -680,12 +682,16 @@ public class DBTest extends AbstractTest
     List<Long> ids = IDENTITIES.stream().map(Identity::getId).collect(Collectors.toList());
     DB.conn().deleteByIds(Identity.class, ids);
 
+    DB.conn().deleteByCond(LogicDelete.class, Cond.eq("name", "S1"));
+
     long c1 = DB.conn().count(new Sql("SELECT * FROM tb_snowflake"));
     long c2 = DB.conn().count(new Sql("SELECT * FROM tb_uuid"));
     long c3 = DB.conn().count(new Sql("SELECT * FROM tb_identity"));
+    long c4 = DB.conn().count(new Sql("SELECT * FROM tb_logic_delete"));
 
     Assert.assertEquals(c1, 0);
     Assert.assertEquals(c2, 0);
     Assert.assertEquals(c3, 0);
+    Assert.assertEquals(c4, 3);
   }
 }

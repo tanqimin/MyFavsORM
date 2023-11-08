@@ -73,8 +73,8 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
                 });
 
             // 自动加入逻辑删除字段
-            if (classMeta.needAppendLogicalDeleteField()) {
-              insertSql.append(StrUtil.format("{},", classMeta.getLogicalDeleteField()));
+            if (classMeta.getLogicDelete() != null) {
+              insertSql.append(StrUtil.format("{},", classMeta.getLogicDelete().getColumnName()));
               valuesSql.append(StrUtil.format("0,"));
             }
             insertSql.deleteLastChar(",");

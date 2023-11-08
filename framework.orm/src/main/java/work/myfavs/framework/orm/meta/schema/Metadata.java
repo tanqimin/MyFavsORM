@@ -29,20 +29,10 @@ public class Metadata {
    * @return 类元数据
    */
   public static ClassMeta get(Class<?> clazz) {
-
-
-    ClassMeta classMeta = CLASS_META_CACHE.get(clazz.getName());
-    if (Objects.isNull(classMeta)) {
-      synchronized (SYNC_LOCK) {
-        classMeta = CLASS_META_CACHE.get(clazz.getName());
-        if (Objects.isNull(classMeta)) {
-          if (log.isDebugEnabled())
-            log.debug(StrUtil.format("ClassMeta : {} keys not exists.", clazz.getName()));
-          classMeta = ClassMeta.createInstance(clazz);
-          CLASS_META_CACHE.put(clazz.getName(), classMeta);
-        }
-      }
-    }
-    return classMeta;
+    final String className = clazz.getName();
+    return CLASS_META_CACHE.computeIfAbsent(className, key -> {
+      log.debug("ClassMeta : {} keys not exists.", className);
+      return ClassMeta.createInstance(clazz);
+    });
   }
 }
