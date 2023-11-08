@@ -55,7 +55,7 @@ public class DB {
   }
 
   public static DB conn(String dsName) {
-    return new DB(DBTemplateContext.get(dsName));
+    return new DB(DBTemplate.get(dsName));
   }
 
   public static DB conn() {

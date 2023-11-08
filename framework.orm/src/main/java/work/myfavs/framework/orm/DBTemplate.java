@@ -2,14 +2,18 @@ package work.myfavs.framework.orm;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
+
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.PKGenerator;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
  * 数据库配置
@@ -18,17 +22,40 @@ import work.myfavs.framework.orm.util.PKGenerator;
  */
 @SuppressWarnings("rawtypes")
 public class DBTemplate {
+  private static final Map<String, DBTemplate> POOL = new ConcurrentHashMap<>();
+
+  public static DBTemplate get(String dsName) {
+    if (POOL.containsKey(dsName)) {
+      return POOL.get(dsName);
+    }
+    throw new DBException("The DataSource named {} not exists.", dsName);
+  }
+
+  public static DBTemplate add(String dsName, DBTemplate dbTemplate) {
+    POOL.put(dsName, dbTemplate);
+    return dbTemplate;
+  }
 
   // region Attributes
-  /** 数据源名称 */
-  private final String dsName;
-  /** 数据源 */
-  private final DataSource dataSource;
-  /** 数据库配置 */
-  private final DBConfig dbConfig;
-  /** 数据库连接工厂 */
+  /**
+   * 数据源名称
+   */
+  private final String      dsName;
+  /**
+   * 数据源
+   */
+  private final DataSource  dataSource;
+  /**
+   * 数据库配置
+   */
+  private final DBConfig    dbConfig;
+  /**
+   * 数据库连接工厂
+   */
   private final ConnFactory connectionFactory;
-  /** 主键生成器 */
+  /**
+   * 主键生成器
+   */
   private final PKGenerator pkGenerator;
   // endregion
 
@@ -112,7 +139,7 @@ public class DBTemplate {
   /**
    * 获取数据库连接工厂
    *
-   * @param cls 数据库连接工厂类型
+   * @param cls        数据库连接工厂类型
    * @param dataSource 数据源
    * @return 数据库连接工厂
    */
@@ -122,10 +149,10 @@ public class DBTemplate {
 
   public static class Builder {
 
-    private final String dsName;
-    private DataSource dataSource;
-    private DBConfig config;
-    public Mapper mapper = new Mapper();
+    private final String     dsName;
+    private       DataSource dataSource;
+    private       DBConfig   config;
+    public        Mapper     mapper = new Mapper();
 
     public Builder() {
       this(DBConfig.DEFAULT_DATASOURCE_NAME);
@@ -170,7 +197,7 @@ public class DBTemplate {
         this.config = new DBConfig();
       }
 
-      return DBTemplateContext.add(dsName, new DBTemplate(this));
+      return DBTemplate.add(dsName, new DBTemplate(this));
     }
   }
 
