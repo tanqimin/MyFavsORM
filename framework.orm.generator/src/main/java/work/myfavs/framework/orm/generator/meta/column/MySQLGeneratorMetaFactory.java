@@ -16,7 +16,7 @@ import work.myfavs.framework.orm.generator.util.GeneratorUtil;
 import work.myfavs.framework.orm.generator.util.ResultSetUtil;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
-import work.myfavs.framework.orm.util.DBUtil;
+import work.myfavs.framework.orm.util.JdbcUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
@@ -47,7 +47,7 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
       conn = DriverManager.getConnection(url, user, pwd);
       String dbName = conn.getCatalog();
       Sql sql = getSql(dbName);
-      ps = DBUtil.getPstForQuery(conn, sql.toString(), sql.getParams());
+      ps = JdbcUtil.getPstForQuery(conn, sql.toString(), sql.getParams());
       rs = ps.executeQuery();
 
       while (rs.next()) {
@@ -63,7 +63,7 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
     } catch (SQLException e) {
       throw new DBException(e);
     } finally {
-      DBUtil.close(rs, ps, conn);
+      JdbcUtil.close(rs, ps, conn);
     }
   }
 

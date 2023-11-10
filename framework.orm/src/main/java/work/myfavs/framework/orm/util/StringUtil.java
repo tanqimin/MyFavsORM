@@ -9,13 +9,13 @@ public class StringUtil extends StrUtil {
    * custom_field_value_01
    *
    * @param str 待处理的字符串
-   * @return
+   * @return 下划线分割的字符串
    */
   public static String toUnderlineCase(CharSequence str) {
-    final StringBuilder result = new StringBuilder();
-    boolean lastUppercase = false;
+    final StringBuilder result        = new StringBuilder();
+    boolean             lastUppercase = false;
     for (int i = 0; i < str.length(); i++) {
-      char ch = str.charAt(i);
+      char ch        = str.charAt(i);
       char lastEntry = i == 0 ? 'X' : result.charAt(result.length() - 1);
       if (ch == ' ' || ch == '_' || ch == '-' || ch == '.') {
         lastUppercase = false;

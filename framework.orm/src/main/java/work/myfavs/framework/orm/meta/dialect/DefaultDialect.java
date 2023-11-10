@@ -1,10 +1,7 @@
 package work.myfavs.framework.orm.meta.dialect;
 
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.sql.PagerUtils;
-import java.util.Collection;
-import java.util.Objects;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.SqlCache.Opt;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
@@ -13,6 +10,9 @@ import work.myfavs.framework.orm.meta.schema.Attributes;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.DruidUtil;
+
+import java.util.Collection;
+import java.util.Objects;
 
 /**
  * 默认数据库方言实现
@@ -29,18 +29,16 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
 
     Sql sql = insert(clazz);
 
-    ClassMeta classMeta = Metadata.get(clazz);
-    Attribute primaryKey = classMeta.getPrimaryKey();
+    ClassMeta  classMeta        = Metadata.get(clazz);
+    Attribute  primaryKey       = classMeta.getPrimaryKey();
     Attributes updateAttributes = classMeta.getUpdateAttributes();
 
     if (classMeta.getStrategy() != GenerationType.IDENTITY) {
-      sql.getParams().add(ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
+      sql.getParams().add(primaryKey.getFieldVisitor().getValue(model));
     }
 
     if (updateAttributes.size() > 0) {
-      updateAttributes.forEach(
-          (col, attr) ->
-              sql.getParams().add(ReflectUtil.getFieldValue(model, attr.getFieldName())));
+      updateAttributes.forEach((col, attr) -> sql.getParams().add(attr.getFieldVisitor().getValue(model)));
     }
 
     return sql;
@@ -53,9 +51,9 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
         clazz,
         Opt.INSERT,
         (key) -> {
-          ClassMeta classMeta = Metadata.get(clazz);
-          String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
-          Attribute primaryKey = classMeta.checkPrimaryKey();
+          ClassMeta  classMeta        = Metadata.get(clazz);
+          String     tableName        = TableAlias.getOpt().orElse(classMeta.getTableName());
+          Attribute  primaryKey       = classMeta.checkPrimaryKey();
           Attributes updateAttributes = classMeta.getUpdateAttributes();
 
           Sql insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
@@ -91,9 +89,9 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
   @Override
   public <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue) {
 
-    ClassMeta classMeta;
-    String tableName;
-    Attribute primaryKey;
+    ClassMeta  classMeta;
+    String     tableName;
+    Attribute  primaryKey;
     Attributes updateAttributes;
 
     Sql sql;
@@ -108,7 +106,7 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
     if (updateAttributes.size() > 0) {
       updateAttributes.forEach(
           (col, attr) -> {
-            final Object fieldValue = ReflectUtil.getFieldValue(model, attr.getFieldName());
+            final Object fieldValue = attr.getFieldVisitor().getValue(model);
             // 忽略属性为null的字段生成
             if (ignoreNullValue && Objects.isNull(fieldValue)) {
               return;
@@ -120,7 +118,8 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
     }
     sql.append(
         StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()),
-        ReflectUtil.getFieldValue(model, primaryKey.getFieldName()));
+        primaryKey.getFieldVisitor().getValue(model)
+    );
 
     return sql;
   }
@@ -129,7 +128,7 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
   public <TModel> Sql delete(Class<TModel> clazz) {
 
     ClassMeta classMeta = Metadata.get(clazz);
-    String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
+    String    tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     return Sql.Delete(tableName);
   }
 

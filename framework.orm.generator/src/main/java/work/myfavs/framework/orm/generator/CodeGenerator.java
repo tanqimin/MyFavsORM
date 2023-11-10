@@ -173,7 +173,7 @@ public class CodeGenerator {
       params.put("columns", tableDefinition.getColumns());
 
       render = generatorTemplate.render("/query.txt", params);
-      outputFile(getFilePath(queryPackage, entity + "Query"), render, coverIfExist);
+      outputFile(getFilePath(queryPackage, entity + "Database"), render, coverIfExist);
 
       render = generatorTemplate.render("/repository.txt", params);
       outputFile(getFilePath(repositoryPackage, entity + "Repository"), render, coverIfExist);

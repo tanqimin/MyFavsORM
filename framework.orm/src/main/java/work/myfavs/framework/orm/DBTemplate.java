@@ -2,18 +2,17 @@ package work.myfavs.framework.orm;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
+import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
+import work.myfavs.framework.orm.util.PKGenerator;
+import work.myfavs.framework.orm.util.exception.DBException;
 
+import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import javax.sql.DataSource;
-
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
-import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
-import work.myfavs.framework.orm.util.PKGenerator;
-import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
  * 数据库配置
@@ -22,7 +21,7 @@ import work.myfavs.framework.orm.util.exception.DBException;
  */
 @SuppressWarnings("rawtypes")
 public class DBTemplate {
-  private static final Map<String, DBTemplate> POOL = new ConcurrentHashMap<>();
+  private static final Map<String/* dsName */, DBTemplate> POOL = new ConcurrentHashMap<>();
 
   public static DBTemplate get(String dsName) {
     if (POOL.containsKey(dsName)) {
@@ -145,6 +144,10 @@ public class DBTemplate {
    */
   private ConnFactory createConnFactory(Class<? extends ConnFactory> cls, DataSource dataSource) {
     return ReflectUtil.newInstance(cls, dataSource);
+  }
+
+  public Database createDatabase() {
+    return new Database(this);
   }
 
   public static class Builder {

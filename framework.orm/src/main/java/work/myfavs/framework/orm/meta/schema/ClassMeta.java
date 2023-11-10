@@ -110,10 +110,6 @@ public class ClassMeta implements Serializable {
 
     final Field[] fields = ReflectUtil.getFields(clazz);
 
-    if (fields == null) {
-      return;
-    }
-
     for (Field field : fields) {
       final Attribute attr = Attribute.createInstance(field);
       if (attr == null) {
@@ -166,7 +162,7 @@ public class ClassMeta implements Serializable {
    * @return 主键字段名
    */
   public String getPrimaryKeyFieldName() {
-    return checkPrimaryKey().getFieldName();
+    return checkPrimaryKey().getFieldVisitor().getName();
   }
 
   /**

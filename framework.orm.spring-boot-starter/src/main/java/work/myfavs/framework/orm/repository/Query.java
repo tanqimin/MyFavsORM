@@ -2,7 +2,7 @@ package work.myfavs.framework.orm.repository;
 
 import java.util.Collection;
 import java.util.List;
-import work.myfavs.framework.orm.DB;
+
 import work.myfavs.framework.orm.DBTemplate;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -248,7 +248,7 @@ public class Query extends BaseRepository {
   public <TView> PageLite<TView> findPageLite(
       Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
 
-    return DB.conn(this.dbTemplate).findPageLite(viewClass, sql, params, pageable);
+    return this.dbTemplate.createDatabase().findPageLite(viewClass, sql, params, pageable);
   }
 
   /**
@@ -262,7 +262,7 @@ public class Query extends BaseRepository {
    */
   public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, IPageable pageable) {
 
-    return DB.conn(this.dbTemplate).findPageLite(viewClass, sql, pageable);
+    return this.dbTemplate.createDatabase().findPageLite(viewClass, sql, pageable);
   }
 
   /**
@@ -285,7 +285,7 @@ public class Query extends BaseRepository {
       int currentPage,
       int pageSize) {
 
-    return DB.conn(this.dbTemplate)
+    return this.dbTemplate.createDatabase()
         .findPageLite(viewClass, sql, params, enablePage, currentPage, pageSize);
   }
 
@@ -383,7 +383,7 @@ public class Query extends BaseRepository {
       int currentPage,
       int pageSize) {
 
-    return DB.conn(this.dbTemplate)
+    return this.dbTemplate.createDatabase()
         .findPage(viewClass, sql, params, enablePage, currentPage, pageSize);
   }
 
@@ -417,7 +417,7 @@ public class Query extends BaseRepository {
   public <TView> Page<TView> findPage(
       Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
 
-    return DB.conn(this.dbTemplate).findPage(viewClass, sql, params, pageable);
+    return this.dbTemplate.createDatabase().findPage(viewClass, sql, params, pageable);
   }
 
   /**
@@ -431,7 +431,7 @@ public class Query extends BaseRepository {
    */
   public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, IPageable pageable) {
 
-    return DB.conn(this.dbTemplate).findPage(viewClass, sql, pageable);
+    return this.dbTemplate.createDatabase().findPage(viewClass, sql, pageable);
   }
 
   /**

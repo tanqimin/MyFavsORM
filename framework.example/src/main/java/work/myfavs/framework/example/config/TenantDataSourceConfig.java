@@ -43,8 +43,7 @@ public class TenantDataSourceConfig {
     dynamicDataSource.setDefaultTargetDataSource(primaryDataSource);
 
     DBTemplate dbTemplate = this.buildDbTemplate(primaryDataSource, JdbcConnFactory.class);
-    DB db = DB.conn(dbTemplate);
-    List<Tenant> tenants = db.find(Tenant.class, new Sql("SELECT * FROM tb_tenant"));
+    List<Tenant> tenants = dbTemplate.createDatabase().find(Tenant.class, new Sql("SELECT * FROM tb_tenant"));
 
     Map<Object, Object> customDataSources = new HashMap<>();
 

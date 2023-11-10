@@ -3,7 +3,11 @@ package work.myfavs.framework.orm;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import work.myfavs.framework.orm.util.DBUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import work.myfavs.framework.orm.util.JdbcUtil;
+import work.myfavs.framework.orm.util.SqlLog;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
@@ -12,8 +16,10 @@ import work.myfavs.framework.orm.util.exception.DBException;
  * @author tanqimin
  */
 public class JdbcConnFactory extends ConnFactory {
-  private final ThreadLocal<Connection> connectionHolder = new ThreadLocal<>();
-  private final ThreadLocal<Integer> connectionDeepHolder = new ThreadLocal<>();
+  private static final Logger log = LoggerFactory.getLogger(JdbcConnFactory.class);
+
+  private final ThreadLocal<Connection> connectionHolder     = new ThreadLocal<>();
+  private final ThreadLocal<Integer>    connectionDeepHolder = new ThreadLocal<>();
 
   public JdbcConnFactory(DataSource dataSource) {
 
@@ -43,7 +49,6 @@ public class JdbcConnFactory extends ConnFactory {
 
   @Override
   public void closeConnection(Connection connection) {
-
     final Integer connDeep = connectionDeepHolder.get();
     if (connDeep == 1) {
       Connection conn = connection;
@@ -80,10 +85,10 @@ public class JdbcConnFactory extends ConnFactory {
   protected void releaseConnection(Connection conn) {
 
     try {
-      DBUtil.commit(conn);
+      JdbcUtil.commit(conn);
     } finally {
       try {
-        DBUtil.close(conn);
+        JdbcUtil.close(conn);
       } catch (SQLException e) {
         throw new DBException(e, "Fail to close connection");
       }

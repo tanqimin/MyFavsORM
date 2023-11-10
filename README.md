@@ -24,7 +24,8 @@ DataSource dataSource = new HikariDataSource(configuration);
 DBTemplate dbTemplate = new DBTemplate.Builder()
         .dataSource(dataSource)
         .config(config -> {
-            config.setShowSql(true)
+            config
+                .setShowSql(true)
                 .setShowResult(true);
         }).build();
 ```
@@ -32,8 +33,9 @@ DBTemplate dbTemplate = new DBTemplate.Builder()
 然后就可以马上使用：
 
 ```java
+Database db = dbTemplate.createDatabase();
 Sql sql = new Sql("SELECT * FROM tb_product");
-List<Record> list = DB.conn().find(sql);
+List<Record> list = db.find(sql);
 ```
 
 ## 使用入门
@@ -120,46 +122,46 @@ sql.where().and(Cond.in("id", params, false));	 //where 1 = 1 and 1 > 2
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product WHERE id = ?", 1);
-Product product = DB.conn().get(Product.class, sql);
+Product product = dbTemplate.createDatabase().get(Product.class, sql);
 ```
 
 #### 根据主键查询
 
 ```java
-Product product = DB.conn().getById(Product.class, 1);
+Product product = dbTemplate.createDatabase().getById(Product.class, 1);
 ```
 
 #### 查询多行记录
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-List<Product> products = DB.conn().find(Product.class, sql);
+List<Product> products = dbTemplate.createDatabase().find(Product.class, sql);
 ```
 
 #### 简单条件查询
 
 ```java
-List<Product> products = DB.conn().findByCond(Product.class, Cond.like("name", "%手机%"));
+List<Product> products = dbTemplate.createDatabase().findByCond(Product.class, Cond.like("name", "%手机%"));
 ```
 
 #### 查询返回ID集合
 
 ```java
 Sql sql = new Sql("SELECT id FROM tb_product").where(Cond.like("name", "%手机%"));
-List<Long> ids = DB.conn().find(Long.class, sql);
+List<Long> ids = dbTemplate.createDatabase().find(Long.class, sql);
 ```
 
 #### 根据某个字段查询
 
 ```java
-List<Product> products = DB.conn().findByField(Product.class, "name", "手机");
+List<Product> products = dbTemplate.createDatabase().findByField(Product.class, "name", "手机");
 ```
 
 #### 查询前N条记录
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-List<Product> products = DB.conn().findTop(Product.class, 10, sql);
+List<Product> products = dbTemplate.createDatabase().findTop(Product.class, 10, sql);
 ```
 
 #### 根据主键集合查询
@@ -167,7 +169,7 @@ List<Product> products = DB.conn().findTop(Product.class, 10, sql);
 ```java
 ArrayList<Integer> params = new ArrayList<>();
 Collections.addAll(list, 1,2,3);
-List<Product> products = DB.conn().findByIds(Product.class, params);
+List<Product> products = dbTemplate.createDatabase().findByIds(Product.class, params);
 ```
 
 #### 查询返回Map
@@ -176,21 +178,21 @@ List<Product> products = DB.conn().findByIds(Product.class, params);
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-Map<Long, Product> map = DB.conn().findMap(Product.class, "id", sql);
+Map<Long, Product> map = dbTemplate.createDatabase().findMap(Product.class, "id", sql);
 ```
 
 #### 查询记录数
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-int count = DB.conn().count(sql);
+int count = dbTemplate.createDatabase().count(sql);
 ```
 
 #### 检查是否存在记录
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-boolean exists = DB.conn().exists(sql);
+boolean exists = dbTemplate.createDatabase().exists(sql);
 ```
 
 #### 分页查询
@@ -198,7 +200,7 @@ boolean exists = DB.conn().exists(sql);
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
 //第3个参数为是否启用分页, 第4个参数为当前页码, 第5个参数为每页记录数
-Page<Product> page = DB.conn().findPage(Product.class, sql, true, 1, 20);
+Page<Product> page = dbTemplate.createDatabase().findPage(Product.class, sql, true, 1, 20);
 ```
 
 建议在分页请求中实现`IPageable`接口：
@@ -210,57 +212,57 @@ public PageRequest implements IPageable {}
 分页查询可写为：
 
 ```java
-Page<Product> page = DB.conn().findPage(Product.class, sql, pageReq);
+Page<Product> page = dbTemplate.createDatabase().findPage(Product.class, sql, pageReq);
 ```
 
 简单分页查询，结果不包含总行数，在某些考虑性能的情况下，可以使用；
 
 ```java
-PageLite<Product> page = DB.conn().findPageLite(Product.class, sql, pageReq);
+PageLite<Product> page = dbTemplate.createDatabase().findPageLite(Product.class, sql, pageReq);
 ```
 
 ### 插入
 
 ```java
 Product p1 = ..;
-DB.conn().create(p1);
+dbTemplate.createDatabase().create(p1);
 
 List<Product> products = ...;
-DB.conn().create(products);
+dbTemplate.createDatabase().create(products);
 ```
 
 ### 修改
 
 ```java
 Product p1 = ..;
-DB.conn().update(p1);
+dbTemplate.createDatabase().update(p1);
 
 List<Product> products = ...;
-DB.conn().update(products);
+dbTemplate.createDatabase().update(products);
 //只更新name字段
-DB.conn().update(products, new String[]{"name"});
+dbTemplate.createDatabase().update(products, new String[]{"name"});
 ```
 
 ### 删除
 
 ```java
 Product p1 = ..;
-DB.conn().delete(p1);
+dbTemplate.createDatabase().delete(p1);
 
 List<Product> products = ...;
-DB.conn().delete(products);
+dbTemplate.createDatabase().delete(products);
 
-DB.conn().deleteById(1);
+dbTemplate.createDatabase().deleteById(1);
 
 ArrayList<Integer> params = new ArrayList<>();
 Collections.addAll(list, 1,2,3);
-DB.conn().deleteByIds(params);
+dbTemplate.createDatabase().deleteByIds(params);
 ```
 
 ### 事务
 
 ```java
-DB.conn().tx(db -> {
+dbTemplate.createDatabase().tx(db -> {
     db.update(p1);
     db.delete(p2);
 });

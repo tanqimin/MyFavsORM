@@ -1,10 +1,6 @@
 package work.myfavs.framework.orm.meta.schema;
 
 import cn.hutool.core.util.StrUtil;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.LogicDelete;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
@@ -12,6 +8,12 @@ import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.reflection.FieldVisitor;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * 数据库列元数据
@@ -24,24 +26,34 @@ public class Attribute implements Serializable {
   private static final long serialVersionUID = 6913045257426812101L;
 
   // region Attributes
-  /** 数据库 列名称 */
-  private String columnName;
-  /** 类 属性名称 */
-  private String fieldName;
-  /** 类 属性类型 */
-  private Class<?> fieldType;
-  /** java.sql.Types 类型 */
-  private int sqlType;
-  /** 是否只读？ */
-  private boolean readonly = false;
-  /** 是否主键？ */
-  private boolean primaryKey = false;
+  /**
+   * 数据库 列名称
+   */
+  private String       columnName;
+  /**
+   * Field访问器
+   */
+  private FieldVisitor fieldVisitor;
+  /**
+   * java.sql.Types 类型
+   */
+  private int          sqlType;
+  /**
+   * 是否只读？
+   */
+  private boolean      readonly    = false;
+  /**
+   * 是否主键？
+   */
+  private boolean      primaryKey  = false;
   /**
    * 是否逻辑删除字段？
    */
-  private boolean logicDelete     = false;
+  private boolean      logicDelete = false;
 
-  /** 类型处理器 */
+  /**
+   * 类型处理器
+   */
   @SuppressWarnings("rawtypes")
   private PropertyHandler propertyHandler = null;
   // endregion
@@ -52,12 +64,8 @@ public class Attribute implements Serializable {
     return columnName;
   }
 
-  public String getFieldName() {
-    return fieldName;
-  }
-
-  public Class<?> getFieldType() {
-    return fieldType;
+  public FieldVisitor getFieldVisitor() {
+    return fieldVisitor;
   }
 
   public int getSqlType() {
@@ -92,12 +100,11 @@ public class Attribute implements Serializable {
    * @return 属性元数据
    */
   static Attribute createInstance(Field field) {
-    Attribute attribute = null;
-    final Column column = field.getAnnotation(Column.class);
+    Attribute    attribute = null;
+    final Column column    = field.getAnnotation(Column.class);
     if (column != null) {
       attribute = new Attribute();
-      attribute.fieldName = field.getName();
-      attribute.fieldType = field.getType();
+      attribute.fieldVisitor = new FieldVisitor(field);
       attribute.readonly = column.readonly();
       attribute.primaryKey = isPrimaryKey(field);
       attribute.logicDelete = isLogicDelete(field);
@@ -114,13 +121,15 @@ public class Attribute implements Serializable {
   private static boolean isPrimaryKey(Field field) {
     return field.getAnnotation(PrimaryKey.class) != null;
   }
+
   private static boolean isLogicDelete(Field field) {
     return field.getAnnotation(LogicDelete.class) != null;
   }
+
   public Object value(ResultSet rs) {
 
     try {
-      return this.propertyHandler.convert(rs, columnName, fieldType);
+      return this.propertyHandler.convert(rs, columnName, fieldVisitor.getType());
     } catch (SQLException ex) {
       throw new DBException(ex);
     }
