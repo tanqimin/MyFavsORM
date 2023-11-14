@@ -42,10 +42,10 @@ public class SqlServerDialectTest extends DefaultDialectTest {
 
   @Test
   public void selectPage() {
-    Sql selectPage1 = getDialect().selectPage(2, 10, CASE1, null);
-    Sql selectPage2 = getDialect().selectPage(3, 10, CASE2, null);
-    Sql selectPage3 = getDialect().selectPage(4, 20, CASE3, null);
-    Sql selectPage4 = getDialect().selectPage(4, 20, CASE4, null);
+    Sql selectPage1 = getDialect().selectPage(true, CASE1, null, 2, 10);
+    Sql selectPage2 = getDialect().selectPage(true, CASE2, null, 3, 10);
+    Sql selectPage3 = getDialect().selectPage(true, CASE3, null, 4, 20);
+    Sql selectPage4 = getDialect().selectPage(true, CASE4, null, 4, 20);
 
     Assert.equals(
         selectPage1.toString(),

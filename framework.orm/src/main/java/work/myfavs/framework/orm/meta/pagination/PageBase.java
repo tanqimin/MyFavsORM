@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
+
 import work.myfavs.framework.orm.DBTemplate;
 
 /**
@@ -15,9 +16,9 @@ import work.myfavs.framework.orm.DBTemplate;
 public class PageBase<TModel> extends HashMap<String, Object> {
 
   protected final DBTemplate dbTemplate;
-  protected final String pageDataField;
-  protected final String pageCurrentField;
-  protected final String pageSizeField;
+  protected final String     pageDataField;
+  protected final String     pageCurrentField;
+  protected final String     pageSizeField;
 
   public PageBase(DBTemplate dbTemplate) {
     this.dbTemplate = dbTemplate;
@@ -26,6 +27,7 @@ public class PageBase<TModel> extends HashMap<String, Object> {
     this.pageSizeField = dbTemplate.getDbConfig().getPageSizeField();
   }
 
+  @SuppressWarnings("unchecked")
   public List<TModel> getData() {
     return (List<TModel>) this.get(pageDataField);
   }
@@ -55,7 +57,7 @@ public class PageBase<TModel> extends HashMap<String, Object> {
 
     List<TOther> list = new ArrayList<>();
     for (Iterator<TModel> iterator = this.getData().iterator(); iterator.hasNext(); ) {
-      TModel item = iterator.next();
+      TModel item  = iterator.next();
       TOther apply = fun.apply(item);
       list.add(apply);
     }

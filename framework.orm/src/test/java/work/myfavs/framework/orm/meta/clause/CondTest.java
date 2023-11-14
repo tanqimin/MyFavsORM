@@ -191,7 +191,7 @@ public class CondTest {
     snowflake.setName("S1");
     snowflake.setType(TypeEnum.FOOD);
 
-    Cond cond = Cond.create(snowflake);
+    Cond cond = Cond.createByCriteria(snowflake);
     assertEquals(" name = ? AND type = ?", cond.toString());
   }
 
@@ -201,7 +201,7 @@ public class CondTest {
     snowflake.setName("S1");
     snowflake.setType(TypeEnum.FOOD);
 
-    Cond cond = Cond.create(snowflake, BaseEntity.Update.class);
+    Cond cond = Cond.createByCriteria(snowflake, BaseEntity.Update.class);
     assertEquals(" name <> ?", cond.toString());
 
     Person person = new Person();
@@ -209,11 +209,11 @@ public class CondTest {
     person.setCars(new String[] {"Car1", "Car2"});
     person.setAlias(Arrays.asList("Alias1", "Alias2"));
 
-    cond = Cond.create(person, Person.PersonQuery.class);
+    cond = Cond.createByCriteria(person, Person.PersonQuery.class);
     System.out.println(cond.toString());
     assertEquals(" person_alias IN (?,?) AND person_name = ?", cond.toString());
 
-    cond = Cond.create(person, Person.PersonList.class);
+    cond = Cond.createByCriteria(person, Person.PersonList.class);
     assertEquals(" cars NOT IN (?,?)", cond.toString());
   }
 

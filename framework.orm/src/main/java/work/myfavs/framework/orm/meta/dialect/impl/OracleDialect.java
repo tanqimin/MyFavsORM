@@ -7,7 +7,10 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSubqueryTableSource;
 import com.alibaba.druid.sql.dialect.oracle.ast.stmt.OracleSelectQueryBlock;
 import com.alibaba.druid.util.JdbcConstants;
+
 import java.util.Collection;
+
+import work.myfavs.framework.orm.DBConfig;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.DefaultDialect;
@@ -22,7 +25,14 @@ public class OracleDialect extends DefaultDialect {
 
   private static final String INNER_TABLE_ALIAS = "_limit";
   private static final String OUTER_TABLE_ALIAS = "_paginate";
-  private static final String COL_ROW_NUM = "_rn";
+  private static final String COL_ROW_NUM       = "_rn";
+
+  public OracleDialect() {
+  }
+
+  public OracleDialect(int maxPageSize) {
+    super(maxPageSize);
+  }
 
   @Override
   public String dbType() {
@@ -37,17 +47,17 @@ public class OracleDialect extends DefaultDialect {
   }
 
   @Override
-  public Sql selectPage(int currentPage, int pageSize, String sql, Collection<?> params) {
-    int offset = pageSize * (currentPage - 1);
+  public Sql selectPage(String sql, Collection<?> params, int currentPage, int pageSize) {
+    int    offset   = pageSize * (currentPage - 1);
     String querySql = limit(sql, offset, pageSize).toUnformattedString();
     return new Sql(querySql, params);
   }
 
   private SQLSelectStatement limit(String sql, int offset, int count) {
     SQLSelectStatement selectStmt = DruidUtil.createSQLSelectStatement(this.dbType(), sql);
-    SQLSelect select = selectStmt.getSelect();
+    SQLSelect          select     = selectStmt.getSelect();
 
-    int maxRow = count + offset;
+    int                    maxRow     = count + offset;
     OracleSelectQueryBlock innerQuery = createInnerQuery(select, maxRow);
 
     select.setOrderBy(null);

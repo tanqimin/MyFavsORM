@@ -458,9 +458,9 @@ public class Cond extends Clause {
    * @param object 包含@Condition注解Field的对象
    * @return Cond
    */
-  public static Cond create(Object object) {
+  public static Cond createByCriteria(Object object) {
 
-    return create(object, Criterion.Default.class);
+    return createByCriteria(object, Criterion.Default.class);
   }
 
   /**
@@ -470,7 +470,7 @@ public class Cond extends Clause {
    * @param criteriaGroup 条件组名
    * @return Cond
    */
-  public static Cond create(Object object, Class<?> criteriaGroup) {
+  public static Cond createByCriteria(Object object, Class<?> criteriaGroup) {
 
     Cond cond = null;
     List<ConditionMatcher> conditionMatchers = new ArrayList<>();

@@ -11,7 +11,10 @@ import com.alibaba.druid.sql.ast.statement.SQLSubqueryTableSource;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.SQLServerSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.SQLServerTop;
 import com.alibaba.druid.util.JdbcConstants;
+
 import java.util.Collection;
+
+import work.myfavs.framework.orm.DBConfig;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.DefaultDialect;
@@ -25,6 +28,13 @@ public class SqlServerDialect extends DefaultDialect {
   private static final String COL_ROW_NUM = "_rn";
   private static final String TABLE_ALIAS = "_paginate";
 
+  public SqlServerDialect() {
+  }
+
+  public SqlServerDialect(int maxPageSize) {
+    super(maxPageSize);
+  }
+
   @Override
   public String dbType() {
 
@@ -35,21 +45,21 @@ public class SqlServerDialect extends DefaultDialect {
   public Sql selectTop(int limit, String sql, Collection<?> params) {
     SQLSelectStatement selectStmt = DruidUtil.createSQLSelectStatement(this.dbType(), sql);
     SQLServerSelectQueryBlock queryBlock =
-            (SQLServerSelectQueryBlock) selectStmt.getSelect().getQuery();
+        (SQLServerSelectQueryBlock) selectStmt.getSelect().getQuery();
     queryBlock.setTop(new SQLServerTop(new SQLNumberExpr(limit)));
     return new Sql(selectStmt.toUnformattedString(), params);
   }
 
   @Override
-  public Sql selectPage(int currentPage, int pageSize, String sql, Collection<?> params) {
-    int offset = pageSize * (currentPage - 1);
+  public Sql selectPage(String sql, Collection<?> params, int currentPage, int pageSize) {
+    int    offset   = pageSize * (currentPage - 1);
     String querySql = limit(sql, offset, pageSize).toUnformattedString();
     return new Sql(querySql, params);
   }
 
   private SQLSelectStatement limit(String sql, int offset, int count) {
     SQLSelectStatement selectStmt = DruidUtil.createSQLSelectStatement(this.dbType(), sql);
-    SQLSelect select = selectStmt.getSelect();
+    SQLSelect          select     = selectStmt.getSelect();
 
     SQLServerSelectQueryBlock queryBlock = (SQLServerSelectQueryBlock) select.getQuery();
 

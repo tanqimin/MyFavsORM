@@ -1,16 +1,19 @@
 package work.myfavs.framework.orm.meta.dialect;
 
 import java.util.Collection;
+
 import work.myfavs.framework.orm.meta.clause.Sql;
 
-/** 通用数据库方言接口 Created by tanqimin on 2015/11/3. */
+/**
+ * 通用数据库方言接口 Created by tanqimin on 2015/11/3.
+ */
 public interface IDialect {
 
   /**
    * 获取插入语句（带参数）
    *
-   * @param clazz 实体类Class
-   * @param entity 实体类对象
+   * @param clazz    实体类Class
+   * @param entity   实体类对象
    * @param <TModel> 实体类类型
    * @return Sql对象
    */
@@ -19,7 +22,7 @@ public interface IDialect {
   /**
    * 获取插入语句（不带参数）
    *
-   * @param clazz 实体类Class
+   * @param clazz    实体类Class
    * @param <TModel> 实体类类型
    * @return Sql对象
    */
@@ -28,7 +31,7 @@ public interface IDialect {
   /**
    * 获取所有记录语句
    *
-   * @param clazz 实体类Class
+   * @param clazz    实体类Class
    * @param <TModel> 实体类类型
    * @return Sql对象
    */
@@ -37,7 +40,7 @@ public interface IDialect {
   /**
    * 获取返回行数语句
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 返回行数语句
    */
@@ -46,7 +49,7 @@ public interface IDialect {
   /**
    * 获取返回行数语句
    *
-   * @param clazz 实体类Class
+   * @param clazz    实体类Class
    * @param <TModel> 实体类类型
    * @return 返回行数语句
    */
@@ -55,8 +58,8 @@ public interface IDialect {
   /**
    * 返回查询前n条记录的语句
    *
-   * @param limit 返回的记录数
-   * @param sql SQL语句
+   * @param limit  返回的记录数
+   * @param sql    SQL语句
    * @param params 参数
    * @return Sql对象
    */
@@ -65,21 +68,22 @@ public interface IDialect {
   /**
    * 返回分页查询语句 如果 pageSize = -1L，则不分页
    *
+   * @param enablePage  是否分页
+   * @param sql         SQL语句
+   * @param params      参数
    * @param currentPage 当前页码
-   * @param pageSize 每页记录数
-   * @param sql SQL语句
-   * @param params 参数
+   * @param pageSize    每页记录数
    * @return Sql对象
    */
-  Sql selectPage(int currentPage, int pageSize, String sql, Collection<?> params);
+  Sql selectPage(boolean enablePage, String sql, Collection<?> params, int currentPage, int pageSize);
 
   /**
    * 获取更新语句
    *
-   * @param clazz 实体类Class
-   * @param model 实体类对象
+   * @param clazz           实体类Class
+   * @param model           实体类对象
    * @param ignoreNullValue 忽略空字段的值
-   * @param <TModel> 实体类类型
+   * @param <TModel>        实体类类型
    * @return Sql对象
    */
   <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue);
@@ -87,7 +91,7 @@ public interface IDialect {
   /**
    * 获取删除实体语句
    *
-   * @param clazz 实体类Class
+   * @param clazz    实体类Class
    * @param <TModel> 实体类类型
    * @return Sql对象
    */

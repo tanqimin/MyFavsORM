@@ -10,6 +10,7 @@ import work.myfavs.framework.orm.meta.schema.Attributes;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.DruidUtil;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -20,6 +21,16 @@ import java.util.Objects;
  * @author tanqimin
  */
 public abstract class DefaultDialect extends AbstractDialect implements IDialect {
+  protected int maxPageSize;
+
+  public DefaultDialect() {
+    this(-1);
+  }
+
+  public DefaultDialect(int maxPageSize) {
+    this.maxPageSize = maxPageSize;
+  }
+
   protected static <TModel> String getTableName(Class<TModel> clazz) {
     return TableAlias.getOpt().orElse(Metadata.get(clazz).getTableName());
   }
@@ -51,29 +62,29 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
         clazz,
         Opt.INSERT,
         (key) -> {
-          ClassMeta  classMeta        = Metadata.get(clazz);
+          ClassMeta  classMeta        = Metadata.entityMeta(clazz);
           String     tableName        = TableAlias.getOpt().orElse(classMeta.getTableName());
           Attribute  primaryKey       = classMeta.checkPrimaryKey();
           Attributes updateAttributes = classMeta.getUpdateAttributes();
 
           Sql insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
-          Sql valuesSql = new Sql(StrUtil.format(" VALUES ("));
+          Sql valuesSql = new Sql(" VALUES (");
           if (classMeta.getStrategy() != GenerationType.IDENTITY) {
-            insertSql.append(StrUtil.format("{},", primaryKey.getColumnName()));
-            valuesSql.append(StrUtil.format("?,"));
+            insertSql.append(primaryKey.getColumnName().concat(","));
+            valuesSql.append("?,");
           }
 
           if (updateAttributes.size() > 0) {
             updateAttributes.forEach(
                 (col, attr) -> {
-                  insertSql.append(StrUtil.format("{},", attr.getColumnName()));
+                  insertSql.append(attr.getColumnName().concat(","));
                   valuesSql.append("?,");
                 });
 
             // 自动加入逻辑删除字段
             if (classMeta.getLogicDelete() != null) {
-              insertSql.append(StrUtil.format("{},", classMeta.getLogicDelete().getColumnName()));
-              valuesSql.append(StrUtil.format("0,"));
+              insertSql.append(classMeta.getLogicDelete().getColumnName().concat(","));
+              valuesSql.append("0,");
             }
             insertSql.deleteLastChar(",");
             valuesSql.deleteLastChar(",");
@@ -116,6 +127,7 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
 
       sql.deleteLastChar(",");
     }
+
     sql.append(
         StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()),
         primaryKey.getFieldVisitor().getValue(model)
@@ -127,13 +139,14 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
   @Override
   public <TModel> Sql delete(Class<TModel> clazz) {
 
-    ClassMeta classMeta = Metadata.get(clazz);
+    ClassMeta classMeta = Metadata.entityMeta(clazz);
     String    tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     return Sql.Delete(tableName);
   }
 
   @Override
   public Sql count(String sql, Collection<?> params) {
+
     return new Sql(PagerUtils.count(sql, DruidUtil.convert(dbType())), params);
   }
 
@@ -148,4 +161,21 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
 
     return new Sql(StrUtil.format("SELECT * FROM {}", getTableName(clazz)));
   }
+
+  @Override
+  public Sql selectPage(boolean enablePage, String sql, Collection<?> params, int currentPage, int pageSize) {
+    if (!enablePage) return new Sql(sql, params);
+    if (currentPage < 1)
+      throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
+
+    if (pageSize < 1)
+      throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
+
+    if (maxPageSize > 0L && pageSize > maxPageSize)
+      throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
+
+    return selectPage(sql, params, currentPage, pageSize);
+  }
+
+  protected abstract Sql selectPage(String sql, Collection<?> params, int currentPage, int pageSize);
 }

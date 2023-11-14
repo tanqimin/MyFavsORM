@@ -28,13 +28,22 @@ abstract public class MyfavsConnection {
   }
 
   /**
-   * 是否使用SQL Server数据库
+   * 判断当前是否使用 SQL Server 数据库
    *
-   * @return 如果当前数据库为SQL Server，返回true，否则返回false
+   * @return 如果是返回 {@code true}，否则返回 {@code false}
    */
   protected boolean isSqlServer() {
     return StrUtil.equals(getDbConfig().getDbType(), DbType.SQL_SERVER)
         || StrUtil.equals(getDbConfig().getDbType(), DbType.SQL_SERVER_2012);
+  }
+
+  /**
+   * 判断当前是否使用 MySql 数据库
+   *
+   * @return 如果是返回 {@code true}，否则返回 {@code false}
+   */
+  protected boolean isMySql() {
+    return StrUtil.equals(getDbConfig().getDbType(), DbType.MYSQL);
   }
 
   protected DBConfig getDbConfig() {

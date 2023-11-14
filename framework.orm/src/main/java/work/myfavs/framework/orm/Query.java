@@ -2,7 +2,10 @@ package work.myfavs.framework.orm;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.PropDesc;
+import cn.hutool.core.lang.Assert;
 import work.myfavs.framework.orm.meta.Record;
+import work.myfavs.framework.orm.meta.annotation.Criteria;
+import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.pagination.IPageable;
@@ -29,7 +32,7 @@ abstract public class Query extends MyfavsConnection {
   }
 
   /**
-   * 执行SQL，返回多行记录
+   * 执行 SQL，返回多行记录
    *
    * @param viewClass 结果集类型
    * @param sql       SQL语句
@@ -65,10 +68,10 @@ abstract public class Query extends MyfavsConnection {
   }
 
   /**
-   * 执行SQL，返回多行记录
+   * 执行 {@link Sql}，返回多行记录
    *
    * @param viewClass 结果集类型
-   * @param sql       SQL
+   * @param sql       {@link Sql}
    * @param <TView>   结果集类型泛型
    * @return 结果集
    */
@@ -84,18 +87,18 @@ abstract public class Query extends MyfavsConnection {
    * @param params 参数
    * @return 结果集
    */
-  public List<Record> find(String sql, Collection<?> params) {
+  public List<Record> findRecords(String sql, Collection<?> params) {
 
     return this.find(Record.class, sql, params);
   }
 
   /**
-   * 执行SQL， 并返回多行记录
+   * 执行 {@link Sql}， 并返回多行记录
    *
-   * @param sql SQL
+   * @param sql {@link Sql}
    * @return 结果集
    */
-  public List<Record> find(Sql sql) {
+  public List<Record> findRecords(Sql sql) {
 
     return this.find(Record.class, sql);
   }
@@ -104,7 +107,7 @@ abstract public class Query extends MyfavsConnection {
    * 执行SQL，并返回Map
    *
    * @param viewClass 结果集类型
-   * @param keyField  返回Map的Key的字段，必须是viewClass中存在的字段
+   * @param keyField  返回 Map 的 Key 的字段，必须是 viewClass 中存在的字段
    * @param sql       SQL语句
    * @param params    SQL参数
    * @param <TView>   结果集类型泛型
@@ -122,11 +125,11 @@ abstract public class Query extends MyfavsConnection {
   }
 
   /**
-   * 执行SQL，并返回Map
+   * 执行 {@link Sql}，并返回 Map
    *
    * @param viewClass 结果集类型
-   * @param keyField  返回Map的Key的字段，必须是viewClass中存在的字段
-   * @param sql       SQL
+   * @param keyField  返回 Map 的 Key 的字段，必须是 viewClass 中存在的字段
+   * @param sql       {@link Sql}
    * @param <TView>   结果集类型泛型
    * @return Map
    */
@@ -147,16 +150,16 @@ abstract public class Query extends MyfavsConnection {
   public <TView> List<TView> findTop(
       Class<TView> viewClass, int top, String sql, Collection<?> params) {
 
-    Sql querySql = getDialect().selectPage(1, top, sql, params);
+    Sql querySql = getDialect().selectPage(true, sql, params, 1, top);
     return this.find(viewClass, querySql);
   }
 
   /**
-   * 执行SQL，返回指定行数的结果集
+   * 执行 {@link Sql}，返回指定行数的结果集
    *
    * @param viewClass 结果集类型
    * @param top       行数
-   * @param sql       SQL
+   * @param sql       {@link Sql}
    * @param <TView>   结果集类型泛型
    * @return 结果集
    */
@@ -173,19 +176,19 @@ abstract public class Query extends MyfavsConnection {
    * @param params 参数
    * @return 结果集
    */
-  public List<Record> findTop(int top, String sql, Collection<?> params) {
+  public List<Record> findTopRecords(int top, String sql, Collection<?> params) {
 
     return this.findTop(Record.class, top, sql, params);
   }
 
   /**
-   * 执行SQL，返回指定行数的结果集
+   * 执行 {@link Sql}，返回指定行数的结果集
    *
    * @param top 行数
-   * @param sql SQL
+   * @param sql {@link Sql}
    * @return 结果集
    */
-  public List<Record> findTop(int top, Sql sql) {
+  public List<Record> findTopRecords(int top, Sql sql) {
 
     return this.findTop(Record.class, top, sql);
   }
@@ -209,10 +212,10 @@ abstract public class Query extends MyfavsConnection {
   }
 
   /**
-   * 执行 SQL ,并返回 1 行记录
+   * 执行 {@link Sql} ,并返回 1 行记录
    *
    * @param viewClass 结果集类型
-   * @param sql       SQL
+   * @param sql       {@link Sql}
    * @param <TView>   结果集类型泛型
    * @return 记录
    */
@@ -228,18 +231,18 @@ abstract public class Query extends MyfavsConnection {
    * @param params 参数
    * @return 记录
    */
-  public Record get(String sql, Collection<?> params) {
+  public Record getRecord(String sql, Collection<?> params) {
 
     return this.get(Record.class, sql, params);
   }
 
   /**
-   * 执行 SQL ,并返回 1 行记录
+   * 执行 {@link Sql} ,并返回 1 行记录
    *
-   * @param sql SQL
+   * @param sql {@link Sql}
    * @return 记录
    */
-  public Record get(Sql sql) {
+  public Record getRecord(Sql sql) {
 
     return this.get(Record.class, sql);
   }
@@ -257,14 +260,12 @@ abstract public class Query extends MyfavsConnection {
       return null;
     }
 
-    ClassMeta classMeta  = Metadata.get(viewClass);
+    ClassMeta classMeta  = Metadata.entityMeta(viewClass);
     Attribute primaryKey = classMeta.checkPrimaryKey();
 
-    Sql sql =
-        getDialect()
-            .select(viewClass)
-            .where(Cond.eq(primaryKey.getColumnName(), id))
-            .and(Cond.logicalDeleteCond(classMeta));
+    Sql sql = getDialect().select(viewClass)
+                          .where(Cond.eq(primaryKey.getColumnName(), id))
+                          .and(Cond.logicalDeleteCond(classMeta));
 
     return this.get(viewClass, sql);
   }
@@ -280,59 +281,57 @@ abstract public class Query extends MyfavsConnection {
    */
   public <TView> TView getByField(Class<TView> viewClass, String field, Object param) {
 
-    Sql sql =
-        getDialect()
-            .select(viewClass)
-            .where(Cond.eq(field, param, false))
-            .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
+    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+
+    Sql sql = getDialect().select(viewClass)
+                          .where(Cond.eq(field, param, false))
+                          .and(Cond.logicalDeleteCond(classMeta));
     return this.get(viewClass, sql);
   }
 
   /**
-   * 根据条件获取记录
+   * 根据 {@link Cond} 条件获取记录
    *
    * @param viewClass 结果类型
-   * @param cond      条件
+   * @param cond      {@link Cond} 条件
    * @param <TView>   实体类型
    * @return 记录
    */
   public <TView> TView getByCond(Class<TView> viewClass, Cond cond) {
 
-    Sql sql =
-        getDialect()
-            .select(viewClass)
-            .where()
-            .and(cond)
-            .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
+    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    Sql sql = getDialect().select(viewClass)
+                          .where()
+                          .and(cond)
+                          .and(Cond.logicalDeleteCond(classMeta));
     return this.get(viewClass, sql);
   }
 
   /**
-   * 根据 @Criteria 注解生成的条件查询记录
+   * 根据 {@link Criteria @Criteria} 注解生成的条件查询记录
    *
    * @param viewClass 结果类型
-   * @param object    包含 @Criteria 注解Field的对象
+   * @param object    包含 {@link Criteria @Criteria} 注解 Field 的对象
    * @param <TView>   实体类型
    * @return 记录
    */
   public <TView> TView getByCriteria(Class<TView> viewClass, Object object) {
 
-    return this.getByCond(viewClass, Cond.create(object));
+    return this.getByCond(viewClass, Cond.createByCriteria(object));
   }
 
   /**
-   * 根据 @Criteria 注解生成的条件查询记录
+   * 根据 {@link Criteria @Criteria} 注解生成的条件查询记录
    *
    * @param viewClass     结果类型
-   * @param object        包含 @Criteria 注解Field的对象
-   * @param criteriaGroup 条件组名
+   * @param object        包含 {@link Criteria @Criteria} 注解 Field 的对象
+   * @param criteriaGroup 条件组名, 参考 {@link Criterion#group() @Criterion(group = CriteriaGroupClass.class)}
    * @param <TView>       实体类型
    * @return 记录
    */
-  public <TView> TView getByCriteria(
-      Class<TView> viewClass, Object object, Class<?> criteriaGroup) {
+  public <TView> TView getByCriteria(Class<TView> viewClass, Object object, Class<?> criteriaGroup) {
 
-    return this.getByCond(viewClass, Cond.create(object, criteriaGroup));
+    return this.getByCond(viewClass, Cond.createByCriteria(object, criteriaGroup));
   }
 
   /**
@@ -345,14 +344,12 @@ abstract public class Query extends MyfavsConnection {
    */
   public <TView> List<TView> findByIds(Class<TView> viewClass, Collection<?> ids) {
 
-    ClassMeta classMeta  = Metadata.get(viewClass);
+    ClassMeta classMeta  = Metadata.entityMeta(viewClass);
     Attribute primaryKey = classMeta.checkPrimaryKey();
-    Sql sql =
-        getDialect()
-            .select(viewClass)
-            .where()
-            .and(Cond.in(primaryKey.getColumnName(), ids, false))
-            .and(Cond.logicalDeleteCond(classMeta));
+    Sql sql = getDialect().select(viewClass)
+                          .where()
+                          .and(Cond.in(primaryKey.getColumnName(), ids, false))
+                          .and(Cond.logicalDeleteCond(classMeta));
     return this.find(viewClass, sql);
   }
 
@@ -367,11 +364,10 @@ abstract public class Query extends MyfavsConnection {
    */
   public <TView> List<TView> findByField(Class<TView> viewClass, String field, Object param) {
 
-    Sql sql =
-        getDialect()
-            .select(viewClass)
-            .where(Cond.eq(field, param, false))
-            .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
+    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    Sql sql = getDialect().select(viewClass)
+                          .where(Cond.eq(field, param, false))
+                          .and(Cond.logicalDeleteCond(classMeta));
     return this.find(viewClass, sql);
   }
 
@@ -384,63 +380,59 @@ abstract public class Query extends MyfavsConnection {
    * @param <TView>   实体类型
    * @return 实体集合
    */
-  public <TView> List<TView> findByField(
-      Class<TView> viewClass, String field, Collection<?> params) {
+  public <TView> List<TView> findByField(Class<TView> viewClass, String field, Collection<?> params) {
 
-    Sql sql =
-        getDialect()
-            .select(viewClass)
-            .where()
-            .and(Cond.in(field, params, false))
-            .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
+    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    Sql sql = getDialect().select(viewClass)
+                          .where()
+                          .and(Cond.in(field, params, false))
+                          .and(Cond.logicalDeleteCond(classMeta));
     return this.find(viewClass, sql);
   }
 
   /**
-   * 根据条件查询实体集合
+   * 根据 {@link Cond} 条件查询实体集合
    *
    * @param viewClass 结果类型
-   * @param cond      查询条件
+   * @param cond      {@link Cond} 条件
    * @param <TView>   实体类型
    * @return 实体集合
    */
   public <TView> List<TView> findByCond(Class<TView> viewClass, Cond cond) {
 
-    Sql sql =
-        getDialect()
-            .select(viewClass)
-            .where()
-            .and(cond)
-            .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
+    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    Sql sql = getDialect().select(viewClass)
+                          .where()
+                          .and(cond)
+                          .and(Cond.logicalDeleteCond(classMeta));
     return this.find(viewClass, sql);
   }
 
   /**
-   * 根据 @Criterion 注解生成的条件查询实体集合
+   * 根据 {@link Criteria @Criteria} 注解生成的条件查询实体集合
    *
    * @param viewClass 结果类型
-   * @param object    包含 @Criterion 注解Field的对象
+   * @param object    包含 {@link Criteria @Criteria} 注解 Field 的对象
    * @param <TView>   实体类型
    * @return 实体集合
    */
   public <TView> List<TView> findByCriteria(Class<TView> viewClass, Object object) {
 
-    return findByCond(viewClass, Cond.create(object));
+    return findByCond(viewClass, Cond.createByCriteria(object));
   }
 
   /**
-   * 根据 @Criteria 注解生成的条件查询实体集合
+   * 根据 {@link Criteria @Criteria} 注解生成的条件查询实体集合
    *
    * @param viewClass     结果类型
-   * @param object        包含 @Criteria 注解Field的对象
-   * @param criteriaGroup 条件组名
+   * @param object        包含 {@link Criteria @Criteria} 注解 Field 的对象
+   * @param criteriaGroup 条件组名, 参考 {@link Criterion#group() @Criterion(group = CriteriaGroupClass.class)}
    * @param <TView>       实体类型
    * @return 实体集合
    */
-  public <TView> List<TView> findByCriteria(
-      Class<TView> viewClass, Object object, Class<?> criteriaGroup) {
+  public <TView> List<TView> findByCriteria(Class<TView> viewClass, Object object, Class<?> criteriaGroup) {
 
-    return findByCond(viewClass, Cond.create(object, criteriaGroup));
+    return findByCond(viewClass, Cond.createByCriteria(object, criteriaGroup));
   }
 
   /**
@@ -457,9 +449,9 @@ abstract public class Query extends MyfavsConnection {
   }
 
   /**
-   * 获取 SQL 的行数
+   * 获取 {@link Sql} 的行数
    *
-   * @param sql SQL
+   * @param sql {@link Sql}
    * @return 行数
    */
   public long count(Sql sql) {
@@ -468,29 +460,28 @@ abstract public class Query extends MyfavsConnection {
   }
 
   /**
-   * 根据条件获取查询的行数
+   * 根据 {@link Cond} 条件获取查询的行数
    *
    * @param viewClass 查询的数据表、视图对应的Java View类型
-   * @param cond      条件
+   * @param cond      {@link Cond} 条件
    * @param <TView>   查询的数据表、视图对应的Java View类型
    * @return 行数
    */
   public <TView> long countByCond(Class<TView> viewClass, Cond cond) {
 
-    Sql sql =
-        getDialect()
-            .count(viewClass)
-            .where()
-            .and(cond)
-            .and(Cond.logicalDeleteCond(Metadata.get(viewClass)));
+    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    Sql sql = getDialect().count(viewClass)
+                          .where()
+                          .and(cond)
+                          .and(Cond.logicalDeleteCond(classMeta));
     return this.get(Number.class, sql).longValue();
   }
 
   /**
-   * 根据传入的SQL判断是否存在符合条件的数据
+   * 根据传入的 {@link Sql} 判断是否存在符合条件的数据
    *
-   * @param sql SQL
-   * @return 查询结果行数大于0返回true，否则返回false
+   * @param sql {@link Sql}
+   * @return 查询结果行数大于 0 返回 {@code true}，否则返回 {@code false}
    */
   public boolean exists(Sql sql) {
 
@@ -502,7 +493,7 @@ abstract public class Query extends MyfavsConnection {
    *
    * @param sql    SQL语句
    * @param params 参数
-   * @return 查询结果行数大于0返回true，否则返回false
+   * @return 查询结果行数大于 0 返回 {@code true}，否则返回 {@code false}
    */
   public boolean exists(String sql, Collection<?> params) {
 
@@ -515,29 +506,28 @@ abstract public class Query extends MyfavsConnection {
    * @param modelClass 实体类型
    * @param entity     实体
    * @param <TModel>   实体类型泛型
-   * @return 存在返回true，不存在返回false
+   * @return 存在返回 {@code true}，不存在返回 {@code false}
    */
   public <TModel> boolean exists(Class<TModel> modelClass, TModel entity) {
-    if (entity == null) {
-      return false;
-    }
+    if (entity == null) return false;
 
-    Attribute primaryKey = Metadata.get(modelClass).checkPrimaryKey();
+    ClassMeta classMeta  = Metadata.entityMeta(modelClass);
+    Attribute primaryKey = classMeta.checkPrimaryKey();
     Object    pkVal      = primaryKey.getFieldVisitor().getValue(entity);
-    if (pkVal == null) {
-      return false;
-    }
+
+    if (pkVal == null) return false;
+
     Sql existSql = getDialect().count(modelClass).where(Cond.eq(primaryKey.getColumnName(), pkVal));
     return exists(existSql);
   }
 
   /**
-   * 根据条件判断是否存在符合条件的数据
+   * 根据 {@link Cond} 条件判断是否存在符合条件的数据
    *
    * @param viewClass 查询的数据表、视图对应的Java View类型
-   * @param cond      条件
+   * @param cond      {@link Cond} 条件
    * @param <TView>   查询的数据表、视图对应的Java View类型
-   * @return 查询结果行数大于0返回true，否则返回false
+   * @return 查询结果行数大于 0 返回 {@code true}，否则返回 {@code false}
    */
   public <TView> boolean existsByCond(Class<TView> viewClass, Cond cond) {
 
@@ -545,7 +535,7 @@ abstract public class Query extends MyfavsConnection {
   }
 
   /**
-   * 执行 SQL 语句，返回简单分页结果集
+   * 执行 SQL 语句，返回 {@link PageLite} 简单分页结果集
    *
    * @param viewClass   返回的数据类型
    * @param sql         SQL语句
@@ -554,7 +544,7 @@ abstract public class Query extends MyfavsConnection {
    * @param currentPage 当前页码
    * @param pageSize    每页记录数
    * @param <TView>     结果类型泛型
-   * @return 简单分页结果集
+   * @return {@link PageLite} 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(
       Class<TView> viewClass,
@@ -564,160 +554,127 @@ abstract public class Query extends MyfavsConnection {
       int currentPage,
       int pageSize) {
 
-    Sql querySql = new Sql(sql, params);
-
-    if (enablePage) {
-      querySql = createPageSql(currentPage, pageSize, sql, params);
-    }
-
-    List<TView> data = this.find(viewClass, querySql);
-
-    return PageLite.createInstance(this.dbTemplate, data, currentPage, pageSize);
+    Sql         querySql = getDialect().selectPage(enablePage, sql, params, currentPage, pageSize);
+    List<TView> data     = this.find(viewClass, querySql);
+    return this.dbTemplate.createPageLite(data, currentPage, pageSize);
   }
 
   /**
-   * 创建分页SQL
-   *
-   * @param currentPage 当前页码
-   * @param pageSize    每页记录数
-   * @param sql         SQL语句
-   * @param params      参数
-   * @return 分页SQL
-   */
-  private Sql createPageSql(int currentPage, int pageSize, String sql, Collection<?> params) {
-    if (currentPage < 1) {
-      throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
-    }
-
-    if (pageSize < 1) {
-      throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
-    }
-
-    long maxPageSize = getDbConfig().getMaxPageSize();
-    if (maxPageSize > 0L && pageSize > maxPageSize) {
-      throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
-    }
-
-    return getDialect().selectPage(currentPage, pageSize, sql, params);
-  }
-
-  /**
-   * 执行 SQL 语句，返回简单分页结果集
+   * 执行 {@link Sql} 语句，返回 {@link PageLite} 简单分页结果集
    *
    * @param viewClass   返回的数据类型
-   * @param sql         SQL
+   * @param sql         {@link Sql}
    * @param enablePage  是否启用分页
    * @param currentPage 当前页码
    * @param pageSize    每页记录数
    * @param <TView>     结果类型泛型
-   * @return 简单分页结果集
+   * @return {@link PageLite} 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(
       Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
-    return this.findPageLite(
-        viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
+    return this.findPageLite(viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
   /**
-   * 执行 SQL 语句，返回简单分页结果集
+   * 执行 SQL 语句，返回 {@link PageLite} 简单分页结果集
    *
    * @param viewClass 返回的数据类型
    * @param sql       SQL语句
    * @param params    参数
-   * @param pageable  分页对象
+   * @param pageable  {@link IPageable} 对象
    * @param <TView>   结果类型泛型
-   * @return 简单分页结果集
+   * @return {@link PageLite} 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(
       Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
 
-    return this.findPageLite(
-        viewClass,
-        sql,
-        params,
-        pageable.getEnablePage(),
-        pageable.getCurrentPage(),
-        pageable.getPageSize());
+    Assert.notNull(pageable);
+
+    boolean enablePage  = pageable.getEnablePage();
+    int     currentPage = pageable.getCurrentPage();
+    int     pageSize    = pageable.getPageSize();
+
+    return this.findPageLite(viewClass, sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
-   * 执行 SQL 语句，返回简单分页结果集
+   * 执行 {@link Sql} 语句，返回 {@link PageLite} 简单分页结果集
    *
    * @param viewClass 返回的数据类型
-   * @param sql       SQL
-   * @param pageable  分页对象
+   * @param sql       {@link Sql}
+   * @param pageable  {@link IPageable} 对象
    * @param <TView>   结果类型泛型
-   * @return 简单分页结果集
+   * @return {@link PageLite} 简单分页结果集
    */
   public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, IPageable pageable) {
 
-    return this.findPageLite(
-        viewClass,
-        sql.toString(),
-        sql.getParams(),
-        pageable.getEnablePage(),
-        pageable.getCurrentPage(),
-        pageable.getPageSize());
+    Assert.notNull(pageable);
+
+    boolean enablePage  = pageable.getEnablePage();
+    int     currentPage = pageable.getCurrentPage();
+    int     pageSize    = pageable.getPageSize();
+
+    return this.findPageLite(viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
   /**
-   * 执行 SQL 语句，返回简单分页结果集
+   * 执行 SQL 语句，返回 {@link PageLite} 简单分页结果集
    *
    * @param sql         SQL语句
    * @param params      参数
    * @param enablePage  是否启用分页
    * @param currentPage 当前页码
    * @param pageSize    每页记录数
-   * @return 简单分页结果集
+   * @return {@link PageLite} 简单分页结果集
    */
-  public PageLite<Record> findPageLite(
+  public PageLite<Record> findRecordsPageLite(
       String sql, Collection<?> params, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPageLite(Record.class, sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
-   * 执行 SQL 语句，返回简单分页结果集
+   * 执行 {@link Sql} 语句，返回 {@link PageLite} 简单分页结果集
    *
-   * @param sql         SQL
+   * @param sql         {@link Sql}
    * @param enablePage  是否启用分页
    * @param currentPage 当前页码
    * @param pageSize    每页记录数
-   * @return 简单分页结果集
+   * @return {@link PageLite} 简单分页结果集
    */
-  public PageLite<Record> findPageLite(Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public PageLite<Record> findRecordsPageLite(Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPageLite(Record.class, sql, enablePage, currentPage, pageSize);
   }
 
   /**
-   * 执行 SQL 语句，返回简单分页结果集
+   * 执行 SQL 语句，返回 {@link PageLite} 简单分页结果集
    *
    * @param sql      SQL语句
    * @param params   参数
-   * @param pageable 分页对象
-   * @return 简单分页结果集
+   * @param pageable {@link IPageable} 对象
+   * @return {@link PageLite} 简单分页结果集
    */
-  public PageLite<Record> findPageLite(String sql, Collection<?> params, IPageable pageable) {
+  public PageLite<Record> findRecordsPageLite(String sql, Collection<?> params, IPageable pageable) {
 
     return this.findPageLite(Record.class, sql, params, pageable);
   }
 
   /**
-   * 执行 SQL 语句，返回简单分页结果集
+   * 执行 {@link Sql} 语句，返回 {@link PageLite} 简单分页结果集
    *
-   * @param sql      SQL
-   * @param pageable 分页对象
-   * @return 简单分页结果集
+   * @param sql      {@link Sql}
+   * @param pageable {@link IPageable} 对象
+   * @return {@link PageLite} 简单分页结果集
    */
-  public PageLite<Record> findPageLite(Sql sql, IPageable pageable) {
+  public PageLite<Record> findRecordsPageLite(Sql sql, IPageable pageable) {
 
     return this.findPageLite(Record.class, sql, pageable);
   }
 
   /**
-   * 执行 SQL 语句，返回分页结果集
+   * 执行 SQL 语句，返回 {@link Page} 分页结果集
    *
    * @param viewClass   返回的数据类型
    * @param sql         SQL语句
@@ -726,7 +683,7 @@ abstract public class Query extends MyfavsConnection {
    * @param currentPage 当前页码
    * @param pageSize    每页记录数
    * @param <TView>     结果类型泛型
-   * @return 分页结果集
+   * @return {@link Page} 分页结果集
    */
   public <TView> Page<TView> findPage(
       Class<TView> viewClass,
@@ -736,9 +693,11 @@ abstract public class Query extends MyfavsConnection {
       int currentPage,
       int pageSize) {
 
-    long totalPages   = 1;
-    long totalRecords = 0;
-    Sql  querySql     = new Sql(sql, params);
+    Sql         querySql = getDialect().selectPage(enablePage, sql, params, currentPage, pageSize);
+    List<TView> data     = this.find(viewClass, querySql);
+
+    long totalPages = 1;
+    long totalRecords;
 
     if (enablePage) {
       totalRecords = this.count(sql, params);
@@ -747,30 +706,23 @@ abstract public class Query extends MyfavsConnection {
       if (totalRecords % pageSize != 0) {
         totalPages++;
       }
-
-      querySql = createPageSql(currentPage, pageSize, sql, params);
-    }
-
-    List<TView> data = this.find(viewClass, querySql);
-
-    if (!enablePage) {
+    } else {
       totalRecords = data.size();
     }
 
-    return Page.createInstance(
-        this.dbTemplate, data, currentPage, pageSize, totalPages, totalRecords);
+    return this.dbTemplate.createPage(data, currentPage, pageSize, totalPages, totalRecords);
   }
 
   /**
-   * 执行 SQL 语句，返回分页结果集
+   * 执行 {@link Sql} 语句，返回 {@link Page} 分页结果集
    *
    * @param viewClass   返回的数据类型
-   * @param sql         SQL
+   * @param sql         {@link Sql}
    * @param enablePage  是否启用分页
    * @param currentPage 当前页码
    * @param pageSize    每页记录数
    * @param <TView>     结果类型泛型
-   * @return 分页结果集
+   * @return {@link Page} 分页结果集
    */
   public <TView> Page<TView> findPage(
       Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
@@ -779,110 +731,111 @@ abstract public class Query extends MyfavsConnection {
   }
 
   /**
-   * 执行 SQL 语句，返回分页结果集
+   * 执行 SQL 语句，返回 {@link Page} 分页结果集
    *
    * @param viewClass 返回的数据类型
    * @param sql       SQL语句
    * @param params    参数
-   * @param pageable  可分页对象
+   * @param pageable  {@link IPageable} 对象
    * @param <TView>   结果类型泛型
-   * @return 分页结果集
+   * @return {@link Page} 分页结果集
    */
   public <TView> Page<TView> findPage(
       Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
 
-    return findPage(
-        viewClass,
-        sql,
-        params,
-        pageable.getEnablePage(),
-        pageable.getCurrentPage(),
-        pageable.getPageSize());
+    Assert.notNull(pageable);
+
+    boolean enablePage  = pageable.getEnablePage();
+    int     currentPage = pageable.getCurrentPage();
+    int     pageSize    = pageable.getPageSize();
+
+    return findPage(viewClass, sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
-   * 执行 SQL 语句，返回分页结果集
+   * 执行 {@link Sql} 语句，返回 {@link Page} 分页结果集
    *
    * @param viewClass 返回的数据类型
-   * @param sql       SQL
-   * @param pageable  可分页对象
+   * @param sql       {@link Sql}
+   * @param pageable  {@link IPageable} 对象
    * @param <TView>   结果类型泛型
-   * @return 分页结果集
+   * @return {@link Page} 分页结果集
    */
   public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, IPageable pageable) {
 
-    return findPage(
-        viewClass,
-        sql.toString(),
-        sql.getParams(),
-        pageable.getEnablePage(),
-        pageable.getCurrentPage(),
-        pageable.getPageSize());
+    Assert.notNull(pageable);
+
+    boolean enablePage  = pageable.getEnablePage();
+    int     currentPage = pageable.getCurrentPage();
+    int     pageSize    = pageable.getPageSize();
+
+    return findPage(viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
   /**
-   * 执行 SQL 语句，返回分页结果集
+   * 执行 SQL 语句，返回 {@link Page} 分页结果集
    *
    * @param sql         SQL语句
    * @param params      参数
    * @param enablePage  是否启用分页
    * @param currentPage 当前页码
    * @param pageSize    每页记录数
-   * @return 分页结果集
+   * @return {@link Page} 分页结果集
    */
-  public Page<Record> findPage(
+  public Page<Record> findRecordsPage(
       String sql, Collection<?> params, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPage(Record.class, sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
-   * 执行 SQL 语句，返回分页结果集
+   * 执行 {@link Sql} 语句，返回 {@link Page} 分页结果集
    *
-   * @param sql         SQL
+   * @param sql         {@link Sql}
    * @param enablePage  是否启用分页
    * @param currentPage 当前页码
    * @param pageSize    每页记录数
-   * @return 分页结果集
+   * @return {@link Page} 结果集
    */
-  public Page<Record> findPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public Page<Record> findRecordsPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPage(Record.class, sql, enablePage, currentPage, pageSize);
   }
 
   /**
-   * 执行 SQL 语句，返回分页结果集
+   * 执行 SQL 语句，返回 {@link Page} 结果集
    *
    * @param sql      SQL语句
    * @param params   参数
-   * @param pageable 可分页对象
-   * @return 分页结果集
+   * @param pageable {@link IPageable} 对象
+   * @return {@link Page} 结果集
    */
-  public Page<Record> findPage(String sql, Collection<?> params, IPageable pageable) {
+  public Page<Record> findRecordsPage(String sql, Collection<?> params, IPageable pageable) {
 
-    return this.findPage(
-        Record.class,
-        sql,
-        params,
-        pageable.getEnablePage(),
-        pageable.getCurrentPage(),
-        pageable.getPageSize());
+    Assert.notNull(pageable);
+
+    boolean enablePage  = pageable.getEnablePage();
+    int     currentPage = pageable.getCurrentPage();
+    int     pageSize    = pageable.getPageSize();
+
+    return this.findPage(Record.class, sql, params, enablePage, currentPage, pageSize);
   }
 
   /**
-   * 执行 SQL 语句，返回分页结果集
+   * 执行 {@link Sql} 语句，返回 {@link Page} 结果集
    *
-   * @param sql      SQL
-   * @param pageable 可分页对象
-   * @return 分页结果集
+   * @param sql      {@link Sql} 对象
+   * @param pageable {@link IPageable} 对象
+   * @return {@link Page} 结果集
    */
-  public Page<Record> findPage(Sql sql, IPageable pageable) {
+  public Page<Record> findRecordsPage(Sql sql, IPageable pageable) {
 
-    return this.findPage(
-        Record.class,
-        sql,
-        pageable.getEnablePage(),
-        pageable.getCurrentPage(),
-        pageable.getPageSize());
+    Assert.notNull(pageable);
+
+    boolean enablePage  = pageable.getEnablePage();
+    int     currentPage = pageable.getCurrentPage();
+    int     pageSize    = pageable.getPageSize();
+
+    return this.findPage(Record.class, sql, enablePage, currentPage, pageSize);
   }
 }

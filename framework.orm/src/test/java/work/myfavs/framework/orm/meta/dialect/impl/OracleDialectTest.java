@@ -28,8 +28,8 @@ public class OracleDialectTest extends DefaultDialectTest {
 
   @Test
   public void selectPage() {
-    Sql selectPage1 = getDialect().selectPage(2, 10, CASE1, null);
-    Sql selectPage2 = getDialect().selectPage(3, 10, CASE2, null);
+    Sql selectPage1 = getDialect().selectPage(true, CASE1, null, 2, 10);
+    Sql selectPage2 = getDialect().selectPage(true, CASE2, null, 3, 10);
 
     Assert.equals(selectPage1.toString(), "SELECT _paginate.* FROM ( SELECT _limit.*, ROWNUM AS _rn FROM ( SELECT * FROM TABLE_NAME ) _limit WHERE _limit.ROWNUM <= 20 ) _paginate WHERE _paginate._rn > 10");
     Assert.equals(selectPage2.toString(), "SELECT _paginate.* FROM ( SELECT _limit.*, ROWNUM AS _rn FROM ( SELECT * FROM TABLE_NAME ORDER BY col1 ) _limit WHERE _limit.ROWNUM <= 30 ) _paginate WHERE _paginate._rn > 20");

@@ -62,22 +62,6 @@ public class DBConvert {
       result.add(model);
     }
 
-    // 找出与查询结果匹配的字段
-//    final List<Attribute> existsAttrs = new ArrayList<>();
-//    for (int i = 1; i <= columnCount; i++) {
-//      if (attributes.containsColumn(metaData.getColumnLabel(i))) {
-//        existsAttrs.add(attributes.getAttribute(metaData.getColumnLabel(i)));
-//      }
-//    }
-//
-//    while (rs.next()) {
-//      TModel model = ReflectUtil.newInstance(modelClass);
-//      for (Attribute attr : existsAttrs) {
-//        attr.getFieldVisitor().setValue(model, attr.value(rs));
-//      }
-//      result.add(model);
-//    }
-
     return result;
   }
 

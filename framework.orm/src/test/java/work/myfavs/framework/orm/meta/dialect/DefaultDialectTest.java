@@ -3,9 +3,12 @@ package work.myfavs.framework.orm.meta.dialect;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+
 import java.math.BigDecimal;
 import java.util.Date;
+
 import org.junit.Test;
+import work.myfavs.framework.orm.DBConfig;
 import work.myfavs.framework.orm.entity.Identity;
 import work.myfavs.framework.orm.entity.Snowflake;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
@@ -16,11 +19,10 @@ import work.myfavs.framework.orm.meta.dialect.impl.SqlServer2012Dialect;
 import work.myfavs.framework.orm.meta.dialect.impl.SqlServerDialect;
 
 public class DefaultDialectTest {
-  protected IDialect mySqlDialect = new MySqlDialect();
-  protected IDialect sqlServerDialect = new SqlServerDialect();
-
+  protected IDialect mySqlDialect         = new MySqlDialect();
+  protected IDialect sqlServerDialect     = new SqlServerDialect();
   protected IDialect sqlServer2012Dialect = new SqlServer2012Dialect();
-  protected IDialect oracleDialect = new OracleDialect();
+  protected IDialect oracleDialect        = new OracleDialect();
 
   private static final String CASE1 = "SELECT * FROM TABLE_NAME WHERE col1 = ? ORDER BY id desc";
   private static final String CASE2 =

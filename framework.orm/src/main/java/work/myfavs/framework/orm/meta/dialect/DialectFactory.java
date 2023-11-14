@@ -1,10 +1,12 @@
 package work.myfavs.framework.orm.meta.dialect;
 
-import java.util.HashMap;
-import java.util.Map;
+import work.myfavs.framework.orm.DBConfig;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.dialect.impl.*;
 import work.myfavs.framework.orm.util.exception.DBException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 数据库方言工厂类
@@ -13,32 +15,57 @@ import work.myfavs.framework.orm.util.exception.DBException;
  */
 public class DialectFactory {
 
-  private static final Map<String, IDialect> map;
-
-  static {
-    map = new HashMap<>();
-    map.put(DbType.SQL_SERVER, new SqlServerDialect());
-    map.put(DbType.SQL_SERVER_2012, new SqlServer2012Dialect());
-    map.put(DbType.MYSQL, new MySqlDialect());
-    map.put(DbType.H2, new H2Dialect());
-    map.put(DbType.POSTGRE_SQL, new PostgreSQLDialect());
-    map.put(DbType.ORACLE, new OracleDialect());
-  }
+  private static final Map<String, IDialect> map = new HashMap<>();
 
   private DialectFactory() {}
 
   /**
-   * 获取数据库方言实现
+   * 创建方言实例
    *
-   * @param dbType 数据库类型，sqlserver、mysql
-   * @return 数据库方言实现类
+   * @param dbType      数据库类型 {@link DbType}
+   * @param maxPageSize 每页最大记录数 {@link DBConfig#getMaxPageSize()}
+   * @return {@link IDialect}
    */
-  public static IDialect getInstance(String dbType) {
-
-    IDialect iDialect = map.get(dbType);
-    if (iDialect == null) {
-      throw new DBException("{} database is not supported.", dbType);
+  private static IDialect createDialect(String dbType, int maxPageSize) {
+    IDialect dialect;
+    switch (dbType) {
+      case DbType.SQL_SERVER:
+        dialect = new SqlServerDialect(maxPageSize);
+        break;
+      case DbType.SQL_SERVER_2012:
+        dialect = new SqlServer2012Dialect(maxPageSize);
+        break;
+      case DbType.MYSQL:
+        dialect = new MySqlDialect(maxPageSize);
+        break;
+      case DbType.POSTGRE_SQL:
+        dialect = new PostgreSQLDialect(maxPageSize);
+        break;
+      case DbType.ORACLE:
+        dialect = new OracleDialect(maxPageSize);
+        break;
+      case DbType.H2:
+        dialect = new H2Dialect(maxPageSize);
+        break;
+      default:
+        throw new DBException("{} database is not supported.", dbType);
     }
-    return iDialect;
+    return dialect;
+  }
+
+  /**
+   * 获取方言实例
+   *
+   * @param dbType      数据库类型 {@link DbType}
+   * @param maxPageSize 每页最大记录数 {@link DBConfig#getMaxPageSize()}
+   * @return {@link IDialect}
+   */
+  public static IDialect getInstance(String dbType, int maxPageSize) {
+    IDialect dialect = map.get(dbType);
+    if (dialect == null) {
+      dialect = createDialect(dbType, maxPageSize);
+      map.put(dbType, dialect);
+    }
+    return dialect;
   }
 }

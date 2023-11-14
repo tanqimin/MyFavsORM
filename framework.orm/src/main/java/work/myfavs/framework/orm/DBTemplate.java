@@ -4,11 +4,14 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
+import work.myfavs.framework.orm.meta.pagination.Page;
+import work.myfavs.framework.orm.meta.pagination.PageLite;
 import work.myfavs.framework.orm.util.PKGenerator;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -146,8 +149,55 @@ public class DBTemplate {
     return ReflectUtil.newInstance(cls, dataSource);
   }
 
+  /**
+   * 创建 {@link Database} 对象
+   * @return {@link Database}
+   */
   public Database createDatabase() {
     return new Database(this);
+  }
+
+  /**
+   * 创建 {@link Page} 对象
+   *
+   * @param data         分页数据
+   * @param currentPage  当前页码
+   * @param pageSize     每页记录数
+   * @param totalPages   总页数
+   * @param totalRecords 总记录数
+   * @param <TView>      分页对象数据类型泛型
+   * @return {@link Page} 对象
+   */
+  public <TView> Page<TView> createPage(List<TView> data, long currentPage, long pageSize, long totalPages, long totalRecords) {
+    Page<TView> page = new Page<>(this);
+    page.setData(data);
+    page.setCurrentPage(currentPage);
+    page.setPageSize(pageSize);
+    page.setTotalPages(totalPages);
+    page.setTotalRecords(totalRecords);
+    return page;
+  }
+
+  /**
+   * 创建 {@link PageLite} 对象
+   *
+   * @param data        分页数据
+   * @param currentPage 当前页码
+   * @param pageSize    每页记录数
+   * @param <TModel>    简单分页对象泛型
+   * @return {@link PageLite} 对象
+   */
+  public <TModel> PageLite<TModel> createPageLite(
+      List<TModel> data, long currentPage, long pageSize) {
+
+    PageLite<TModel> instance = new PageLite<>(this);
+    instance.setData(data);
+    instance.setCurrentPage(currentPage);
+    instance.setPageSize(pageSize);
+    if (data != null) {
+      instance.setHasNext(data.size() == pageSize);
+    }
+    return instance;
   }
 
   public static class Builder {
