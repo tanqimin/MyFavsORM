@@ -37,8 +37,8 @@ public class CondTest {
   public void tearDown() {}
 
   @Test
-  public void logicalDeleteCond() {
-    Cond cond = Cond.logicalDeleteCond(logicDeleteMeta);
+  public void logicalDelete() {
+    Cond cond = Cond.logicalDelete(logicDeleteMeta.getLogicDelete());
     assertEquals(" deleted = ?", cond.toString());
     assertEquals(1, cond.getParams().size());
     assertFalse(cond.getParams().get(0) instanceof Boolean);

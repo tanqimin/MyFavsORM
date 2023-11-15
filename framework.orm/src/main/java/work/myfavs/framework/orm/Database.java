@@ -464,10 +464,11 @@ public class Database extends Query {
 
     if (entity == null) return 0;
 
-    ClassMeta classMeta = Metadata.entityMeta(modelClass);
+    ClassMeta classMeta   = Metadata.entityMeta(modelClass);
+    Attribute logicDelete = classMeta.getLogicDelete();
 
     Sql sql = getDialect().update(modelClass, entity, false)
-                          .and(Cond.logicalDeleteCond(classMeta));
+                          .and(Cond.logicalDelete(logicDelete));
     return execute(sql);
   }
 
@@ -483,10 +484,11 @@ public class Database extends Query {
 
     if (entity == null) return 0;
 
-    ClassMeta classMeta = Metadata.entityMeta(modelClass);
+    ClassMeta classMeta   = Metadata.entityMeta(modelClass);
+    Attribute logicDelete = classMeta.getLogicDelete();
 
     Sql sql = getDialect().update(modelClass, entity, true)
-                          .and(Cond.logicalDeleteCond(classMeta));
+                          .and(Cond.logicalDelete(logicDelete));
     return execute(sql);
   }
 
@@ -809,12 +811,13 @@ public class Database extends Query {
   }
 
   private int deleteByCond(ClassMeta classMeta, Cond deleteCond) {
-    Sql    sql;
-    String tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
-    if (classMeta.getLogicDelete() != null) {
+    Sql       sql;
+    String    tableName   = TableAlias.getOpt().orElse(classMeta.getTableName());
+    Attribute logicDelete = classMeta.getLogicDelete();
+    if (logicDelete != null) {
       sql = Sql.Update(tableName)
-               .set(StrUtil.format("{} = {}", classMeta.getLogicDelete().getColumnName(), classMeta.getPrimaryKey().getColumnName()))
-               .where(deleteCond).and(Cond.logicalDeleteCond(classMeta));
+               .set(StrUtil.format("{} = {}", logicDelete.getColumnName(), classMeta.getPrimaryKey().getColumnName()))
+               .where(deleteCond).and(Cond.logicalDelete(logicDelete));
     } else {
       sql = Sql.Delete(tableName).where(deleteCond);
     }

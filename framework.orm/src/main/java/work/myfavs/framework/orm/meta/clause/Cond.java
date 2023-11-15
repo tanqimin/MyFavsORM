@@ -6,13 +6,14 @@ import cn.hutool.core.util.StrUtil;
 import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.FuzzyMode;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
-import work.myfavs.framework.orm.meta.schema.ClassMeta;
-import work.myfavs.framework.orm.util.common.Constant;
+import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.util.convert.ObjectConvert;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Supplier;
+
+import static work.myfavs.framework.orm.util.common.Constant.*;
 
 /**
  * SQL 条件构建
@@ -57,14 +58,17 @@ public class Cond extends Clause {
   }
 
   /**
-   * 创建逻辑删除条件
+   * 创建逻辑删除条件<br/>
+   * 如果 logicDelete 不为空，则创建逻辑删除条件
    *
-   * @param classMeta 类元数据
-   * @return Cond
+   * @param logicDelete {@link Attribute} 逻辑删除标记字段
+   * @return {@link Cond}
    */
-  public static Cond logicalDeleteCond(ClassMeta classMeta) {
-    if (classMeta.getLogicDelete() == null) return new Cond();
-    return Cond.eq(classMeta.getLogicDelete().getColumnName(), 0);
+  public static Cond logicalDelete(Attribute logicDelete) {
+
+    if (logicDelete == null) return new Cond();
+    if (!logicDelete.isLogicDelete()) return new Cond();
+    return Cond.eq(logicDelete.getColumnName(), 0);
   }
 
   /**
@@ -72,7 +76,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数值
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond eq(String field, Object param) {
 
@@ -85,7 +89,7 @@ public class Cond extends Clause {
    * @param field      字段
    * @param param      参数值
    * @param ignoreNull 是否忽略 null 值
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond eq(String field, Object param, boolean ignoreNull) {
 
@@ -100,7 +104,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数值
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond ne(String field, Object param) {
 
@@ -113,7 +117,7 @@ public class Cond extends Clause {
    * @param field      字段
    * @param param      参数值
    * @param ignoreNull 是否忽略 null 值
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond ne(String field, Object param, boolean ignoreNull) {
 
@@ -127,7 +131,7 @@ public class Cond extends Clause {
    * 创建 IS NULL 条件
    *
    * @param field 字段
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond isNull(String field) {
 
@@ -138,7 +142,7 @@ public class Cond extends Clause {
    * 创建 IS NOT NULL 条件
    *
    * @param field 字段
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond isNotNull(String field) {
 
@@ -150,7 +154,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond gt(String field, Object param) {
 
@@ -165,7 +169,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond ge(String field, Object param) {
 
@@ -180,7 +184,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond lt(String field, Object param) {
 
@@ -195,7 +199,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond le(String field, Object param) {
 
@@ -210,7 +214,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond like(String field, Object param) {
 
@@ -224,9 +228,9 @@ public class Cond extends Clause {
    * {@link FuzzyMode#MULTIPLE} : 参数 {@code param} 中如检测到任意通配符 {@code %}，使用模糊查询，并把 {@code _} 转义为 {@code ¦_}<br/>
    * <br/>
    * 示例：查询参数 param 的值为："_ABC%"<br/>
-   * 如果 {@code fuzzyMode = } {@link FuzzyMode#ALL} 返回 {@code field_name LIKE '_ABC%'} ;<br/>
-   * 如果 {@code fuzzyMode = } {@link FuzzyMode#SINGLE} 返回 {@code field_name LIKE '_ABC¦%' ESCAPE '¦'} ;<br/>
-   * 如果 {@code fuzzyMode = } {@link FuzzyMode#MULTIPLE} 返回 {@code field_name LIKE '¦_ABC%' ESCAPE '¦'} ;<br/>
+   * 如果 {@code fuzzyMode = } {@link FuzzyMode#ALL} 返回 {@code field LIKE '_ABC%'} ;<br/>
+   * 如果 {@code fuzzyMode = } {@link FuzzyMode#SINGLE} 返回 {@code field LIKE '_ABC¦%' ESCAPE '¦'} ;<br/>
+   * 如果 {@code fuzzyMode = } {@link FuzzyMode#MULTIPLE} 返回 {@code field LIKE '¦_ABC%' ESCAPE '¦'} ;<br/>
    *
    * @param field     字段
    * @param param     参数
@@ -234,41 +238,40 @@ public class Cond extends Clause {
    * @return {@link Cond}
    */
   public static Cond like(String field, Object param, FuzzyMode fuzzyMode) {
-    Cond cond = new Cond();
-    if (StrUtil.isBlankIfStr(param)) return cond;
+    if (StrUtil.isBlankIfStr(param)) return new Cond();
 
-    String paramVal  = param.toString();
-    String multiStr  = Constant.FUZZY_MULTIPLE;
-    String escapeStr = Constant.FUZZY_ESCAPE;
-    String singleStr = Constant.FUZZY_SINGLE;
-
+    String paramVal   = param.toString();
     String likeClause = StrUtil.format(" {} LIKE ?", field);
-    if (fuzzyMode == FuzzyMode.SINGLE && paramVal.contains(singleStr)) {
-      cond.sql.append(likeClause);
-      if (paramVal.contains(multiStr)) {
-        cond.params.add(StrUtil.replace(paramVal, multiStr, escapeStr.concat(multiStr)));
-        return cond.escape(escapeStr);
-      }
-      cond.params.add(paramVal);
-      return cond;
+    if (fuzzyMode == FuzzyMode.SINGLE && paramVal.contains(FUZZY_SINGLE)) {
+      return escapeFuzzy(likeClause, paramVal, FUZZY_MULTIPLE);
     }
 
-    if (fuzzyMode == FuzzyMode.MULTIPLE && paramVal.contains(multiStr)) {
-      cond.sql.append(likeClause);
-      if (paramVal.contains(singleStr)) {
-        cond.params.add(StrUtil.replace(paramVal, singleStr, escapeStr.concat(singleStr)));
-        return cond.escape(escapeStr);
-      }
-      return cond;
+    if (fuzzyMode == FuzzyMode.MULTIPLE && paramVal.contains(FUZZY_MULTIPLE)) {
+      return escapeFuzzy(likeClause, paramVal, FUZZY_SINGLE);
     }
 
-    if (paramVal.contains(multiStr) || paramVal.contains(singleStr)) {
-      cond.sql.append(likeClause);
-      cond.params.add(param);
-      return cond;
+    if (paramVal.contains(FUZZY_MULTIPLE) || paramVal.contains(FUZZY_SINGLE)) {
+      return escapeFuzzy(likeClause, paramVal, null);
     }
 
     return eq(field, param);
+  }
+
+  /**
+   * 转义模糊查询条件
+   *
+   * @param sql            原 SQL
+   * @param param          参数值
+   * @param fuzzySearchStr 需要转义的模糊查询通配符
+   * @return {@link Cond}
+   */
+  private static Cond escapeFuzzy(String sql, String param, String fuzzySearchStr) {
+    if (StrUtil.isEmpty(fuzzySearchStr)
+        || !param.contains(fuzzySearchStr))
+      return new Cond(sql, param);
+
+    String paramVal = StrUtil.replace(param, fuzzySearchStr, FUZZY_ESCAPE.concat(fuzzySearchStr));
+    return new Cond(sql, paramVal).escape();
   }
 
   /**
@@ -278,7 +281,7 @@ public class Cond extends Clause {
    * @param field  字段
    * @param param1 参数1
    * @param param2 参数2
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond between(String field, Object param1, Object param2) {
 
@@ -300,7 +303,7 @@ public class Cond extends Clause {
    *
    * @param field  字段
    * @param params 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond in(String field, Collection<?> params) {
 
@@ -315,7 +318,7 @@ public class Cond extends Clause {
    * @param field       字段
    * @param params      参数
    * @param ignoreEmpty 是否忽略空参数集合
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond in(String field, Collection<?> params, boolean ignoreEmpty) {
 
@@ -339,7 +342,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param sql   SQL
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond in(String field, Sql sql) {
     if (Objects.isNull(sql)) return new Cond();
@@ -352,7 +355,7 @@ public class Cond extends Clause {
    *
    * @param field  字段
    * @param params 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond notIn(String field, Collection<?> params) {
 
@@ -367,7 +370,7 @@ public class Cond extends Clause {
    * @param field       字段
    * @param params      参数
    * @param ignoreEmpty 是否忽略空参数集合
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond notIn(String field, Collection<?> params, boolean ignoreEmpty) {
 
@@ -397,7 +400,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param sql   SQL
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond notIn(String field, Sql sql) {
     if (Objects.isNull(sql)) return new Cond();
@@ -433,7 +436,7 @@ public class Cond extends Clause {
    * 构建 EXIST ({subSql}) 条件
    *
    * @param subSql SQL
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond exists(Sql subSql) {
     if (Objects.isNull(subSql)) return new Cond();
@@ -444,7 +447,7 @@ public class Cond extends Clause {
    * 构建 EXIST ({supplier}) 条件
    *
    * @param supplier Supplier
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond exists(Supplier<Sql> supplier) {
 
@@ -455,7 +458,7 @@ public class Cond extends Clause {
    * 构建 NOT EXIST ({subSql}) 条件
    *
    * @param subSql SQL
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond notExists(Sql subSql) {
     if (Objects.isNull(subSql)) return new Cond();
@@ -466,7 +469,7 @@ public class Cond extends Clause {
    * 构建 NOT EXIST ({supplier}) 条件
    *
    * @param supplier Supplier
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond notExists(Supplier<Sql> supplier) {
 
@@ -477,7 +480,7 @@ public class Cond extends Clause {
    * 使用 AND {cond} 拼接多个条件
    *
    * @param cond Cond
-   * @return Cond
+   * @return {@link Cond}
    */
   public Cond and(Cond cond) {
 
@@ -493,7 +496,7 @@ public class Cond extends Clause {
    * 使用 OR {cond} 拼接多个条件
    *
    * @param cond Cond
-   * @return Cond
+   * @return {@link Cond}
    */
   public Cond or(Cond cond) {
 
@@ -509,7 +512,7 @@ public class Cond extends Clause {
    * 根据@Condition 注解创建Cond
    *
    * @param object 包含@Condition注解Field的对象
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond createByCriteria(Object object) {
 
@@ -521,7 +524,7 @@ public class Cond extends Clause {
    *
    * @param object        包含@Condition注解Field的对象
    * @param criteriaGroup 条件组名
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond createByCriteria(Object object, Class<?> criteriaGroup) {
 
@@ -610,12 +613,11 @@ public class Cond extends Clause {
   /**
    * 设置转义符，用于使用 {@link Cond#like(String, Object, FuzzyMode)} 方法后设置
    *
-   * @param escape 转义符
    * @return {@link Cond}
    */
-  private Cond escape(String escape) {
-    if (StrUtil.isEmpty(escape)) return this;
-    this.sql.append(StrUtil.format(" ESCAPE '{}'", escape));
+  private Cond escape() {
+    if (StrUtil.isEmpty(FUZZY_ESCAPE)) return this;
+    this.sql.append(StrUtil.format(" ESCAPE '{}'", FUZZY_ESCAPE));
     return this;
   }
 }

@@ -260,12 +260,13 @@ abstract public class Query extends MyfavsConnection {
       return null;
     }
 
-    ClassMeta classMeta  = Metadata.entityMeta(viewClass);
-    Attribute primaryKey = classMeta.checkPrimaryKey();
+    ClassMeta classMeta   = Metadata.entityMeta(viewClass);
+    Attribute primaryKey  = classMeta.checkPrimaryKey();
+    Attribute logicDelete = classMeta.getLogicDelete();
 
     Sql sql = getDialect().select(viewClass)
                           .where(Cond.eq(primaryKey.getColumnName(), id))
-                          .and(Cond.logicalDeleteCond(classMeta));
+                          .and(Cond.logicalDelete(logicDelete));
 
     return this.get(viewClass, sql);
   }
@@ -281,11 +282,12 @@ abstract public class Query extends MyfavsConnection {
    */
   public <TView> TView getByField(Class<TView> viewClass, String field, Object param) {
 
-    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    ClassMeta classMeta   = Metadata.entityMeta(viewClass);
+    Attribute logicDelete = classMeta.getLogicDelete();
 
     Sql sql = getDialect().select(viewClass)
                           .where(Cond.eq(field, param, false))
-                          .and(Cond.logicalDeleteCond(classMeta));
+                          .and(Cond.logicalDelete(logicDelete));
     return this.get(viewClass, sql);
   }
 
@@ -299,11 +301,13 @@ abstract public class Query extends MyfavsConnection {
    */
   public <TView> TView getByCond(Class<TView> viewClass, Cond cond) {
 
-    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    ClassMeta classMeta   = Metadata.entityMeta(viewClass);
+    Attribute logicDelete = classMeta.getLogicDelete();
+
     Sql sql = getDialect().select(viewClass)
                           .where()
                           .and(cond)
-                          .and(Cond.logicalDeleteCond(classMeta));
+                          .and(Cond.logicalDelete(logicDelete));
     return this.get(viewClass, sql);
   }
 
@@ -344,12 +348,14 @@ abstract public class Query extends MyfavsConnection {
    */
   public <TView> List<TView> findByIds(Class<TView> viewClass, Collection<?> ids) {
 
-    ClassMeta classMeta  = Metadata.entityMeta(viewClass);
-    Attribute primaryKey = classMeta.checkPrimaryKey();
+    ClassMeta classMeta   = Metadata.entityMeta(viewClass);
+    Attribute primaryKey  = classMeta.checkPrimaryKey();
+    Attribute logicDelete = classMeta.getLogicDelete();
+
     Sql sql = getDialect().select(viewClass)
                           .where()
                           .and(Cond.in(primaryKey.getColumnName(), ids, false))
-                          .and(Cond.logicalDeleteCond(classMeta));
+                          .and(Cond.logicalDelete(logicDelete));
     return this.find(viewClass, sql);
   }
 
@@ -364,10 +370,12 @@ abstract public class Query extends MyfavsConnection {
    */
   public <TView> List<TView> findByField(Class<TView> viewClass, String field, Object param) {
 
-    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    ClassMeta classMeta   = Metadata.entityMeta(viewClass);
+    Attribute logicDelete = classMeta.getLogicDelete();
+
     Sql sql = getDialect().select(viewClass)
                           .where(Cond.eq(field, param, false))
-                          .and(Cond.logicalDeleteCond(classMeta));
+                          .and(Cond.logicalDelete(logicDelete));
     return this.find(viewClass, sql);
   }
 
@@ -382,11 +390,13 @@ abstract public class Query extends MyfavsConnection {
    */
   public <TView> List<TView> findByField(Class<TView> viewClass, String field, Collection<?> params) {
 
-    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    ClassMeta classMeta   = Metadata.entityMeta(viewClass);
+    Attribute logicDelete = classMeta.getLogicDelete();
+
     Sql sql = getDialect().select(viewClass)
                           .where()
                           .and(Cond.in(field, params, false))
-                          .and(Cond.logicalDeleteCond(classMeta));
+                          .and(Cond.logicalDelete(logicDelete));
     return this.find(viewClass, sql);
   }
 
@@ -400,11 +410,13 @@ abstract public class Query extends MyfavsConnection {
    */
   public <TView> List<TView> findByCond(Class<TView> viewClass, Cond cond) {
 
-    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    ClassMeta classMeta   = Metadata.entityMeta(viewClass);
+    Attribute logicDelete = classMeta.getLogicDelete();
+
     Sql sql = getDialect().select(viewClass)
                           .where()
                           .and(cond)
-                          .and(Cond.logicalDeleteCond(classMeta));
+                          .and(Cond.logicalDelete(logicDelete));
     return this.find(viewClass, sql);
   }
 
@@ -469,11 +481,13 @@ abstract public class Query extends MyfavsConnection {
    */
   public <TView> long countByCond(Class<TView> viewClass, Cond cond) {
 
-    ClassMeta classMeta = Metadata.entityMeta(viewClass);
+    ClassMeta classMeta   = Metadata.entityMeta(viewClass);
+    Attribute logicDelete = classMeta.getLogicDelete();
+
     Sql sql = getDialect().count(viewClass)
                           .where()
                           .and(cond)
-                          .and(Cond.logicalDeleteCond(classMeta));
+                          .and(Cond.logicalDelete(logicDelete));
     return this.get(Number.class, sql).longValue();
   }
 
