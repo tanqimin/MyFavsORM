@@ -3,17 +3,16 @@ package work.myfavs.framework.orm.meta.clause;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.function.Supplier;
-
 import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.FuzzyMode;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.convert.ObjectConvert;
+
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * SQL 条件构建
@@ -235,29 +234,38 @@ public class Cond extends Clause {
    * @return {@link Cond}
    */
   public static Cond like(String field, Object param, FuzzyMode fuzzyMode) {
-    if (StrUtil.isBlankIfStr(param)) return new Cond();
+    Cond cond = new Cond();
+    if (StrUtil.isBlankIfStr(param)) return cond;
 
-    String paramVal = param.toString();
-    if (fuzzyMode == FuzzyMode.SINGLE && paramVal.contains(Constant.FUZZY_SINGLE)) {
-      return new Cond(
-          StrUtil.format(" {} LIKE ?", field),
-          StrUtil.replace(paramVal,
-                          Constant.FUZZY_MULTIPLE,
-                          Constant.FUZZY_ESCAPE.concat(Constant.FUZZY_MULTIPLE)))
-          .escape(Constant.FUZZY_ESCAPE);
+    String paramVal  = param.toString();
+    String multiStr  = Constant.FUZZY_MULTIPLE;
+    String escapeStr = Constant.FUZZY_ESCAPE;
+    String singleStr = Constant.FUZZY_SINGLE;
+
+    String likeClause = StrUtil.format(" {} LIKE ?", field);
+    if (fuzzyMode == FuzzyMode.SINGLE && paramVal.contains(singleStr)) {
+      cond.sql.append(likeClause);
+      if (paramVal.contains(multiStr)) {
+        cond.params.add(StrUtil.replace(paramVal, multiStr, escapeStr.concat(multiStr)));
+        return cond.escape(escapeStr);
+      }
+      cond.params.add(paramVal);
+      return cond;
     }
 
-    if (fuzzyMode == FuzzyMode.MULTIPLE && paramVal.contains(Constant.FUZZY_MULTIPLE)) {
-      return new Cond(
-          StrUtil.format(" {} LIKE ?", field),
-          StrUtil.replace(paramVal,
-                          Constant.FUZZY_SINGLE,
-                          Constant.FUZZY_ESCAPE.concat(Constant.FUZZY_SINGLE)))
-          .escape(Constant.FUZZY_ESCAPE);
+    if (fuzzyMode == FuzzyMode.MULTIPLE && paramVal.contains(multiStr)) {
+      cond.sql.append(likeClause);
+      if (paramVal.contains(singleStr)) {
+        cond.params.add(StrUtil.replace(paramVal, singleStr, escapeStr.concat(singleStr)));
+        return cond.escape(escapeStr);
+      }
+      return cond;
     }
 
-    if (paramVal.contains(Constant.FUZZY_MULTIPLE) || paramVal.contains(Constant.FUZZY_SINGLE)) {
-      return new Cond(StrUtil.format(" {} LIKE ?", field), param);
+    if (paramVal.contains(multiStr) || paramVal.contains(singleStr)) {
+      cond.sql.append(likeClause);
+      cond.params.add(param);
+      return cond;
     }
 
     return eq(field, param);
