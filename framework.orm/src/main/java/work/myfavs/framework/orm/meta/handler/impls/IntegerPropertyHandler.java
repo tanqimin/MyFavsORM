@@ -16,51 +16,38 @@
  */
 package work.myfavs.framework.orm.meta.handler.impls;
 
+import cn.hutool.core.convert.Convert;
+
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class IntegerPropertyHandler extends PropertyHandler<Integer> {
+public class IntegerPropertyHandler extends NumberPropertyHandler<Integer> {
 
-  private boolean isPrimitive;
-
-  public IntegerPropertyHandler() {}
+  public IntegerPropertyHandler() {
+  }
 
   public IntegerPropertyHandler(boolean isPrimitive) {
-
-    this.isPrimitive = isPrimitive;
+    super(isPrimitive);
   }
 
   @Override
-  public Integer convert(ResultSet rs, String columnName, Class<Integer> clazz)
-      throws SQLException {
-
-    int i = rs.getInt(columnName);
-    if (rs.wasNull()) {
-      if (isPrimitive) {
-        return 0;
-      } else {
-        return null;
-      }
-    }
-    return i;
-  }
-
-  @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Integer param)
-      throws SQLException {
-
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
-    ps.setInt(paramIndex, param);
+  protected Integer nullPrimitiveValue() {
+    return 0;
   }
 
   @Override
   public int getSqlType() {
     return Types.INTEGER;
+  }
+
+  @Override
+  protected Integer convert(Object val) {
+    return Convert.toInt(val);
+  }
+
+  @Override
+  protected void setParameter(PreparedStatement ps, int paramIndex, Integer param) throws SQLException {
+    ps.setInt(paramIndex, param);
   }
 }

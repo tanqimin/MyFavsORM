@@ -9,10 +9,25 @@ public interface Constant {
    */
   int MAX_PARAM_SIZE_FOR_MSSQL = 1000;
 
+  /**
+   * 默认日期格式
+   */
   String DATE_FORMAT_STR = "yyyy-MM-dd HH:mm:ss.SSS";
 
+  /**
+   * 默认日期格式器
+   */
   SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_STR);
 
+  /**
+   * 原始类型列表
+   */
   List<Class<?>> PRIMITIVE_TYPES = List.of(Integer.class, Long.class, Double.class, String.class, Float.class, Boolean.class, Number.class,
                                            Short.class);
+
+  String FUZZY_MULTIPLE = "%";
+
+  String FUZZY_SINGLE = "_";
+
+  String FUZZY_ESCAPE = "¦";
 }

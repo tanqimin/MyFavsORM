@@ -16,44 +16,33 @@
  */
 package work.myfavs.framework.orm.meta.handler.impls;
 
+import cn.hutool.core.convert.Convert;
+
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class FloatPropertyHandler extends PropertyHandler<Float> {
+public class FloatPropertyHandler extends NumberPropertyHandler<Float> {
 
-  private boolean isPrimitive;
-
-  public FloatPropertyHandler() {}
+  public FloatPropertyHandler() {
+  }
 
   public FloatPropertyHandler(boolean isPrimitive) {
-
-    this.isPrimitive = isPrimitive;
+    super(isPrimitive);
   }
 
   @Override
-  public Float convert(ResultSet rs, String columnName, Class<Float> clazz) throws SQLException {
-
-    float i = rs.getFloat(columnName);
-    if (rs.wasNull()) {
-      if (isPrimitive) {
-        return 0.0f;
-      } else {
-        return null;
-      }
-    }
-    return i;
+  protected Float nullPrimitiveValue() {
+    return 0.0f;
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Float param) throws SQLException {
+  protected Float convert(Object val) {
+    return Convert.toFloat(val);
+  }
 
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
+  @Override
+  protected void setParameter(PreparedStatement ps, int paramIndex, Float param) throws SQLException {
     ps.setFloat(paramIndex, param);
   }
 

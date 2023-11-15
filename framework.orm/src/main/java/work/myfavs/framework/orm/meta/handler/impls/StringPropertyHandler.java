@@ -20,15 +20,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Objects;
+
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 public class StringPropertyHandler extends PropertyHandler<String> {
 
   @Override
   public String convert(ResultSet rs, String columnName, Class<String> clazz) throws SQLException {
-
-    final String str = rs.getString(columnName);
-    return rs.wasNull() ? null : str;
+    return rs.getString(columnName);
   }
 
   @Override

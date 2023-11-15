@@ -1,44 +1,34 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
+import cn.hutool.core.convert.Convert;
+
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-/** Created by tanqimin on 2016/1/29. */
-public class BytePropertyHandler extends PropertyHandler<Byte> {
-
-  private boolean isPrimitive;
-
-  public BytePropertyHandler() {}
+/**
+ * Created by tanqimin on 2016/1/29.
+ */
+public class BytePropertyHandler extends NumberPropertyHandler<Byte> {
+  public BytePropertyHandler() {
+  }
 
   public BytePropertyHandler(boolean isPrimitive) {
-
-    this.isPrimitive = isPrimitive;
+    super(isPrimitive);
   }
 
   @Override
-  public Byte convert(ResultSet rs, String columnName, Class<Byte> clazz) throws SQLException {
-
-    byte i = rs.getByte(columnName);
-    if (rs.wasNull()) {
-      if (isPrimitive) {
-        return 0;
-      } else {
-        return null;
-      }
-    }
-    return i;
+  protected Byte nullPrimitiveValue() {
+    return Convert.toByte(0);
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Byte param) throws SQLException {
+  protected Byte convert(Object val) {
+    return Convert.toByte(val);
+  }
 
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
+  @Override
+  protected void setParameter(PreparedStatement ps, int paramIndex, Byte param) throws SQLException {
     ps.setByte(paramIndex, param);
   }
 

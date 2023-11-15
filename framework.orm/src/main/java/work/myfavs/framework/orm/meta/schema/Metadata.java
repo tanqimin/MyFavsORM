@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.util.exception.DBException;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * 元数据构建
@@ -17,8 +17,7 @@ public class Metadata {
 
   private static final Logger log = LoggerFactory.getLogger(Metadata.class);
 
-  private static final Map<String, ClassMeta> CLASS_META_CACHE = new WeakHashMap<>();
-  private static final Object                 SYNC_LOCK        = new Object();
+  private static final Map<Class<?>, ClassMeta> CLASS_META_CACHE = new HashMap<>();
 
   private Metadata() {}
 
@@ -29,9 +28,8 @@ public class Metadata {
    * @return 类元数据
    */
   public static ClassMeta get(Class<?> clazz) {
-    final String className = clazz.getName();
-    return CLASS_META_CACHE.computeIfAbsent(className, key -> {
-      log.debug("ClassMeta : {} keys not exists.", className);
+    return CLASS_META_CACHE.computeIfAbsent(clazz, key -> {
+      log.debug("ClassMeta : {} keys not exists.", clazz.getName());
       return ClassMeta.createInstance(clazz);
     });
   }

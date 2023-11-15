@@ -684,7 +684,7 @@ public class Database extends Query {
       return 0;
     }
 
-    ClassMeta classMeta = ClassMeta.createInstance(modelClass);
+    ClassMeta classMeta = Metadata.entityMeta(modelClass);
     Object    pkVal     = classMeta.getPrimaryKey().getFieldVisitor().getValue(entity);
 
     return deleteById(classMeta, pkVal);
