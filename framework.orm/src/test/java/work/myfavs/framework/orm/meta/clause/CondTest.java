@@ -3,17 +3,21 @@ package work.myfavs.framework.orm.meta.clause;
 import static org.junit.Assert.*;
 
 import cn.hutool.core.util.StrUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import work.myfavs.framework.orm.entity.*;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.annotation.Criterion;
+import work.myfavs.framework.orm.meta.enumeration.FuzzyMode;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
+import work.myfavs.framework.orm.meta.schema.Metadata;
 
 public class CondTest {
   ClassMeta identityClassMeta;
@@ -23,10 +27,10 @@ public class CondTest {
 
   @Before
   public void setUp() {
-    identityClassMeta = ClassMeta.createInstance(Identity.class);
-    snowflakeClassMeta = ClassMeta.createInstance(Snowflake.class);
-    uuidClassMeta = ClassMeta.createInstance(Uuid.class);
-    logicDeleteMeta = ClassMeta.createInstance(LogicDelete.class);
+    identityClassMeta = Metadata.entityMeta(Identity.class);
+    snowflakeClassMeta = Metadata.entityMeta(Snowflake.class);
+    uuidClassMeta = Metadata.entityMeta(Uuid.class);
+    logicDeleteMeta = Metadata.entityMeta(LogicDelete.class);
   }
 
   @After
@@ -101,6 +105,19 @@ public class CondTest {
     assertEquals("", Cond.like("id", null).toString());
     assertEquals(" id = ?", Cond.like("id", 1).toString());
     assertEquals(" id LIKE ?", Cond.like("id", "1%").toString());
+
+    String paramVal   = "_ABC%";
+    Cond   multiLike  = Cond.like("id", paramVal, FuzzyMode.MULTIPLE);
+    Cond   singleLike = Cond.like("id", paramVal, FuzzyMode.SINGLE);
+
+    assertEquals(" id = ?", Cond.like("id", 1, FuzzyMode.ALL).toString());
+    assertEquals(" id = ?", Cond.like("id", 1, FuzzyMode.MULTIPLE).toString());
+    assertEquals(" id = ?", Cond.like("id", 1, FuzzyMode.SINGLE).toString());
+    assertEquals(" id LIKE ?", Cond.like("id", paramVal, FuzzyMode.ALL).toString());
+    assertEquals(" id LIKE ? ESCAPE '¦'", multiLike.toString());
+    assertEquals(" id LIKE ? ESCAPE '¦'", singleLike.toString());
+    assertEquals(multiLike.params.get(0), "¦_ABC%");
+    assertEquals(singleLike.params.get(0), "_ABC¦%");
   }
 
   @Test
@@ -206,7 +223,7 @@ public class CondTest {
 
     Person person = new Person();
     person.setName("Person1");
-    person.setCars(new String[] {"Car1", "Car2"});
+    person.setCars(new String[]{"Car1", "Car2"});
     person.setAlias(Arrays.asList("Alias1", "Alias2"));
 
     cond = Cond.createByCriteria(person, Person.PersonQuery.class);
