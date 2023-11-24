@@ -6,13 +6,13 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.SqlCache.Opt;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.schema.Attribute;
-import work.myfavs.framework.orm.meta.schema.Attributes;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.DruidUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,7 +32,7 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
   }
 
   protected static <TModel> String getTableName(Class<TModel> clazz) {
-    return TableAlias.getOpt().orElse(Metadata.get(clazz).getTableName());
+    return TableAlias.getOpt().orElse(Metadata.classMeta(clazz).getTableName());
   }
 
   @Override
@@ -40,16 +40,16 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
 
     Sql sql = insert(clazz);
 
-    ClassMeta  classMeta        = Metadata.get(clazz);
-    Attribute  primaryKey       = classMeta.getPrimaryKey();
-    Attributes updateAttributes = classMeta.getUpdateAttributes();
+    ClassMeta                               classMeta        = Metadata.classMeta(clazz);
+    Attribute                               primaryKey       = classMeta.getPrimaryKey();
+    Map<String /* columnName */, Attribute> updateAttributes = classMeta.getUpdateAttributes();
 
     if (classMeta.getStrategy() != GenerationType.IDENTITY) {
       sql.getParams().add(primaryKey.getFieldVisitor().getValue(model));
     }
 
-    if (updateAttributes.size() > 0) {
-      updateAttributes.forEach((col, attr) -> sql.getParams().add(attr.getFieldVisitor().getValue(model)));
+    for (Map.Entry<String, Attribute> entry : updateAttributes.entrySet()) {
+      sql.getParams().add(entry.getValue().getFieldVisitor().getValue(model));
     }
 
     return sql;
@@ -62,10 +62,10 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
         clazz,
         Opt.INSERT,
         (key) -> {
-          ClassMeta  classMeta        = Metadata.entityMeta(clazz);
-          String     tableName        = TableAlias.getOpt().orElse(classMeta.getTableName());
-          Attribute  primaryKey       = classMeta.checkPrimaryKey();
-          Attributes updateAttributes = classMeta.getUpdateAttributes();
+          ClassMeta                               classMeta        = Metadata.entityMeta(clazz);
+          String                                  tableName        = TableAlias.getOpt().orElse(classMeta.getTableName());
+          Attribute                               primaryKey       = classMeta.checkPrimaryKey();
+          Map<String /* columnName */, Attribute> updateAttributes = classMeta.getUpdateAttributes();
 
           Sql insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
           Sql valuesSql = new Sql(" VALUES (");
@@ -74,7 +74,7 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
             valuesSql.append("?,");
           }
 
-          if (updateAttributes.size() > 0) {
+          if (!updateAttributes.isEmpty()) {
             updateAttributes.forEach(
                 (col, attr) -> {
                   insertSql.append(attr.getColumnName().concat(","));
@@ -100,21 +100,21 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
   @Override
   public <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue) {
 
-    ClassMeta  classMeta;
-    String     tableName;
-    Attribute  primaryKey;
-    Attributes updateAttributes;
+    ClassMeta                               classMeta;
+    String                                  tableName;
+    Attribute                               primaryKey;
+    Map<String /* columnName */, Attribute> updateAttributes;
 
     Sql sql;
 
-    classMeta = Metadata.get(clazz);
+    classMeta = Metadata.classMeta(clazz);
     tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     primaryKey = classMeta.checkPrimaryKey();
     updateAttributes = classMeta.getUpdateAttributes();
 
     sql = Sql.Update(tableName).append(" SET");
 
-    if (updateAttributes.size() > 0) {
+    if (!updateAttributes.isEmpty()) {
       updateAttributes.forEach(
           (col, attr) -> {
             final Object fieldValue = attr.getFieldVisitor().getValue(model);

@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
  * Field 访问器
  */
 public class FieldVisitor {
-  private Field field;
+  private final Field field;
 
   public FieldVisitor(Field field) {
     this.field = field;

@@ -1,10 +1,10 @@
 package work.myfavs.framework.orm;
 
-import java.sql.Connection;
-
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.dialect.DialectFactory;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
+
+import java.sql.Connection;
 
 /**
  * 数据库配置
@@ -165,28 +165,6 @@ public class DBConfig {
   public DBConfig setFetchSize(int fetchSize) {
 
     this.fetchSize = fetchSize;
-    return this;
-  }
-
-  /**
-   * 获取查询超时时间
-   *
-   * @return 查询超时时间
-   */
-  public int getQueryTimeout() {
-
-    return queryTimeout;
-  }
-
-  /**
-   * 设置查询超时时间
-   *
-   * @param queryTimeout 查询超时时间
-   * @return Configuration
-   */
-  public DBConfig setQueryTimeout(int queryTimeout) {
-
-    this.queryTimeout = queryTimeout;
     return this;
   }
 

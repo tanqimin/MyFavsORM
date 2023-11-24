@@ -97,7 +97,7 @@ public class SqlLog {
   }
 
   private <TView> void showEntities(Class<TView> viewClass, List<TView> result) {
-    ClassMeta             classMeta  = Metadata.get(viewClass);
+    ClassMeta             classMeta  = Metadata.classMeta(viewClass);
     Collection<Attribute> attributes = classMeta.getQueryAttributes().values();
     log.debug(CollUtil.join(attributes, ", ", Attribute::getColumnName));
     for (TView tView : result) {

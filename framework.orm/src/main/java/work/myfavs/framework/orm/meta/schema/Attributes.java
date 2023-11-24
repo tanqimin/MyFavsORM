@@ -42,11 +42,13 @@ public class Attributes {
       return CollUtil.list(true, map.values());
     }
 
-    List<Attribute> res = new LinkedList<>();
+    List<Attribute> res = new ArrayList<>();
     for (String columnName : columnNames) {
       final String col = StrUtil.trim(columnName);
+      Attribute    attribute = getAttribute(col);
+
       if (containsColumn(col)) {
-        res.add(getAttribute(col));
+        res.add(attribute);
       }
     }
     return res;

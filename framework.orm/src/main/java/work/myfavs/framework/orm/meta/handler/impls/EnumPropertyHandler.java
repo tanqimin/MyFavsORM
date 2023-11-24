@@ -2,13 +2,16 @@ package work.myfavs.framework.orm.meta.handler.impls;
 
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.StrUtil;
+import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-/** Created by tanqimin on 2016/1/29. */
+/**
+ * Created by tanqimin on 2016/1/29.
+ */
 public class EnumPropertyHandler extends PropertyHandler<Object> {
 
   @Override
@@ -21,10 +24,6 @@ public class EnumPropertyHandler extends PropertyHandler<Object> {
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Object param) throws SQLException {
 
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
     ps.setString(paramIndex, StrUtil.toString(param));
   }
 

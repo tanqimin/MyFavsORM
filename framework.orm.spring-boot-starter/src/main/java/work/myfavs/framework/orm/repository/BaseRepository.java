@@ -1,6 +1,7 @@
 package work.myfavs.framework.orm.repository;
 
 import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Sql;
 
 import java.util.Collection;
@@ -15,8 +16,6 @@ import java.util.Map;
 public abstract class BaseRepository {
 
   protected DBTemplate dbTemplate;
-
-  private BaseRepository() {}
 
   public BaseRepository(DBTemplate dbTemplate) {
 
@@ -42,7 +41,9 @@ public abstract class BaseRepository {
    */
   protected <TView> List<TView> find(Class<TView> viewClass, String sql, Collection<?> params) {
 
-    return this.dbTemplate.createDatabase().find(viewClass, sql, params);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.find(viewClass, sql, params);
+    }
   }
 
   /**
@@ -55,7 +56,9 @@ public abstract class BaseRepository {
    */
   protected <TView> List<TView> find(Class<TView> viewClass, Sql sql) {
 
-    return this.dbTemplate.createDatabase().find(viewClass, sql);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.find(viewClass, sql);
+    }
   }
 
   /**
@@ -70,7 +73,9 @@ public abstract class BaseRepository {
    */
   protected <TKey, TView> Map<TKey, TView> findMap(
       Class<TView> viewClass, String keyField, String sql, Collection<?> params) {
-    return this.dbTemplate.createDatabase().findMap(viewClass, keyField, sql, params);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.findMap(viewClass, keyField, sql, params);
+    }
   }
 
   /**
@@ -84,7 +89,9 @@ public abstract class BaseRepository {
    */
   protected <TKey, TView> Map<TKey, TView> findMap(
       Class<TView> viewClass, String keyField, Sql sql) {
-    return this.dbTemplate.createDatabase().findMap(viewClass, keyField, sql);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.findMap(viewClass, keyField, sql);
+    }
   }
 
   /**
@@ -100,7 +107,9 @@ public abstract class BaseRepository {
   protected <TView> List<TView> findTop(
       Class<TView> viewClass, int top, String sql, Collection<?> params) {
 
-    return this.dbTemplate.createDatabase().findTop(viewClass, top, sql, params);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.findTop(viewClass, top, sql, params);
+    }
   }
 
   /**
@@ -114,7 +123,9 @@ public abstract class BaseRepository {
    */
   protected <TView> List<TView> findTop(Class<TView> viewClass, int top, Sql sql) {
 
-    return this.dbTemplate.createDatabase().findTop(viewClass, top, sql);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.findTop(viewClass, top, sql);
+    }
   }
 
   /**
@@ -128,7 +139,9 @@ public abstract class BaseRepository {
    */
   protected <TView> TView get(Class<TView> viewClass, String sql, Collection<?> params) {
 
-    return this.dbTemplate.createDatabase().get(viewClass, sql, params);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.get(viewClass, sql, params);
+    }
   }
 
   /**
@@ -141,7 +154,9 @@ public abstract class BaseRepository {
    */
   protected <TView> TView get(Class<TView> viewClass, Sql sql) {
 
-    return this.dbTemplate.createDatabase().get(viewClass, sql);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.get(viewClass, sql);
+    }
   }
 
   /**
@@ -153,7 +168,9 @@ public abstract class BaseRepository {
    */
   protected long count(String sql, Collection<?> params) {
 
-    return this.dbTemplate.createDatabase().count(sql, params);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.count(sql, params);
+    }
   }
 
   /**
@@ -164,6 +181,8 @@ public abstract class BaseRepository {
    */
   protected long count(Sql sql) {
 
-    return this.dbTemplate.createDatabase().count(sql);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.count(sql);
+    }
   }
 }

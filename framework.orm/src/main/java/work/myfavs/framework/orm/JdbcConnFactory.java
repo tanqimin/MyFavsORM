@@ -1,14 +1,13 @@
 package work.myfavs.framework.orm;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import work.myfavs.framework.orm.util.JdbcUtil;
-import work.myfavs.framework.orm.util.SqlLog;
 import work.myfavs.framework.orm.util.exception.DBException;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Objects;
 
 /**
  * JDBC 连接工厂
@@ -83,15 +82,25 @@ public class JdbcConnFactory extends ConnFactory {
    * @param conn 数据库链接
    */
   protected void releaseConnection(Connection conn) {
+    if (Objects.isNull(conn)) return;
 
     try {
-      JdbcUtil.commit(conn);
-    } finally {
-      try {
-        JdbcUtil.close(conn);
-      } catch (SQLException e) {
-        throw new DBException(e, "Fail to close connection");
+      if (conn.isClosed()) return;
+      if (!conn.getAutoCommit()) {
+        conn.commit();
       }
+    } catch (SQLException e) {
+      throw new DBException(e, "Fail to committed transaction");
+    } finally {
+      closeConn(conn);
+    }
+  }
+
+  private static void closeConn(Connection conn) {
+    try {
+      conn.close();
+    } catch (SQLException e) {
+      throw new DBException(e, "Fail to close connection");
     }
   }
 }

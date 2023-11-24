@@ -68,7 +68,6 @@ public class AbstractTest {
   private static void initDatabase() {
     if (database == null) {
       database = dbTemplate.createDatabase();
-      database.open();
     }
   }
 

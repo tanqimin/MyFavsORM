@@ -8,10 +8,10 @@ public class MetadataTest extends DefaultDialectTest {
 
   @Test
   public void get() {
-    ClassMeta classMeta = Metadata.get(Snowflake.class);
+    ClassMeta classMeta = Metadata.classMeta(Snowflake.class);
     for (int i = 0; i < 10; i++) {
       //
-      classMeta = Metadata.get(Snowflake.class);
+      classMeta = Metadata.classMeta(Snowflake.class);
     }
 
     System.out.println(classMeta);

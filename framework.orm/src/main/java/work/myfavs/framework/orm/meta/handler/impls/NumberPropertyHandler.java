@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import cn.hutool.core.convert.Convert;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 import java.sql.PreparedStatement;
@@ -31,10 +30,6 @@ public abstract class NumberPropertyHandler<T extends Number> extends PropertyHa
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, T param) throws SQLException {
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
     setParameter(ps, paramIndex, param);
   }
 

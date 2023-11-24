@@ -1,28 +1,23 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import cn.hutool.core.convert.Convert;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
-
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.Date;
 
 /**
  * Created by tanqimin on 2016/1/29.
  */
-public class DatePropertyHandler extends PropertyHandler<Date> {
+public class DatePropertyHandler extends AbstractDatePropertyHandler<Date> {
 
   @Override
-  public Date convert(ResultSet rs, String columnName, Class<Date> clazz) throws SQLException {
-    return Convert.toDate(rs.getObject(columnName));
+  protected Date fromMilliseconds(long millisecond) {
+    return new Date(millisecond);
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Date param) throws SQLException {
-
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
 
     if (param instanceof Timestamp)
       ps.setTimestamp(paramIndex, (Timestamp) param);

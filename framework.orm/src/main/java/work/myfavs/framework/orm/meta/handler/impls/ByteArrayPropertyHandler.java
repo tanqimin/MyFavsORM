@@ -1,14 +1,12 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.*;
-
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.ByteUtil;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.util.common.IOUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.*;
 
 /**
  * Created by tanqimin on 2016/1/29.
@@ -49,10 +47,6 @@ public class ByteArrayPropertyHandler extends PropertyHandler<byte[]> {
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, byte[] param) throws SQLException {
 
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
     ps.setBytes(paramIndex, param);
   }
 

@@ -5,7 +5,7 @@ import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.meta.schema.Attribute;
-import work.myfavs.framework.orm.meta.schema.Attributes;
+import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.common.Constant;
 
@@ -14,6 +14,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -47,17 +48,21 @@ public class DBConvert {
   private static <TModel> List<TModel> toEntities(
       Class<TModel> modelClass, ResultSet rs) throws SQLException {
 
-    final List<TModel>      result      = new ArrayList<>();
-    final Attributes        attributes  = Metadata.get(modelClass).getQueryAttributes();
+    final List<TModel> result = new ArrayList<>();
+
+    ClassMeta classMeta = Metadata.classMeta(modelClass);
+
+    final Map<String /*columnName*/, Attribute> attributes = classMeta.getQueryAttributes();
+
     final ResultSetMetaData metaData    = rs.getMetaData();
     final int               columnCount = metaData.getColumnCount();
 
     while (rs.next()) {
       TModel model = ReflectUtil.newInstance(modelClass);
       for (int i = 1; i <= columnCount; i++) {
-        Attribute attr = attributes.getAttribute(metaData.getColumnName(i));
+        Attribute attr = attributes.get(metaData.getColumnName(i).toUpperCase());
         if (Objects.isNull(attr)) continue;
-        attr.getFieldVisitor().setValue(model, attr.value(rs));
+        attr.getFieldVisitor().setValue(model, attr.convert(rs));
       }
       result.add(model);
     }

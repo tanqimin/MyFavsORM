@@ -7,7 +7,6 @@ import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.StringUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
 import work.myfavs.framework.orm.util.reflection.FieldVisitor;
 
 import java.io.Serializable;
@@ -126,12 +125,7 @@ public class Attribute implements Serializable {
     return field.getAnnotation(LogicDelete.class) != null;
   }
 
-  public Object value(ResultSet rs) {
-
-    try {
-      return this.propertyHandler.convert(rs, columnName, fieldVisitor.getType());
-    } catch (SQLException ex) {
-      throw new DBException(ex);
-    }
+  public Object convert(ResultSet rs) throws SQLException {
+    return this.propertyHandler.convert(rs, columnName, fieldVisitor.getType());
   }
 }

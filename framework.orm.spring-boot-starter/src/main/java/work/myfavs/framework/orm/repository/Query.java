@@ -1,6 +1,7 @@
 package work.myfavs.framework.orm.repository;
 
 import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.pagination.IPageable;
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * 查询器基类
  */
+@SuppressWarnings("unused")
 public class Query extends BaseRepository {
 
   /**
@@ -74,7 +76,7 @@ public class Query extends BaseRepository {
    * @param params 参数
    * @return 结果集
    */
-  public List<Record> findRecord(String sql, Collection<?> params) {
+  public List<Record> findRecords(String sql, Collection<?> params) {
 
     return this.find(Record.class, sql, params);
   }
@@ -85,7 +87,7 @@ public class Query extends BaseRepository {
    * @param sql SQL
    * @return 结果集
    */
-  public List<Record> findRecord(Sql sql) {
+  public List<Record> findRecords(Sql sql) {
 
     return this.find(Record.class, sql);
   }
@@ -130,7 +132,7 @@ public class Query extends BaseRepository {
    * @param params 参数
    * @return 结果集
    */
-  public List<Record> findRecordTop(int top, String sql, Collection<?> params) {
+  public List<Record> findTopRecords(int top, String sql, Collection<?> params) {
 
     return this.findTop(Record.class, top, sql, params);
   }
@@ -142,7 +144,7 @@ public class Query extends BaseRepository {
    * @param sql SQL
    * @return 结果集
    */
-  public List<Record> findRecordTop(int top, Sql sql) {
+  public List<Record> findTopRecords(int top, Sql sql) {
 
     return this.findTop(Record.class, top, sql);
   }
@@ -250,7 +252,9 @@ public class Query extends BaseRepository {
   public <TView> PageLite<TView> findPageLite(
       Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
 
-    return this.dbTemplate.createDatabase().findPageLite(viewClass, sql, params, pageable);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.findPageLite(viewClass, sql, params, pageable);
+    }
   }
 
   /**
@@ -264,7 +268,9 @@ public class Query extends BaseRepository {
    */
   public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, IPageable pageable) {
 
-    return this.dbTemplate.createDatabase().findPageLite(viewClass, sql, pageable);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.findPageLite(viewClass, sql, pageable);
+    }
   }
 
   /**
@@ -287,8 +293,9 @@ public class Query extends BaseRepository {
       int currentPage,
       int pageSize) {
 
-    return this.dbTemplate.createDatabase()
-                          .findPageLite(viewClass, sql, params, enablePage, currentPage, pageSize);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.findPageLite(viewClass, sql, params, enablePage, currentPage, pageSize);
+    }
   }
 
   /**
@@ -319,7 +326,7 @@ public class Query extends BaseRepository {
    * @param pageSize    每页记录数
    * @return 简单分页结果集
    */
-  public PageLite<Record> findRecordPageLite(
+  public PageLite<Record> findRecordsPageLite(
       String sql, Collection<?> params, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPageLite(Record.class, sql, params, enablePage, currentPage, pageSize);
@@ -334,7 +341,7 @@ public class Query extends BaseRepository {
    * @param pageSize    每页记录数
    * @return 简单分页结果集
    */
-  public PageLite<Record> findRecordPageLite(
+  public PageLite<Record> findRecordsPageLite(
       Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPageLite(Record.class, sql, enablePage, currentPage, pageSize);
@@ -348,7 +355,7 @@ public class Query extends BaseRepository {
    * @param pageable 分页对象
    * @return 简单分页结果集
    */
-  public PageLite<Record> findRecordPageLite(String sql, Collection<?> params, IPageable pageable) {
+  public PageLite<Record> findRecordsPageLite(String sql, Collection<?> params, IPageable pageable) {
 
     return this.findPageLite(Record.class, sql, params, pageable);
   }
@@ -360,7 +367,7 @@ public class Query extends BaseRepository {
    * @param pageable 分页对象
    * @return 简单分页结果集
    */
-  public PageLite<Record> findRecordPageLite(Sql sql, IPageable pageable) {
+  public PageLite<Record> findRecordsPageLite(Sql sql, IPageable pageable) {
 
     return this.findPageLite(Record.class, sql, pageable);
   }
@@ -385,8 +392,9 @@ public class Query extends BaseRepository {
       int currentPage,
       int pageSize) {
 
-    return this.dbTemplate.createDatabase()
-                          .findPage(viewClass, sql, params, enablePage, currentPage, pageSize);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.findPage(viewClass, sql, params, enablePage, currentPage, pageSize);
+    }
   }
 
   /**
@@ -419,7 +427,9 @@ public class Query extends BaseRepository {
   public <TView> Page<TView> findPage(
       Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
 
-    return this.dbTemplate.createDatabase().findPage(viewClass, sql, params, pageable);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.findPage(viewClass, sql, params, pageable);
+    }
   }
 
   /**
@@ -433,7 +443,9 @@ public class Query extends BaseRepository {
    */
   public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, IPageable pageable) {
 
-    return this.dbTemplate.createDatabase().findPage(viewClass, sql, pageable);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.findPage(viewClass, sql, pageable);
+    }
   }
 
   /**
@@ -446,7 +458,7 @@ public class Query extends BaseRepository {
    * @param pageSize    每页记录数
    * @return 分页结果集
    */
-  public Page<Record> findRecordPage(
+  public Page<Record> findRecordsPage(
       String sql, Collection<?> params, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPage(Record.class, sql, params, enablePage, currentPage, pageSize);
@@ -461,7 +473,7 @@ public class Query extends BaseRepository {
    * @param pageSize    每页记录数
    * @return 分页结果集
    */
-  public Page<Record> findRecordPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
+  public Page<Record> findRecordsPage(Sql sql, boolean enablePage, int currentPage, int pageSize) {
 
     return this.findPage(Record.class, sql, enablePage, currentPage, pageSize);
   }
@@ -474,7 +486,7 @@ public class Query extends BaseRepository {
    * @param pageable 分页对象
    * @return 分页结果集
    */
-  public Page<Record> findRecordPage(String sql, Collection<?> params, IPageable pageable) {
+  public Page<Record> findRecordsPage(String sql, Collection<?> params, IPageable pageable) {
 
     return this.findPage(Record.class, sql, params, pageable);
   }
@@ -486,7 +498,7 @@ public class Query extends BaseRepository {
    * @param pageable 分页对象
    * @return 分页结果集
    */
-  public Page<Record> findRecordPage(Sql sql, IPageable pageable) {
+  public Page<Record> findRecordsPage(Sql sql, IPageable pageable) {
 
     return this.findPage(Record.class, sql, pageable);
   }
