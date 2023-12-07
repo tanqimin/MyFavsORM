@@ -104,28 +104,29 @@ public class DatabaseTest extends AbstractTest
   @Test
   public void find() {
     initSnowflakes();
-    database.truncate(Snowflake.class);
-    database.create(Snowflake.class, SNOW_FLAKES);
 
-    List<Snowflake> snowflakes = database.find(Snowflake.class, new Sql("SELECT * FROM tb_snowflake"));
-    Assert.assertEquals(3, snowflakes.size());
+    database.tx(db -> {
+      db.truncate(Snowflake.class);
+      db.create(Snowflake.class, SNOW_FLAKES);
 
-    snowflakes =
-        database.find(Snowflake.class, "SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1"));
-    Assert.assertEquals(1, snowflakes.size());
+      List<Snowflake> snowflakes = db.find(Snowflake.class, new Sql("SELECT * FROM tb_snowflake"));
+      Assert.assertEquals(3, snowflakes.size());
 
-    snowflakes = database.find(Snowflake.class, new Sql("SELECT * FROM tb_snowflake"));
-    Assert.assertEquals(3, snowflakes.size());
+      snowflakes = db.find(Snowflake.class, "SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1"));
+      Assert.assertEquals(1, snowflakes.size());
 
-    snowflakes = database.find(Snowflake.class, new Sql("SELECT id, type, name FROM tb_snowflake"));
-    Assert.assertEquals(3, snowflakes.size());
+      snowflakes = db.find(Snowflake.class, new Sql("SELECT * FROM tb_snowflake"));
+      Assert.assertEquals(3, snowflakes.size());
 
-    List<Record> records =
-        database.findRecords(new Sql("SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1")));
-    Assert.assertEquals(1, records.size());
+      snowflakes = db.find(Snowflake.class, new Sql("SELECT id, type, name FROM tb_snowflake"));
+      Assert.assertEquals(3, snowflakes.size());
 
-    records = database.findRecords("SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1"));
-    Assert.assertEquals(1, records.size());
+      List<Record> records = db.findRecords(new Sql("SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1")));
+      Assert.assertEquals(1, records.size());
+
+      records = db.findRecords("SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1"));
+      Assert.assertEquals(1, records.size());
+    });
   }
 
   @Test
@@ -134,29 +135,19 @@ public class DatabaseTest extends AbstractTest
     database.truncate(Snowflake.class);
     database.create(Snowflake.class, SNOW_FLAKES);
 
-    Map<Long, Snowflake> result =
-        database
-            .findMap(
-                Snowflake.class,
-                "id",
-                "SELECT * FROM tb_snowflake WHERE disable = ?",
-                List.of(false));
+    Map<Long, Snowflake> result = database.findMap(
+        Snowflake.class,
+        "id",
+        "SELECT * FROM tb_snowflake WHERE disable = ?",
+        List.of(false));
 
-    result.forEach(
-        (k, v) -> {
-          Assert.assertTrue(k > 0L);
-        });
+    result.forEach((k, v) -> Assert.assertTrue(k > 0L));
 
-    result =
-        database
-            .findMap(
-                Snowflake.class,
-                "id",
-                new Sql("SELECT * FROM tb_snowflake WHERE disable = ?", List.of(false)));
-    result.forEach(
-        (k, v) -> {
-          Assert.assertTrue(k > 0L);
-        });
+    result = database.findMap(
+        Snowflake.class,
+        "id",
+        new Sql("SELECT * FROM tb_snowflake WHERE disable = ?", List.of(false)));
+    result.forEach((k, v) -> Assert.assertTrue(k > 0L));
   }
 
   @Test

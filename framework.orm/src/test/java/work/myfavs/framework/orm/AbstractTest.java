@@ -4,15 +4,13 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
-import java.util.ArrayList;
-import java.util.List;
-import javax.sql.DataSource;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.meta.clause.Sql;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AbstractTest {
   protected static final String DB_TYPE       = DbType.SQL_SERVER;
@@ -48,12 +46,16 @@ public class AbstractTest {
   }
 
   private static void createTablesForSqlServer() {
-    String    sqlContent = ResourceUtil.readUtf8Str("sql/sql_server.sql");
-    List<Sql> sqlList    = new ArrayList<>();
+    String       sqlContent = ResourceUtil.readUtf8Str("sql/sql_server.sql");
+    List<String> sqlList    = new ArrayList<>();
     for (String s : sqlContent.split("GO")) {
-      sqlList.add(new Sql(StrUtil.trim(s)));
+      sqlList.add(StrUtil.trim(s));
     }
-    database.execute(sqlList);
+    database.tx(db -> {
+      for (String sql : sqlList) {
+        int result = db.createQuery(sql).execute();
+      }
+    });
   }
 
   @BeforeClass

@@ -132,7 +132,8 @@ public class ClassMeta {
         continue;
       }
 
-      this.queryAttributes.put(attr.getColumnName().toUpperCase(), attr);
+      String columnName = attr.getColumnName().toUpperCase();
+      this.queryAttributes.put(columnName, attr);
 
       if (attr.isReadonly()) {
         continue;
@@ -143,7 +144,7 @@ public class ClassMeta {
       } else if (attr.isLogicDelete()) {
         this.logicDelete = attr;
       } else {
-        this.updateAttributes.put(attr.getColumnName().toUpperCase(), attr);
+        this.updateAttributes.put(columnName, attr);
       }
     }
   }

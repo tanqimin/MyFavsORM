@@ -75,6 +75,7 @@ public class PropertyHandlerFactory {
     if (Objects.nonNull(propertyHandler)) return propertyHandler;
 
     if (clazz.isEnum()) {
+      HANDLER_MAP.put(clazzName, ENUM_PROPERTY_HANDLER);
       return ENUM_PROPERTY_HANDLER;
     }
 

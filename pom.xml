@@ -31,6 +31,7 @@
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+        <reflectasm.version>1.11.9</reflectasm.version>
     </properties>
 
     <!--私服仓库-->
@@ -153,6 +154,14 @@
                 <artifactId>hutool-core</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.esotericsoftware/reflectasm -->
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>reflectasm</artifactId>
+                <version>${reflectasm.version}</version>
+            </dependency>
+
 
             <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-json -->
             <dependency>

@@ -29,7 +29,7 @@ public class Metadata {
    * @return 类元数据
    */
   public static ClassMeta entityMeta(Class<?> clazz) {
-    ClassMeta classMeta = ClassMeta.createInstance(clazz);
+    ClassMeta classMeta = classMeta(clazz);
     if (classMeta.isEntity())
       return classMeta;
     throw new DBException("Class {} is not an entity class", clazz.getName());

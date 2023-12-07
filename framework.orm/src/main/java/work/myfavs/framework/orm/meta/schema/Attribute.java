@@ -125,6 +125,13 @@ public class Attribute implements Serializable {
     return field.getAnnotation(LogicDelete.class) != null;
   }
 
+  /**
+   * 把 {@link ResultSet} 中对应字段的值转换为指定的对象
+   *
+   * @param rs {@link ResultSet}
+   * @return Object
+   * @throws SQLException 异常
+   */
   public Object convert(ResultSet rs) throws SQLException {
     return this.propertyHandler.convert(rs, columnName, fieldVisitor.getType());
   }
