@@ -13,9 +13,9 @@ import java.sql.Types;
 public class ObjectPropertyHandler extends PropertyHandler<Object> {
 
   @Override
-  public Object convert(ResultSet rs, String columnName, Class<Object> clazz) throws SQLException {
+  public Object convert(ResultSet rs, int columnIndex, Class<Object> clazz) throws SQLException {
 
-    return rs.getObject(columnName);
+    return rs.getObject(columnIndex);
   }
 
   @Override

@@ -16,8 +16,6 @@
  */
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import cn.hutool.core.convert.Convert;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -32,13 +30,13 @@ public class DoublePropertyHandler extends NumberPropertyHandler<Double> {
   }
 
   @Override
-  protected Double nullPrimitiveValue() {
-    return 0.0d;
+  protected Double convertNumber(Number val) {
+    return val.doubleValue();
   }
 
   @Override
-  protected Double convert(Object val) {
-    return Convert.toDouble(val);
+  protected Double convertString(String val) {
+    return Double.parseDouble(val);
   }
 
   @Override

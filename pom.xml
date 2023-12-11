@@ -155,28 +155,6 @@
                 <version>${hutool.version}</version>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/com.esotericsoftware/reflectasm -->
-            <dependency>
-                <groupId>com.esotericsoftware</groupId>
-                <artifactId>reflectasm</artifactId>
-                <version>${reflectasm.version}</version>
-            </dependency>
-
-
-            <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-json -->
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-json</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-
-            <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-
             <!-- https://mvnrepository.com/artifact/com.ibeetl/beetl -->
             <dependency>
                 <groupId>com.ibeetl</groupId>

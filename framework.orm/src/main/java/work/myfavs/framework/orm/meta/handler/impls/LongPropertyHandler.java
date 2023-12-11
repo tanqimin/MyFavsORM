@@ -16,8 +16,6 @@
  */
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import cn.hutool.core.convert.Convert;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -32,13 +30,13 @@ public class LongPropertyHandler extends NumberPropertyHandler<Long> {
   }
 
   @Override
-  protected Long nullPrimitiveValue() {
-    return 0L;
+  protected Long convertNumber(Number val) {
+    return val.longValue();
   }
 
   @Override
-  protected Long convert(Object val) {
-    return Convert.toLong(val);
+  protected Long convertString(String val) {
+    return Long.parseLong(val);
   }
 
   @Override

@@ -22,7 +22,7 @@ public class BooleanPropertyHandler extends PropertyHandler<Boolean> {
   }
 
   @Override
-  public Boolean convert(ResultSet rs, String columnName, Class<Boolean> clazz)
+  public Boolean convert(ResultSet rs, int columnName, Class<Boolean> clazz)
       throws SQLException {
 
     boolean i = rs.getBoolean(columnName);

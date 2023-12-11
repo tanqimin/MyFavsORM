@@ -1,7 +1,5 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import cn.hutool.core.convert.Convert;
-
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -16,13 +14,17 @@ public class BigDecimalPropertyHandler extends NumberPropertyHandler<BigDecimal>
   }
 
   @Override
-  protected BigDecimal nullPrimitiveValue() {
-    return null;
+  protected BigDecimal convertNumber(Number val) {
+    if (val instanceof BigDecimal) {
+      return (BigDecimal) val;
+    } else {
+      return BigDecimal.valueOf(val.doubleValue());
+    }
   }
 
   @Override
-  protected BigDecimal convert(Object val) {
-    return Convert.toBigDecimal(val);
+  protected BigDecimal convertString(String val) {
+    return BigDecimal.valueOf(Double.parseDouble(val));
   }
 
   @Override

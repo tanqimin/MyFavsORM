@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 /**
  * 数据库列元数据
@@ -28,33 +29,32 @@ public class Attribute implements Serializable {
   /**
    * 数据库 列名称
    */
-  private String       columnName;
+  private final String          columnName;
   /**
    * Field访问器
    */
-  private FieldVisitor fieldVisitor;
+  private final FieldVisitor    fieldVisitor;
   /**
    * java.sql.Types 类型
    */
-  private int          sqlType;
+  private final int             sqlType;
   /**
    * 是否只读？
    */
-  private boolean      readonly    = false;
+  private final boolean         readonly;
   /**
    * 是否主键？
    */
-  private boolean      primaryKey  = false;
+  private final boolean         primaryKey;
   /**
    * 是否逻辑删除字段？
    */
-  private boolean      logicDelete = false;
-
+  private final boolean         logicDelete;
   /**
    * 类型处理器
    */
   @SuppressWarnings("rawtypes")
-  private PropertyHandler propertyHandler = null;
+  private final PropertyHandler propertyHandler;
   // endregion
 
   // region Getter && Setter
@@ -65,6 +65,11 @@ public class Attribute implements Serializable {
 
   public FieldVisitor getFieldVisitor() {
     return fieldVisitor;
+  }
+
+  @SuppressWarnings("rawtypes")
+  public PropertyHandler getPropertyHandler() {
+    return propertyHandler;
   }
 
   public int getSqlType() {
@@ -83,12 +88,21 @@ public class Attribute implements Serializable {
     return logicDelete;
   }
 
-
   // endregion
 
   // region Constructor
 
-  private Attribute() {}
+  private Attribute(Field field, Column column) {
+    this.readonly = column.readonly();
+    this.fieldVisitor = new FieldVisitor(field);
+    this.primaryKey = isPrimaryKey(field);
+    this.logicDelete = isLogicDelete(field);
+    this.columnName = StrUtil.isEmpty(column.value())
+        ? StringUtil.toUnderlineCase(field.getName())
+        : column.value();
+    this.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
+    this.sqlType = this.propertyHandler.getSqlType();
+  }
 
   // endregion
 
@@ -99,22 +113,10 @@ public class Attribute implements Serializable {
    * @return 属性元数据
    */
   static Attribute createInstance(Field field) {
-    Attribute    attribute = null;
-    final Column column    = field.getAnnotation(Column.class);
-    if (column != null) {
-      attribute = new Attribute();
-      attribute.fieldVisitor = new FieldVisitor(field);
-      attribute.readonly = column.readonly();
-      attribute.primaryKey = isPrimaryKey(field);
-      attribute.logicDelete = isLogicDelete(field);
-      attribute.columnName =
-          StrUtil.isEmpty(column.value())
-              ? StringUtil.toUnderlineCase(field.getName())
-              : column.value();
-      attribute.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
-      attribute.sqlType = attribute.propertyHandler.getSqlType();
-    }
-    return attribute;
+    final Column column = field.getAnnotation(Column.class);
+    if (Objects.isNull(column)) return null;
+
+    return new Attribute(field, column);
   }
 
   private static boolean isPrimaryKey(Field field) {
@@ -125,14 +127,11 @@ public class Attribute implements Serializable {
     return field.getAnnotation(LogicDelete.class) != null;
   }
 
-  /**
-   * 把 {@link ResultSet} 中对应字段的值转换为指定的对象
-   *
-   * @param rs {@link ResultSet}
-   * @return Object
-   * @throws SQLException 异常
-   */
-  public Object convert(ResultSet rs) throws SQLException {
-    return this.propertyHandler.convert(rs, columnName, fieldVisitor.getType());
+  public <TModel> void setValue(TModel model, ResultSet rs, int columnIndex) throws SQLException {
+    this.setValue(model, this.propertyHandler.convert(rs, columnIndex, this.fieldVisitor.getType()));
+  }
+
+  public <TModel> void setValue(TModel model, Object value) {
+    this.fieldVisitor.setValue(model, value);
   }
 }

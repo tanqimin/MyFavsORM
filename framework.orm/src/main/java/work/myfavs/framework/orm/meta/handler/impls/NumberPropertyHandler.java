@@ -1,11 +1,11 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+import work.myfavs.framework.orm.util.convert.ConvertUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Objects;
 
 public abstract class NumberPropertyHandler<T extends Number> extends PropertyHandler<T> {
 
@@ -18,23 +18,18 @@ public abstract class NumberPropertyHandler<T extends Number> extends PropertyHa
   }
 
   @Override
-  public T convert(ResultSet rs, String columnName, Class<T> clazz) throws SQLException {
-    Object val = rs.getObject(columnName);
-    if (Objects.isNull(val))
-      return isPrimitive ? nullPrimitiveValue() : null;
-    return convert(val);
+  public T convert(ResultSet rs, int columnIndex, Class<T> clazz) throws SQLException {
+    return ConvertUtil.toNumber(clazz, rs.getObject(columnIndex), this::convertNumber, this::convertString);
   }
-
-  protected abstract T nullPrimitiveValue();
-
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, T param) throws SQLException {
     setParameter(ps, paramIndex, param);
   }
 
+  protected abstract T convertNumber(Number val);
 
-  protected abstract T convert(Object val);
+  protected abstract T convertString(String val);
 
   protected abstract void setParameter(PreparedStatement ps, int paramIndex, T param) throws SQLException;
 

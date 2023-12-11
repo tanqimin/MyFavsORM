@@ -16,8 +16,6 @@
  */
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import cn.hutool.core.convert.Convert;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -32,18 +30,18 @@ public class IntegerPropertyHandler extends NumberPropertyHandler<Integer> {
   }
 
   @Override
-  protected Integer nullPrimitiveValue() {
-    return 0;
-  }
-
-  @Override
   public int getSqlType() {
     return Types.INTEGER;
   }
 
   @Override
-  protected Integer convert(Object val) {
-    return Convert.toInt(val);
+  protected Integer convertNumber(Number val) {
+    return val.intValue();
+  }
+
+  @Override
+  protected Integer convertString(String val) {
+    return Integer.valueOf(val);
   }
 
   @Override

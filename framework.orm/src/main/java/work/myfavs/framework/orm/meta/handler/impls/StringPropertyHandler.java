@@ -26,8 +26,8 @@ import java.sql.Types;
 public class StringPropertyHandler extends PropertyHandler<String> {
 
   @Override
-  public String convert(ResultSet rs, String columnName, Class<String> clazz) throws SQLException {
-    return rs.getString(columnName);
+  public String convert(ResultSet rs, int columnIndex, Class<String> clazz) throws SQLException {
+    return rs.getString(columnIndex);
   }
 
   @Override

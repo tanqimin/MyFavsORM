@@ -26,9 +26,9 @@ import java.sql.Types;
 public class NStringPropertyHandler extends PropertyHandler<String> {
 
   @Override
-  public String convert(ResultSet rs, String columnName, Class<String> clazz) throws SQLException {
+  public String convert(ResultSet rs, int columnIndex, Class<String> clazz) throws SQLException {
 
-    return rs.getNString(columnName);
+    return rs.getNString(columnIndex);
   }
 
   @Override

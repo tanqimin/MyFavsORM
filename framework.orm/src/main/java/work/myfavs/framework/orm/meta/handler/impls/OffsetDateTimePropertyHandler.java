@@ -16,10 +16,10 @@ import java.time.OffsetDateTime;
 public class OffsetDateTimePropertyHandler extends PropertyHandler<OffsetDateTime> {
 
   @Override
-  public OffsetDateTime convert(ResultSet rs, String columnName, Class<OffsetDateTime> clazz)
+  public OffsetDateTime convert(ResultSet rs, int columnIndex, Class<OffsetDateTime> clazz)
       throws SQLException {
 
-    return rs.getObject(columnName, OffsetDateTime.class);
+    return rs.getObject(columnIndex, OffsetDateTime.class);
   }
 
   @Override

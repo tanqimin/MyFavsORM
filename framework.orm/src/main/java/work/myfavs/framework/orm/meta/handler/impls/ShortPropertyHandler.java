@@ -16,8 +16,6 @@
  */
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import cn.hutool.core.convert.Convert;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -32,13 +30,13 @@ public class ShortPropertyHandler extends NumberPropertyHandler<Short> {
   }
 
   @Override
-  protected Short nullPrimitiveValue() {
-    return 0;
+  protected Short convertNumber(Number val) {
+    return val.shortValue();
   }
 
   @Override
-  protected Short convert(Object val) {
-    return Convert.toShort(val);
+  protected Short convertString(String val) {
+    return Short.parseShort(val);
   }
 
   @Override

@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.util.reflection;
 
-import cn.hutool.core.convert.Convert;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.lang.reflect.Field;
@@ -30,7 +29,7 @@ public class FieldVisitor {
     }
 
     try {
-      this.field.set(entity, Convert.convert(getType(), value));
+      this.field.set(entity, value);
     } catch (IllegalAccessException e) {
       throw new DBException(e, "could not set field {} on class {}", this.field.getName(), entity.getClass().toString());
     }

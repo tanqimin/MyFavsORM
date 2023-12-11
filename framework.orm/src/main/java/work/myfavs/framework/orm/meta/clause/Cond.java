@@ -7,7 +7,7 @@ import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.FuzzyMode;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 import work.myfavs.framework.orm.meta.schema.Attribute;
-import work.myfavs.framework.orm.util.convert.ObjectConvert;
+import work.myfavs.framework.orm.util.convert.ConvertUtil;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -592,11 +592,11 @@ public class Cond extends Clause {
       case LESS_THAN_OR_EQUALS:
         return Cond.le(fieldName, paramVal);
       case IN:
-        Collection<?> inParam = ObjectConvert.toCollection(paramVal);
+        Collection<?> inParam = ConvertUtil.toCollection(paramVal);
         if (inParam.isEmpty()) return new Cond();
         return Cond.in(fieldName, inParam);
       case NOT_IN:
-        Collection<?> notInParam = ObjectConvert.toCollection(paramVal);
+        Collection<?> notInParam = ConvertUtil.toCollection(paramVal);
         if (notInParam.isEmpty()) return new Cond();
         return Cond.notIn(fieldName, notInParam);
       default:

@@ -20,7 +20,7 @@ public abstract class PropertyHandler<T> {
    * @return 对象
    * @throws SQLException SQLException
    */
-  public abstract T convert(ResultSet rs, String columnName, Class<T> clazz) throws SQLException;
+  public abstract T convert(ResultSet rs, int columnIndex, Class<T> clazz) throws SQLException;
 
   /**
    * 把对象作为参数添加到Statement

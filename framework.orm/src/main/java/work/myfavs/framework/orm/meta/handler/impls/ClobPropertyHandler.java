@@ -10,9 +10,9 @@ import java.sql.*;
 public class ClobPropertyHandler extends PropertyHandler<Clob> {
 
   @Override
-  public Clob convert(ResultSet rs, String columnName, Class<Clob> clazz) throws SQLException {
+  public Clob convert(ResultSet rs, int columnIndex, Class<Clob> clazz) throws SQLException {
 
-    return rs.getClob(columnName);
+    return rs.getClob(columnIndex);
   }
 
   @Override

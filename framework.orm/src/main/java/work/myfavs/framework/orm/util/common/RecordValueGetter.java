@@ -1,9 +1,8 @@
 package work.myfavs.framework.orm.util.common;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Record基本类型getter接口
@@ -61,14 +60,6 @@ public interface RecordValueGetter<K> {
   Long getLong(K attr);
 
   /**
-   * 获取char型属性值
-   *
-   * @param attr 属性名
-   * @return 属性值
-   */
-  Character getChar(K attr);
-
-  /**
    * 获取float型属性值<br>
    *
    * @param attr 属性名
@@ -101,19 +92,11 @@ public interface RecordValueGetter<K> {
   BigDecimal getBigDecimal(K attr);
 
   /**
-   * 获取BigInteger型属性值
-   *
-   * @param attr 属性名
-   * @return 属性值
-   */
-  BigInteger getBigInteger(K attr);
-
-  /**
    * 获得Enum类型的值
    *
-   * @param <E> 枚举类型
+   * @param <E>   枚举类型
    * @param clazz Enum的Class
-   * @param attr attr
+   * @param attr  attr
    * @return Enum类型的值，无则返回Null
    */
   <E extends Enum<E>> E getEnum(Class<E> clazz, K attr);
@@ -127,10 +110,10 @@ public interface RecordValueGetter<K> {
   Date getDate(K attr);
 
   /**
-   * 获取LocalDateTime类型值
+   * 获取UUID类型的值
    *
    * @param attr 属性名
-   * @return LocalDateTime类型属性值
+   * @return UUID类型属性值
    */
-  LocalDateTime getLocalDateTime(K attr);
+  UUID getUUID(K attr);
 }

@@ -167,7 +167,8 @@ public class Database implements Closeable {
 
   private void setKey(Attribute attr, Object entity, ResultSet rs) throws SQLException {
     if (rs.next()) {
-      attr.getFieldVisitor().setValue(entity, rs.getObject(1));
+      attr.setValue(entity, rs, 1);
+//      attr.getFieldVisitor().setValue(entity, rs.getObject(1));
     }
   }
 
@@ -555,7 +556,8 @@ public class Database implements Closeable {
       default:
         break;
     }
-    primaryKey.getFieldVisitor().setValue(entity, pkVal);
+
+    primaryKey.setValue(entity, pkVal);
     return pkVal;
   }
 

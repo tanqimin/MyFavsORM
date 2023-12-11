@@ -1,18 +1,17 @@
 package work.myfavs.framework.orm.meta;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.convert.Convert;
+import work.myfavs.framework.orm.util.common.RecordValueGetter;
+import work.myfavs.framework.orm.util.convert.ConvertUtil;
+
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import work.myfavs.framework.orm.util.common.RecordValueGetter;
+import java.util.UUID;
 
-/** ORM查询记录对象 */
+/**
+ * ORM查询记录对象
+ */
 public class Record extends LinkedHashMap<String, Object> implements RecordValueGetter<String> {
 
   private static final long serialVersionUID = 4437164782221886837L;
@@ -29,7 +28,7 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
   /**
    * 设置属性
    *
-   * @param attr 属性名称
+   * @param attr  属性名称
    * @param value 属性值
    * @return Record
    */
@@ -41,9 +40,9 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
   /**
    * 获取属性
    *
-   * @param attr 属性名称
+   * @param attr         属性名称
    * @param defaultValue 如果获取属性为null，则返回defaultValue
-   * @param <T> 属性类型
+   * @param <T>          属性类型
    * @return 属性值
    */
   @SuppressWarnings("unchecked")
@@ -59,7 +58,7 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * 获取属性
    *
    * @param attr 属性名称
-   * @param <T> 属性类型
+   * @param <T>  属性类型
    * @return 属性值
    */
   public <T> T getBean(String attr) {
@@ -68,77 +67,68 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
 
   @Override
   public Object getObj(String attr) {
-    return super.get(attr);
+    return get(attr, null);
   }
 
   @Override
   public String getStr(String attr) {
-    return Convert.toStr(get(attr));
+    return ConvertUtil.toString(get(attr));
   }
 
   @Override
   public Integer getInt(String attr) {
-    return Convert.toInt(get(attr));
+    return ConvertUtil.toInt(get(attr));
   }
 
   @Override
   public Short getShort(String attr) {
-    return Convert.toShort(get(attr));
+    return ConvertUtil.toShort(get(attr));
   }
 
   @Override
   public Boolean getBool(String attr) {
-    return Convert.toBool(get(attr));
+    return ConvertUtil.toBool(get(attr), false);
   }
 
   @Override
   public Long getLong(String attr) {
-    return Convert.toLong(get(attr));
-  }
-
-  @Override
-  public Character getChar(String attr) {
-    return Convert.toChar(get(attr));
+    return ConvertUtil.toLong(get(attr));
   }
 
   @Override
   public Float getFloat(String attr) {
-    return Convert.toFloat(get(attr));
+    return ConvertUtil.toFloat(get(attr));
   }
 
   @Override
   public Double getDouble(String attr) {
-    return Convert.toDouble(get(attr));
+    return ConvertUtil.toDouble(get(attr));
   }
 
   @Override
   public Byte getByte(String attr) {
-    return Convert.toByte(get(attr));
+    return ConvertUtil.toByte(get(attr));
   }
 
   @Override
   public BigDecimal getBigDecimal(String attr) {
-    return Convert.toBigDecimal(get(attr));
+    return ConvertUtil.toBigDecimal(get(attr));
   }
 
-  @Override
-  public BigInteger getBigInteger(String attr) {
-    return Convert.toBigInteger(get(attr));
-  }
 
   @Override
   public <E extends Enum<E>> E getEnum(Class<E> clazz, String attr) {
-    return Convert.toEnum(clazz, get(attr));
+    return ConvertUtil.toEnum(clazz, get(attr));
   }
 
   @Override
   public Date getDate(String attr) {
-    return Convert.toDate(get(attr));
+    return ConvertUtil.toDate(get(attr));
   }
 
   @Override
-  public LocalDateTime getLocalDateTime(String attr) {
-    return Convert.toLocalDateTime(get(attr));
+  public UUID getUUID(String attr) {
+    return ConvertUtil.toUUID(get(attr));
   }
 
   /**
@@ -152,50 +142,10 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
   }
 
   /**
-   * 获取LocalDate类型值
-   *
-   * @param attr 属性名
-   * @return LocalDate类型属性值
-   */
-  public LocalDate getLocalDate(String attr) {
-    return getLocalDateTime(attr).toLocalDate();
-  }
-
-  /**
-   * 获取Time类型值
-   *
-   * @param attr 属性名
-   * @return Time类型属性值
-   */
-  public Time getTime(String attr) {
-    return get(attr, null);
-  }
-
-  /**
-   * 获取Timestamp类型值
-   *
-   * @param attr 属性名
-   * @return Timestamp类型属性值
-   */
-  public Timestamp getTimestamp(String attr) {
-    return get(attr, null);
-  }
-
-  /**
-   * 获取Number类型值
-   *
-   * @param attr 属性名
-   * @return Number类型属性值
-   */
-  public Number getNumber(String attr) {
-    return get(attr, null);
-  }
-
-  /**
    * 转换为Bean对象
    *
    * @param bean Bean
-   * @param <T> Bean类型
+   * @param <T>  Bean类型
    * @return Bean
    */
   public <T> T toBean(T bean) {
@@ -207,7 +157,7 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * 转换为Bean对象
    *
    * @param tClass Bean类
-   * @param <T> Bean类型
+   * @param <T>    Bean类型
    * @return Bean
    */
   public <T> T toBean(Class<T> tClass) {
@@ -218,7 +168,7 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * 转换为Bean对象，忽略属性大小写
    *
    * @param tClass Bean类
-   * @param <T> Bean类型
+   * @param <T>    Bean类型
    * @return Bean
    */
   public <T> T toBeanIgnoreCase(Class<T> tClass) {
@@ -229,7 +179,7 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * Bean转换为Record
    *
    * @param bean Bean
-   * @param <T> Bean类型
+   * @param <T>  Bean类型
    * @return Record
    */
   public <T> Record toRecord(T bean) {

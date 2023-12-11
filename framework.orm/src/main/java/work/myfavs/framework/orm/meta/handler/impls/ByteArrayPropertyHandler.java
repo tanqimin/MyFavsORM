@@ -14,8 +14,8 @@ import java.sql.*;
 public class ByteArrayPropertyHandler extends PropertyHandler<byte[]> {
 
   @Override
-  public byte[] convert(ResultSet rs, String columnName, Class<byte[]> clazz) throws SQLException {
-    Object val = rs.getObject(columnName);
+  public byte[] convert(ResultSet rs, int columnIndex, Class<byte[]> clazz) throws SQLException {
+    Object val = rs.getObject(columnIndex);
     if (val == null) return null;
 
     if (val instanceof Blob) {

@@ -16,8 +16,6 @@
  */
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import cn.hutool.core.convert.Convert;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -32,13 +30,13 @@ public class FloatPropertyHandler extends NumberPropertyHandler<Float> {
   }
 
   @Override
-  protected Float nullPrimitiveValue() {
-    return 0.0f;
+  protected Float convertNumber(Number val) {
+    return val.floatValue();
   }
 
   @Override
-  protected Float convert(Object val) {
-    return Convert.toFloat(val);
+  protected Float convertString(String val) {
+    return Float.parseFloat(val);
   }
 
   @Override

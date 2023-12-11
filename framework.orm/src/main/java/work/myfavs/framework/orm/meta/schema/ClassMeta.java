@@ -8,7 +8,9 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -47,6 +49,7 @@ public class ClassMeta {
    */
   private       Attribute      logicDelete;
 
+  private final Constructor<?>                          modelConstructor;
   /**
    * 更新字段
    */
@@ -114,7 +117,7 @@ public class ClassMeta {
   /**
    * 构造方法
    */
-  private ClassMeta(Class<?> clazz) {
+  private ClassMeta(Class<?> clazz) throws RuntimeException {
     this.clazz = clazz;
 
     final Table table = clazz.getAnnotation(Table.class);
@@ -123,6 +126,8 @@ public class ClassMeta {
       this.strategy = table.strategy();
       this.tableName = getTableName(table, clazz);
     }
+
+    this.modelConstructor = ReflectUtil.getConstructor(clazz);
 
     final Field[] fields = ReflectUtil.getFields(clazz);
 
@@ -163,7 +168,22 @@ public class ClassMeta {
    * @return 列元数据
    */
   public static ClassMeta createInstance(Class<?> clazz) {
-    return CLASS_META_CACHE.computeIfAbsent(clazz.getName(), key -> new ClassMeta(clazz));
+    String    className = clazz.getName();
+    ClassMeta classMeta = CLASS_META_CACHE.get(className);
+    if (Objects.isNull(classMeta)) {
+      classMeta = new ClassMeta(clazz);
+      CLASS_META_CACHE.put(className, classMeta);
+    }
+    return classMeta;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T createModel() {
+    try {
+      return (T) this.modelConstructor.newInstance();
+    } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+      throw new DBException("Error create model instance: {}", e.getMessage());
+    }
   }
 
   /**

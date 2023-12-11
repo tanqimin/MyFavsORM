@@ -1,21 +1,18 @@
 package work.myfavs.framework.orm.meta;
 
-import static org.junit.Assert.*;
-
 import cn.hutool.core.util.IdUtil;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import work.myfavs.framework.orm.AbstractTest;
 import work.myfavs.framework.orm.entity.Snowflake;
 import work.myfavs.framework.orm.entity.Uuid;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class RecordTest extends AbstractTest {
 
@@ -99,13 +96,6 @@ public class RecordTest extends AbstractTest {
   }
 
   @Test
-  public void getChar() {
-    record.clear();
-    record.set("char", 'a');
-    assertEquals(record.getChar("char"), Character.valueOf('a'));
-  }
-
-  @Test
   public void getFloat() {
     record.clear();
     float value = 1.0f;
@@ -138,14 +128,6 @@ public class RecordTest extends AbstractTest {
   }
 
   @Test
-  public void getBigInteger() {
-    record.clear();
-    BigInteger bigInteger = BigInteger.valueOf(1L);
-    record.set("bigInteger", bigInteger);
-    assertEquals(record.getBigInteger("bigInteger"), bigInteger);
-  }
-
-  @Test
   public void getEnum() {
     record.clear();
     TypeEnum value = TypeEnum.DRINK;
@@ -162,51 +144,11 @@ public class RecordTest extends AbstractTest {
   }
 
   @Test
-  public void getLocalDateTime() {
-    record.clear();
-    LocalDateTime value = LocalDateTime.now();
-    record.set("localDateTime", value);
-    assertEquals(record.getLocalDateTime("localDateTime"), value);
-  }
-
-  @Test
   public void getBytes() {
     record.clear();
     byte[] bytes = new byte[0];
     record.set("bytes", bytes);
     assertEquals(record.getBytes("bytes"), bytes);
-  }
-
-  @Test
-  public void getLocalDate() {
-    record.clear();
-    LocalDate value = LocalDate.now();
-    record.set("localDate", value);
-    assertEquals(record.getLocalDate("localDate"), value);
-  }
-
-  @Test
-  public void getTime() {
-    record.clear();
-    Time value = Time.valueOf("12:00:00");
-    record.set("time", value);
-    assertEquals(record.getTime("time"), value);
-  }
-
-  @Test
-  public void getTimestamp() {
-    record.clear();
-    Timestamp value = Timestamp.valueOf(LocalDateTime.now());
-    record.set("timestamp", value);
-    assertEquals(record.getTimestamp("timestamp"), value);
-  }
-
-  @Test
-  public void getNumber() {
-    record.clear();
-    Number value = 1;
-    record.set("number", value);
-    assertEquals(record.getNumber("number"), value);
   }
 
   @Test

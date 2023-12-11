@@ -1,7 +1,5 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import cn.hutool.core.convert.Convert;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -18,13 +16,13 @@ public class BytePropertyHandler extends NumberPropertyHandler<Byte> {
   }
 
   @Override
-  protected Byte nullPrimitiveValue() {
-    return Convert.toByte(0);
+  protected Byte convertNumber(Number val) {
+    return val.byteValue();
   }
 
   @Override
-  protected Byte convert(Object val) {
-    return Convert.toByte(val);
+  protected Byte convertString(String val) {
+    return Byte.parseByte(val);
   }
 
   @Override

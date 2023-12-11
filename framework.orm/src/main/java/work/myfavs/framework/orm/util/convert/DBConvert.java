@@ -59,10 +59,10 @@ public class DBConvert {
 
     while (rs.next()) {
       TModel model = ReflectUtil.newInstance(modelClass);
-      for (int i = 1; i <= columnCount; i++) {
-        Attribute attr = attributes.get(metaData.getColumnName(i).toUpperCase());
+      for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+        Attribute attr = attributes.get(metaData.getColumnName(columnIndex).toUpperCase());
         if (Objects.isNull(attr)) continue;
-        attr.getFieldVisitor().setValue(model, attr.convert(rs));
+        attr.setValue(model, rs, columnIndex);
       }
       result.add(model);
     }
@@ -74,13 +74,11 @@ public class DBConvert {
   private static <TModel> List<TModel> toScalar(Class<TModel> modelClass, ResultSet rs)
       throws SQLException {
 
-    final List<TModel>      list     = new ArrayList<>();
-    final ResultSetMetaData metaData = rs.getMetaData();
+    final List<TModel> list = new ArrayList<>();
 
     PropertyHandler propertyHandler = PropertyHandlerFactory.getInstance(modelClass);
     while (rs.next()) {
-      String colName = metaData.getColumnLabel(1);
-      list.add((TModel) propertyHandler.convert(rs, colName, modelClass));
+      list.add((TModel) propertyHandler.convert(rs, 1, modelClass));
     }
     return list;
   }

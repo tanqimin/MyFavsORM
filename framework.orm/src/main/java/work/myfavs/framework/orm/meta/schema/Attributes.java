@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
  */
 public class Attributes {
 
-  private final Map<String /* columnName */, Attribute> map = new TreeMap<>();
+  private final Map<String /* columnName */, Attribute> map = new LinkedHashMap<>();
 
   private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
   private final Lock          writeLock     = readWriteLock.writeLock();
@@ -44,7 +44,7 @@ public class Attributes {
 
     List<Attribute> res = new ArrayList<>();
     for (String columnName : columnNames) {
-      final String col = StrUtil.trim(columnName);
+      final String col       = StrUtil.trim(columnName);
       Attribute    attribute = getAttribute(col);
 
       if (containsColumn(col)) {

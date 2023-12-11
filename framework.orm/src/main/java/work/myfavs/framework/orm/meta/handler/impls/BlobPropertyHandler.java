@@ -10,9 +10,9 @@ import java.sql.*;
 public class BlobPropertyHandler extends PropertyHandler<Blob> {
 
   @Override
-  public Blob convert(ResultSet rs, String columnName, Class<Blob> clazz) throws SQLException {
+  public Blob convert(ResultSet rs, int columnIndex, Class<Blob> clazz) throws SQLException {
 
-    return rs.getBlob(columnName);
+    return rs.getBlob(columnIndex);
   }
 
   @Override
