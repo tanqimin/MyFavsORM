@@ -3,6 +3,7 @@ package work.myfavs.framework.orm.meta.schema;
 import cn.hutool.core.util.StrUtil;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.LogicDelete;
+import work.myfavs.framework.orm.meta.annotation.NVarchar;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
@@ -67,11 +68,6 @@ public class Attribute implements Serializable {
     return fieldVisitor;
   }
 
-  @SuppressWarnings("rawtypes")
-  public PropertyHandler getPropertyHandler() {
-    return propertyHandler;
-  }
-
   public int getSqlType() {
     return sqlType;
   }
@@ -92,7 +88,8 @@ public class Attribute implements Serializable {
 
   // region Constructor
 
-  private Attribute(Field field, Column column) {
+  private Attribute(Field field) {
+    Column column = field.getAnnotation(Column.class);
     this.readonly = column.readonly();
     this.fieldVisitor = new FieldVisitor(field);
     this.primaryKey = isPrimaryKey(field);
@@ -100,8 +97,23 @@ public class Attribute implements Serializable {
     this.columnName = StrUtil.isEmpty(column.value())
         ? StringUtil.toUnderlineCase(field.getName())
         : column.value();
-    this.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
+
+    this.propertyHandler = getPropertyHandler(field);
     this.sqlType = this.propertyHandler.getSqlType();
+  }
+
+  private static PropertyHandler<?> getPropertyHandler(Field field) {
+    if (isNVachar(field) && isStringField(field))
+      return PropertyHandlerFactory.getNVarcharPropertyHandler();
+    return PropertyHandlerFactory.getInstance(field.getType());
+  }
+
+  private static boolean isStringField(Field field) {
+    return String.class.equals(field.getType());
+  }
+
+  private static boolean isNVachar(Field field) {
+    return Objects.nonNull(field.getAnnotation(NVarchar.class));
   }
 
   // endregion
@@ -113,10 +125,11 @@ public class Attribute implements Serializable {
    * @return 属性元数据
    */
   static Attribute createInstance(Field field) {
-    final Column column = field.getAnnotation(Column.class);
-    if (Objects.isNull(column)) return null;
 
-    return new Attribute(field, column);
+    if (Objects.isNull(field.getAnnotation(Column.class)))
+      return null;
+
+    return new Attribute(field);
   }
 
   private static boolean isPrimaryKey(Field field) {

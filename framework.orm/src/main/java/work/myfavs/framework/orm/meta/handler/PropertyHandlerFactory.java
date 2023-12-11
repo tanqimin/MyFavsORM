@@ -12,9 +12,10 @@ import java.util.UUID;
 
 public class PropertyHandlerFactory {
 
-  private static final Map<String, PropertyHandler<?>> HANDLER_MAP             = new HashMap<>();
-  private static final EnumPropertyHandler             ENUM_PROPERTY_HANDLER   = new EnumPropertyHandler();
-  private static final ObjectPropertyHandler           OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
+  private static final Map<String, PropertyHandler<?>> HANDLER_MAP               = new HashMap<>();
+  private static final EnumPropertyHandler             ENUM_PROPERTY_HANDLER     = new EnumPropertyHandler();
+  private static final ObjectPropertyHandler           OBJECT_PROPERTY_HANDLER   = new ObjectPropertyHandler();
+  private static final StringPropertyHandler           NVARCHAR_PROPERTY_HANDLER = new StringPropertyHandler(true);
 
   private PropertyHandlerFactory() {}
 
@@ -80,5 +81,9 @@ public class PropertyHandlerFactory {
     }
 
     return OBJECT_PROPERTY_HANDLER;
+  }
+
+  public static StringPropertyHandler getNVarcharPropertyHandler() {
+    return NVARCHAR_PROPERTY_HANDLER;
   }
 }

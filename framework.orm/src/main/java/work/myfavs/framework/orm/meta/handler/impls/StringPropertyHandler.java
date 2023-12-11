@@ -25,19 +25,33 @@ import java.sql.Types;
 
 public class StringPropertyHandler extends PropertyHandler<String> {
 
+  private boolean useNVarchar;
+
+  public StringPropertyHandler() {
+
+  }
+
+  public StringPropertyHandler(boolean useNVarchar) {
+    this.useNVarchar = useNVarchar;
+  }
+
   @Override
   public String convert(ResultSet rs, int columnIndex, Class<String> clazz) throws SQLException {
-    return rs.getString(columnIndex);
+    return useNVarchar ? rs.getNString(columnIndex) : rs.getString(columnIndex);
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, String param) throws SQLException {
 
-    ps.setString(paramIndex, param);
+    if (useNVarchar)
+      ps.setNString(paramIndex, param);
+    else
+      ps.setString(paramIndex, param);
   }
 
   @Override
   public int getSqlType() {
-    return Types.VARCHAR;
+
+    return useNVarchar ? Types.NVARCHAR : Types.VARCHAR;
   }
 }
