@@ -942,8 +942,6 @@ public class Database implements Closeable {
   public <TView> List<TView> find(Class<TView> viewClass, String sql, Collection<?> params) {
     sqlLog.showSql(sql, params);
 
-    Metadata.classMeta(viewClass);
-
     List<TView> result = this.createQuery(sql)
                              .addParameters(params)
                              .find(viewClass);

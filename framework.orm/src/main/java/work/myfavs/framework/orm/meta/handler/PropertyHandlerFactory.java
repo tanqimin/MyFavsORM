@@ -1,7 +1,9 @@
 package work.myfavs.framework.orm.meta.handler;
 
+import work.myfavs.framework.orm.meta.annotation.NVarchar;
 import work.myfavs.framework.orm.meta.handler.impls.*;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -83,7 +85,18 @@ public class PropertyHandlerFactory {
     return OBJECT_PROPERTY_HANDLER;
   }
 
-  public static StringPropertyHandler getNVarcharPropertyHandler() {
-    return NVARCHAR_PROPERTY_HANDLER;
+  @SuppressWarnings("rawtypes")
+  public static PropertyHandler getInstance(Field field) {
+    if (useNVarchar(field) && isStringType(field))
+      return NVARCHAR_PROPERTY_HANDLER;
+    return getInstance(field.getType());
+  }
+
+  private static boolean isStringType(Field field) {
+    return String.class.equals(field.getType());
+  }
+
+  private static boolean useNVarchar(Field field) {
+    return Objects.nonNull(field.getAnnotation(NVarchar.class));
   }
 }

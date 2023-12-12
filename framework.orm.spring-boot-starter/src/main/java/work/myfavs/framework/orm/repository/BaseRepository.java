@@ -13,13 +13,11 @@ import java.util.Map;
  *
  * @author tanqimin
  */
-public abstract class BaseRepository {
+public abstract class BaseRepository extends SimpleRepository {
 
-  protected DBTemplate dbTemplate;
 
   public BaseRepository(DBTemplate dbTemplate) {
-
-    this.dbTemplate = dbTemplate;
+    super(dbTemplate);
   }
 
   public void setDbTemplate(DBTemplate dbTemplate) {

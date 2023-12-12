@@ -3,7 +3,6 @@ package work.myfavs.framework.orm.meta.schema;
 import cn.hutool.core.util.StrUtil;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.LogicDelete;
-import work.myfavs.framework.orm.meta.annotation.NVarchar;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
@@ -98,23 +97,10 @@ public class Attribute implements Serializable {
         ? StringUtil.toUnderlineCase(field.getName())
         : column.value();
 
-    this.propertyHandler = getPropertyHandler(field);
+    this.propertyHandler = PropertyHandlerFactory.getInstance(field);
     this.sqlType = this.propertyHandler.getSqlType();
   }
 
-  private static PropertyHandler<?> getPropertyHandler(Field field) {
-    if (isNVachar(field) && isStringField(field))
-      return PropertyHandlerFactory.getNVarcharPropertyHandler();
-    return PropertyHandlerFactory.getInstance(field.getType());
-  }
-
-  private static boolean isStringField(Field field) {
-    return String.class.equals(field.getType());
-  }
-
-  private static boolean isNVachar(Field field) {
-    return Objects.nonNull(field.getAnnotation(NVarchar.class));
-  }
 
   // endregion
 
