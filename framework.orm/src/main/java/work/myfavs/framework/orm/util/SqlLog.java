@@ -5,16 +5,15 @@ import cn.hutool.core.util.StrUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.meta.BatchParameters;
+import work.myfavs.framework.orm.meta.Parameters;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.common.Constant;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class SqlLog {
 
@@ -25,20 +24,15 @@ public class SqlLog {
   private final boolean showSql;
   private final boolean showResult;
 
-  public SqlLog(DBTemplate dbTemplate) {
-    showSql = dbTemplate.getDbConfig().getShowSql();
-    showResult = dbTemplate.getDbConfig().getShowResult();
+  public SqlLog(boolean showSql, boolean showResult) {
+    this.showSql = showSql;
+    this.showResult = showResult;
   }
 
-  public void showSql(String sql, Collection<?> params) {
+  public void showSql(String sql) {
+    if (!this.showSql) return;
+    if (!log.isDebugEnabled()) return;
 
-    if (showSql && log.isDebugEnabled()) {
-      showSql(sql);
-      showParams(params);
-    }
-  }
-
-  private void showSql(String sql) {
     log.debug(title("SQL").concat(System.lineSeparator()).concat(sql));
   }
 
@@ -46,27 +40,22 @@ public class SqlLog {
     return StrUtil.padAfter(StrUtil.format("----- {} ", title), TITLE_LENGTH, "-");
   }
 
-  private void showParams(Collection<?> params) {
-    if (CollUtil.isNotEmpty(params)) {
-      log.debug(title("PARAMETERS"));
-      log.debug(CollUtil.join(params, ", ", this::format));
-    }
-  }
+  public void showParams(BatchParameters batchParameters) {
+    if (!this.showSql) return;
+    if (!log.isDebugEnabled()) return;
+    if (batchParameters == null || batchParameters.isEmpty()) return;
 
-  private void showBatchParams(Collection<Collection<?>> batchParams) {
-    if (CollUtil.isNotEmpty(batchParams)) {
-      log.debug(title(StrUtil.format("TOTAL {} PARAMETERS", batchParams.size())));
-      for (Collection<?> params : batchParams) {
-        log.debug(CollUtil.join(params, ", ", this::format));
+    log.debug(title("PARAMETERS"));
+    if (batchParameters.isBatch()) {
+      for (Map.Entry<Integer, Parameters> entry : batchParameters.getBatchParameters().entrySet()) {
+        Parameters parameters = entry.getValue();
+        if (parameters.isEmpty()) continue;
+        log.debug(CollUtil.join(parameters.getParameters().values(), ", ", this::format));
       }
-    }
-  }
-
-  public void showBatchSql(String sql, Collection<Collection<?>> paramsList) {
-
-    if (showSql && log.isDebugEnabled()) {
-      showSql(sql);
-      showBatchParams(paramsList);
+    } else {
+      Parameters parameters = batchParameters.getCurrentBatchParameters();
+      if (parameters.isEmpty()) return;
+      log.debug(CollUtil.join(parameters.getParameters().values(), ", ", this::format));
     }
   }
 

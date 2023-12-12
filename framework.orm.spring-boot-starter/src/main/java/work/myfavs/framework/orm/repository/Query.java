@@ -253,7 +253,7 @@ public class Query extends BaseRepository {
       Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.findPageLite(viewClass, sql, params, pageable);
+      return database.createOrm().findPageLite(viewClass, sql, params, pageable);
     }
   }
 
@@ -269,7 +269,7 @@ public class Query extends BaseRepository {
   public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, IPageable pageable) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.findPageLite(viewClass, sql, pageable);
+      return database.createOrm().findPageLite(viewClass, sql, pageable);
     }
   }
 
@@ -294,7 +294,7 @@ public class Query extends BaseRepository {
       int pageSize) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.findPageLite(viewClass, sql, params, enablePage, currentPage, pageSize);
+      return database.createOrm().findPageLite(viewClass, sql, params, enablePage, currentPage, pageSize);
     }
   }
 
@@ -393,7 +393,7 @@ public class Query extends BaseRepository {
       int pageSize) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.findPage(viewClass, sql, params, enablePage, currentPage, pageSize);
+      return database.createOrm().findPage(viewClass, sql, params, enablePage, currentPage, pageSize);
     }
   }
 
@@ -428,7 +428,7 @@ public class Query extends BaseRepository {
       Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.findPage(viewClass, sql, params, pageable);
+      return database.createOrm().findPage(viewClass, sql, params, pageable);
     }
   }
 
@@ -444,7 +444,7 @@ public class Query extends BaseRepository {
   public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, IPageable pageable) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.findPage(viewClass, sql, pageable);
+      return database.createOrm().findPage(viewClass, sql, pageable);
     }
   }
 

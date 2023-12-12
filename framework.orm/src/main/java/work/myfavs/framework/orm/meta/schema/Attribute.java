@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -132,5 +133,16 @@ public class Attribute implements Serializable {
 
   public <TModel> void setValue(TModel model, Object value) {
     this.fieldVisitor.setValue(model, value);
+  }
+
+  public <TModel> void setPrimaryKey(TModel model, ResultSet rs) throws SQLException {
+    if (rs.next())
+      setValue(model, rs, 1);
+  }
+
+  public <TModel> void setPrimaryKeys(Collection<TModel> models, ResultSet rs) throws SQLException {
+    for (TModel model : models) {
+      setPrimaryKey(model, rs);
+    }
   }
 }

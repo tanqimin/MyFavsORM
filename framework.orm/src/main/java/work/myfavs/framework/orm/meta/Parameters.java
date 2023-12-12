@@ -1,7 +1,9 @@
 package work.myfavs.framework.orm.meta;
 
+import cn.hutool.core.collection.CollUtil;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.reflection.FieldVisitor;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,6 +16,8 @@ public class Parameters {
   private final Map<Integer/*paramIndex*/, Object> parameters = new LinkedHashMap<>();
 
   public void addParameters(Collection<?> params) {
+    if (CollUtil.isEmpty(params)) return;
+
     int paramIndex = parameters.size();
     for (Object param : params) {
       parameters.put(++paramIndex, param);
@@ -25,6 +29,11 @@ public class Parameters {
       throw new DBException("Error adding parameter: error index {}", paramIndex);
 
     parameters.put(paramIndex, param);
+  }
+
+  public void addParameter(Object param) {
+    int paramIndex = parameters.size();
+    parameters.put(++paramIndex, param);
   }
 
   public boolean isEmpty() {
@@ -48,5 +57,13 @@ public class Parameters {
     } catch (SQLException ex) {
       throw new DBException(ex, "Error apply parameters: {}", ex.getMessage());
     }
+  }
+
+  public Map<Integer, Object> getParameters() {
+    return this.parameters;
+  }
+
+  public int size() {
+    return this.parameters.size();
   }
 }

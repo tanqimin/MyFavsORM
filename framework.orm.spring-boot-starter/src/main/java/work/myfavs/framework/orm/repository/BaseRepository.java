@@ -40,7 +40,7 @@ public abstract class BaseRepository extends SimpleRepository {
   protected <TView> List<TView> find(Class<TView> viewClass, String sql, Collection<?> params) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.find(viewClass, sql, params);
+      return database.createOrm().find(viewClass, sql, params);
     }
   }
 
@@ -55,7 +55,7 @@ public abstract class BaseRepository extends SimpleRepository {
   protected <TView> List<TView> find(Class<TView> viewClass, Sql sql) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.find(viewClass, sql);
+      return database.createOrm().find(viewClass, sql);
     }
   }
 
@@ -72,7 +72,7 @@ public abstract class BaseRepository extends SimpleRepository {
   protected <TKey, TView> Map<TKey, TView> findMap(
       Class<TView> viewClass, String keyField, String sql, Collection<?> params) {
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.findMap(viewClass, keyField, sql, params);
+      return database.createOrm().findMap(viewClass, keyField, sql, params);
     }
   }
 
@@ -88,7 +88,7 @@ public abstract class BaseRepository extends SimpleRepository {
   protected <TKey, TView> Map<TKey, TView> findMap(
       Class<TView> viewClass, String keyField, Sql sql) {
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.findMap(viewClass, keyField, sql);
+      return database.createOrm().findMap(viewClass, keyField, sql);
     }
   }
 
@@ -106,7 +106,7 @@ public abstract class BaseRepository extends SimpleRepository {
       Class<TView> viewClass, int top, String sql, Collection<?> params) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.findTop(viewClass, top, sql, params);
+      return database.createOrm().findTop(viewClass, top, sql, params);
     }
   }
 
@@ -122,7 +122,7 @@ public abstract class BaseRepository extends SimpleRepository {
   protected <TView> List<TView> findTop(Class<TView> viewClass, int top, Sql sql) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.findTop(viewClass, top, sql);
+      return database.createOrm().findTop(viewClass, top, sql);
     }
   }
 
@@ -138,7 +138,7 @@ public abstract class BaseRepository extends SimpleRepository {
   protected <TView> TView get(Class<TView> viewClass, String sql, Collection<?> params) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.get(viewClass, sql, params);
+      return database.createOrm().get(viewClass, sql, params);
     }
   }
 
@@ -153,7 +153,7 @@ public abstract class BaseRepository extends SimpleRepository {
   protected <TView> TView get(Class<TView> viewClass, Sql sql) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.get(viewClass, sql);
+      return database.createOrm().get(viewClass, sql);
     }
   }
 
@@ -167,7 +167,7 @@ public abstract class BaseRepository extends SimpleRepository {
   protected long count(String sql, Collection<?> params) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.count(sql, params);
+      return database.createOrm().count(sql, params);
     }
   }
 
@@ -180,7 +180,7 @@ public abstract class BaseRepository extends SimpleRepository {
   protected long count(Sql sql) {
 
     try (Database database = this.dbTemplate.createDatabase()) {
-      return database.count(sql);
+      return database.createOrm().count(sql);
     }
   }
 }

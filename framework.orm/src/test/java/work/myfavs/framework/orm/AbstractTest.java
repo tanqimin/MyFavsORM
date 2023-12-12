@@ -7,6 +7,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import work.myfavs.framework.orm.meta.DbType;
+import work.myfavs.framework.orm.meta.clause.Sql;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -51,9 +52,9 @@ public class AbstractTest {
     for (String s : sqlContent.split("GO")) {
       sqlList.add(StrUtil.trim(s));
     }
-    database.tx(db -> {
+    database.tx(em -> {
       for (String sql : sqlList) {
-        int result = db.createQuery(sql).execute();
+        em.execute(new Sql(sql));
       }
     });
   }
@@ -79,5 +80,9 @@ public class AbstractTest {
     dataSource = null;
     dbTemplate = null;
     database = null;
+  }
+
+  public static void main(String[] args) {
+
   }
 }
