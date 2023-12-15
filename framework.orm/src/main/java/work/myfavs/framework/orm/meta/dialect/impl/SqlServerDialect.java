@@ -28,11 +28,8 @@ public class SqlServerDialect extends DefaultDialect {
   private static final String COL_ROW_NUM = "_rn";
   private static final String TABLE_ALIAS = "_paginate";
 
-  public SqlServerDialect() {
-  }
-
-  public SqlServerDialect(int maxPageSize) {
-    super(maxPageSize);
+  public SqlServerDialect(DBConfig dbConfig) {
+    super(dbConfig);
   }
 
   @Override

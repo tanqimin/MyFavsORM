@@ -15,11 +15,11 @@ public class FieldVisitor {
     this.field.setAccessible(true);
   }
 
-  public Object getValue(Object obj) {
+  public Object getValue(Object entity) {
     try {
-      return this.field.get(obj);
+      return this.field.get(entity);
     } catch (IllegalAccessException e) {
-      throw new DBException(e, "could not get field {} on class {}", this.field.getName(), obj.getClass().toString());
+      throw new DBException(e, "could not get field {} on class {}", this.field.getName(), entity.getClass().toString());
     }
   }
 

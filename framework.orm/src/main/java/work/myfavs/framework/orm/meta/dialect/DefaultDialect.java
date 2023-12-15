@@ -2,6 +2,13 @@ package work.myfavs.framework.orm.meta.dialect;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.sql.PagerUtils;
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.expr.*;
+import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
+import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
+import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem;
+import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
+import work.myfavs.framework.orm.DBConfig;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.SqlCache.Opt;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
@@ -11,9 +18,7 @@ import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.DruidUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 默认数据库方言实现
@@ -21,79 +26,55 @@ import java.util.Objects;
  * @author tanqimin
  */
 public abstract class DefaultDialect extends AbstractDialect implements IDialect {
-  protected int maxPageSize;
+  protected DBConfig dbConfig;
 
-  public DefaultDialect() {
-    this(-1);
-  }
-
-  public DefaultDialect(int maxPageSize) {
-    this.maxPageSize = maxPageSize;
+  public DefaultDialect(DBConfig dbConfig) {
+    this.dbConfig = dbConfig;
   }
 
   protected static <TModel> String getTableName(Class<TModel> clazz) {
     return TableAlias.getOpt().orElse(Metadata.classMeta(clazz).getTableName());
   }
 
-  @Override
-  public <TModel> Sql insert(Class<TModel> clazz, TModel model) {
-
-    Sql sql = insert(clazz);
-
-    ClassMeta                               classMeta        = Metadata.classMeta(clazz);
-    Attribute                               primaryKey       = classMeta.getPrimaryKey();
-    Map<String /* columnName */, Attribute> updateAttributes = classMeta.getUpdateAttributes();
-
-    if (classMeta.getStrategy() != GenerationType.IDENTITY) {
-      sql.getParams().add(primaryKey.getFieldVisitor().getValue(model));
-    }
-
-    for (Map.Entry<String, Attribute> entry : updateAttributes.entrySet()) {
-      sql.getParams().add(entry.getValue().getFieldVisitor().getValue(model));
-    }
-
-    return sql;
-  }
 
   @Override
-  public <TModel> Sql insert(Class<TModel> clazz) {
+  public String insert(ClassMeta entityMeta) {
 
+    Class<?> clazz = entityMeta.getClazz();
+    Opt      opt   = Opt.INSERT;
     return SqlCache.computeIfAbsent(
         clazz,
-        Opt.INSERT,
-        (key) -> {
-          ClassMeta                               classMeta        = Metadata.entityMeta(clazz);
-          String                                  tableName        = TableAlias.getOpt().orElse(classMeta.getTableName());
-          Attribute                               primaryKey       = classMeta.checkPrimaryKey();
-          Map<String /* columnName */, Attribute> updateAttributes = classMeta.getUpdateAttributes();
+        opt,
+        () -> {
+          GenerationType                          strategy         = entityMeta.getStrategy();
+          Attribute                               primaryKey       = entityMeta.checkPrimaryKey();
+          Map<String /* columnName */, Attribute> updateAttributes = entityMeta.getUpdateAttributes();
 
-          Sql insertSql = new Sql(StrUtil.format("INSERT INTO {} (", tableName));
-          Sql valuesSql = new Sql(" VALUES (");
-          if (classMeta.getStrategy() != GenerationType.IDENTITY) {
-            insertSql.append(primaryKey.getColumnName().concat(","));
-            valuesSql.append("?,");
+          SQLInsertStatement insertStatement = new SQLInsertStatement();
+          List<SQLExpr>      columns         = new ArrayList<>();
+          List<SQLExpr>      values          = new ArrayList<>();
+          //设置表名
+          insertStatement.setTableSource(new SQLExprTableSource(getTableName(clazz)));
+          if (strategy != GenerationType.IDENTITY) {
+            columns.add(createColumn(primaryKey.getColumnName()));
+            values.add(new SQLVariantRefExpr("?"));
           }
 
-          if (!updateAttributes.isEmpty()) {
-            updateAttributes.forEach(
-                (col, attr) -> {
-                  insertSql.append(attr.getColumnName().concat(","));
-                  valuesSql.append("?,");
-                });
-
-            // 自动加入逻辑删除字段
-            if (classMeta.getLogicDelete() != null) {
-              insertSql.append(classMeta.getLogicDelete().getColumnName().concat(","));
-              valuesSql.append("0,");
-            }
-            insertSql.deleteLastChar(",");
-            valuesSql.deleteLastChar(",");
+          for (Map.Entry<String, Attribute> entry : updateAttributes.entrySet()) {
+            columns.add(createColumn(entry.getValue().getColumnName()));
+            values.add(new SQLVariantRefExpr("?"));
           }
 
-          insertSql.append(")");
-          valuesSql.append(")");
+          Attribute logicDelete = entityMeta.getLogicDelete();
+          if (Objects.nonNull(logicDelete)) {
+            columns.add(createColumn(logicDelete.getColumnName()));
+            values.add(new SQLIntegerExpr(0));
+          }
 
-          return new Sql().append(insertSql).append(valuesSql);
+          insertStatement.getColumns().addAll(columns);
+          insertStatement.setValues(new SQLInsertStatement.ValuesClause(values));
+
+          return insertStatement.toUnformattedString();
         });
   }
 
@@ -101,39 +82,102 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
   public <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue) {
 
     ClassMeta                               classMeta;
-    String                                  tableName;
     Attribute                               primaryKey;
     Map<String /* columnName */, Attribute> updateAttributes;
 
-    Sql sql;
+    Sql sql = new Sql();
 
     classMeta = Metadata.classMeta(clazz);
-    tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     primaryKey = classMeta.checkPrimaryKey();
     updateAttributes = classMeta.getUpdateAttributes();
 
-    sql = Sql.Update(tableName).append(" SET");
+    SQLUpdateStatement updateStatement = new SQLUpdateStatement();
+    updateStatement.setTableSource(new SQLExprTableSource(getTableName(clazz)));
 
-    if (!updateAttributes.isEmpty()) {
-      updateAttributes.forEach(
-          (col, attr) -> {
-            final Object fieldValue = attr.getFieldVisitor().getValue(model);
-            // 忽略属性为null的字段生成
-            if (ignoreNullValue && Objects.isNull(fieldValue)) {
-              return;
-            }
-            sql.append(StrUtil.format(" {} = ?,", attr.getColumnName()), fieldValue);
-          });
+    for (Map.Entry<String, Attribute> entry : updateAttributes.entrySet()) {
+      Object fieldValue = entry.getValue().getValue(model);
+      if (ignoreNullValue && Objects.isNull(fieldValue)) continue;
 
-      sql.deleteLastChar(",");
+      SQLUpdateSetItem sqlUpdateSetItem = createUpdateSetItem(entry.getValue().getColumnName());
+      updateStatement.addItem(sqlUpdateSetItem);
+
+      sql.getParams().add(fieldValue);
     }
 
-    sql.append(
-        StrUtil.format(" WHERE {} = ?", primaryKey.getColumnName()),
-        primaryKey.getFieldVisitor().getValue(model)
-    );
+    SQLBinaryOpExpr pkCondition = new SQLBinaryOpExpr(
+        createColumn(primaryKey.getColumnName()),
+        SQLBinaryOperator.Equality,
+        new SQLVariantRefExpr("?"));
 
+    sql.getParams().add(primaryKey.getValue(model));
+
+    Attribute logicDelete = classMeta.getLogicDelete();
+    if (Objects.isNull(logicDelete)) {
+      updateStatement.addWhere(pkCondition);
+    } else {
+      updateStatement.addWhere(new SQLBinaryOpExpr(
+          pkCondition,
+          SQLBinaryOperator.BooleanAnd,
+          new SQLBinaryOpExpr(
+              createColumn(logicDelete.getColumnName()),
+              SQLBinaryOperator.Equality,
+              new SQLIntegerExpr(0)
+          )
+      ));
+    }
+
+    sql.append(updateStatement.toUnformattedString());
     return sql;
+  }
+
+  @Override
+  public String update(ClassMeta classMeta, String[] columns) {
+
+    Attribute             primaryKey       = classMeta.checkPrimaryKey();
+    Collection<Attribute> updateAttributes = classMeta.getUpdateAttributes(columns);
+
+    if (updateAttributes.isEmpty())
+      throw new DBException("Could not match update attributes.");
+
+    SQLUpdateStatement updateStatement = new SQLUpdateStatement();
+    updateStatement.setTableSource(new SQLExprTableSource(getTableName(classMeta.getClazz())));
+
+    for (Attribute attr : updateAttributes) {
+      updateStatement.addItem(createUpdateSetItem(attr.getColumnName()));
+    }
+
+    SQLBinaryOpExpr pkCondition = new SQLBinaryOpExpr(
+        createColumn(primaryKey.getColumnName()),
+        SQLBinaryOperator.Equality,
+        new SQLVariantRefExpr("?"));
+
+    Attribute logicDelete = classMeta.getLogicDelete();
+    if (Objects.isNull(logicDelete)) {
+      updateStatement.addWhere(pkCondition);
+    } else {
+      updateStatement.addWhere(new SQLBinaryOpExpr(
+          pkCondition,
+          SQLBinaryOperator.BooleanAnd,
+          new SQLBinaryOpExpr(
+              createColumn(logicDelete.getColumnName()),
+              SQLBinaryOperator.Equality,
+              new SQLIntegerExpr(0)
+          )
+      ));
+    }
+
+    return updateStatement.toUnformattedString();
+  }
+
+  protected static SQLUpdateSetItem createUpdateSetItem(String columnName) {
+    SQLUpdateSetItem sqlUpdateSetItem = new SQLUpdateSetItem();
+    sqlUpdateSetItem.setColumn(createColumn(columnName));
+    sqlUpdateSetItem.setValue(new SQLVariantRefExpr("?"));
+    return sqlUpdateSetItem;
+  }
+
+  protected static SQLIdentifierExpr createColumn(String columnName) {
+    return new SQLIdentifierExpr(columnName);
   }
 
   @Override
@@ -146,7 +190,6 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
 
   @Override
   public Sql count(String sql, Collection<?> params) {
-
     return new Sql(PagerUtils.count(sql, DruidUtil.convert(dbType())), params);
   }
 
@@ -171,6 +214,7 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
     if (pageSize < 1)
       throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
 
+    long maxPageSize = this.dbConfig.getMaxPageSize();
     if (maxPageSize > 0L && pageSize > maxPageSize)
       throw new DBException("每页记录数不能超出系统设置的最大记录数 {}", maxPageSize);
 

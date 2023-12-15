@@ -80,6 +80,7 @@ public class Database implements Closeable {
    *
    * @return 如果连接不存在，则创建，否则记录数据库连接打开次数 {@code +1}，并返回 {@link ConnFactory#openConnection()}
    */
+  @SuppressWarnings("resource")
   public Database open() {
     this.connFactory.openConnection();
     return this;

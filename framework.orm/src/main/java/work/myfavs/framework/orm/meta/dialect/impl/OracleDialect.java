@@ -27,11 +27,8 @@ public class OracleDialect extends DefaultDialect {
   private static final String OUTER_TABLE_ALIAS = "_paginate";
   private static final String COL_ROW_NUM       = "_rn";
 
-  public OracleDialect() {
-  }
-
-  public OracleDialect(int maxPageSize) {
-    super(maxPageSize);
+  public OracleDialect(DBConfig dbConfig) {
+    super(dbConfig);
   }
 
   @Override

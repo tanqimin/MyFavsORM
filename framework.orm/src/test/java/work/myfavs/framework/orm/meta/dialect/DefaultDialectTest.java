@@ -17,12 +17,15 @@ import work.myfavs.framework.orm.meta.dialect.impl.MySqlDialect;
 import work.myfavs.framework.orm.meta.dialect.impl.OracleDialect;
 import work.myfavs.framework.orm.meta.dialect.impl.SqlServer2012Dialect;
 import work.myfavs.framework.orm.meta.dialect.impl.SqlServerDialect;
+import work.myfavs.framework.orm.meta.schema.ClassMeta;
+import work.myfavs.framework.orm.meta.schema.Metadata;
 
 public class DefaultDialectTest {
-  protected IDialect mySqlDialect         = new MySqlDialect();
-  protected IDialect sqlServerDialect     = new SqlServerDialect();
-  protected IDialect sqlServer2012Dialect = new SqlServer2012Dialect();
-  protected IDialect oracleDialect        = new OracleDialect();
+  protected DBConfig dbConfig             = new DBConfig();
+  protected IDialect mySqlDialect         = new MySqlDialect(dbConfig);
+  protected IDialect sqlServerDialect     = new SqlServerDialect(dbConfig);
+  protected IDialect sqlServer2012Dialect = new SqlServer2012Dialect(dbConfig);
+  protected IDialect oracleDialect        = new OracleDialect(dbConfig);
 
   private static final String CASE1 = "SELECT * FROM TABLE_NAME WHERE col1 = ? ORDER BY id desc";
   private static final String CASE2 =
@@ -79,34 +82,10 @@ public class DefaultDialectTest {
 
   @Test
   public void insert() {
-    Sql insert1 = mySqlDialect.insert(Identity.class);
-    Sql insert2 = mySqlDialect.insert(Snowflake.class);
-    System.out.println(insert1);
-    System.out.println(insert2);
+    String insert1 = mySqlDialect.insert(Metadata.entityMeta(Identity.class));
+    String insert2 = mySqlDialect.insert(Metadata.entityMeta(Snowflake.class));
 
-    Identity identity = new Identity();
-    identity.setCreated(new Date());
-    identity.setName("AAA");
-    identity.setDisable(false);
-    identity.setPrice(new BigDecimal("0"));
-    identity.setType(TypeEnum.FOOD);
-
-    Snowflake snowflake = new Snowflake();
-    snowflake.setId(0L);
-    snowflake.setCreated(new Date());
-    snowflake.setName("");
-    snowflake.setDisable(false);
-    snowflake.setPrice(new BigDecimal("0"));
-    snowflake.setType(TypeEnum.FOOD);
-    snowflake.setConfig("");
-
-    insert1 = mySqlDialect.insert(Identity.class, identity);
-    insert2 = mySqlDialect.insert(Snowflake.class, snowflake);
-
-    System.out.println(insert1);
-    System.out.println(insert2);
-
-    System.out.println("insert1 params: " + insert1.getParams().size());
-    System.out.println("insert2 params: " + insert2.getParams().size());
+    Assert.notNull(insert1);
+    Assert.notNull(insert2);
   }
 }

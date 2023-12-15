@@ -8,11 +8,8 @@ import work.myfavs.framework.orm.meta.DbType;
  */
 public class PostgreSQLDialect extends MySqlDialect {
 
-  public PostgreSQLDialect() {
-  }
-
-  public PostgreSQLDialect(int maxPageSize) {
-    super(maxPageSize);
+  public PostgreSQLDialect(DBConfig dbConfig) {
+    super(dbConfig);
   }
 
   @Override

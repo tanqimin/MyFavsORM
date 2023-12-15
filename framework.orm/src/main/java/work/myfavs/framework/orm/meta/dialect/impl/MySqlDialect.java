@@ -5,6 +5,7 @@ import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import work.myfavs.framework.orm.DBConfig;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.dialect.DefaultDialect;
@@ -17,11 +18,8 @@ import java.util.Collection;
  */
 public class MySqlDialect extends DefaultDialect {
 
-  public MySqlDialect() {
-  }
-
-  public MySqlDialect(int maxPageSize) {
-    super(maxPageSize);
+  public MySqlDialect(DBConfig dbConfig) {
+    super(dbConfig);
   }
 
   @Override

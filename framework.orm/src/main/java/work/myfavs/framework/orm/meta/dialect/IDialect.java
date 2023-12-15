@@ -3,6 +3,7 @@ package work.myfavs.framework.orm.meta.dialect;
 import java.util.Collection;
 
 import work.myfavs.framework.orm.meta.clause.Sql;
+import work.myfavs.framework.orm.meta.schema.ClassMeta;
 
 /**
  * 通用数据库方言接口 Created by tanqimin on 2015/11/3.
@@ -10,23 +11,13 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 public interface IDialect {
 
   /**
-   * 获取插入语句（带参数）
-   *
-   * @param clazz    实体类Class
-   * @param entity   实体类对象
-   * @param <TModel> 实体类类型
-   * @return Sql对象
-   */
-  <TModel> Sql insert(Class<TModel> clazz, TModel entity);
-
-  /**
    * 获取插入语句（不带参数）
    *
-   * @param clazz    实体类Class
-   * @param <TModel> 实体类类型
+   * @param <TModel>   实体类类型
+   * @param entityMeta 实体类Class
    * @return Sql对象
    */
-  <TModel> Sql insert(Class<TModel> clazz);
+  String insert(ClassMeta entityMeta);
 
   /**
    * 获取所有记录语句
@@ -87,6 +78,8 @@ public interface IDialect {
    * @return Sql对象
    */
   <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue);
+
+  String update(ClassMeta entityMeta, String[] columns);
 
   /**
    * 获取删除实体语句

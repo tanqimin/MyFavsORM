@@ -8,11 +8,8 @@ import work.myfavs.framework.orm.meta.DbType;
  */
 public class H2Dialect extends MySqlDialect {
 
-  public H2Dialect() {
-  }
-
-  public H2Dialect(int maxPageSize) {
-    super(maxPageSize);
+  public H2Dialect(DBConfig dbConfig) {
+    super(dbConfig);
   }
 
   @Override

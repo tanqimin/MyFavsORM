@@ -1,12 +1,14 @@
 package work.myfavs.framework.orm.meta.dialect;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import work.myfavs.framework.orm.meta.clause.Sql;
+import java.util.function.Supplier;
 
 /**
  * SQL 语句缓存
@@ -15,25 +17,25 @@ import work.myfavs.framework.orm.meta.clause.Sql;
  */
 public final class SqlCache {
 
-  private static final Map<String, Sql> CACHE = new ConcurrentHashMap<>();
+  private static final Map<String/*class_opt_columns*/, String/*sql*/> CACHE = new ConcurrentHashMap<>();
 
   private SqlCache() {}
 
-  public static Sql put(Class<?> clazz, Opt opt, String[] columns, Sql sql) {
+  public static String put(Class<?> clazz, Opt opt, String[] columns, String sql) {
     final String key = getKey(clazz, opt, columns);
-    return pack(CACHE.put(key, sql));
+    return CACHE.put(key, sql);
   }
 
-  public static Sql put(Class<?> clazz, Opt opt, Sql sql) {
+  public static String put(Class<?> clazz, Opt opt, String sql) {
     return put(clazz, opt, null, sql);
   }
 
-  public static Sql get(Class<?> clazz, Opt opt, String[] columns) {
+  public static String get(Class<?> clazz, Opt opt, String[] columns) {
     final String key = getKey(clazz, opt, columns);
-    return pack(CACHE.get(key));
+    return CACHE.get(key);
   }
 
-  public static Sql get(Class<?> clazz, Opt opt) {
+  public static String get(Class<?> clazz, Opt opt) {
     return get(clazz, opt, null);
   }
 
@@ -46,14 +48,19 @@ public final class SqlCache {
     return contains(clazz, opt, null);
   }
 
-  public static Sql computeIfAbsent(
-      Class<?> clazz, Opt opt, String[] columns, Function<String, Sql> func) {
+  public static String computeIfAbsent(
+      Class<?> clazz, Opt opt, String[] columns, Supplier<String> sqlSupplier) {
     final String key = getKey(clazz, opt, columns);
-    return pack(CACHE.computeIfAbsent(key, func));
+    String       sql = CACHE.get(key);
+    if (Objects.isNull(sql)) {
+      sql = sqlSupplier.get();
+      CACHE.put(key, sql);
+    }
+    return sql;
   }
 
-  public static Sql computeIfAbsent(Class<?> clazz, Opt opt, Function<String, Sql> func) {
-    return computeIfAbsent(clazz, opt, null, func);
+  public static String computeIfAbsent(Class<?> clazz, Opt opt, Supplier<String> sqlSupplier) {
+    return computeIfAbsent(clazz, opt, null, sqlSupplier);
   }
 
   public static void clear() {
@@ -61,38 +68,33 @@ public final class SqlCache {
   }
 
   private static String getKey(Class<?> clazz, Opt opt, String[] columns) {
-    final String clazzName = clazz.getName();
-    final String optType = opt.name();
-    final StringBuilder col = new StringBuilder();
-    if (columns == null || columns.length == 0) {
-      col.append("*");
-    } else {
-      Arrays.stream(columns).sorted().forEach(c -> col.append(c).append("_"));
-      col.deleteCharAt(col.lastIndexOf("_"));
+    String col = "*";
+    if (ArrayUtil.isNotEmpty(columns)) {
+      col = StrUtil.join("_", Arrays.stream(columns).sorted());
     }
 
-    return StrUtil.format("{}_{}_{}", clazzName, optType, col);
+    return StrUtil.format("{}_{}_{}", clazz.getName(), opt.name(), col);
   }
 
   /**
-   * 对缓存结果打包，避免引用被修改
-   *
-   * @param sql SQL
-   * @return SQL
+   * SQL 操作类型
    */
-  private static Sql pack(Sql sql) {
-    return Optional.ofNullable(sql).map(Sql::new).orElse(null);
-  }
-
-  /** SQL 操作类型 */
-  enum Opt {
-    /** 查询 */
+  public enum Opt {
+    /**
+     * 查询
+     */
     SELECT,
-    /** 插入 */
+    /**
+     * 插入
+     */
     INSERT,
-    /** 更新 */
+    /**
+     * 更新
+     */
     UPDATE,
-    /** 删除 */
+    /**
+     * 删除
+     */
     DELETE
   }
 }

@@ -1,8 +1,9 @@
 package work.myfavs.framework.orm;
 
 import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.meta.dialect.DialectFactory;
 import work.myfavs.framework.orm.meta.dialect.IDialect;
+import work.myfavs.framework.orm.meta.dialect.impl.*;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.sql.Connection;
 
@@ -30,10 +31,6 @@ public class DBConfig {
    * 查询每次抓取数据的数量
    */
   private             int      fetchSize               = 1000;
-  /**
-   * 查询超时时间，单位：秒
-   */
-  private             int      queryTimeout            = 60;
   /**
    * 是否显示SQL
    */
@@ -97,7 +94,28 @@ public class DBConfig {
   public IDialect getDialect() {
 
     if (this.dialect == null) {
-      this.dialect = DialectFactory.getInstance(dbType, maxPageSize);
+      switch (dbType) {
+        case DbType.SQL_SERVER:
+          this.dialect = new SqlServerDialect(this);
+          break;
+        case DbType.SQL_SERVER_2012:
+          this.dialect = new SqlServer2012Dialect(this);
+          break;
+        case DbType.MYSQL:
+          this.dialect = new MySqlDialect(this);
+          break;
+        case DbType.POSTGRE_SQL:
+          this.dialect = new PostgreSQLDialect(this);
+          break;
+        case DbType.ORACLE:
+          this.dialect = new OracleDialect(this);
+          break;
+        case DbType.H2:
+          this.dialect = new H2Dialect(this);
+          break;
+        default:
+          throw new DBException("{} database is not supported.", dbType);
+      }
     }
     return this.dialect;
   }

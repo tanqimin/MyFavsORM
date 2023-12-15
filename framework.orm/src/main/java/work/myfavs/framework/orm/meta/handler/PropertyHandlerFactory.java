@@ -87,13 +87,9 @@ public class PropertyHandlerFactory {
 
   @SuppressWarnings("rawtypes")
   public static PropertyHandler getInstance(Field field) {
-    if (useNVarchar(field) && isStringType(field))
+    if (useNVarchar(field) && String.class.equals(field.getType()))
       return NVARCHAR_PROPERTY_HANDLER;
     return getInstance(field.getType());
-  }
-
-  private static boolean isStringType(Field field) {
-    return String.class.equals(field.getType());
   }
 
   private static boolean useNVarchar(Field field) {

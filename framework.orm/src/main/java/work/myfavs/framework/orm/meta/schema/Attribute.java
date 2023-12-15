@@ -84,6 +84,11 @@ public class Attribute implements Serializable {
     return logicDelete;
   }
 
+  @SuppressWarnings("rawtypes")
+  public PropertyHandler getPropertyHandler() {
+    return propertyHandler;
+  }
+
   // endregion
 
   // region Constructor
@@ -133,6 +138,10 @@ public class Attribute implements Serializable {
 
   public <TModel> void setValue(TModel model, Object value) {
     this.fieldVisitor.setValue(model, value);
+  }
+
+  public <TModel> Object getValue(TModel model) {
+    return this.fieldVisitor.getValue(model);
   }
 
   public <TModel> void setPrimaryKey(TModel model, ResultSet rs) throws SQLException {

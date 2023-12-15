@@ -17,11 +17,8 @@ import work.myfavs.framework.orm.util.DruidUtil;
  */
 public class SqlServer2012Dialect extends SqlServerDialect {
 
-  public SqlServer2012Dialect() {
-  }
-
-  public SqlServer2012Dialect(int maxPageSize) {
-    super(maxPageSize);
+  public SqlServer2012Dialect(DBConfig dbConfig) {
+    super(dbConfig);
   }
 
   @Override
