@@ -54,15 +54,15 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
           List<SQLExpr>      columns         = new ArrayList<>();
           List<SQLExpr>      values          = new ArrayList<>();
           //设置表名
-          insertStatement.setTableSource(new SQLExprTableSource(getTableName(clazz)));
+          insertStatement.setTableSource(createTableSource(getTableName(clazz)));
           if (strategy != GenerationType.IDENTITY) {
             columns.add(createColumn(primaryKey.getColumnName()));
-            values.add(new SQLVariantRefExpr("?"));
+            values.add(createParam());
           }
 
           for (Map.Entry<String, Attribute> entry : updateAttributes.entrySet()) {
             columns.add(createColumn(entry.getValue().getColumnName()));
-            values.add(new SQLVariantRefExpr("?"));
+            values.add(createParam());
           }
 
           Attribute logicDelete = entityMeta.getLogicDelete();
@@ -81,18 +81,17 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
   @Override
   public <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue) {
 
-    ClassMeta                               classMeta;
-    Attribute                               primaryKey;
-    Map<String /* columnName */, Attribute> updateAttributes;
 
     Sql sql = new Sql();
 
-    classMeta = Metadata.classMeta(clazz);
-    primaryKey = classMeta.checkPrimaryKey();
-    updateAttributes = classMeta.getUpdateAttributes();
+    ClassMeta classMeta   = Metadata.classMeta(clazz);
+    Attribute primaryKey  = classMeta.checkPrimaryKey();
+    Attribute logicDelete = classMeta.getLogicDelete();
+
+    Map<String /* columnName */, Attribute> updateAttributes = classMeta.getUpdateAttributes();
 
     SQLUpdateStatement updateStatement = new SQLUpdateStatement();
-    updateStatement.setTableSource(new SQLExprTableSource(getTableName(clazz)));
+    updateStatement.setTableSource(createTableSource(getTableName(clazz)));
 
     for (Map.Entry<String, Attribute> entry : updateAttributes.entrySet()) {
       Object fieldValue = entry.getValue().getValue(model);
@@ -104,76 +103,71 @@ public abstract class DefaultDialect extends AbstractDialect implements IDialect
       sql.getParams().add(fieldValue);
     }
 
-    SQLBinaryOpExpr pkCondition = new SQLBinaryOpExpr(
-        createColumn(primaryKey.getColumnName()),
-        SQLBinaryOperator.Equality,
-        new SQLVariantRefExpr("?"));
+    updateStatement.addWhere(createCondition(primaryKey, logicDelete));
 
+    sql.append(updateStatement.toUnformattedString());
     sql.getParams().add(primaryKey.getValue(model));
 
-    Attribute logicDelete = classMeta.getLogicDelete();
-    if (Objects.isNull(logicDelete)) {
-      updateStatement.addWhere(pkCondition);
-    } else {
-      updateStatement.addWhere(new SQLBinaryOpExpr(
-          pkCondition,
+    return sql;
+  }
+
+  private static SQLBinaryOpExpr createCondition(Attribute primaryKey, Attribute logicDelete) {
+    SQLBinaryOpExpr condition = new SQLBinaryOpExpr(
+        createColumn(primaryKey.getColumnName()),
+        SQLBinaryOperator.Equality,
+        createParam());
+
+    if (Objects.nonNull(logicDelete)) {
+      condition = new SQLBinaryOpExpr(
+          condition,
           SQLBinaryOperator.BooleanAnd,
           new SQLBinaryOpExpr(
               createColumn(logicDelete.getColumnName()),
               SQLBinaryOperator.Equality,
               new SQLIntegerExpr(0)
           )
-      ));
+      );
     }
-
-    sql.append(updateStatement.toUnformattedString());
-    return sql;
+    return condition;
   }
 
   @Override
   public String update(ClassMeta classMeta, String[] columns) {
 
-    Attribute             primaryKey       = classMeta.checkPrimaryKey();
+    Attribute primaryKey  = classMeta.checkPrimaryKey();
+    Attribute logicDelete = classMeta.getLogicDelete();
+
     Collection<Attribute> updateAttributes = classMeta.getUpdateAttributes(columns);
 
     if (updateAttributes.isEmpty())
       throw new DBException("Could not match update attributes.");
 
+    String tableName = getTableName(classMeta.getClazz());
+
     SQLUpdateStatement updateStatement = new SQLUpdateStatement();
-    updateStatement.setTableSource(new SQLExprTableSource(getTableName(classMeta.getClazz())));
+    updateStatement.setTableSource(createTableSource(tableName));
 
     for (Attribute attr : updateAttributes) {
       updateStatement.addItem(createUpdateSetItem(attr.getColumnName()));
     }
 
-    SQLBinaryOpExpr pkCondition = new SQLBinaryOpExpr(
-        createColumn(primaryKey.getColumnName()),
-        SQLBinaryOperator.Equality,
-        new SQLVariantRefExpr("?"));
-
-    Attribute logicDelete = classMeta.getLogicDelete();
-    if (Objects.isNull(logicDelete)) {
-      updateStatement.addWhere(pkCondition);
-    } else {
-      updateStatement.addWhere(new SQLBinaryOpExpr(
-          pkCondition,
-          SQLBinaryOperator.BooleanAnd,
-          new SQLBinaryOpExpr(
-              createColumn(logicDelete.getColumnName()),
-              SQLBinaryOperator.Equality,
-              new SQLIntegerExpr(0)
-          )
-      ));
-    }
-
+    updateStatement.addWhere(createCondition(primaryKey, logicDelete));
     return updateStatement.toUnformattedString();
+  }
+
+  private static SQLExprTableSource createTableSource(String tableName) {
+    return new SQLExprTableSource(tableName);
   }
 
   protected static SQLUpdateSetItem createUpdateSetItem(String columnName) {
     SQLUpdateSetItem sqlUpdateSetItem = new SQLUpdateSetItem();
     sqlUpdateSetItem.setColumn(createColumn(columnName));
-    sqlUpdateSetItem.setValue(new SQLVariantRefExpr("?"));
+    sqlUpdateSetItem.setValue(createParam());
     return sqlUpdateSetItem;
+  }
+
+  protected static SQLVariantRefExpr createParam() {
+    return new SQLVariantRefExpr("?");
   }
 
   protected static SQLIdentifierExpr createColumn(String columnName) {

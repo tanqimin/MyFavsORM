@@ -6,9 +6,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.druid.sql.ast.SQLName;
+import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLTruncateStatement;
+import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem;
+import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.annotation.Criteria;
 import work.myfavs.framework.orm.meta.annotation.Criterion;
@@ -435,12 +437,15 @@ public class Orm {
     }
 
     if (this.database.isSqlServer()) {
+      //SQL Server有 2100 个参数限制，所以只能采用传统批量更新的方式
       return updateByLines(modelClass, entities, columns);
     }
 
-    ClassMeta             classMeta  = Metadata.entityMeta(modelClass);
-    Attribute             primaryKey = classMeta.checkPrimaryKey();
-    Collection<Attribute> updAttrs   = classMeta.getUpdateAttributes(columns);
+    //在非 SQL Server 中，在 10000 条记录以内的更新，此方式速度较快
+    ClassMeta             classMeta   = Metadata.entityMeta(modelClass);
+    Attribute             primaryKey  = classMeta.checkPrimaryKey();
+    Attribute             logicDelete = classMeta.getLogicDelete();
+    Collection<Attribute> updAttrs    = classMeta.getUpdateAttributes(columns);
 
     if (updAttrs.isEmpty()) {
       throw new DBException("Could not match update attributes.");
@@ -451,93 +456,79 @@ public class Orm {
     String                   tableName = TableAlias.getOpt().orElse(classMeta.getTableName());
     List<Sql>                sqlList   = new ArrayList<>();
 
+    /*
+    为保值效率，按 batchSize 切割更新的数据
+    此处依赖的实体数量不是固定的，所以暂时不能封装在 Dialect 中
+     */
     for (List<TModel> entityList : batchList) {
-//      Sql sql = new Sql();
-//      SQLUpdateStatement updateStatement = new SQLUpdateStatement();
-//      updateStatement.setTableSource(new SQLExprTableSource(tableName));
-//
-//      for (Attribute updAttr : updAttrs) {
-//        SQLCaseExpr caseExpr = new SQLCaseExpr();
-//        caseExpr.addItem(new SQLBinaryOpExpr(
-//                             new SQLIdentifierExpr(updAttr.getColumnName()),
-//                             SQLBinaryOperator.Equality,
-//                             new SQLVariantRefExpr("?")),
-//                         new SQLVariantRefExpr("?"));
-//
-//        SQLUpdateSetItem sqlUpdateSetItem = new SQLUpdateSetItem();
-//        sqlUpdateSetItem.setColumn(new SQLIdentifierExpr(updAttr.getColumnName()));
-//        sqlUpdateSetItem.setValue(caseExpr);
-//        updateStatement.addItem(sqlUpdateSetItem);
-//
-//        sql.getParams().add(primaryKey.getValue())
-//      }
-//
-//      SQLInListExpr pkCondition = new SQLInListExpr();
-//      pkCondition.setExpr(new SQLIdentifierExpr(primaryKey.getColumnName()));
-//      for (TModel model : entityList) {
-//        pkCondition.addTarget(new SQLVariantRefExpr("?"));
-//      }
-//
-//      Attribute logicDelete = classMeta.getLogicDelete();
-//      if (Objects.isNull(logicDelete)) {
-//        updateStatement.addWhere(pkCondition);
-//      } else {
-//        updateStatement.addWhere(new SQLBinaryOpExpr(
-//            pkCondition,
-//            SQLBinaryOperator.BooleanAnd,
-//            new SQLBinaryOpExpr(
-//                new SQLIdentifierExpr(logicDelete.getColumnName()),
-//                SQLBinaryOperator.Equality,
-//                new SQLIntegerExpr(0)
-//            )
-//        ));
-//      }
-//
-//      sql.append(updateStatement.toUnformattedString());
+      Sql sql = new Sql();
 
-      //------------------------------------------------------------------------
-      Sql sql = Sql.Update(tableName).append(" SET ");
+      //构建 Update SQL 语句
+      SQLUpdateStatement updateStatement = new SQLUpdateStatement();
+      updateStatement.setTableSource(new SQLExprTableSource(tableName));
 
-      List<Object>     ids        = new ArrayList<>();
-      Map<String, Sql> setClauses = new TreeMap<>();
-      for (TModel entity : entityList) {
-        for (Attribute updAttr : updAttrs) {
-          Sql          setClause;
-          final String columnName = updAttr.getColumnName();
-          if (setClauses.containsKey(columnName)) {
-            setClause = setClauses.get(columnName);
-          } else {
-            setClause = new Sql(StrUtil.format(" {} = CASE {} ", columnName, primaryKey.getColumnName()));
-          }
-          setClause.append(
-              new Sql(" WHEN ? THEN ? ",
-                      CollectionUtil.newArrayList(
-                          primaryKey.getFieldVisitor().getValue(entity),
-                          updAttr.getFieldVisitor().getValue(entity)
-                      )
-              )
+      for (Attribute updAttr : updAttrs) {
+        //此处根据更新的属性，构建 CASE 语句：
+        SQLCaseExpr caseExpr = new SQLCaseExpr();
+        for (TModel model : entityList) {
+
+          caseExpr.addItem(
+              new SQLBinaryOpExpr(
+                  new SQLIdentifierExpr(primaryKey.getColumnName()),
+                  SQLBinaryOperator.Equality,
+                  new SQLVariantRefExpr("?")
+              ),
+              new SQLVariantRefExpr("?")
           );
 
-          setClauses.put(columnName, setClause);
+          sql.getParams().add(primaryKey.getValue(model));
+          sql.getParams().add(updAttr.getValue(model));
         }
-        ids.add(primaryKey.getFieldVisitor().getValue(entity));
+
+        /*
+        把 CASE 添加到 UPDATE 的字段中：
+        {updateColumn} = CASE
+          WHEN {primaryKey} = ? THEN ?
+          WHEN {primaryKey} = ? THEN ?
+          WHEN {primaryKey} = ? THEN ?
+        END
+         */
+        SQLUpdateSetItem sqlUpdateSetItem = new SQLUpdateSetItem();
+        sqlUpdateSetItem.setColumn(new SQLIdentifierExpr(updAttr.getColumnName()));
+        sqlUpdateSetItem.setValue(caseExpr);
+        updateStatement.addItem(sqlUpdateSetItem);
+
       }
 
-      for (Sql setClause : setClauses.values()) {
-        sql.append(setClause).append(" END,");
+      //构建主键条件 WHERE {primaryKey} in (?,?,?)
+      SQLInListExpr condition = new SQLInListExpr();
+      condition.setExpr(new SQLIdentifierExpr(primaryKey.getColumnName()));
+      for (TModel model : entityList) {
+        condition.addTarget(new SQLVariantRefExpr("?"));
+        sql.getParams().add(primaryKey.getValue(model));
       }
-      sql.deleteLastChar(",");
 
-      sql.where().and(Cond.in(primaryKey.getColumnName(), ids));
-      if (classMeta.getLogicDelete() != null) {
-        sql.append(StrUtil.format(" AND {} = 0", classMeta.getLogicDelete().getColumnName()));
+      //构建逻辑删除条件
+      if (Objects.isNull(logicDelete)) {
+        updateStatement.addWhere(condition);
+      } else {
+        updateStatement.addWhere(new SQLBinaryOpExpr(
+            condition,
+            SQLBinaryOperator.BooleanAnd,
+            new SQLBinaryOpExpr(
+                new SQLIdentifierExpr(logicDelete.getColumnName()),
+                SQLBinaryOperator.Equality,
+                new SQLIntegerExpr(0)
+            )
+        ));
       }
+
+      sql.append(updateStatement.toUnformattedString());
       sqlList.add(sql);
     }
-    for (Sql batchSql : sqlList) {
-      result += this.execute(batchSql);
-    }
-    return result;
+
+    int[] execute = this.execute(sqlList);
+    return Arrays.stream(execute).sum();
   }
 
   /**

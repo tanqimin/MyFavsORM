@@ -577,7 +577,7 @@ public class DatabaseTest extends AbstractTest
               for (Identity i : IDENTITIES) {
                 i.setPrice(new BigDecimal("1099.00"));
               }
-              innerOrm.update(Identity.class, IDENTITIES, new String[]{"price"});
+              innerOrm.update(Identity.class, IDENTITIES, new String[]{"name","price"});
 
               List<Identity> identities = innerOrm.find(Identity.class, new Sql("select * from tb_identity"));
 
