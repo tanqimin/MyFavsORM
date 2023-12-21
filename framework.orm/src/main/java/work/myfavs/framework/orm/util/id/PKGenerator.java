@@ -1,7 +1,8 @@
-package work.myfavs.framework.orm.util;
+package work.myfavs.framework.orm.util.id;
 
-import cn.hutool.core.lang.Snowflake;
-import cn.hutool.core.util.IdUtil;
+import work.myfavs.framework.orm.util.id.Snowflake;
+
+import java.util.UUID;
 
 /**
  * 主键生成器
@@ -10,16 +11,16 @@ import cn.hutool.core.util.IdUtil;
  */
 public class PKGenerator {
 
-  private static Snowflake snowflake;
+  private final Snowflake snowflake;
 
   /**
    * 主键生成器
    *
-   * @param workerId 终端ID
+   * @param workerId     终端ID
    * @param dataCenterId 数据中心ID
    */
   public PKGenerator(long workerId, long dataCenterId) {
-    snowflake = IdUtil.getSnowflake(workerId, dataCenterId);
+    snowflake = new Snowflake(workerId, dataCenterId);
   }
 
   /**
@@ -29,7 +30,7 @@ public class PKGenerator {
    */
   public String nextUUID() {
 
-    return IdUtil.randomUUID();
+    return UUID.randomUUID().toString();
   }
 
   /**

@@ -1,17 +1,18 @@
 package work.myfavs.framework.orm;
 
-import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.core.util.StrUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
+import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.orm.util.common.IOUtil;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AbstractTest {
   protected static final String DB_TYPE       = DbType.SQL_SERVER;
@@ -30,7 +31,7 @@ public class AbstractTest {
   protected static Database database;
 
   private static void initDBTemplate() {
-    if (dbTemplate == null) {
+    if (Objects.isNull(dbTemplate)) {
       HikariConfig configuration = new HikariConfig();
       configuration.setDriverClassName(DRIVER_CLASS);
       configuration.setJdbcUrl(JDBC_URL);
@@ -47,10 +48,10 @@ public class AbstractTest {
   }
 
   private static void createTablesForSqlServer() {
-    String       sqlContent = ResourceUtil.readUtf8Str("sql/sql_server.sql");
+    String       sqlContent = IOUtil.read("sql/sql_server.sql");
     List<String> sqlList    = new ArrayList<>();
     for (String s : sqlContent.split("GO")) {
-      sqlList.add(StrUtil.trim(s));
+      sqlList.add(StringUtil.trim(s));
     }
     database.tx(em -> {
       for (String sql : sqlList) {
@@ -69,7 +70,7 @@ public class AbstractTest {
   }
 
   private static void initDatabase() {
-    if (database == null) {
+    if (Objects.isNull(database)) {
       database = dbTemplate.createDatabase();
     }
   }

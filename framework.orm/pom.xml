@@ -22,11 +22,6 @@
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-core -->
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-core</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>

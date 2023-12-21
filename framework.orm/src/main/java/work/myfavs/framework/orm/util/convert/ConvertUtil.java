@@ -1,8 +1,8 @@
 package work.myfavs.framework.orm.util.convert;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.EnumUtil;
+
+import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.orm.util.common.ArrayUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.lang.reflect.Array;
@@ -19,7 +19,7 @@ public class ConvertUtil {
    */
   public static Collection<?> toCollection(Object object) {
     Collection<Object> collection = new ArrayList<>();
-    if (object == null) return collection;
+    if (Objects.isNull(object)) return collection;
 
     if (ArrayUtil.isArray(object)) {
       Class<?> componentType = object.getClass().getComponentType();
@@ -30,13 +30,13 @@ public class ConvertUtil {
         }
         return collection;
       } else {
-        return CollectionUtil.toList((Object[]) object);
+        return List.of((Object[]) object);
       }
     } else if (object instanceof Collection<?>) {
       return (Collection<?>) object;
     }
 
-    throw new DBException("The argument (Type: {}) can't convert to Collection", object.getClass().getName());
+    throw new DBException("The argument (Type: %s) can't convert to Collection", object.getClass().getName());
   }
 
   /**
@@ -63,7 +63,7 @@ public class ConvertUtil {
         return clazz.isPrimitive() ? numberFunc.apply(0) : null;
       return stringFunc.apply(str);
     }
-    throw new DBException("Cannot convert type {} to {}.", value.getClass().getName(), clazz.getName());
+    throw new DBException("Cannot convert type %s to %s.", value.getClass().getName(), clazz.getName());
   }
 
   public static Integer toInt(Object value) {
@@ -121,21 +121,26 @@ public class ConvertUtil {
           "T".equalsIgnoreCase(strVal) || "J".equalsIgnoreCase(strVal);
     }
 
-    throw new DBException("Don't know how to convert type {} to {}", value.getClass().getName(), Boolean.class.getName());
+    throw new DBException("Don't know how to convert type %s to %s", value.getClass().getName(), Boolean.class.getName());
   }
 
   public static <T extends Enum<T>> T toEnum(Class<T> clazz, Object value) {
     if (Objects.isNull(value)) return null;
 
+    String str;
     if (value instanceof String) {
-      String str = ((String) value).trim();
-      str = str.isEmpty() ? null : str;
-      if (Objects.isNull(str))
+      str = ((String) value).trim();
+      if (StringUtil.isEmpty(str))
         return null;
-      return EnumUtil.fromStringQuietly(clazz, str);
+    } else {
+      str = StringUtil.toString(value);
     }
 
-    throw new DBException("Cannot convert type {} to enum: {}", value.getClass(), clazz.getName());
+    try {
+      return Enum.valueOf(clazz, str);
+    } catch (IllegalArgumentException e) {
+      throw new DBException("Cannot convert type %s to enum: %s", value.getClass(), clazz.getName());
+    }
   }
 
   public static String toString(Object value) {
@@ -149,7 +154,7 @@ public class ConvertUtil {
     if (clazz.isInstance(value)) return (T) value;
     if (value instanceof Date) return dateFunction.apply(((Date) value).getTime());
     if (value instanceof Number) return dateFunction.apply(((Number) value).longValue());
-    throw new DBException("Cannot convert type {} to java.util.Date", value.getClass());
+    throw new DBException("Cannot convert type %s to java.util.Date", value.getClass());
   }
 
   public static Date toDate(Object value) {
@@ -168,6 +173,6 @@ public class ConvertUtil {
       return UUID.fromString(str);
     }
 
-    throw new DBException("Cannot convert type {} to {}.", value.getClass().getName(), UUID.class.getName());
+    throw new DBException("Cannot convert type %s to %s.", value.getClass().getName(), UUID.class.getName());
   }
 }

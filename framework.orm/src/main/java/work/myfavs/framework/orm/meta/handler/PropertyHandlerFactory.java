@@ -1,9 +1,7 @@
 package work.myfavs.framework.orm.meta.handler;
 
-import work.myfavs.framework.orm.meta.annotation.NVarchar;
 import work.myfavs.framework.orm.meta.handler.impls.*;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -14,10 +12,9 @@ import java.util.UUID;
 
 public class PropertyHandlerFactory {
 
-  private static final Map<String, PropertyHandler<?>> HANDLER_MAP               = new HashMap<>();
-  private static final EnumPropertyHandler             ENUM_PROPERTY_HANDLER     = new EnumPropertyHandler();
-  private static final ObjectPropertyHandler           OBJECT_PROPERTY_HANDLER   = new ObjectPropertyHandler();
-  private static final StringPropertyHandler           NVARCHAR_PROPERTY_HANDLER = new StringPropertyHandler(true);
+  private static final Map<String, PropertyHandler<?>> HANDLER_MAP             = new HashMap<>();
+  private static final EnumPropertyHandler             ENUM_PROPERTY_HANDLER   = new EnumPropertyHandler();
+  private static final ObjectPropertyHandler           OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
 
   private PropertyHandlerFactory() {}
 
@@ -83,16 +80,5 @@ public class PropertyHandlerFactory {
     }
 
     return OBJECT_PROPERTY_HANDLER;
-  }
-
-  @SuppressWarnings("rawtypes")
-  public static PropertyHandler getInstance(Field field) {
-    if (useNVarchar(field) && String.class.equals(field.getType()))
-      return NVARCHAR_PROPERTY_HANDLER;
-    return getInstance(field.getType());
-  }
-
-  private static boolean useNVarchar(Field field) {
-    return Objects.nonNull(field.getAnnotation(NVarchar.class));
   }
 }

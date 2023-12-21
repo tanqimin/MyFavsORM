@@ -52,7 +52,7 @@ public class TenantDataSourceConfig {
 
     Map<Object, Object> customDataSources = new HashMap<>();
 
-    if (DynamicDataSource.connectProperties == null)
+    if (Objects.isNull(DynamicDataSource.connectProperties))
       DynamicDataSource.connectProperties = primaryDataSource.getConnectProperties();
 
     for (Tenant tenant : tenants) {

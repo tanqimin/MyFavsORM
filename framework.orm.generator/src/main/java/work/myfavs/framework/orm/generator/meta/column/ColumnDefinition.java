@@ -1,9 +1,11 @@
 package work.myfavs.framework.orm.generator.meta.column;
 
-import cn.hutool.core.util.StrUtil;
-import java.io.Serializable;
 import work.myfavs.framework.orm.generator.meta.TypeDefinition;
 import work.myfavs.framework.orm.generator.util.GeneratorUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 public class ColumnDefinition implements Serializable {
 
@@ -31,15 +33,15 @@ public class ColumnDefinition implements Serializable {
 
   public String getFieldName() {
 
-    if (column == null) {
+    if (Objects.isNull(column)) {
       return null;
     }
-    return StrUtil.toCamelCase(column);
+    return StringUtil.toCamelCase(column);
   }
 
   public String getComment() {
 
-    if (comment == null) {
+    if (Objects.isNull(comment)) {
       return null;
     }
     if (comment.contains("#")) {

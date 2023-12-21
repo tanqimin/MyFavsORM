@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.util.convert;
 
-import cn.hutool.core.util.ReflectUtil;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
@@ -8,6 +7,7 @@ import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.common.Constant;
+import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -60,6 +60,7 @@ public class DBConvert {
     while (rs.next()) {
       TModel model = ReflectUtil.newInstance(modelClass);
       for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+
         Attribute attr = attributes.get(metaData.getColumnName(columnIndex).toUpperCase());
         if (Objects.isNull(attr)) continue;
         attr.setValue(model, rs, columnIndex);

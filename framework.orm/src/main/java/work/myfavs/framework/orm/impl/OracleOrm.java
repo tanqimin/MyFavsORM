@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.meta.dialect.impl;
+package work.myfavs.framework.orm.impl;
 
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
@@ -7,44 +7,30 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSubqueryTableSource;
 import com.alibaba.druid.sql.dialect.oracle.ast.stmt.OracleSelectQueryBlock;
 import com.alibaba.druid.util.JdbcConstants;
+import work.myfavs.framework.orm.Database;
+import work.myfavs.framework.orm.meta.DbType;
+import work.myfavs.framework.orm.meta.clause.Sql;
+import work.myfavs.framework.orm.util.common.DruidUtil;
 
 import java.util.Collection;
 
-import work.myfavs.framework.orm.DBConfig;
-import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.meta.clause.Sql;
-import work.myfavs.framework.orm.meta.dialect.DefaultDialect;
-import work.myfavs.framework.orm.util.DruidUtil;
-
-/**
- * Oracle方言实现
- *
- * @author tanqimin
- */
-public class OracleDialect extends DefaultDialect {
+public class OracleOrm extends AbstractOrm {
 
   private static final String INNER_TABLE_ALIAS = "_limit";
   private static final String OUTER_TABLE_ALIAS = "_paginate";
   private static final String COL_ROW_NUM       = "_rn";
 
-  public OracleDialect(DBConfig dbConfig) {
-    super(dbConfig);
+  public OracleOrm(Database database) {
+    super(database);
   }
 
   @Override
-  public String dbType() {
-
+  protected String dbType() {
     return DbType.ORACLE;
   }
 
   @Override
-  public Sql selectTop(int limit, String sql, Collection<?> params) {
-    String querySql = limit(sql, 0, limit).toUnformattedString();
-    return new Sql(querySql, params);
-  }
-
-  @Override
-  public Sql selectPage(String sql, Collection<?> params, int currentPage, int pageSize) {
+  protected Sql selectPage(String sql, Collection<?> params, int currentPage, int pageSize) {
     int    offset   = pageSize * (currentPage - 1);
     String querySql = limit(sql, offset, pageSize).toUnformattedString();
     return new Sql(querySql, params);

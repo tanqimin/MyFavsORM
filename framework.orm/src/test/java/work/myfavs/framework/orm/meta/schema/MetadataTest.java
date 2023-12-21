@@ -2,9 +2,8 @@ package work.myfavs.framework.orm.meta.schema;
 
 import org.junit.Test;
 import work.myfavs.framework.orm.entity.Snowflake;
-import work.myfavs.framework.orm.meta.dialect.DefaultDialectTest;
 
-public class MetadataTest extends DefaultDialectTest {
+public class MetadataTest {
 
   @Test
   public void get() {

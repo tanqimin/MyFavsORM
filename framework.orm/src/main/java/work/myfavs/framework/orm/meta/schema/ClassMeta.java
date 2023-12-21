@@ -1,12 +1,12 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
+
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
-import work.myfavs.framework.orm.util.StringUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.orm.util.common.ArrayUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -121,7 +121,7 @@ public class ClassMeta {
     this.clazz = clazz;
 
     final Table table = clazz.getAnnotation(Table.class);
-    if (table != null) {
+    if (Objects.nonNull(table)) {
       this.isEntity = true;
       this.strategy = table.strategy();
       this.tableName = getTableName(table, clazz);
@@ -129,11 +129,11 @@ public class ClassMeta {
 
     this.modelConstructor = ReflectUtil.getConstructor(clazz);
 
-    final Field[] fields = ReflectUtil.getFields(clazz);
+    final List<Field> fields = ReflectUtil.getFields(clazz);
 
     for (Field field : fields) {
       final Attribute attr = Attribute.createInstance(field);
-      if (attr == null) {
+      if (Objects.isNull(attr)) {
         continue;
       }
 
@@ -155,7 +155,7 @@ public class ClassMeta {
   }
 
   private static String getTableName(Table table, Class<?> clazz) {
-    return StrUtil.isEmpty(table.value())
+    return StringUtil.isEmpty(table.value())
         ? StringUtil.toUnderlineCase(clazz.getSimpleName())
         : table.value();
   }
@@ -182,7 +182,7 @@ public class ClassMeta {
     try {
       return (T) this.modelConstructor.newInstance();
     } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-      throw new DBException("Error create model instance: {}", e.getMessage());
+      throw new DBException("Error create model instance: %s", e.getMessage());
     }
   }
 
@@ -193,8 +193,8 @@ public class ClassMeta {
    */
   public Attribute checkPrimaryKey() {
 
-    if (primaryKey == null) {
-      throw new DBException("The view class [{}] could not contain primary key", this.clazz.getName());
+    if (Objects.isNull(primaryKey)) {
+      throw new DBException("The view class [%s] could not contain primary key", this.clazz.getName());
     }
     return primaryKey;
   }

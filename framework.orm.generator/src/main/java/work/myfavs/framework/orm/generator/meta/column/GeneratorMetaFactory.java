@@ -7,9 +7,11 @@ import work.myfavs.framework.orm.generator.util.GeneratorUtil;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.util.exception.DBException;
 
+import java.util.Objects;
+
 public abstract class GeneratorMetaFactory {
 
-  private GeneratorMeta generatorMeta = null;
+  private GeneratorMeta   generatorMeta   = null;
   private GeneratorConfig generatorConfig = null;
 
   protected GeneratorMetaFactory() {}
@@ -22,7 +24,7 @@ public abstract class GeneratorMetaFactory {
     if (DbType.MYSQL.equals(dbType)) {
       generatorMetaFactory = new MySQLGeneratorMetaFactory(generatorConfig);
     } else {
-      throw new DBException("{} database is not supported.", dbType);
+      throw new DBException("%s database is not supported.", dbType);
     }
     generatorMetaFactory.generatorConfig = generatorConfig;
     return generatorMetaFactory;
@@ -30,7 +32,7 @@ public abstract class GeneratorMetaFactory {
 
   public GeneratorMeta getGeneratorMeta() {
 
-    if (this.generatorMeta == null) {
+    if (Objects.isNull(this.generatorMeta)) {
       this.generatorMeta = createGeneratorMeta();
       this.handlePrefix();
     }
@@ -41,7 +43,7 @@ public abstract class GeneratorMetaFactory {
   private void handlePrefix() {
 
     String prefix = generatorConfig.getTablePrefix();
-    if (prefix == null || prefix.length() == 0) {
+    if (Objects.isNull(prefix) || prefix.isEmpty()) {
       return;
     }
     for (TableDefinition tableDefinition : this.generatorMeta.getTableDefinitions()) {

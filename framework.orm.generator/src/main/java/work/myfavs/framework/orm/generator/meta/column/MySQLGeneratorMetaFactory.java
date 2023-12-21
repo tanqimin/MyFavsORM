@@ -1,7 +1,5 @@
 package work.myfavs.framework.orm.generator.meta.column;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import work.myfavs.framework.orm.generator.GeneratorConfig;
 import work.myfavs.framework.orm.generator.meta.GeneratorMeta;
 import work.myfavs.framework.orm.generator.meta.TableDefinition;
@@ -11,11 +9,14 @@ import work.myfavs.framework.orm.generator.util.ResultSetUtil;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
+import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.sql.*;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
 
@@ -47,10 +48,10 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
       Sql    sql    = getSql(dbName);
       ps = conn.prepareStatement(sql.toString());
       List<Object> params = sql.getParams();
-      if (CollUtil.isNotEmpty(params)) {
+      if (CollectionUtil.isNotEmpty(params)) {
         int pid = 1;
         for (Object param : params) {
-          if (param == null)
+          if (Objects.isNull(param))
             ps.setObject(pid, null);
           else
             PropertyHandlerFactory.getInstance(param.getClass()).addParameter(ps, pid, param);
@@ -73,7 +74,7 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
       throw new DBException(e);
     } finally {
       try {
-        if (rs != null) {
+        if (Objects.nonNull(rs)) {
           if (!rs.isClosed())
             rs.close();
         }
@@ -81,7 +82,7 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
         throw new DBException(e);
       } finally {
         try {
-          if (ps != null) {
+          if (Objects.nonNull(ps)) {
             if (!ps.isClosed())
               ps.close();
           }
@@ -89,7 +90,7 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
           throw new DBException(e);
         } finally {
           try {
-            if (conn != null) {
+            if (Objects.nonNull(conn)) {
               if (!ps.isClosed())
                 ps.close();
             }
@@ -133,13 +134,13 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
 
     TableDefinition tableDefinition = null;
     for (TableDefinition definition : tableDefinitions) {
-      if (StrUtil.equalsIgnoreCase(table, definition.getTableName())) {
+      if (StringUtil.equalsIgnoreCase(table, definition.getTableName())) {
         tableDefinition = definition;
         break;
       }
     }
 
-    if (tableDefinition == null) {
+    if (Objects.isNull(tableDefinition)) {
       tableDefinition = new TableDefinition();
       tableDefinition.setTableName(table);
       tableDefinition.setClassName(GeneratorUtil.toClass(table));
@@ -173,7 +174,7 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
 
   private TypeDefinition createTypeDefinition(String dataType, String comment) {
 
-    if (comment != null) {
+    if (Objects.nonNull(comment)) {
       if (comment.contains("#")) {
         String         className      = comment.split("#")[1];
         TypeDefinition typeDefinition = new TypeDefinition(className);
@@ -183,11 +184,11 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
     }
 
     for (Entry<String, TypeDefinition> entry : generatorConfig.getTypeMapper().entrySet()) {
-      if (StrUtil.equalsIgnoreCase(dataType, entry.getKey())) {
+      if (StringUtil.equalsIgnoreCase(dataType, entry.getKey())) {
         return entry.getValue();
       }
     }
 
-    throw new DBException("{} type is not registered.", dataType);
+    throw new DBException("%s type is not registered.", dataType);
   }
 }

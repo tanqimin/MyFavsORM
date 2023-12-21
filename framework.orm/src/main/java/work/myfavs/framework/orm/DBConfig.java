@@ -1,9 +1,6 @@
 package work.myfavs.framework.orm;
 
 import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.meta.dialect.IDialect;
-import work.myfavs.framework.orm.meta.dialect.impl.*;
-import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.sql.Connection;
 
@@ -15,10 +12,6 @@ import java.sql.Connection;
 public class DBConfig {
 
   public static final String   DEFAULT_DATASOURCE_NAME = "default";
-  /**
-   * 数据库方言
-   */
-  private             IDialect dialect;
   /**
    * 数据库类型
    */
@@ -85,40 +78,6 @@ public class DBConfig {
    * 分页查询结果是否存在下一页字段名称
    */
   private String pageHasNextField = "hasNext";
-
-  /**
-   * 获取数据库方言
-   *
-   * @return 数据库方言
-   */
-  public IDialect getDialect() {
-
-    if (this.dialect == null) {
-      switch (dbType) {
-        case DbType.SQL_SERVER:
-          this.dialect = new SqlServerDialect(this);
-          break;
-        case DbType.SQL_SERVER_2012:
-          this.dialect = new SqlServer2012Dialect(this);
-          break;
-        case DbType.MYSQL:
-          this.dialect = new MySqlDialect(this);
-          break;
-        case DbType.POSTGRE_SQL:
-          this.dialect = new PostgreSQLDialect(this);
-          break;
-        case DbType.ORACLE:
-          this.dialect = new OracleDialect(this);
-          break;
-        case DbType.H2:
-          this.dialect = new H2Dialect(this);
-          break;
-        default:
-          throw new DBException("{} database is not supported.", dbType);
-      }
-    }
-    return this.dialect;
-  }
 
   /**
    * 获取数据库类型

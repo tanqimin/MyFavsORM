@@ -1,13 +1,5 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import static org.junit.Assert.*;
-
-import cn.hutool.core.util.StrUtil;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +10,13 @@ import work.myfavs.framework.orm.meta.enumeration.FuzzyMode;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
+import work.myfavs.framework.orm.util.common.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class CondTest {
   ClassMeta identityClassMeta;
@@ -51,7 +50,7 @@ public class CondTest {
 
   @Test
   public void testEq() {
-    assertTrue(StrUtil.equalsIgnoreCase(" id is null", Cond.eq("id", null, false).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase(" id is null", Cond.eq("id", null, false).toString()));
     assertEquals("", Cond.eq("id", null, true).toString());
   }
 
@@ -62,41 +61,41 @@ public class CondTest {
 
   @Test
   public void testNe() {
-    assertTrue(StrUtil.equalsIgnoreCase(" id is not null", Cond.ne("id", null, false).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase(" id is not null", Cond.ne("id", null, false).toString()));
     assertEquals("", Cond.ne("id", null, true).toString());
   }
 
   @Test
   public void isNull() {
-    assertTrue(StrUtil.equalsIgnoreCase(" id is null", Cond.eq("id", null, false).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase(" id is null", Cond.eq("id", null, false).toString()));
   }
 
   @Test
   public void isNotNull() {
-    assertTrue(StrUtil.equalsIgnoreCase(" id is not null", Cond.ne("id", null, false).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase(" id is not null", Cond.ne("id", null, false).toString()));
   }
 
   @Test
   public void gt() {
-    assertTrue(StrUtil.equalsIgnoreCase(" id > ?", Cond.gt("id", 0).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase(" id > ?", Cond.gt("id", 0).toString()));
     assertEquals("", Cond.gt("id", null).toString());
   }
 
   @Test
   public void ge() {
-    assertTrue(StrUtil.equalsIgnoreCase(" id >= ?", Cond.ge("id", 0).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase(" id >= ?", Cond.ge("id", 0).toString()));
     assertEquals("", Cond.ge("id", null).toString());
   }
 
   @Test
   public void lt() {
-    assertTrue(StrUtil.equalsIgnoreCase(" id < ?", Cond.lt("id", 0).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase(" id < ?", Cond.lt("id", 0).toString()));
     assertEquals("", Cond.lt("id", null).toString());
   }
 
   @Test
   public void le() {
-    assertTrue(StrUtil.equalsIgnoreCase(" id <= ?", Cond.le("id", 0).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase(" id <= ?", Cond.le("id", 0).toString()));
     assertEquals("", Cond.le("id", null).toString());
   }
 
@@ -147,7 +146,7 @@ public class CondTest {
   @Test
   public void testIn1() {
     Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(StrUtil.format(" id IN ({})", sql), Cond.in("id", sql).toString());
+    assertEquals(String.format(" id IN (%s)", sql), Cond.in("id", sql).toString());
   }
 
   @Test
@@ -169,31 +168,31 @@ public class CondTest {
   @Test
   public void testNotIn1() {
     Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(StrUtil.format(" id NOT IN ({})", sql), Cond.notIn("id", sql).toString());
+    assertEquals(String.format(" id NOT IN (%s)", sql), Cond.notIn("id", sql).toString());
   }
 
   @Test
   public void exists() {
     Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(StrUtil.format(" EXISTS ({})", sql), Cond.exists(sql).toString());
+    assertEquals(String.format(" EXISTS (%s)", sql), Cond.exists(sql).toString());
   }
 
   @Test
   public void testExists() {
     Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(StrUtil.format(" EXISTS ({})", sql), Cond.exists(() -> sql).toString());
+    assertEquals(String.format(" EXISTS (%s)", sql), Cond.exists(() -> sql).toString());
   }
 
   @Test
   public void notExists() {
     Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(StrUtil.format(" NOT EXISTS ({})", sql), Cond.notExists(sql).toString());
+    assertEquals(String.format(" NOT EXISTS (%s)", sql), Cond.notExists(sql).toString());
   }
 
   @Test
   public void testNotExists() {
     Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(StrUtil.format(" NOT EXISTS ({})", sql), Cond.notExists(() -> sql).toString());
+    assertEquals(String.format(" NOT EXISTS (%s)", sql), Cond.notExists(() -> sql).toString());
   }
 
   @Test

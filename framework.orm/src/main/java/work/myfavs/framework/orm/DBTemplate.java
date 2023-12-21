@@ -1,19 +1,20 @@
 package work.myfavs.framework.orm;
 
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ReflectUtil;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
-import work.myfavs.framework.orm.util.PKGenerator;
+import work.myfavs.framework.orm.util.id.PKGenerator;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -30,7 +31,7 @@ public class DBTemplate {
     if (POOL.containsKey(dsName)) {
       return POOL.get(dsName);
     }
-    throw new DBException("The DataSource named {} not exists.", dsName);
+    throw new DBException("The DataSource named %s not exists.", dsName);
   }
 
   public static DBTemplate add(String dsName, DBTemplate dbTemplate) {
@@ -85,7 +86,7 @@ public class DBTemplate {
    * @param mapper Mapper
    */
   private void registerMapper(Mapper mapper) {
-    if (mapper == null || mapper.map.isEmpty()) {
+    if (Objects.isNull(mapper) || mapper.map.isEmpty()) {
       PropertyHandlerFactory.registerDefault();
       return;
     }
@@ -146,11 +147,19 @@ public class DBTemplate {
    * @return 数据库连接工厂
    */
   private ConnFactory createConnFactory(Class<? extends ConnFactory> cls, DataSource dataSource) {
-    return ReflectUtil.newInstance(cls, dataSource);
+    try {
+      //使用cls反射创建 ConnFactory 的实例
+
+      Constructor<? extends ConnFactory> constructor = cls.getDeclaredConstructor(DataSource.class);
+      return constructor.newInstance(dataSource);
+    } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+      throw new DBException("Error create ConnFactory instance : %s", e.getMessage());
+    }
   }
 
   /**
    * 创建 {@link Database} 对象
+   *
    * @return {@link Database}
    */
   public Database createDatabase() {
@@ -194,7 +203,7 @@ public class DBTemplate {
     instance.setData(data);
     instance.setCurrentPage(currentPage);
     instance.setPageSize(pageSize);
-    if (data != null) {
+    if (Objects.nonNull(data)) {
       instance.setHasNext(data.size() == pageSize);
     }
     return instance;
@@ -244,9 +253,9 @@ public class DBTemplate {
 
     public DBTemplate build() {
 
-      Assert.notNull(this.dataSource, "DataSource is required.");
+      Objects.requireNonNull(this.dataSource, "DataSource is required.");
 
-      if (this.config == null) {
+      if (Objects.isNull(this.config)) {
         this.config = new DBConfig();
       }
 

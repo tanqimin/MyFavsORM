@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import cn.hutool.core.util.StrUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
@@ -32,6 +31,6 @@ public class Metadata {
     ClassMeta classMeta = classMeta(clazz);
     if (classMeta.isEntity())
       return classMeta;
-    throw new DBException("Class {} is not an entity class", clazz.getName());
+    throw new DBException("Class %s is not an entity class", clazz.getName());
   }
 }

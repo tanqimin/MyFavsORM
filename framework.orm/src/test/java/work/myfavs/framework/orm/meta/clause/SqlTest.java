@@ -1,10 +1,11 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import static org.junit.Assert.*;
-
-import cn.hutool.core.util.StrUtil;
-import java.util.List;
 import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class SqlTest {
 
@@ -142,14 +143,14 @@ public class SqlTest {
   public void testLeftJoin() {
     Sql user = Sql.SelectAll().from("user");
     Sql sql = new Sql().leftJoin(user, "u", "u.id = id");
-    assertEquals(StrUtil.format(" LEFT JOIN ({}) u ON u.id = id", user.toString()), sql.toString());
+    assertEquals(String.format(" LEFT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
   public void testLeftJoin1() {
     Sql user = Sql.SelectAll().from("user");
     Sql sql = new Sql().leftJoin(() -> user, "u", "u.id = id");
-    assertEquals(StrUtil.format(" LEFT JOIN ({}) u ON u.id = id", user.toString()), sql.toString());
+    assertEquals(String.format(" LEFT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
@@ -163,7 +164,7 @@ public class SqlTest {
     Sql user = Sql.SelectAll().from("user");
     Sql sql = new Sql().rightJoin(user, "u", "u.id = id");
     assertEquals(
-        StrUtil.format(" RIGHT JOIN ({}) u ON u.id = id", user.toString()), sql.toString());
+        String.format(" RIGHT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
@@ -171,7 +172,7 @@ public class SqlTest {
     Sql user = Sql.SelectAll().from("user");
     Sql sql = new Sql().rightJoin(() -> user, "u", "u.id = id");
     assertEquals(
-        StrUtil.format(" RIGHT JOIN ({}) u ON u.id = id", user.toString()), sql.toString());
+        String.format(" RIGHT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
@@ -185,7 +186,7 @@ public class SqlTest {
     Sql user = Sql.SelectAll().from("user");
     Sql sql = new Sql().innerJoin(user, "u", "u.id = id");
     assertEquals(
-        StrUtil.format(" INNER JOIN ({}) u ON u.id = id", user.toString()), sql.toString());
+        String.format(" INNER JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
@@ -193,7 +194,7 @@ public class SqlTest {
     Sql user = Sql.SelectAll().from("user");
     Sql sql = new Sql().innerJoin(() -> user, "u", "u.id = id");
     assertEquals(
-        StrUtil.format(" INNER JOIN ({}) u ON u.id = id", user.toString()), sql.toString());
+        String.format(" INNER JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
@@ -206,14 +207,14 @@ public class SqlTest {
   public void testFullJoin() {
     Sql user = Sql.SelectAll().from("user");
     Sql sql = new Sql().fullJoin(user, "u", "u.id = id");
-    assertEquals(StrUtil.format(" FULL JOIN ({}) u ON u.id = id", user.toString()), sql.toString());
+    assertEquals(String.format(" FULL JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
   public void testFullJoin1() {
     Sql user = Sql.SelectAll().from("user");
     Sql sql = new Sql().fullJoin(() -> user, "u", "u.id = id");
-    assertEquals(StrUtil.format(" FULL JOIN ({}) u ON u.id = id", user.toString()), sql.toString());
+    assertEquals(String.format(" FULL JOIN ({}) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test

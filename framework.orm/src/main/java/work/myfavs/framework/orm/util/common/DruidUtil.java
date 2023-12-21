@@ -1,12 +1,15 @@
-package work.myfavs.framework.orm.util;
+package work.myfavs.framework.orm.util.common;
 
 import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
+import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.util.JdbcConstants;
+
 import java.util.List;
+
 import work.myfavs.framework.orm.util.exception.DBException;
 
 public class DruidUtil {
@@ -40,11 +43,34 @@ public class DruidUtil {
     return (SQLSelectStatement) stmt;
   }
 
-  public static SQLSelect createSQLSelect(String dbType, String sql) {
-    return createSQLSelectStatement(dbType, sql).getSelect();
+  public static SQLInsertStatement createSQLInsertStatement(String tableName) {
+    SQLInsertStatement insertStatement = new SQLInsertStatement();
+    insertStatement.setTableSource(createTableSource(tableName));
+    return insertStatement;
   }
 
-  public static SQLSelect createSQLSelect(DbType dbType, String sql) {
-    return createSQLSelectStatement(dbType, sql).getSelect();
+  public static SQLUpdateStatement createSQLUpdateStatement(String tableName) {
+    SQLUpdateStatement updateStatement = new SQLUpdateStatement();
+    updateStatement.setTableSource(createTableSource(tableName));
+    return updateStatement;
+  }
+
+  public static SQLVariantRefExpr createParam() {
+    return new SQLVariantRefExpr("?");
+  }
+
+  public static SQLIdentifierExpr createColumn(String columnName) {
+    return new SQLIdentifierExpr(columnName);
+  }
+
+  public static SQLUpdateSetItem createUpdateSetItem(String columnName) {
+    SQLUpdateSetItem sqlUpdateSetItem = new SQLUpdateSetItem();
+    sqlUpdateSetItem.setColumn(DruidUtil.createColumn(columnName));
+    sqlUpdateSetItem.setValue(DruidUtil.createParam());
+    return sqlUpdateSetItem;
+  }
+
+  public static SQLExprTableSource createTableSource(String tableName) {
+    return new SQLExprTableSource(tableName);
   }
 }

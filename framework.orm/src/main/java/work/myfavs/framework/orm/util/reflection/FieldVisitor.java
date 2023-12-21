@@ -1,7 +1,5 @@
 package work.myfavs.framework.orm.util.reflection;
 
-import work.myfavs.framework.orm.util.exception.DBException;
-
 import java.lang.reflect.Field;
 
 /**
@@ -15,24 +13,12 @@ public class FieldVisitor {
     this.field.setAccessible(true);
   }
 
-  public Object getValue(Object entity) {
-    try {
-      return this.field.get(entity);
-    } catch (IllegalAccessException e) {
-      throw new DBException(e, "could not get field {} on class {}", this.field.getName(), entity.getClass().toString());
-    }
+  public <T> T getValue(Object entity) {
+    return ReflectUtil.getFieldValue(this.field, entity);
   }
 
   public void setValue(Object entity, Object value) {
-    if (value == null && this.field.getType().isPrimitive()) {
-      return; // dont try set null to a primitive field
-    }
-
-    try {
-      this.field.set(entity, value);
-    } catch (IllegalAccessException e) {
-      throw new DBException(e, "could not set field {} on class {}", this.field.getName(), entity.getClass().toString());
-    }
+    ReflectUtil.setFieldValue(this.field, entity, value);
   }
 
   public Field getField() {

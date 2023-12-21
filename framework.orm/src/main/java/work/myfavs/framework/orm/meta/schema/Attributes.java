@@ -1,9 +1,9 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
+
+import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -31,7 +31,8 @@ public class Attributes {
    */
   public Attribute getAttribute(String columnName) {
 
-    Assert.notBlank(columnName);
+    if (StringUtil.isEmpty(columnName))
+      throw new DBException("Column name can not be empty");
 
     return map.get(columnName.toUpperCase());
   }
@@ -39,12 +40,12 @@ public class Attributes {
   public List<Attribute> getAttributes(String[] columnNames) {
 
     if (ArrayUtil.isEmpty(columnNames)) {
-      return CollUtil.list(true, map.values());
+      return new ArrayList<>(map.values());
     }
 
     List<Attribute> res = new ArrayList<>();
     for (String columnName : columnNames) {
-      final String col       = StrUtil.trim(columnName);
+      final String col       = StringUtil.trim(columnName);
       Attribute    attribute = getAttribute(col);
 
       if (containsColumn(col)) {
@@ -61,8 +62,10 @@ public class Attributes {
 
   public Attribute put(String columnName, Attribute value) {
 
-    Assert.notBlank(columnName);
-    Assert.notNull(value);
+    if (StringUtil.isEmpty(columnName))
+      throw new DBException("Column name can not be empty");
+
+    Objects.requireNonNull(value);
 
     final String key = columnName.toUpperCase();
     writeLock.lock();
@@ -79,7 +82,8 @@ public class Attributes {
 
   public boolean containsColumn(String columnName) {
 
-    Assert.notBlank(columnName);
+    if (StringUtil.isEmpty(columnName))
+      throw new DBException("Column name can not be empty");
 
     return map.containsKey(columnName.toUpperCase());
   }

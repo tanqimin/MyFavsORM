@@ -1,9 +1,9 @@
 package work.myfavs.framework.orm.util.common;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import work.myfavs.framework.orm.util.exception.DBException;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class IOUtil {
 
@@ -31,4 +31,19 @@ public class IOUtil {
   }
 
 
+  public static String read(String filePath) {
+    try (InputStream is = IOUtil.class.getClassLoader().getResourceAsStream(filePath)) {
+      StringBuilder content = new StringBuilder();
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          content.append(line).append(System.lineSeparator());
+        }
+      }
+
+      return content.toString();
+    } catch (IOException e) {
+      throw new DBException(e, "Error read file in path: %s, message: %s", filePath, e.getMessage());
+    }
+  }
 }

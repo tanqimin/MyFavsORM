@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.meta;
 
-import cn.hutool.core.util.IdUtil;
 import org.junit.Before;
 import org.junit.Test;
 import work.myfavs.framework.orm.AbstractTest;
@@ -10,9 +9,11 @@ import work.myfavs.framework.orm.entity.enums.TypeEnum;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 
 public class RecordTest extends AbstractTest {
 
@@ -45,8 +46,8 @@ public class RecordTest extends AbstractTest {
   @Test
   public void getBean() {
     record.clear();
-    String id = IdUtil.randomUUID();
-    Uuid uuid = new Uuid();
+    String id   = UUID.randomUUID().toString();
+    Uuid   uuid = new Uuid();
     uuid.setId(id);
     record.set("uuid", uuid);
     assertEquals(record.<Uuid>getBean("uuid").getId(), id);
@@ -90,7 +91,7 @@ public class RecordTest extends AbstractTest {
   @Test
   public void getLong() {
     record.clear();
-    long id = IdUtil.getSnowflakeNextId();
+    long id = 121L;
     record.set("long", id);
     assertEquals(record.getLong("long"), Long.valueOf(id));
   }
@@ -154,7 +155,7 @@ public class RecordTest extends AbstractTest {
   @Test
   public void toBean() {
     record.clear();
-    record.set("id", IdUtil.randomUUID());
+    record.set("id", UUID.randomUUID().toString());
     Uuid uuid = record.toBean(new Uuid());
     assertNotNull(uuid);
     assertEquals(uuid.getId(), record.get("id"));
@@ -171,10 +172,10 @@ public class RecordTest extends AbstractTest {
   public void toRecord() {
     record.clear();
     Snowflake snowflake = new Snowflake();
-    snowflake.setId(IdUtil.getSnowflakeNextId());
+    snowflake.setId(123L);
     snowflake.setName("Hello");
     snowflake.setPrice(BigDecimal.ONE);
-    Record record1 = record.toRecord(snowflake);
+    Record record1 = Record.toRecord(snowflake);
     assertNotNull(record1);
     assertEquals(snowflake.getId(), record1.get("id"));
     assertEquals(snowflake.getName(), record1.get("name"));
@@ -184,7 +185,7 @@ public class RecordTest extends AbstractTest {
   @Test
   public void testClone() {
     record.clear();
-    record.set("id", IdUtil.getSnowflakeNextId());
+    record.set("id", 123L);
     Record clone = record.clone();
     assertEquals(clone.get("id"), record.get("id"));
   }

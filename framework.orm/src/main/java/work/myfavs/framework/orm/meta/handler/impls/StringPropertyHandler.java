@@ -22,36 +22,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Objects;
 
 public class StringPropertyHandler extends PropertyHandler<String> {
 
-  private boolean useNVarchar;
 
   public StringPropertyHandler() {
 
   }
 
-  public StringPropertyHandler(boolean useNVarchar) {
-    this.useNVarchar = useNVarchar;
-  }
-
   @Override
   public String convert(ResultSet rs, int columnIndex, Class<String> clazz) throws SQLException {
-    return useNVarchar ? rs.getNString(columnIndex) : rs.getString(columnIndex);
+
+    Object val = rs.getObject(columnIndex);
+    if (Objects.isNull(val)) {
+      return null;
+    }
+
+    return val.toString();
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, String param) throws SQLException {
 
-    if (useNVarchar)
-      ps.setNString(paramIndex, param);
-    else
-      ps.setString(paramIndex, param);
+    ps.setString(paramIndex, param);
   }
 
   @Override
   public int getSqlType() {
 
-    return useNVarchar ? Types.NVARCHAR : Types.VARCHAR;
+    return Types.VARCHAR;
   }
 }

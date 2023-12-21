@@ -29,7 +29,7 @@ public class JdbcConnFactory extends ConnFactory {
   public Connection openConnection() {
 
     Connection connection = getCurrentConnection();
-    if (connection == null) {
+    if (Objects.isNull(connection)) {
       connectionDeepHolder.set(1);
       connection = createConnection();
       connectionHolder.set(connection);
@@ -51,7 +51,7 @@ public class JdbcConnFactory extends ConnFactory {
     final Integer connDeep = connectionDeepHolder.get();
     if (connDeep == 1) {
       Connection conn = connection;
-      if (conn == null) {
+      if (Objects.isNull(conn)) {
         conn = getCurrentConnection();
       }
       releaseConnection(conn);

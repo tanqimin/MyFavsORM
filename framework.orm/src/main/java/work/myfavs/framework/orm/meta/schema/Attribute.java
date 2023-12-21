@@ -1,12 +1,11 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import cn.hutool.core.util.StrUtil;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.LogicDelete;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
-import work.myfavs.framework.orm.util.StringUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.reflection.FieldVisitor;
 
 import java.io.Serializable;
@@ -99,11 +98,11 @@ public class Attribute implements Serializable {
     this.fieldVisitor = new FieldVisitor(field);
     this.primaryKey = isPrimaryKey(field);
     this.logicDelete = isLogicDelete(field);
-    this.columnName = StrUtil.isEmpty(column.value())
+    this.columnName = StringUtil.isEmpty(column.value())
         ? StringUtil.toUnderlineCase(field.getName())
         : column.value();
 
-    this.propertyHandler = PropertyHandlerFactory.getInstance(field);
+    this.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
     this.sqlType = this.propertyHandler.getSqlType();
   }
 
@@ -125,11 +124,11 @@ public class Attribute implements Serializable {
   }
 
   private static boolean isPrimaryKey(Field field) {
-    return field.getAnnotation(PrimaryKey.class) != null;
+    return Objects.nonNull(field.getAnnotation(PrimaryKey.class));
   }
 
   private static boolean isLogicDelete(Field field) {
-    return field.getAnnotation(LogicDelete.class) != null;
+    return Objects.nonNull(field.getAnnotation(LogicDelete.class));
   }
 
   public <TModel> void setValue(TModel model, ResultSet rs, int columnIndex) throws SQLException {

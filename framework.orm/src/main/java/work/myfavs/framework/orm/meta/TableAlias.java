@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.meta.dialect;
+package work.myfavs.framework.orm.meta;
 
 import java.util.Optional;
 import java.util.function.Consumer;

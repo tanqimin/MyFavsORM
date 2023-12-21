@@ -1,8 +1,7 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import cn.hutool.core.util.EnumUtil;
-import cn.hutool.core.util.StrUtil;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+import work.myfavs.framework.orm.util.common.StringUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,13 +17,20 @@ public class EnumPropertyHandler extends PropertyHandler<Object> {
   @SuppressWarnings("unchecked")
   public Object convert(ResultSet rs, int columnIndex, Class clazz) throws SQLException {
 
-    return EnumUtil.fromStringQuietly(clazz, rs.getString(columnIndex));
+    String val = rs.getString(columnIndex);
+    if (StringUtil.isEmpty(val)) return null;
+
+    try {
+      return Enum.valueOf(clazz, val);
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Object param) throws SQLException {
 
-    ps.setString(paramIndex, StrUtil.toString(param));
+    ps.setString(paramIndex, StringUtil.toString(param));
   }
 
   @Override

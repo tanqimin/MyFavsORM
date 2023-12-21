@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.util.common;
+package work.myfavs.framework.orm.meta;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -9,7 +9,7 @@ import java.util.UUID;
  *
  * @param <K> attr类型
  */
-public interface RecordValueGetter<K> {
+public interface IRecord<K> {
 
   /**
    * 获取Object属性值

@@ -1,13 +1,16 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
+
 import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.FuzzyMode;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 import work.myfavs.framework.orm.meta.schema.Attribute;
+import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.convert.ConvertUtil;
+import work.myfavs.framework.orm.util.reflection.FieldVisitor;
+import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -46,7 +49,7 @@ public class Cond extends Clause {
 
     super(sql);
     super.params.add(param);
-    if (params != null && params.length > 0) {
+    if (ArrayUtil.isNotEmpty(params)) {
       super.params.addAll(Arrays.asList(params));
     }
   }
@@ -66,7 +69,7 @@ public class Cond extends Clause {
    */
   public static Cond logicalDelete(Attribute logicDelete) {
 
-    if (logicDelete == null) return new Cond();
+    if (Objects.isNull(logicDelete)) return new Cond();
     if (!logicDelete.isLogicDelete()) return new Cond();
     return Cond.eq(logicDelete.getColumnName(), 0);
   }
@@ -93,10 +96,10 @@ public class Cond extends Clause {
    */
   public static Cond eq(String field, Object param, boolean ignoreNull) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (StringUtil.isBlankIfStr(param)) {
       return ignoreNull ? new Cond() : isNull(field);
     }
-    return new Cond(StrUtil.format(" {} = ?", field), param);
+    return new Cond(String.format(" %s = ?", field), param);
   }
 
   /**
@@ -121,10 +124,10 @@ public class Cond extends Clause {
    */
   public static Cond ne(String field, Object param, boolean ignoreNull) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (StringUtil.isBlankIfStr(param)) {
       return ignoreNull ? new Cond() : isNotNull(field);
     }
-    return new Cond(StrUtil.format(" {} <> ?", field), param);
+    return new Cond(String.format(" %s <> ?", field), param);
   }
 
   /**
@@ -135,7 +138,7 @@ public class Cond extends Clause {
    */
   public static Cond isNull(String field) {
 
-    return new Cond(StrUtil.format(" {} IS NULL", field));
+    return new Cond(String.format(" %s IS NULL", field));
   }
 
   /**
@@ -146,7 +149,7 @@ public class Cond extends Clause {
    */
   public static Cond isNotNull(String field) {
 
-    return new Cond(StrUtil.format(" {} IS NOT NULL", field));
+    return new Cond(String.format(" %s IS NOT NULL", field));
   }
 
   /**
@@ -158,10 +161,10 @@ public class Cond extends Clause {
    */
   public static Cond gt(String field, Object param) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (StringUtil.isBlankIfStr(param)) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} > ?", field), param);
+    return new Cond(String.format(" %s > ?", field), param);
   }
 
   /**
@@ -173,10 +176,10 @@ public class Cond extends Clause {
    */
   public static Cond ge(String field, Object param) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (StringUtil.isBlankIfStr(param)) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} >= ?", field), param);
+    return new Cond(String.format(" %s >= ?", field), param);
   }
 
   /**
@@ -188,10 +191,10 @@ public class Cond extends Clause {
    */
   public static Cond lt(String field, Object param) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (StringUtil.isBlankIfStr(param)) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} < ?", field), param);
+    return new Cond(String.format(" %s < ?", field), param);
   }
 
   /**
@@ -203,10 +206,10 @@ public class Cond extends Clause {
    */
   public static Cond le(String field, Object param) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (StringUtil.isBlankIfStr(param)) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} <= ?", field), param);
+    return new Cond(String.format(" %s <= ?", field), param);
   }
 
   /**
@@ -238,10 +241,10 @@ public class Cond extends Clause {
    * @return {@link Cond}
    */
   public static Cond like(String field, Object param, FuzzyMode fuzzyMode) {
-    if (StrUtil.isBlankIfStr(param)) return new Cond();
+    if (StringUtil.isBlankIfStr(param)) return new Cond();
 
     String paramVal   = param.toString();
-    String likeClause = StrUtil.format(" {} LIKE ?", field);
+    String likeClause = String.format(" %s LIKE ?", field);
     if (fuzzyMode == FuzzyMode.SINGLE && paramVal.contains(FUZZY_SINGLE)) {
       return escapeFuzzy(likeClause, paramVal, FUZZY_MULTIPLE);
     }
@@ -266,11 +269,11 @@ public class Cond extends Clause {
    * @return {@link Cond}
    */
   private static Cond escapeFuzzy(String sql, String param, String fuzzySearchStr) {
-    if (StrUtil.isEmpty(fuzzySearchStr)
+    if (StringUtil.isEmpty(fuzzySearchStr)
         || !param.contains(fuzzySearchStr))
       return new Cond(sql, param);
 
-    String paramVal = StrUtil.replace(param, fuzzySearchStr, FUZZY_ESCAPE.concat(fuzzySearchStr));
+    String paramVal = StringUtil.replace(param, fuzzySearchStr, FUZZY_ESCAPE.concat(fuzzySearchStr));
     return new Cond(sql, paramVal).escape();
   }
 
@@ -285,16 +288,16 @@ public class Cond extends Clause {
    */
   public static Cond between(String field, Object param1, Object param2) {
 
-    if (param1 == null && param2 == null) {
+    if (Objects.isNull(param1) && Objects.isNull(param2)) {
       return new Cond();
     }
-    if (param2 == null) {
+    if (Objects.isNull(param2)) {
       return ge(field, param1);
     }
-    if (param1 == null) {
+    if (Objects.isNull(param1)) {
       return le(field, param2);
     }
-    return new Cond(StrUtil.format(" {} BETWEEN ? AND ?", field), param1, param2);
+    return new Cond(String.format(" %s BETWEEN ? AND ?", field), param1, param2);
   }
 
   /**
@@ -328,13 +331,13 @@ public class Cond extends Clause {
     int          paramCnt    = sqlParams.size();
 
     if (paramCnt == 0) {
-      return ignoreEmpty ? new Cond() : new Cond(StrUtil.format(" 1 > 2"));
+      return ignoreEmpty ? new Cond() : new Cond(" 1 > 2");
     }
 
     if (paramCnt == 1) {
       return eq(field, sqlParams.get(0));
     }
-    return new Cond(StrUtil.format(" {} IN ({})", field, sql), sqlParams);
+    return new Cond(String.format(" %s IN (%s)", field, sql), sqlParams);
   }
 
   /**
@@ -346,7 +349,7 @@ public class Cond extends Clause {
    */
   public static Cond in(String field, Sql sql) {
     if (Objects.isNull(sql)) return new Cond();
-    return new Cond(StrUtil.format(" {} IN ({})", field, sql.sql), sql.params);
+    return new Cond(String.format(" %s IN (%s)", field, sql.sql), sql.params);
   }
 
   /**
@@ -386,13 +389,13 @@ public class Cond extends Clause {
     paramCnt = sqlParams.size();
 
     if (paramCnt == 0) {
-      return ignoreEmpty ? new Cond() : new Cond(StrUtil.format(" 1 > 2"));
+      return ignoreEmpty ? new Cond() : new Cond(" 1 > 2");
     }
 
     if (paramCnt == 1) {
       return ne(field, sqlParams.get(0));
     }
-    return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql), sqlParams);
+    return new Cond(String.format(" %s NOT IN (%s)", field, sql), sqlParams);
   }
 
   /**
@@ -404,7 +407,7 @@ public class Cond extends Clause {
    */
   public static Cond notIn(String field, Sql sql) {
     if (Objects.isNull(sql)) return new Cond();
-    return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params);
+    return new Cond(String.format(" %s NOT IN (%s)", field, sql.sql), sql.params);
   }
 
   private static Sql createInClauseParams(Collection<?> params) {
@@ -415,9 +418,9 @@ public class Cond extends Clause {
 
     sqlBuilder = new StringBuilder();
     sqlParams = new ArrayList<>();
-    if (CollUtil.isNotEmpty(params)) {
+    if (CollectionUtil.isNotEmpty(params)) {
       for (Object param : params) {
-        if (StrUtil.isBlankIfStr(param)) {
+        if (StringUtil.isBlankIfStr(param)) {
           continue;
         }
         sqlBuilder.append("?,");
@@ -440,7 +443,7 @@ public class Cond extends Clause {
    */
   public static Cond exists(Sql subSql) {
     if (Objects.isNull(subSql)) return new Cond();
-    return new Cond(StrUtil.format(" EXISTS ({})", subSql.sql), subSql.params.toArray());
+    return new Cond(String.format(" EXISTS (%s)", subSql.sql), subSql.params.toArray());
   }
 
   /**
@@ -462,7 +465,7 @@ public class Cond extends Clause {
    */
   public static Cond notExists(Sql subSql) {
     if (Objects.isNull(subSql)) return new Cond();
-    return new Cond(StrUtil.format(" NOT EXISTS ({})", subSql.sql), subSql.params.toArray());
+    return new Cond(String.format(" NOT EXISTS (%s)", subSql.sql), subSql.params.toArray());
   }
 
   /**
@@ -484,10 +487,10 @@ public class Cond extends Clause {
    */
   public Cond and(Cond cond) {
 
-    if (StrUtil.isBlankIfStr(cond.sql)) {
+    if (StringUtil.isBlankIfStr(cond.sql)) {
       return this;
     }
-    this.sql.append(StrUtil.format(" AND {}", StrUtil.trimStart(cond.sql)));
+    this.sql.append(String.format(" AND %s", StringUtil.trimStart(cond.sql)));
     this.params.addAll(cond.params);
     return this;
   }
@@ -500,10 +503,10 @@ public class Cond extends Clause {
    */
   public Cond or(Cond cond) {
 
-    if (StrUtil.isBlankIfStr(cond.sql)) {
+    if (StringUtil.isBlankIfStr(cond.sql)) {
       return this;
     }
-    this.sql.append(StrUtil.format(" OR {}", StrUtil.trimStart(cond.sql)));
+    this.sql.append(String.format(" OR %s", StringUtil.trimStart(cond.sql)));
     this.params.addAll(cond.params);
     return this;
   }
@@ -530,7 +533,7 @@ public class Cond extends Clause {
 
     Cond                   cond              = null;
     List<ConditionMatcher> conditionMatchers = new ArrayList<>();
-    final Field[]          fields            = ReflectUtil.getFields(object.getClass());
+    final List<Field>      fields            = ReflectUtil.getFields(object.getClass());
     for (Field field : fields) {
       final Criterion[] annotations = field.getAnnotationsByType(Criterion.class);
       for (Criterion annotation : annotations) {
@@ -539,8 +542,8 @@ public class Cond extends Clause {
         }
         ConditionMatcher conditionMatcher = new ConditionMatcher();
         conditionMatcher.fieldName =
-            StrUtil.isBlank(annotation.value()) ? field.getName() : annotation.value();
-        conditionMatcher.fieldValue = ReflectUtil.getFieldValue(object, field);
+            StringUtil.isBlank(annotation.value()) ? field.getName() : annotation.value();
+        conditionMatcher.fieldValue = new FieldVisitor(field).getValue(object);
         conditionMatcher.operator = annotation.operator();
         conditionMatcher.order = annotation.order();
         conditionMatchers.add(conditionMatcher);
@@ -550,7 +553,7 @@ public class Cond extends Clause {
     conditionMatchers.sort(Comparator.comparingInt(o -> o.order));
 
     for (ConditionMatcher condMat : conditionMatchers) {
-      if (cond == null) {
+      if (Objects.isNull(cond)) {
         cond = createCondByOperator(condMat.operator, condMat.fieldName, condMat.fieldValue);
       } else {
         cond.and(createCondByOperator(condMat.operator, condMat.fieldName, condMat.fieldValue));
@@ -616,8 +619,8 @@ public class Cond extends Clause {
    * @return {@link Cond}
    */
   private Cond escape() {
-    if (StrUtil.isEmpty(FUZZY_ESCAPE)) return this;
-    this.sql.append(StrUtil.format(" ESCAPE '{}'", FUZZY_ESCAPE));
+    if (StringUtil.isEmpty(FUZZY_ESCAPE)) return this;
+    this.sql.append(String.format(" ESCAPE '%s'", FUZZY_ESCAPE));
     return this;
   }
 }

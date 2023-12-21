@@ -1,18 +1,17 @@
 package work.myfavs.framework.orm.meta;
 
-import cn.hutool.core.bean.BeanUtil;
-import work.myfavs.framework.orm.util.common.RecordValueGetter;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.convert.ConvertUtil;
+import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * ORM查询记录对象
  */
-public class Record extends LinkedHashMap<String, Object> implements RecordValueGetter<String> {
+public class Record extends LinkedHashMap<String, Object> implements IRecord<String> {
 
   private static final long serialVersionUID = 4437164782221886837L;
 
@@ -48,7 +47,8 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
   @SuppressWarnings("unchecked")
   public <T> T get(String attr, T defaultValue) {
     final Object obj = super.get(attr);
-    if (obj == null) {
+
+    if (Objects.isNull(obj)) {
       return defaultValue;
     }
     return (T) obj;
@@ -149,7 +149,21 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * @return Bean
    */
   public <T> T toBean(T bean) {
-    BeanUtil.fillBeanWithMap(this, bean, false, false);
+    return toBean(bean, false);
+  }
+
+  private <T> T toBean(T bean, boolean ignoreCase) {
+    List<Field> fields = ReflectUtil.getFields(bean.getClass());
+    Set<String> keySet = this.keySet();
+    for (Field field : fields) {
+      String fieldName = field.getName();
+      for (String key : keySet) {
+        if (StringUtil.equals(key, fieldName, ignoreCase)) {
+          ReflectUtil.setFieldValue(field, bean, this.get(key));
+          break;
+        }
+      }
+    }
     return bean;
   }
 
@@ -161,7 +175,9 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * @return Bean
    */
   public <T> T toBean(Class<T> tClass) {
-    return BeanUtil.toBean(this, tClass);
+    T bean = ReflectUtil.newInstance(tClass);
+
+    return toBean(bean);
   }
 
   /**
@@ -172,7 +188,9 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * @return Bean
    */
   public <T> T toBeanIgnoreCase(Class<T> tClass) {
-    return BeanUtil.toBeanIgnoreCase(this, tClass, false);
+    T bean = ReflectUtil.newInstance(tClass);
+
+    return toBean(bean, true);
   }
 
   /**
@@ -182,9 +200,15 @@ public class Record extends LinkedHashMap<String, Object> implements RecordValue
    * @param <T>  Bean类型
    * @return Record
    */
-  public <T> Record toRecord(T bean) {
-    this.putAll(BeanUtil.beanToMap(bean));
-    return this;
+  public static <T> Record toRecord(T bean) {
+    if (Objects.isNull(bean)) return null;
+
+    Record      record = new Record();
+    List<Field> fields = ReflectUtil.getFields(bean.getClass());
+    for (Field field : fields) {
+      record.put(field.getName(), ReflectUtil.getFieldValue(field, bean));
+    }
+    return record;
   }
 
   @Override
