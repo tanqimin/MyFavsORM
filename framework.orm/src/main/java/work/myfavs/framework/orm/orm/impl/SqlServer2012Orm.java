@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.impl;
+package work.myfavs.framework.orm.orm.impl;
 
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLOrderBy;
@@ -12,6 +12,9 @@ import work.myfavs.framework.orm.util.common.DruidUtil;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * Orm SqlServer实现 2012或以上版本
+ */
 public class SqlServer2012Orm extends SqlServerOrm {
   public SqlServer2012Orm(Database database) {
     super(database);

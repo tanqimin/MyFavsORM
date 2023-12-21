@@ -17,6 +17,7 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.pagination.IPageable;
 import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
+import work.myfavs.framework.orm.orm.Orm;
 import work.myfavs.framework.orm.util.func.ThrowingFunction;
 
 import java.math.BigDecimal;

@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm;
+package work.myfavs.framework.orm.orm;
 
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.annotation.Criteria;
@@ -16,9 +16,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * ORM 实体操作
+ */
 public interface Orm {
 
-  int execute(String sql, Collection<?> params, ThrowingConsumer<PreparedStatement, SQLException> consumer);
+  /**
+   * 执行查询，返回影响行数
+   *
+   * @param sql            SQL语句
+   * @param params         参数
+   * @param configConsumer 在执行查询前允许，可对 PreparedStatement 进行设置
+   * @return 影响行数
+   */
+  int execute(String sql, Collection<?> params, ThrowingConsumer<PreparedStatement, SQLException> configConsumer);
 
   /**
    * 执行 SQL 语句，返回影响行数
@@ -73,6 +84,13 @@ public interface Orm {
    */
   int[] execute(List<Sql> sqlList, int timeout);
 
+  /**
+   * 执行多个 {@link Sql} 语句
+   *
+   * @param sqlList        {@link Sql} 语句集合
+   * @param configConsumer 在执行查询前允许，可对 PreparedStatement 进行设置
+   * @return 返回数组，包含每个查询的影响行数
+   */
   int[] execute(List<Sql> sqlList, ThrowingConsumer<PreparedStatement, SQLException> configConsumer);
 
   /**

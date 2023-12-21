@@ -1,6 +1,8 @@
 package work.myfavs.framework.orm;
 
 import work.myfavs.framework.orm.meta.DbType;
+import work.myfavs.framework.orm.orm.Orm;
+import work.myfavs.framework.orm.orm.OrmFactory;
 import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 import work.myfavs.framework.orm.util.func.ThrowingConsumer;

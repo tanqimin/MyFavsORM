@@ -1,11 +1,21 @@
-package work.myfavs.framework.orm;
+package work.myfavs.framework.orm.orm;
 
-import work.myfavs.framework.orm.impl.*;
+import work.myfavs.framework.orm.Database;
+import work.myfavs.framework.orm.orm.impl.*;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.util.exception.DBException;
 
+/**
+ * ORM 工厂类
+ */
 public class OrmFactory {
 
+  /**
+   * 创建 ORM 实例
+   *
+   * @param database {@link Database}
+   * @return {@link Orm}
+   */
   public static Orm createOrm(Database database) {
     String dbType = database.getDbConfig().getDbType();
     switch (dbType) {

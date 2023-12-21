@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.impl;
+package work.myfavs.framework.orm.orm.impl;
 
 import com.alibaba.druid.sql.ast.SQLLimit;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
@@ -13,6 +13,9 @@ import work.myfavs.framework.orm.util.common.DruidUtil;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * Orm MySql实现
+ */
 public class MySqlOrm extends AbstractOrm {
   public MySqlOrm(Database database) {
     super(database);

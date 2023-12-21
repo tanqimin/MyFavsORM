@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.impl;
+package work.myfavs.framework.orm.orm.impl;
 
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
@@ -14,6 +14,9 @@ import work.myfavs.framework.orm.util.common.DruidUtil;
 
 import java.util.Collection;
 
+/**
+ * Orm Oracle实现
+ */
 public class OracleOrm extends AbstractOrm {
 
   private static final String INNER_TABLE_ALIAS = "_limit";

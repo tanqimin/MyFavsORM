@@ -1,6 +1,8 @@
-package work.myfavs.framework.orm.impl;
+package work.myfavs.framework.orm.orm.impl;
 
+import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.PagerUtils;
+import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.*;
@@ -18,11 +20,12 @@ import work.myfavs.framework.orm.meta.pagination.PageLite;
 import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-import work.myfavs.framework.orm.util.common.DruidUtil;
-import work.myfavs.framework.orm.util.id.PKGenerator;
+import work.myfavs.framework.orm.orm.Orm;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
+import work.myfavs.framework.orm.util.common.DruidUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 import work.myfavs.framework.orm.util.func.ThrowingConsumer;
+import work.myfavs.framework.orm.util.id.PKGenerator;
 import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
 import java.lang.reflect.Field;
@@ -31,6 +34,9 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * ORM 通用实体操作
+ */
 public abstract class AbstractOrm implements Orm {
 
   protected final Database   database;
@@ -43,17 +49,36 @@ public abstract class AbstractOrm implements Orm {
     this.dbConfig = this.dbTemplate.getDbConfig();
   }
 
+  /**
+   * 获取表名，统一封装并获取 TableAlias 中设置的别名
+   *
+   * @param entityMeta 实体类元数据
+   * @return 实际执行的数据表名称
+   */
   protected static String getTableName(ClassMeta entityMeta) {
     return TableAlias.getOpt().orElse(entityMeta.getTableName());
   }
 
-  public int execute(String sql, Collection<?> params, ThrowingConsumer<PreparedStatement, SQLException> consumer) {
+  /**
+   * Orm 实现类标记的数据库类型
+   *
+   * @return 数据库类型 {@link work.myfavs.framework.orm.meta.DbType}
+   */
+  protected abstract String dbType();
+
+  /**
+   * 执行查询，返回影响行数
+   *
+   * @param sql            SQL语句
+   * @param params         参数
+   * @param configConsumer 在执行查询前允许，可对 PreparedStatement 进行设置
+   * @return 影响行数
+   */
+  public int execute(String sql, Collection<?> params, ThrowingConsumer<PreparedStatement, SQLException> configConsumer) {
     try (Query query = this.database.createQuery(sql)) {
-      return query.addParameters(params).execute(consumer, null);
+      return query.addParameters(params).execute(configConsumer, null);
     }
   }
-
-  protected abstract String dbType();
 
   /**
    * 执行 SQL 语句，返回影响行数
@@ -124,6 +149,13 @@ public abstract class AbstractOrm implements Orm {
     return this.execute(sqlList, ps -> ps.setQueryTimeout(timeout));
   }
 
+  /**
+   * 执行多个 {@link Sql} 语句
+   *
+   * @param sqlList        {@link Sql} 语句集合
+   * @param configConsumer 在执行查询前允许，可对 PreparedStatement 进行设置
+   * @return 返回数组，包含每个查询的影响行数
+   */
   public int[] execute(List<Sql> sqlList, ThrowingConsumer<PreparedStatement, SQLException> configConsumer) {
     final int   sqlCnt  = sqlList.size();
     final int[] results = new int[sqlCnt];
@@ -259,18 +291,19 @@ public abstract class AbstractOrm implements Orm {
   /**
    * 使用SQL语句的批量创建方法 insert into table (f1, f2, f3) values (?,?,?),(?,?,?)...(?,?,?)
    *
-   * @param classMeta 实体类
-   * @param entities  实体
-   * @param <TModel>  实体类类型
+   * @param entityMeta 实体类元数据
+   * @param entities   实体
+   * @param <TModel>   实体类类型
    * @return 记录数
    */
-  private <TModel> int createInSqlBatch(ClassMeta classMeta, Collection<TModel> entities) {
+  private <TModel> int createInSqlBatch(ClassMeta entityMeta, Collection<TModel> entities) {
 
     int result = 0;
 
-    final Map<String /* columnName */, Attribute> updateAttributes = classMeta.getUpdateAttributes();
-    final GenerationType                          strategy         = classMeta.getStrategy();
-    final Attribute                               primaryKey       = classMeta.checkPrimaryKey();
+    final Map<String /* columnName */, Attribute> updateAttributes = entityMeta.getUpdateAttributes();
+    final String                                  tableName        = getTableName(entityMeta);
+    final GenerationType                          strategy         = entityMeta.getStrategy();
+    final Attribute                               primaryKey       = entityMeta.checkPrimaryKey();
 
     final List<Sql> sqlList = new ArrayList<>();
 
@@ -279,7 +312,6 @@ public abstract class AbstractOrm implements Orm {
 
     for (List<TModel> entityList : batchList) {
       boolean insertClauseCompleted = false;
-      String  tableName             = TableAlias.getOpt().orElse(classMeta.getTableName());
       Sql     insertClause          = Sql.New(String.format("INSERT INTO %s (", tableName));
       Sql     valuesClause          = Sql.New(") VALUES ");
 
@@ -298,9 +330,9 @@ public abstract class AbstractOrm implements Orm {
           valuesClause.append("?,", attr.getFieldVisitor().getValue(entity));
         }
 
-        if (Objects.nonNull(classMeta.getLogicDelete())) {
+        if (Objects.nonNull(entityMeta.getLogicDelete())) {
           if (!insertClauseCompleted) {
-            insertClause.append(classMeta.getLogicDelete().getColumnName() + ",");
+            insertClause.append(entityMeta.getLogicDelete().getColumnName() + ",");
           }
 
           valuesClause.append("?,", 0);
@@ -363,6 +395,15 @@ public abstract class AbstractOrm implements Orm {
     }
   }
 
+  /**
+   * 如果实体的主键键值为 null，根据主键策略生成数据库主键值
+   *
+   * @param strategy   {@link GenerationType}
+   * @param primaryKey 主键 {@link Attribute}
+   * @param entity     实体
+   * @param <TModel>   实体类泛型
+   * @return 数据库主键值
+   */
   protected <TModel> Object generatePrimaryKey(GenerationType strategy, Attribute primaryKey, TModel entity) {
     Object pkVal = primaryKey.getValue(entity);
 
@@ -402,6 +443,13 @@ public abstract class AbstractOrm implements Orm {
     return execute(sql);
   }
 
+  /**
+   * 根据主键和逻辑删除字段，创建查询条件
+   *
+   * @param primaryKey  主键 {@link Attribute}
+   * @param logicDelete 逻辑删除字段 {@link Attribute}
+   * @return {@link SQLBinaryOpExpr}
+   */
   protected static SQLBinaryOpExpr createCondition(Attribute primaryKey, Attribute logicDelete) {
     SQLBinaryOpExpr condition = new SQLBinaryOpExpr(
         DruidUtil.createColumn(primaryKey.getColumnName()),
@@ -655,7 +703,7 @@ public abstract class AbstractOrm implements Orm {
   }
 
   /**
-   * 根据ID删除记录
+   * 根据 ID 删除记录
    *
    * @param modelClass 实体类型
    * @param id         ID值
@@ -671,6 +719,13 @@ public abstract class AbstractOrm implements Orm {
     return deleteById(entityMeta, id);
   }
 
+  /**
+   * 根据 ID 删除记录
+   *
+   * @param entityMeta 实体类元数据
+   * @param id         ID值
+   * @return 影响行数
+   */
   protected int deleteById(ClassMeta entityMeta, Object id) {
     final String pkColumnName = entityMeta.getPrimaryKeyColumnName();
     final Cond   deleteCond   = Cond.eq(pkColumnName, id);
@@ -713,6 +768,13 @@ public abstract class AbstractOrm implements Orm {
     execute(new Sql(truncateStatement.toUnformattedString()));
   }
 
+  /**
+   * 根据条件删除
+   *
+   * @param entityMeta 实体类元数据
+   * @param deleteCond 删除条件
+   * @return 影响行数
+   */
   protected int deleteByCond(ClassMeta entityMeta, Cond deleteCond) {
     final String    tableName   = getTableName(entityMeta);
     final Attribute primaryKey  = entityMeta.checkPrimaryKey();
@@ -1186,7 +1248,7 @@ public abstract class AbstractOrm implements Orm {
     final ClassMeta classMeta   = Metadata.entityMeta(viewClass);
     final Attribute logicDelete = classMeta.getLogicDelete();
 
-    final Sql sql = this.count(classMeta)
+    final Sql sql = this.countSql(classMeta)
                         .where()
                         .and(cond)
                         .and(Cond.logicalDelete(logicDelete));
@@ -1233,7 +1295,7 @@ public abstract class AbstractOrm implements Orm {
 
     if (Objects.isNull(pkVal)) return false;
 
-    final Sql existSql = this.count(entityMeta).where(Cond.eq(primaryKey.getColumnName(), pkVal));
+    final Sql existSql = this.countSql(entityMeta).where(Cond.eq(primaryKey.getColumnName(), pkVal));
     return exists(existSql);
   }
 
@@ -1555,6 +1617,12 @@ public abstract class AbstractOrm implements Orm {
     return this.findPage(Record.class, sql, enablePage, currentPage, pageSize);
   }
 
+  /**
+   * 创建通用 INSERT 语句
+   *
+   * @param entityMeta 实体类元数据
+   * @return INSERT 语句
+   */
   protected String insert(ClassMeta entityMeta) {
 
     final GenerationType                          strategy         = entityMeta.getStrategy();
@@ -1589,8 +1657,16 @@ public abstract class AbstractOrm implements Orm {
     return insertStatement.toUnformattedString();
   }
 
+  /**
+   * 创建通用 UPDATE 语句
+   *
+   * @param clazz           实体类型
+   * @param model           实体
+   * @param ignoreNullValue 是否忽略空值字段
+   * @param <TModel>        实体类型泛型
+   * @return {@link Sql}
+   */
   protected <TModel> Sql update(Class<TModel> clazz, TModel model, boolean ignoreNullValue) {
-
 
     final Sql sql = new Sql();
 
@@ -1621,19 +1697,53 @@ public abstract class AbstractOrm implements Orm {
     return sql;
   }
 
+  /**
+   * 把 SQL 重构为适用于分页查询的语句 (子类需实现)
+   *
+   * @param sql         SQL语句
+   * @param params      SQL参数
+   * @param currentPage 当前页码
+   * @param pageSize    总页数
+   * @return 分页查询语句 {@link Sql}
+   */
   protected abstract Sql selectPage(String sql, Collection<?> params, int currentPage, int pageSize);
 
+  /**
+   * 创建通用 SELECT 语句
+   *
+   * @param entityMeta 实体类元数据
+   * @return SELECT {@link Sql}
+   */
   protected Sql select(ClassMeta entityMeta) {
 
     return new Sql(String.format("SELECT * FROM %s", getTableName(entityMeta)));
   }
 
-  protected Sql count(ClassMeta entityMeta) {
+  /**
+   * 创建通用 SELECT COUNT(*) 语句
+   *
+   * @param entityMeta 实体类元数据
+   * @return SELECT COUNT(*) {@link Sql}
+   */
+  protected Sql countSql(ClassMeta entityMeta) {
 
     return new Sql(String.format("SELECT COUNT(*) FROM %s", getTableName(entityMeta)));
   }
 
+  /**
+   * 把 SQL 重构为 COUNT(*) 语句
+   * *
+   * * @param sql         SQL语句
+   * * @param params      SQL参数
+   *
+   * @return COUNT(*) 语句
+   */
   protected Sql countSql(String sql, Collection<?> params) {
-    return new Sql(PagerUtils.count(sql, DruidUtil.convert(dbType())), params);
+
+    DbType dbType = DruidUtil.convert(dbType());
+    String count = SQLUtils.format(
+        PagerUtils.count(sql, dbType),
+        dbType, new SQLUtils.FormatOption(true, false));
+    return new Sql(count, params);
   }
 }

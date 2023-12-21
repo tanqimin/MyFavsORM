@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.impl;
+package work.myfavs.framework.orm.orm.impl;
 
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLOrderBy;
@@ -24,6 +24,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Orm SqlServer实现：2005以上，2012或以上版本请使用 {@link SqlServer2012Orm}
+ */
 public class SqlServerOrm extends AbstractOrm {
 
   private static final String COL_ROW_NUM = "_rn";
@@ -38,14 +41,23 @@ public class SqlServerOrm extends AbstractOrm {
     return DbType.SQL_SERVER;
   }
 
+  /**
+   * SQL Server 批量更新实现，由于2100个参数限制，所以使用批量更新方式
+   *
+   * @param modelClass 实体类型
+   * @param entities   实体集合
+   * @param columns    需要更新的列
+   * @param <TModel>   实体类型泛型
+   * @return 影响行数
+   */
   @Override
   public <TModel> int update(Class<TModel> modelClass, Collection<TModel> entities, String[] columns) {
 
-    ClassMeta             classMeta = Metadata.classMeta(modelClass);
-    Attribute             pk        = classMeta.checkPrimaryKey();
-    Collection<Attribute> updAttrs  = classMeta.getUpdateAttributes(columns);
+    ClassMeta             entityMeta = Metadata.entityMeta(modelClass);
+    Attribute             pk         = entityMeta.checkPrimaryKey();
+    Collection<Attribute> updAttrs   = entityMeta.getUpdateAttributes(columns);
 
-    String sql = this.update(classMeta, columns);
+    String sql = this.update(entityMeta, columns);
 
     Collection<Collection<?>> paramsList;
     Collection<Object>        params;
@@ -71,6 +83,14 @@ public class SqlServerOrm extends AbstractOrm {
     }
   }
 
+  /**
+   * SQL Server 根据主键 ID 集合批量删除实现，由于2100个参数限制，需对传入 ID 集合进行切割拆分
+   *
+   * @param modelClass 实体类型
+   * @param ids        ID集合
+   * @param <TModel>   实体类型泛型
+   * @return 影响行数
+   */
   @Override
   public <TModel> int deleteByIds(Class<TModel> modelClass, Collection<?> ids) {
     if (CollectionUtil.isEmpty(ids)) {
