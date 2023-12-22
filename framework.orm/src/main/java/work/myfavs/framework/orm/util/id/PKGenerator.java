@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.util.id;
 
-import work.myfavs.framework.orm.util.id.Snowflake;
+import work.myfavs.framework.orm.util.lang.Snowflake;
 
 import java.util.UUID;
 

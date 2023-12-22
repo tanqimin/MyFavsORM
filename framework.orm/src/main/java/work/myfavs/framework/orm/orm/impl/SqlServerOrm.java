@@ -97,30 +97,30 @@ public class SqlServerOrm extends AbstractOrm {
       return 0;
     }
 
-    final ClassMeta classMeta    = Metadata.classMeta(modelClass);
-    final Attribute primaryKey   = classMeta.checkPrimaryKey();
+    final ClassMeta entityMeta   = Metadata.entityMeta(modelClass);
+    final Attribute primaryKey   = entityMeta.checkPrimaryKey();
     final String    pkColumnName = primaryKey.getColumnName();
 
     int                     ret         = 0;
     List<? extends List<?>> splitParams = CollectionUtil.split(ids, Constant.MAX_PARAM_SIZE_FOR_MSSQL);
     for (List<?> splitParam : splitParams) {
       Cond deleteCond = Cond.in(pkColumnName, splitParam, false);
-      ret += deleteByCond(classMeta, deleteCond);
+      ret += deleteByCond(entityMeta, deleteCond);
     }
     return ret;
   }
 
-  protected String update(ClassMeta classMeta, String[] columns) {
+  protected String update(ClassMeta entityMeta, String[] columns) {
 
-    Attribute primaryKey  = classMeta.checkPrimaryKey();
-    Attribute logicDelete = classMeta.getLogicDelete();
+    Attribute primaryKey  = entityMeta.checkPrimaryKey();
+    Attribute logicDelete = entityMeta.getLogicDelete();
 
-    Collection<Attribute> updateAttributes = classMeta.getUpdateAttributes(columns);
+    Collection<Attribute> updateAttributes = entityMeta.getUpdateAttributes(columns);
 
     if (updateAttributes.isEmpty())
       throw new DBException("Could not match update attributes.");
 
-    String tableName = getTableName(classMeta);
+    String tableName = getTableName(entityMeta);
 
     SQLUpdateStatement updateStatement = DruidUtil.createSQLUpdateStatement(tableName);
 

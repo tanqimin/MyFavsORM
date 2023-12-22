@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.util.id;
+package work.myfavs.framework.orm.util.lang;
 
 import work.myfavs.framework.orm.util.exception.DBException;
 

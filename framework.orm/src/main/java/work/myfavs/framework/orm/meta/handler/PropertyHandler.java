@@ -14,9 +14,9 @@ public abstract class PropertyHandler<T> {
   /**
    * 把ResultSet的值转换为指定类型对象
    *
-   * @param rs ResultSet
-   * @param columnName 字段名
-   * @param clazz 类型
+   * @param rs          ResultSet
+   * @param columnIndex 字段Index
+   * @param clazz       类型
    * @return 对象
    * @throws SQLException SQLException
    */
@@ -25,9 +25,9 @@ public abstract class PropertyHandler<T> {
   /**
    * 把对象作为参数添加到Statement
    *
-   * @param ps PreparedStatement
+   * @param ps         PreparedStatement
    * @param paramIndex 参数ID
-   * @param param 参数对象
+   * @param param      参数对象
    * @throws SQLException SQLException
    */
   public abstract void addParameter(PreparedStatement ps, int paramIndex, T param)

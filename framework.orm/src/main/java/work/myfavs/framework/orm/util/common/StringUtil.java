@@ -3,6 +3,9 @@ package work.myfavs.framework.orm.util.common;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+/**
+ * 字符串工具栏
+ */
 public class StringUtil {
 
   public static boolean isEmpty(CharSequence str) {
