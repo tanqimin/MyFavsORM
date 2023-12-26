@@ -11,16 +11,6 @@ import java.util.Date;
  */
 public class DatePropertyHandler extends AbstractDatePropertyHandler<Date> {
 
-  private final boolean useTimestamp;
-
-  public DatePropertyHandler() {
-    this(false);
-  }
-
-  public DatePropertyHandler(boolean useTimestamp) {
-    this.useTimestamp = useTimestamp;
-  }
-
   @Override
   protected Date fromMilliseconds(long millisecond) {
     return new Date(millisecond);
@@ -28,11 +18,6 @@ public class DatePropertyHandler extends AbstractDatePropertyHandler<Date> {
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Date param) throws SQLException {
-
-    if (useTimestamp) {
-      ps.setLong(paramIndex, param.getTime());
-      return;
-    }
 
     if (param instanceof Timestamp) {
       ps.setTimestamp(paramIndex, (Timestamp) param);
@@ -46,6 +31,6 @@ public class DatePropertyHandler extends AbstractDatePropertyHandler<Date> {
   @Override
   public int getSqlType() {
 
-    return useTimestamp ? Types.BIGINT : Types.TIMESTAMP;
+    return Types.TIMESTAMP;
   }
 }

@@ -30,7 +30,7 @@ public class EnumPropertyHandler extends PropertyHandler<Object> {
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Object param) throws SQLException {
 
-    ps.setString(paramIndex, StringUtil.toString(param));
+    ps.setString(paramIndex, StringUtil.toStr(param));
   }
 
   @Override
