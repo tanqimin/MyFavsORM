@@ -104,7 +104,7 @@ public class Product implements Serializable {
 }
 ```
 
-此处用到`@Table`、`@Column`、`@NVarchar`和`@PrimaryKey`注解：
+此处用到`@Table`、`@Column`、和`@PrimaryKey`注解：
 
 + `@Table`，定义实体的数据表，其中参数value为数据表名称(如果不设置value，则会把实体名称转成下划线分隔，小写的形式（如实体名称为 *ProductPrice*，对应的数据表名称为 *product_price*），strategy为主键策略；
     * GenerationType.UUID，UUID，如果主键值为null，会自动生成；
@@ -112,7 +112,6 @@ public class Product implements Serializable {
     * GenerationType.IDENTITY，数据库自增，值由数据库生成；
     * GenerationType.ASSIGNED，自然主键，值由用户自定义；
 + `@Column`，定义实体类关联的数据表字段，参数value为数据字段名称(如果不设置value，则会把实体属性名称转成下划线分隔，小写的形式（如实体名称为 *productCode*，对应的数据字段名称为 *product_code*）；参数readOnly默认值为false，当设置为true时，插入和更新操作不会包含该字段；
-+ `@NVarchar`，如果属性类型为String，使用此注解底层会自动切换到rs.getNString()和statement.setNString(str)方法支持更多字符显示；
 + `@PrimaryKey`，定义主键的属性，必须和`@Column`配合使用；
 
 ##### Sql构建器

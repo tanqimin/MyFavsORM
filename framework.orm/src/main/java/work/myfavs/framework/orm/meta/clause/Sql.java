@@ -524,7 +524,7 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql and(Cond cond) {
 
-    if (StringUtil.isBlankIfStr(cond.sql)) {
+    if (StringUtil.isBlank(cond.sql)) {
       return this;
     }
     this.append(String.format(" AND%s", cond.sql), cond.params);
@@ -540,7 +540,7 @@ public class Sql extends Clause implements Serializable {
   public Sql and(Supplier<Cond> supplier) {
 
     Cond cond = supplier.get();
-    if (StringUtil.isBlankIfStr(cond.sql)) {
+    if (StringUtil.isBlank(cond.sql)) {
       return this;
     }
     this.append(String.format(" AND (%s)", StringUtil.trimStart(cond.sql)), cond.params);
@@ -555,7 +555,7 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql or(Cond cond) {
 
-    if (StringUtil.isBlankIfStr(cond.sql)) {
+    if (StringUtil.isBlank(cond.sql)) {
       return this;
     }
     this.append(String.format(" OR%s", cond.sql), cond.params);
@@ -571,7 +571,7 @@ public class Sql extends Clause implements Serializable {
   public Sql or(Supplier<Cond> supplier) {
 
     Cond cond = supplier.get();
-    if (StringUtil.isBlankIfStr(cond.sql)) {
+    if (StringUtil.isBlank(cond.sql)) {
       return this;
     }
     this.append(String.format(" OR (%s)", StringUtil.trimStart(cond.sql)), cond.params);
@@ -709,7 +709,7 @@ public class Sql extends Clause implements Serializable {
    * @return SQL
    */
   public Sql limit(int row) {
-    final String rowStr = checkInjection(StringUtil.toString(row));
+    final String rowStr = checkInjection(StringUtil.toStr(row));
     return this.append(String.format(" LIMIT %s", rowStr));
   }
 
@@ -721,8 +721,8 @@ public class Sql extends Clause implements Serializable {
    * @return SQL
    */
   public Sql limit(int offset, int row) {
-    final String offsetStr = checkInjection(StringUtil.toString(offset));
-    final String rowStr    = checkInjection(StringUtil.toString(row));
+    final String offsetStr = checkInjection(StringUtil.toStr(offset));
+    final String rowStr    = checkInjection(StringUtil.toStr(row));
     return this.append(String.format(" LIMIT %s, %s", offsetStr, rowStr));
   }
 

@@ -4,23 +4,40 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * 字符串工具栏
+ * 字符串工具类
  */
 public class StringUtil {
 
+  /**
+   * 判断字符串是否为空
+   *
+   * @param str 字符串
+   * @return 如果为空返回 {@code true}
+   */
   public static boolean isEmpty(CharSequence str) {
     return str == null || str.length() == 0;
   }
 
+  /**
+   * 判断字符串是否不为空
+   *
+   * @param str 字符串
+   * @return 如果不为空返回 {@code true}
+   */
   public static boolean isNotEmpty(CharSequence str) {
     return !isEmpty(str);
   }
 
+  /**
+   * 判断字符串是否为空(包括空格、制表符等)
+   *
+   * @param str 字符串
+   * @return 如果字符串为空或包含空格、制表符等返回 {@code true}
+   */
   public static boolean isBlank(CharSequence str) {
     if (isEmpty(str)) {
       return true;
     }
-
 
     for (int i = 0; i < str.length(); i++) {
       if (!isBlankChar(str.charAt(i))) {
@@ -31,6 +48,13 @@ public class StringUtil {
     return true;
   }
 
+  /**
+   * 判断传入 char 是否为空字符串
+   *
+   * @param c Char
+   * @return 如果为空或空格、制表符等返回 {@code true}
+   */
+  @SuppressWarnings("UnnecessaryUnicodeEscape")
   public static boolean isBlankChar(int c) {
     return Character.isWhitespace(c)
         || Character.isSpaceChar(c)
@@ -43,12 +67,6 @@ public class StringUtil {
         || c == '\u2800'
         // MONGOLIAN VOWEL SEPARATOR
         || c == '\u180e';
-  }
-
-  public static String trim(String str) {
-    if (isEmpty(str)) return str;
-
-    return str.trim();
   }
 
   public static boolean equals(CharSequence str1, CharSequence str2) {
@@ -140,6 +158,12 @@ public class StringUtil {
     return result.toString();
   }
 
+  /**
+   * 把首字母转换为大写
+   *
+   * @param str 字符串
+   * @return 首字母大写的字符串
+   */
   public static String upperFirst(String str) {
     if (!str.isEmpty()) {
       char firstChar = str.charAt(0);
@@ -150,34 +174,57 @@ public class StringUtil {
     return str;
   }
 
-  public static String toString(Object obj) {
+  /**
+   * 把对象换为字符串
+   *
+   * @param obj 对象
+   * @return 字符串
+   */
+  public static String toStr(Object obj) {
     if (Objects.isNull(obj)) return null;
     return obj.toString();
   }
 
-  public static boolean isBlankIfStr(Object obj) {
-    if (null == obj) {
-      return true;
-    } else if (obj instanceof CharSequence) {
-      return isBlank((CharSequence) obj);
-    }
-    return false;
-  }
-
+  /**
+   * 替换字符串
+   *
+   * @param str         字符串
+   * @param target      需被替换的字符串
+   * @param replacement 替换的字符串
+   * @return 替换后的字符串
+   */
   public static String replace(String str, CharSequence target, CharSequence replacement) {
     if (isEmpty(str)) return str;
 
     return str.replace(target, replacement);
   }
 
+  /**
+   * 删除字符串前面的空格
+   *
+   * @param str 字符串
+   * @return 删除前面空格后的字符串
+   */
   public static String trimStart(CharSequence str) {
     return trim(str, -1);
   }
 
+  /**
+   * 删除字符串后面的空格
+   *
+   * @param str 字符串
+   * @return 删除后面空格后的字符串
+   */
   public static String trimEnd(CharSequence str) {
     return trim(str, 1);
   }
 
+  /**
+   * 删除字符串前后方的空格
+   *
+   * @param str 字符串
+   * @return 删除前后方空格后的字符串
+   */
   public static String trim(CharSequence str) {
     return trim(str, 0);
   }
@@ -193,6 +240,14 @@ public class StringUtil {
     return trim(str, mode, StringUtil::isBlankChar);
   }
 
+  /**
+   * 除去字符串头尾部的符合条件的字符串，如果字符串是{@code null}，依然返回{@code null}。
+   *
+   * @param str       要处理的字符串
+   * @param mode      {@code -1}表示trimStart，{@code 0}表示trim全部， {@code 1}表示trimEnd
+   * @param predicate 条件
+   * @return 除去字符串头尾部的符合条件的字符串，如果字符串是{@code null}，依然返回{@code null}。
+   */
   public static String trim(CharSequence str, int mode, Predicate<Character> predicate) {
     String result;
     if (str == null) {
@@ -221,6 +276,13 @@ public class StringUtil {
     return result;
   }
 
+  /**
+   * 删除字符串前缀
+   *
+   * @param str    字符串
+   * @param prefix 前缀
+   * @return 删除前缀后的字符串
+   */
   public static String removePrefix(String str, String prefix) {
     if (isEmpty(str) || isEmpty(prefix)) {
       return str;
@@ -234,6 +296,12 @@ public class StringUtil {
 
   final static char UNDERLINE = '_';
 
+  /**
+   * 把_分割的字符串转为驼峰格式
+   *
+   * @param str _分割的字符串
+   * @return 驼峰格式的字符串
+   */
   public static String toCamelCase(String str) {
     if (isEmpty(str))
       return str;
@@ -260,14 +328,36 @@ public class StringUtil {
     }
   }
 
+  /**
+   * 判断字符串是否包含目标字符
+   *
+   * @param str        字符串
+   * @param searchChar 目标字符
+   * @return 如果包含返回 {@code true}
+   */
   public static boolean contains(String str, char searchChar) {
     return indexOf(str, searchChar) > -1;
   }
 
+  /**
+   * 返回目标字符的位置
+   *
+   * @param str        字符串
+   * @param searchChar 目标字符
+   * @return 目标字符的位置
+   */
   public static int indexOf(String str, char searchChar) {
     return indexOf(str, searchChar, 0);
   }
 
+  /**
+   * 返回目标字符的位置
+   *
+   * @param str        字符串
+   * @param searchChar 目标字符
+   * @param start      开始位置
+   * @return 目标字符的位置
+   */
   public static int indexOf(String str, char searchChar, int start) {
     return str.indexOf(searchChar, start);
   }

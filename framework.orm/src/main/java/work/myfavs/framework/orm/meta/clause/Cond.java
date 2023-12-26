@@ -5,9 +5,9 @@ import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.FuzzyMode;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
 import work.myfavs.framework.orm.meta.schema.Attribute;
-import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.common.ArrayUtil;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.convert.ConvertUtil;
 import work.myfavs.framework.orm.util.reflection.FieldVisitor;
 import work.myfavs.framework.orm.util.reflection.ReflectUtil;
@@ -96,7 +96,7 @@ public class Cond extends Clause {
    */
   public static Cond eq(String field, Object param, boolean ignoreNull) {
 
-    if (StringUtil.isBlankIfStr(param)) {
+    if (Objects.isNull(param)) {
       return ignoreNull ? new Cond() : isNull(field);
     }
     return new Cond(String.format(" %s = ?", field), param);
@@ -124,7 +124,7 @@ public class Cond extends Clause {
    */
   public static Cond ne(String field, Object param, boolean ignoreNull) {
 
-    if (StringUtil.isBlankIfStr(param)) {
+    if (Objects.isNull(param)) {
       return ignoreNull ? new Cond() : isNotNull(field);
     }
     return new Cond(String.format(" %s <> ?", field), param);
@@ -161,7 +161,7 @@ public class Cond extends Clause {
    */
   public static Cond gt(String field, Object param) {
 
-    if (StringUtil.isBlankIfStr(param)) {
+    if (Objects.isNull(param)) {
       return new Cond();
     }
     return new Cond(String.format(" %s > ?", field), param);
@@ -176,7 +176,7 @@ public class Cond extends Clause {
    */
   public static Cond ge(String field, Object param) {
 
-    if (StringUtil.isBlankIfStr(param)) {
+    if (Objects.isNull(param)) {
       return new Cond();
     }
     return new Cond(String.format(" %s >= ?", field), param);
@@ -191,7 +191,7 @@ public class Cond extends Clause {
    */
   public static Cond lt(String field, Object param) {
 
-    if (StringUtil.isBlankIfStr(param)) {
+    if (Objects.isNull(param)) {
       return new Cond();
     }
     return new Cond(String.format(" %s < ?", field), param);
@@ -206,7 +206,7 @@ public class Cond extends Clause {
    */
   public static Cond le(String field, Object param) {
 
-    if (StringUtil.isBlankIfStr(param)) {
+    if (Objects.isNull(param)) {
       return new Cond();
     }
     return new Cond(String.format(" %s <= ?", field), param);
@@ -241,7 +241,7 @@ public class Cond extends Clause {
    * @return {@link Cond}
    */
   public static Cond like(String field, Object param, FuzzyMode fuzzyMode) {
-    if (StringUtil.isBlankIfStr(param)) return new Cond();
+    if (Objects.isNull(param)) return new Cond();
 
     String paramVal   = param.toString();
     String likeClause = String.format(" %s LIKE ?", field);
@@ -420,7 +420,7 @@ public class Cond extends Clause {
     sqlParams = new ArrayList<>();
     if (CollectionUtil.isNotEmpty(params)) {
       for (Object param : params) {
-        if (StringUtil.isBlankIfStr(param)) {
+        if (Objects.isNull(param)) {
           continue;
         }
         sqlBuilder.append("?,");
@@ -487,7 +487,7 @@ public class Cond extends Clause {
    */
   public Cond and(Cond cond) {
 
-    if (StringUtil.isBlankIfStr(cond.sql)) {
+    if (StringUtil.isBlank(cond.sql)) {
       return this;
     }
     this.sql.append(String.format(" AND %s", StringUtil.trimStart(cond.sql)));
@@ -503,7 +503,7 @@ public class Cond extends Clause {
    */
   public Cond or(Cond cond) {
 
-    if (StringUtil.isBlankIfStr(cond.sql)) {
+    if (StringUtil.isBlank(cond.sql)) {
       return this;
     }
     this.sql.append(String.format(" OR %s", StringUtil.trimStart(cond.sql)));

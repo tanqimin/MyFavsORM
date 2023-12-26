@@ -72,7 +72,7 @@ public class Record extends LinkedHashMap<String, Object> implements IRecord<Str
 
   @Override
   public String getStr(String attr) {
-    return ConvertUtil.toString(get(attr));
+    return ConvertUtil.toStr(get(attr));
   }
 
   @Override

@@ -63,7 +63,7 @@ public abstract class Clause {
 
   @Override
   public String toString() {
-    return StringUtil.toString(sql);
+    return StringUtil.toStr(sql);
   }
 
   public Clause deleteLastChar(String str) {

@@ -169,6 +169,16 @@ public class DBTemplate {
   /**
    * 创建 {@link Page} 对象
    *
+   * @param <TView> 分页对象数据类型泛型
+   * @return {@link Page} 对象
+   */
+  public <TView> Page<TView> createPage() {
+    return new Page<>(this);
+  }
+
+  /**
+   * 创建 {@link Page} 对象
+   *
    * @param data         分页数据
    * @param currentPage  当前页码
    * @param pageSize     每页记录数
@@ -178,13 +188,23 @@ public class DBTemplate {
    * @return {@link Page} 对象
    */
   public <TView> Page<TView> createPage(List<TView> data, long currentPage, long pageSize, long totalPages, long totalRecords) {
-    Page<TView> page = new Page<>(this);
+    Page<TView> page = createPage();
     page.setData(data);
     page.setCurrentPage(currentPage);
     page.setPageSize(pageSize);
     page.setTotalPages(totalPages);
     page.setTotalRecords(totalRecords);
     return page;
+  }
+
+  /**
+   * 创建 {@link PageLite} 对象
+   *
+   * @param <TModel> 简单分页对象泛型
+   * @return {@link PageLite} 对象
+   */
+  public <TModel> PageLite<TModel> createPageLite() {
+    return new PageLite<>(this);
   }
 
   /**
@@ -199,7 +219,7 @@ public class DBTemplate {
   public <TModel> PageLite<TModel> createPageLite(
       List<TModel> data, long currentPage, long pageSize) {
 
-    PageLite<TModel> instance = new PageLite<>(this);
+    PageLite<TModel> instance = createPageLite();
     instance.setData(data);
     instance.setCurrentPage(currentPage);
     instance.setPageSize(pageSize);
