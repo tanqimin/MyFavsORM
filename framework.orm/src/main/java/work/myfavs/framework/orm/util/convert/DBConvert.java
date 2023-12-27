@@ -61,7 +61,7 @@ public class DBConvert {
       TModel model = ReflectUtil.newInstance(modelClass);
       for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
 
-        Attribute attr = attributes.get(metaData.getColumnName(columnIndex).toUpperCase());
+        Attribute attr = attributes.get(metaData.getColumnLabel(columnIndex).toUpperCase());
         if (Objects.isNull(attr)) continue;
         attr.setValue(model, rs, columnIndex);
       }
