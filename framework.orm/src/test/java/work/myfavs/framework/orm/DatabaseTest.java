@@ -354,7 +354,6 @@ public class DatabaseTest extends AbstractTest
     Assert.assertEquals(3L, page.getTotalRecords());
 
     page = orm.findPage(Snowflake.class, sql, pageable);
-    Sql sqlWithId = Sql.Select("id").from("tb_snowflake").where(Cond.eq("disable", false));
     Assert.assertEquals(2, page.getData().size());
     Assert.assertEquals(2L, page.getTotalPages());
     Assert.assertEquals(3L, page.getTotalRecords());
@@ -578,7 +577,7 @@ public class DatabaseTest extends AbstractTest
               for (Identity i : IDENTITIES) {
                 i.setPrice(new BigDecimal("1099.00"));
               }
-              innerOrm.update(Identity.class, IDENTITIES, new String[]{"name","price"});
+              innerOrm.update(Identity.class, IDENTITIES, new String[]{"name", "price"});
 
               List<Identity> identities = innerOrm.find(Identity.class, new Sql("select * from tb_identity"));
 

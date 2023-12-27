@@ -128,7 +128,7 @@ public class Database implements Closeable {
     try {
       return getConnection().setSavepoint();
     } catch (SQLException e) {
-      throw new DBException(e, "Fail to set save point: {}", e.getMessage());
+      throw new DBException(e, "Fail to set save point: %s", e.getMessage());
     }
   }
 
@@ -136,7 +136,7 @@ public class Database implements Closeable {
     try {
       return getConnection().setSavepoint(name);
     } catch (SQLException e) {
-      throw new DBException(e, "Fail to set save point: {}", e.getMessage());
+      throw new DBException(e, "Fail to set save point: %s", e.getMessage());
     }
   }
 
@@ -153,7 +153,7 @@ public class Database implements Closeable {
       }
 
     } catch (SQLException e) {
-      throw new DBException(e, "Fail to rollback transaction: {}", e.getMessage());
+      throw new DBException(e, "Fail to rollback transaction: %s", e.getMessage());
     }
   }
 
@@ -165,7 +165,7 @@ public class Database implements Closeable {
         connection.commit();
       }
     } catch (SQLException e) {
-      throw new DBException(e, "Fail to committed transaction: {}", e.getMessage());
+      throw new DBException(e, "Fail to committed transaction: %s", e.getMessage());
     }
   }
 
@@ -184,7 +184,7 @@ public class Database implements Closeable {
       return result;
     } catch (SQLException e) {
       this.rollback();
-      throw new DBException(e, "Error in transaction: {}", e.getMessage());
+      throw new DBException(e, "Error in transaction: %s", e.getMessage());
     }
   }
 
@@ -201,7 +201,7 @@ public class Database implements Closeable {
       database.commit();
     } catch (SQLException e) {
       this.rollback();
-      throw new DBException(e, "Error in transaction: {}", e.getMessage());
+      throw new DBException(e, "Error in transaction: %s", e.getMessage());
     }
   }
 }

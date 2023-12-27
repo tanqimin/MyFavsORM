@@ -54,7 +54,7 @@ public class Parameters {
               .addParameter(statement, paramIndex, value);
       }
     } catch (SQLException ex) {
-      throw new DBException(ex, "Error apply parameters: {}", ex.getMessage());
+      throw new DBException(ex, "Error apply parameters: %s", ex.getMessage());
     }
   }
 

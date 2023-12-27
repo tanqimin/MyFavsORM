@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.meta;
 
-import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.sql.PreparedStatement;
@@ -8,7 +7,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 public class BatchParameters {
   private final Map<Integer/*batchIndex*/, Parameters> batchParameters = new LinkedHashMap<>();
@@ -17,6 +15,7 @@ public class BatchParameters {
 
   public BatchParameters() {
     currentBatchSize = 1;
+    this.put(this.currentBatchSize, new Parameters());
   }
 
   public Parameters getCurrentBatchParameters() {
@@ -55,7 +54,7 @@ public class BatchParameters {
         }
       }
     } catch (SQLException ex) {
-      throw new DBException(ex, "Error apply batch parameters: {}", ex.getMessage());
+      throw new DBException(ex, "Error apply batch parameters: %s", ex.getMessage());
     }
   }
 
@@ -77,6 +76,6 @@ public class BatchParameters {
   }
 
   public boolean isEmpty() {
-    return this.batchParameters.isEmpty();
+    return this.batchParameters.size() == 1 && this.batchParameters.get(1).isEmpty();
   }
 }

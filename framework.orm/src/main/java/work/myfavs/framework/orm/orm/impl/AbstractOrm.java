@@ -327,7 +327,7 @@ public abstract class AbstractOrm implements Orm {
           if (!insertClauseCompleted) {
             insertClause.append(attr.getColumnName() + ",");
           }
-          valuesClause.append("?,", attr.getFieldVisitor().getValue(entity));
+          valuesClause.append("?,", attr.getFieldVisitor().<TModel>getValue(entity));
         }
 
         if (Objects.nonNull(entityMeta.getLogicDelete())) {

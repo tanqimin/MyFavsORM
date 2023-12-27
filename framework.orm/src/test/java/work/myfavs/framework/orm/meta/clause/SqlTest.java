@@ -214,7 +214,7 @@ public class SqlTest {
   public void testFullJoin1() {
     Sql user = Sql.SelectAll().from("user");
     Sql sql = new Sql().fullJoin(() -> user, "u", "u.id = id");
-    assertEquals(String.format(" FULL JOIN ({}) u ON u.id = id", user.toString()), sql.toString());
+    assertEquals(String.format(" FULL JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
