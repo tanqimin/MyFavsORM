@@ -96,7 +96,7 @@ public class DBConvert {
       for (int i = 1; i <= columnCount; i++) {
         String colName  = metaData.getColumnLabel(i);
         Object colValue = rs.getObject(i);
-        ((Record) tModel).put(colName, rs.wasNull() ? null : colValue);
+        ((Record) tModel).put(colName, colValue);
       }
       list.add(tModel);
     }
