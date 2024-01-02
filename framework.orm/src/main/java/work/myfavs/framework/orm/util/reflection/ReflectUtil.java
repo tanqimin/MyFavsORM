@@ -7,9 +7,19 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+/**
+ * 反射工具类
+ */
 public class ReflectUtil {
+
   private final static Map<Class<?>, List<Field>> CLASS_CACHE = new WeakHashMap<>();
 
+  /**
+   * 获取指定类的所有 {@link Field}，并设置 Accessible 为 {@code true}
+   *
+   * @param clazz 类型
+   * @return 所有
+   */
   public static List<Field> getFields(Class<?> clazz) {
     List<Field> fields = CLASS_CACHE.get(clazz);
     if (Objects.nonNull(fields)) return fields;
@@ -63,6 +73,7 @@ public class ReflectUtil {
   }
 
   public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... parameterTypes) {
+    Objects.requireNonNull(clazz);
     try {
       return clazz.getDeclaredConstructor(parameterTypes);
     } catch (NoSuchMethodException e) {
@@ -71,11 +82,28 @@ public class ReflectUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T newInstance(Class<T> clazz) {
+  public static <T> T newInstance(Class<T> clazz, Object... params) {
+
     try {
-      return (T) getConstructor(clazz).newInstance();
+      if (Objects.isNull(params))
+        return (T) getConstructor(clazz).newInstance();
+      return (T) getConstructor(clazz, getClasses(params)).newInstance(params);
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
       throw new DBException("Error create instance for class: %s", clazz.getName());
     }
+  }
+
+  public static Class<?>[] getClasses(Object... objects) {
+    Class<?>[] classes = new Class<?>[objects.length];
+    Object     obj;
+    for (int i = 0; i < objects.length; i++) {
+      obj = objects[i];
+      if (null == obj) {
+        classes[i] = Object.class;
+      } else {
+        classes[i] = obj.getClass();
+      }
+    }
+    return classes;
   }
 }

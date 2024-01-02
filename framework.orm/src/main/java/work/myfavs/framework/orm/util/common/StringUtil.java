@@ -164,7 +164,7 @@ public class StringUtil {
    * @param str 字符串
    * @return 首字母大写的字符串
    */
-  public static String upperFirst(String str) {
+  public static String capitalize(String str) {
     if (!str.isEmpty()) {
       char firstChar = str.charAt(0);
       if (Character.isLowerCase(firstChar)) {

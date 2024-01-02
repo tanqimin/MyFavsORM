@@ -71,8 +71,8 @@ public class StringUtilTest {
   public void upperFirst() {
     String s1 = "username";
     String s2 = "customProperty";
-    assertEquals("Username", StringUtil.upperFirst(s1));
-    assertEquals("CustomProperty", StringUtil.upperFirst(s2));
+    assertEquals("Username", StringUtil.capitalize(s1));
+    assertEquals("CustomProperty", StringUtil.capitalize(s2));
   }
 
   @Test

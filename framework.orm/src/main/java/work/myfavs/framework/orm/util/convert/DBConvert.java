@@ -48,24 +48,43 @@ public class DBConvert {
   private static <TModel> List<TModel> toEntities(
       Class<TModel> modelClass, ResultSet rs) throws SQLException {
 
-    final List<TModel> result = new ArrayList<>();
-
-    ClassMeta classMeta = Metadata.classMeta(modelClass);
-
+    ClassMeta                                   classMeta  = Metadata.classMeta(modelClass);
     final Map<String /*columnName*/, Attribute> attributes = classMeta.getQueryAttributes();
 
+    final List<TModel>      result      = new ArrayList<>();
     final ResultSetMetaData metaData    = rs.getMetaData();
     final int               columnCount = metaData.getColumnCount();
 
     while (rs.next()) {
       TModel model = ReflectUtil.newInstance(modelClass);
       for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-
-        Attribute attr = attributes.get(metaData.getColumnLabel(columnIndex).toUpperCase());
+        
+        String    columnLabel = metaData.getColumnLabel(columnIndex).toUpperCase();
+        Attribute attr        = attributes.get(columnLabel);
         if (Objects.isNull(attr)) continue;
         attr.setValue(model, rs, columnIndex);
       }
       result.add(model);
+    }
+
+    return result;
+  }
+
+  private static <TModel> List<TModel> toRecords(Class<TModel> modelClass, ResultSet rs)
+      throws SQLException {
+
+    final List<TModel>      result      = new ArrayList<>();
+    final ResultSetMetaData metaData    = rs.getMetaData();
+    final int               columnCount = metaData.getColumnCount();
+
+    while (rs.next()) {
+      TModel tModel = ReflectUtil.newInstance(modelClass);
+      for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+        String columnLabel = metaData.getColumnLabel(columnIndex);
+        Object colValue    = rs.getObject(columnIndex);
+        ((Record) tModel).put(columnLabel, colValue);
+      }
+      result.add(tModel);
     }
 
     return result;
@@ -84,23 +103,5 @@ public class DBConvert {
     return list;
   }
 
-  private static <TModel> List<TModel> toRecords(Class<TModel> modelClass, ResultSet rs)
-      throws SQLException {
 
-    final List<TModel>      list        = new ArrayList<>();
-    final ResultSetMetaData metaData    = rs.getMetaData();
-    final int               columnCount = metaData.getColumnCount();
-
-    while (rs.next()) {
-      TModel tModel = ReflectUtil.newInstance(modelClass);
-      for (int i = 1; i <= columnCount; i++) {
-        String colName  = metaData.getColumnLabel(i);
-        Object colValue = rs.getObject(i);
-        ((Record) tModel).put(colName, colValue);
-      }
-      list.add(tModel);
-    }
-
-    return list;
-  }
 }

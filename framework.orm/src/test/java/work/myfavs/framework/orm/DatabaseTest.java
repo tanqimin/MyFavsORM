@@ -53,7 +53,8 @@ public class DatabaseTest extends AbstractTest
       };
 
   @Before
-  public void setUp() {}
+  public void setUp() {
+  }
 
   @Test
   public void tx() {

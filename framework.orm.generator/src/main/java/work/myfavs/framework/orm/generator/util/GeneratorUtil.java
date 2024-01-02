@@ -13,7 +13,7 @@ public class GeneratorUtil {
   public static String toClass(String tableName) {
 
     String className = StringUtil.toCamelCase(tableName);
-    return StringUtil.upperFirst(className);
+    return StringUtil.capitalize(className);
   }
 
   /**
@@ -27,6 +27,6 @@ public class GeneratorUtil {
 
     final String tableWithoutPrefix = StringUtil.removePrefix(tableName, prefix);
     final String className = StringUtil.toCamelCase(tableWithoutPrefix);
-    return StringUtil.upperFirst(className);
+    return StringUtil.capitalize(className);
   }
 }
