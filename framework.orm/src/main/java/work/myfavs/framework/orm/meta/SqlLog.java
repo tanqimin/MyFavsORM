@@ -14,6 +14,11 @@ public class SqlLog {
 
   private static final Logger log = LoggerFactory.getLogger(SqlLog.class);
 
+  private static final String LINE_SEPARATOR = System.lineSeparator();
+  private static final String TITLE_SQL      = "---------------------- SQL --------------------------------";
+  private static final String TITLE_PAR      = "---------------------- PARAMETERS -------------------------";
+  private static final String TITLE_RES      = "---------------------- QUERY RESULTS ----------------------";
+
   private final boolean showSql;
   private final boolean showResult;
 
@@ -24,44 +29,42 @@ public class SqlLog {
 
   public void showSql(String sql) {
     if (!this.showSql) return;
-    log.debug("---------------------- SQL --------------------------------");
-    log.debug(System.lineSeparator().concat(sql));
+
+    log.debug(TITLE_SQL.concat(LINE_SEPARATOR).concat(sql));
   }
 
   public void showParams(BatchParameters batchParameters) {
     if (!this.showSql) return;
     if (Objects.isNull(batchParameters) || batchParameters.isEmpty()) return;
 
+    log.debug(TITLE_PAR);
     if (batchParameters.isBatch()) {
-      log.debug("---------------------- PARAMETERS -------------------------");
       for (Map.Entry<Integer, Parameters> entry : batchParameters.getBatchParameters().entrySet()) {
         Parameters parameters = entry.getValue();
         if (parameters.isEmpty()) continue;
 
-        log.debug(CollectionUtil.join(parameters.getParameters().values(), ", ", this::format));
+        log.debug(format(parameters));
       }
     } else {
       Parameters parameters = batchParameters.getCurrentBatchParameters();
       if (parameters.isEmpty()) return;
-      log.debug("---------------------- PARAMETERS -------------------------");
-      log.debug(CollectionUtil.join(parameters.getParameters().values(), ", ", this::format));
+
+      log.debug(format(parameters));
     }
   }
 
-  public int showAffectedRows(int result) {
-    if (!this.showResult) return result;
+  public void showAffectedRows(int result) {
+    if (!this.showResult) return;
 
     if (Math.abs(result) > 1)
       log.debug("Executed successfully, affected {} rows", result);
     else
       log.debug("Executed successfully.");
-    return result;
   }
 
-  public <TView> List<TView> showResult(Class<TView> viewClass, List<TView> result) {
-    if (!this.showResult) return result;
+  public <TView> void showResult(Class<TView> viewClass, List<TView> result) {
+    if (!this.showResult) return;
 
-    log.debug("---------------------- QUERY RESULTS ----------------------");
     if (viewClass == Record.class) {
       showRecords(result);
     } else if (viewClass.isPrimitive() || Constant.PRIMITIVE_TYPES.contains(viewClass)) {
@@ -70,8 +73,6 @@ public class SqlLog {
       showEntities(viewClass, result);
     }
     log.debug(String.format("Query results : %d rows", result.size()));
-
-    return result;
   }
 
   public void showResult(String format, Object... arguments) {
@@ -82,17 +83,15 @@ public class SqlLog {
   private <TView> void showEntities(Class<TView> viewClass, List<TView> result) {
     ClassMeta             classMeta  = Metadata.classMeta(viewClass);
     Collection<Attribute> attributes = classMeta.getQueryAttributes().values();
-    log.debug(CollectionUtil.join(attributes, ", ", Attribute::getColumnName));
+    log.debug(TITLE_RES);
+    log.debug(this.formatAttribuiteName(attributes));
     for (TView tView : result) {
-      log.debug(CollectionUtil.join(attributes, ", ", attribute -> getResultValue(tView, attribute)));
+      log.debug(this.formatAttribuiteValue(tView, attributes));
     }
   }
 
-  private <TView> String getResultValue(TView entity, Attribute attribute) {
-    return format(attribute.getFieldVisitor().getValue(entity));
-  }
-
   private <TView> void showScalar(List<TView> result) {
+    log.debug(TITLE_RES);
     for (TView tView : result) {
       log.debug(format(tView));
     }
@@ -100,14 +99,15 @@ public class SqlLog {
 
   private <TView> void showRecords(List<TView> result) {
     Iterator<TView> iterator = result.iterator();
+    log.debug(TITLE_RES);
     if (iterator.hasNext()) {
       Record record = (Record) iterator.next();
-      log.debug(CollectionUtil.join(record.keySet(), ", ", str -> str));
-      log.debug(CollectionUtil.join(record.values(), ", ", this::format));
+      log.debug(this.formatRecordKeySet(record));
+      log.debug(this.formatRecordValues(record));
 
       while (iterator.hasNext()) {
         record = (Record) iterator.next();
-        log.debug(CollectionUtil.join(record.values(), ", ", this::format));
+        log.debug(this.formatRecordValues(record));
       }
     }
   }
@@ -116,6 +116,23 @@ public class SqlLog {
     if (Objects.isNull(param)) return "null";
     if (param instanceof Number) return param.toString();
     if (param instanceof Date) return String.format("'%s'", Constant.DATE_FORMATTER.format(param));
+    if (param instanceof Parameters) return CollectionUtil.join(((Parameters) param).getParameters().values(), ", ", this::format);
     return String.format("'%s'", param);
+  }
+
+  private String formatAttribuiteName(Collection<Attribute> attributes) {
+    return CollectionUtil.join(attributes, ", ", Attribute::getColumnName);
+  }
+
+  private <TView> String formatAttribuiteValue(TView tView, Collection<Attribute> attributes) {
+    return CollectionUtil.join(attributes, ", ", attribute -> format(attribute.getValue(tView)));
+  }
+
+  private String formatRecordKeySet(Record record) {
+    return CollectionUtil.join(record.keySet(), ", ", str -> str);
+  }
+
+  private String formatRecordValues(Record record) {
+    return CollectionUtil.join(record.values(), ", ", this::format);
   }
 }

@@ -297,9 +297,9 @@ public class Query implements Closeable {
     final long   start  = System.currentTimeMillis();
     List<TModel> result = DBConvert.toList(modelClass, resultSet);
     final long   end    = System.currentTimeMillis();
-
+    this.sqlLog.showResult(modelClass, result);
     this.sqlLog.showResult("ResultSet convert execution time : {} ms", end - start);
-    return this.sqlLog.showResult(modelClass, result);
+    return result;
   }
 
 
@@ -315,7 +315,7 @@ public class Query implements Closeable {
     ResultSet  resultSet = preparedStatement.getGeneratedKeys();
     final long end       = System.currentTimeMillis();
 
-    this.sqlLog.showResult("Get generated key execution time : {} ms", end - start);
+    this.sqlLog.showResult("Get generated keys execution time : {} ms", end - start);
     return resultSet;
   }
 
@@ -331,8 +331,9 @@ public class Query implements Closeable {
     int        result = preparedStatement.executeUpdate();
     final long end    = System.currentTimeMillis();
 
+    this.sqlLog.showAffectedRows(result);
     this.sqlLog.showResult("Execute update execution time : {} ms", end - start);
-    return this.sqlLog.showAffectedRows(result);
+    return result;
   }
 
   /**
@@ -347,8 +348,8 @@ public class Query implements Closeable {
     int[]      result = preparedStatement.executeBatch();
     final long end    = System.currentTimeMillis();
 
-    this.sqlLog.showResult("Execute update execution time : {} ms", end - start);
     this.sqlLog.showAffectedRows(result.length);
+    this.sqlLog.showResult("Execute update execution time : {} ms", end - start);
     return result;
   }
 
