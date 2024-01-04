@@ -7,13 +7,8 @@ import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.common.Constant;
-import work.myfavs.framework.orm.util.func.ThrowingRunnable;
-import work.myfavs.framework.orm.util.func.ThrowingSupplier;
 
-import java.sql.SQLException;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class SqlLog {
 
@@ -79,31 +74,9 @@ public class SqlLog {
     return result;
   }
 
-  public void showExecutionTime(Supplier<String> supplier) {
+  public void showResult(String format, Object... arguments) {
     if (!this.showResult) return;
-
-    log.debug(supplier.get());
-  }
-
-  public <TView> TView showExecutionTimeReturn(ThrowingSupplier<TView, SQLException> actionSupplier, Function<Long, String> messageFunction)
-      throws SQLException {
-    final long start = System.currentTimeMillis();
-    TView      tView = actionSupplier.get();
-    final long end   = System.currentTimeMillis();
-    if (!this.showResult) return tView;
-
-    log.debug(messageFunction.apply(end - start));
-    return tView;
-  }
-
-  public void showExecutionTime(ThrowingRunnable<SQLException> actionRunnable, Function<Long, String> messageFunction)
-      throws SQLException {
-    final long start = System.currentTimeMillis();
-    actionRunnable.run();
-    final long end = System.currentTimeMillis();
-    if (!this.showResult) return;
-
-    log.debug(messageFunction.apply(end - start));
+    log.debug(format, arguments);
   }
 
   private <TView> void showEntities(Class<TView> viewClass, List<TView> result) {
