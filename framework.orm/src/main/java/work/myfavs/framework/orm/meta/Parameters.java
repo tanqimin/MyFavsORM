@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class Parameters {
   private final Map<Integer/*paramIndex*/, Object> parameters = new LinkedHashMap<>();
@@ -47,7 +46,7 @@ public class Parameters {
       for (Map.Entry<Integer, Object> entry : parameters.entrySet()) {
         Integer paramIndex = entry.getKey();
         Object  value      = entry.getValue();
-        if (Objects.isNull(value))
+        if (null == value)
           statement.setObject(paramIndex, null);
         else
           PropertyHandlerFactory

@@ -7,7 +7,6 @@ import java.sql.Types;
 
 /**
  * @author tanqimin
- * @date 2016/1/29
  */
 public class BigDecimalPropertyHandler extends NumberPropertyHandler<BigDecimal> {
   public BigDecimalPropertyHandler() {

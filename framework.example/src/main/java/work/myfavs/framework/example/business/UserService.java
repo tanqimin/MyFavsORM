@@ -9,7 +9,6 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.pagination.Page;
 
 import java.util.Date;
-import java.util.Objects;
 
 @Service
 public class UserService extends BaseService {
@@ -32,12 +31,12 @@ public class UserService extends BaseService {
   @Transactional(rollbackFor = Exception.class)
   public Long updateUser(Long id, User entity) {
     User user = userRepository.getById(id);
-    if(Objects.isNull(user)) return 0L;
+    if(null == user) return 0L;
     user.setUsername(entity.getUsername());
     user.setPassword(entity.getPassword());
     user.setEmail(entity.getEmail());
     user.setModified(new Date());
 
-    return new Long(userRepository.update(user));
+    return (long) userRepository.update(user);
   }
 }

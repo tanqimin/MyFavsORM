@@ -1,13 +1,10 @@
 package work.myfavs.framework.orm;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Objects;
 
 /**
  * JDBC 连接工厂
@@ -15,7 +12,6 @@ import java.util.Objects;
  * @author tanqimin
  */
 public class JdbcConnFactory extends ConnFactory {
-  private static final Logger log = LoggerFactory.getLogger(JdbcConnFactory.class);
 
   private final ThreadLocal<Connection> connectionHolder     = new ThreadLocal<>();
   private final ThreadLocal<Integer>    connectionDeepHolder = new ThreadLocal<>();
@@ -29,14 +25,14 @@ public class JdbcConnFactory extends ConnFactory {
   public Connection openConnection() {
 
     Connection connection = getCurrentConnection();
-    if (Objects.isNull(connection)) {
+    if (null == connection) {
       connectionDeepHolder.set(1);
       connection = createConnection();
       connectionHolder.set(connection);
-    } else {
-      connectionDeepHolder.set(connectionDeepHolder.get() + 1);
+      return connection;
     }
 
+    connectionDeepHolder.set(connectionDeepHolder.get() + 1);
     return connection;
   }
 
@@ -49,17 +45,18 @@ public class JdbcConnFactory extends ConnFactory {
   @Override
   public void closeConnection(Connection connection) {
     final Integer connDeep = connectionDeepHolder.get();
-    if (connDeep == 1) {
-      Connection conn = connection;
-      if (Objects.isNull(conn)) {
-        conn = getCurrentConnection();
-      }
-      releaseConnection(conn);
-      connectionHolder.remove();
-      connectionDeepHolder.remove();
-    } else {
+    if (connDeep > 1) {
       connectionDeepHolder.set(connDeep - 1);
+      return;
     }
+
+    Connection conn = connection;
+    if (null == conn)
+      conn = getCurrentConnection();
+
+    releaseConnection(conn);
+    connectionHolder.remove();
+    connectionDeepHolder.remove();
   }
 
   /**
@@ -82,13 +79,13 @@ public class JdbcConnFactory extends ConnFactory {
    * @param conn 数据库链接
    */
   protected void releaseConnection(Connection conn) {
-    if (Objects.isNull(conn)) return;
+
+    if (null == conn) return;
 
     try {
-      if (conn.isClosed()) return;
-      if (!conn.getAutoCommit()) {
-        conn.commit();
-      }
+      if (withoutCommit(conn)) return;
+
+      conn.commit();
     } catch (SQLException e) {
       throw new DBException(e, "提交事务时发生异常: %s", e.getMessage());
     } finally {
@@ -96,8 +93,15 @@ public class JdbcConnFactory extends ConnFactory {
     }
   }
 
+  private static boolean withoutCommit(Connection conn) throws SQLException {
+    return conn.getAutoCommit() || conn.isClosed();
+  }
+
   private static void closeConn(Connection conn) {
     try {
+      if (!withoutCommit(conn)) {
+        conn.rollback();
+      }
       conn.close();
     } catch (SQLException e) {
       throw new DBException(e, "关闭数据库连接时发生异常: %s", e.getMessage());

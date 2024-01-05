@@ -9,14 +9,13 @@ import work.myfavs.framework.orm.generator.util.ResultSetUtil;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
-import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.sql.*;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
 
 public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
 
@@ -51,9 +50,10 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
       if (CollectionUtil.isNotEmpty(params)) {
         int pid = 1;
         for (Object param : params) {
-          if (Objects.isNull(param))
+          if (null == param)
             ps.setObject(pid, null);
           else
+            //noinspection unchecked
             PropertyHandlerFactory.getInstance(param.getClass()).addParameter(ps, pid, param);
           pid++;
         }
@@ -73,32 +73,44 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
     } catch (SQLException e) {
       throw new DBException(e);
     } finally {
-      try {
-        if (Objects.nonNull(rs)) {
-          if (!rs.isClosed())
-            rs.close();
-        }
-      } catch (SQLException e) {
-        throw new DBException(e);
-      } finally {
-        try {
-          if (Objects.nonNull(ps)) {
-            if (!ps.isClosed())
-              ps.close();
-          }
-        } catch (SQLException e) {
-          throw new DBException(e);
-        } finally {
-          try {
-            if (Objects.nonNull(conn)) {
-              if (!ps.isClosed())
-                ps.close();
-            }
-          } catch (SQLException e) {
-            throw new DBException(e);
-          }
-        }
+      close(rs, ps, conn);
+    }
+  }
+
+  private static void close(ResultSet rs, PreparedStatement ps, Connection conn) {
+    try {
+      if (null != rs) {
+        if (!rs.isClosed())
+          rs.close();
       }
+    } catch (SQLException e) {
+      throw new DBException(e);
+    } finally {
+      close(ps, conn);
+    }
+  }
+
+  private static void close(PreparedStatement ps, Connection conn) {
+    try {
+      if (null != ps) {
+        if (!ps.isClosed())
+          ps.close();
+      }
+    } catch (SQLException e) {
+      throw new DBException(e);
+    } finally {
+      close(conn);
+    }
+  }
+
+  private static void close(Connection conn) {
+    try {
+      if (null != conn) {
+        if (!conn.isClosed())
+          conn.close();
+      }
+    } catch (SQLException e) {
+      throw new DBException(e);
     }
   }
 
@@ -117,17 +129,15 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
     where table_schema = 'myfavs_test'
      */
 
-    Sql sql =
-        Sql.Select("table_name AS `table`,")
-           .append(" column_name AS `column`,")
-           .append(" data_type AS `type`,")
-           .append(" CASE is_nullable WHEN 'YES' THEN 1 ELSE 0 END AS `nullable`,")
-           .append(" CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END AS `pk`,")
-           .append(" ordinal_position AS `idx`,")
-           .append(" column_comment AS `comment`")
-           .from("information_schema.`COLUMNS`")
-           .where(Cond.eq("table_schema", dbName));
-    return sql;
+    return Sql.Select("table_name AS `table`,")
+              .append(" column_name AS `column`,")
+              .append(" data_type AS `type`,")
+              .append(" CASE is_nullable WHEN 'YES' THEN 1 ELSE 0 END AS `nullable`,")
+              .append(" CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END AS `pk`,")
+              .append(" ordinal_position AS `idx`,")
+              .append(" column_comment AS `comment`")
+              .from("information_schema.`COLUMNS`")
+              .where(Cond.eq("table_schema", dbName));
   }
 
   private TableDefinition getTableDefinition(String table, List<TableDefinition> tableDefinitions) {
@@ -140,7 +150,7 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
       }
     }
 
-    if (Objects.isNull(tableDefinition)) {
+    if (null == tableDefinition) {
       tableDefinition = new TableDefinition();
       tableDefinition.setTableName(table);
       tableDefinition.setClassName(GeneratorUtil.toClass(table));
@@ -174,7 +184,7 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
 
   private TypeDefinition createTypeDefinition(String dataType, String comment) {
 
-    if (Objects.nonNull(comment)) {
+    if (null != comment) {
       if (comment.contains("#")) {
         String         className      = comment.split("#")[1];
         TypeDefinition typeDefinition = new TypeDefinition(className);

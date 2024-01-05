@@ -34,7 +34,7 @@ public class DatabaseTest extends AbstractTest
 
   private static final Logger log = LoggerFactory.getLogger(DatabaseTest.class);
 
-  IPageable pageable =
+  final IPageable pageable =
       new IPageable() {
         @Override
         public boolean getEnablePage() {

@@ -3,8 +3,6 @@ package work.myfavs.framework.orm.util.common;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class ArrayUtilTest {
 
   public final static String[] obj = {"A", "BC", "D"};

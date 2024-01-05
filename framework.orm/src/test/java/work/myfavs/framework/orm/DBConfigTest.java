@@ -2,7 +2,6 @@ package work.myfavs.framework.orm;
 
 import junit.framework.TestCase;
 import org.junit.Assert;
-import org.junit.Test;
 import work.myfavs.framework.orm.meta.DbType;
 
 import java.sql.Connection;

@@ -23,7 +23,7 @@ public class ReflectUtil {
    */
   public static List<Field> getFields(Class<?> clazz) {
     List<Field> fields = CLASS_CACHE.get(clazz);
-    if (Objects.nonNull(fields)) return fields;
+    if (null != fields) return fields;
 
     fields = new ArrayList<>();
     Class<?> searchClass = clazz;
@@ -65,7 +65,7 @@ public class ReflectUtil {
   }
 
   public static void setFieldValue(Field field, Object entity, Object value) {
-    if (Objects.isNull(value) && field.getType().isPrimitive()) {
+    if (null == value && field.getType().isPrimitive()) {
       return; // 基础类型不能设置null值
     }
 
@@ -93,7 +93,7 @@ public class ReflectUtil {
   public static <T> T newInstance(Class<T> clazz, Object... params) {
 
     try {
-      if (Objects.isNull(params))
+      if (null == params)
         return (T) getConstructor(clazz).newInstance();
       return (T) getConstructor(clazz, getClasses(params)).newInstance(params);
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

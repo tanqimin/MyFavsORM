@@ -19,7 +19,7 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class Repository<TModel> extends Query {
 
-  protected Class<TModel> modelClass;
+  protected final Class<TModel> modelClass;
 
   /**
    * 构造方法

@@ -2,11 +2,6 @@ package work.myfavs.framework.example.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
-
-import java.math.BigDecimal;
-import java.util.*;
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,6 +17,13 @@ import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.handler.impls.*;
 import work.myfavs.framework.orm.util.lang.NString;
+
+import javax.sql.DataSource;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class TenantDataSourceConfig {
@@ -53,7 +55,7 @@ public class TenantDataSourceConfig {
 
     Map<Object, Object> customDataSources = new HashMap<>();
 
-    if (Objects.isNull(DynamicDataSource.connectProperties))
+    if (null == DynamicDataSource.connectProperties)
       DynamicDataSource.connectProperties = primaryDataSource.getConnectProperties();
 
     for (Tenant tenant : tenants) {

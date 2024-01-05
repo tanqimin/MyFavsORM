@@ -1,11 +1,12 @@
 package work.myfavs.framework.orm.entity.test;
 
+import work.myfavs.framework.orm.entity.Identity;
+import work.myfavs.framework.orm.entity.enums.TypeEnum;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import work.myfavs.framework.orm.entity.Identity;
-import work.myfavs.framework.orm.entity.enums.TypeEnum;
 
 public interface IIdentityTest {
   List<Identity> IDENTITIES = new ArrayList<>();

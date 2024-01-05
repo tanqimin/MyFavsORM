@@ -11,7 +11,7 @@ public class AttributesTest {
   Map<String /* columnName */, Attribute> attributes;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     attributes = Metadata.classMeta(Snowflake.class).getQueryAttributes();
   }
 

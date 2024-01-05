@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.util.common;
 
-import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -181,7 +180,7 @@ public class StringUtil {
    * @return 字符串
    */
   public static String toStr(Object obj) {
-    if (Objects.isNull(obj)) return null;
+    if (null == obj) return null;
     return obj.toString();
   }
 

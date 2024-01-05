@@ -4,7 +4,6 @@ import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * IO工具类
@@ -58,7 +57,7 @@ public class IOUtil {
   public static String read(String filePath) {
     try (InputStream is = IOUtil.class.getClassLoader().getResourceAsStream(filePath)) {
       StringBuilder content = new StringBuilder();
-      if (Objects.isNull(is))
+      if (null == is)
         return content.toString();
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
         String line;

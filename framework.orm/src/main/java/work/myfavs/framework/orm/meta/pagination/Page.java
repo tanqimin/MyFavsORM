@@ -16,11 +16,6 @@ public class Page<TModel> extends PageBase<TModel> {
   protected final String pageTotalPageField;
   protected final String pageTotalRecordField;
 
-  // region Attributes
-  private final long totalPages   = 1L;
-  private final long totalRecords = 0L;
-  // endregion
-
   // region Getter && Setter
   public long getTotalPages() {
     return (long) this.get(pageTotalPageField);
@@ -64,8 +59,8 @@ public class Page<TModel> extends PageBase<TModel> {
         data,
         this.getCurrentPage(),
         this.getPageSize(),
-        this.totalPages,
-        this.totalRecords);
+        this.getTotalPages(),
+        this.getTotalRecords());
   }
 
   /**

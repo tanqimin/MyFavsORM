@@ -14,15 +14,14 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
-import work.myfavs.framework.orm.util.common.DruidUtil;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.common.Constant;
+import work.myfavs.framework.orm.util.common.DruidUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Orm SqlServer实现：2005以上，2012或以上版本请使用 {@link SqlServer2012Orm}
@@ -167,7 +166,7 @@ public class SqlServerOrm extends AbstractOrm {
   }
 
   private SQLOver createSQLOver(SQLServerSelectQueryBlock queryBlock) {
-    if (Objects.isNull(queryBlock.getOrderBy()))
+    if (null == queryBlock.getOrderBy())
       return new SQLOver(new SQLOrderBy(SQLUtils.toSQLExpr("CURRENT_TIMESTAMP")));
     return new SQLOver(queryBlock.getOrderBy());
   }

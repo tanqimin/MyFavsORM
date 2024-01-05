@@ -1,11 +1,12 @@
 package work.myfavs.framework.orm.util.convert;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import work.myfavs.framework.orm.AbstractTest;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class ConvertUtilTest extends AbstractTest {
     

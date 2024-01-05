@@ -1,8 +1,8 @@
 package work.myfavs.framework.orm.util.convert;
 
 
-import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.lang.reflect.Array;
@@ -22,7 +22,7 @@ public class ConvertUtil {
    */
   public static Collection<?> toCollection(Object object) {
     Collection<Object> collection = new ArrayList<>();
-    if (Objects.isNull(object)) return collection;
+    if (null == object) return collection;
 
     if (ArrayUtil.isArray(object)) {
       Class<?> componentType = object.getClass().getComponentType();
@@ -56,13 +56,13 @@ public class ConvertUtil {
                                Object value,
                                Function<Number, T> numberFunc,
                                Function<String, T> stringFunc) {
-    if (Objects.isNull(value))
+    if (null == value)
       return clazz.isPrimitive() ? numberFunc.apply(0) : null;
     else if (value instanceof Number) return numberFunc.apply((Number) value);
     else if (value instanceof String) {
       String str = ((String) value).trim();
       str = str.isEmpty() ? null : str;
-      if (Objects.isNull(str))
+      if (null == str)
         return clazz.isPrimitive() ? numberFunc.apply(0) : null;
       return stringFunc.apply(str);
     }
@@ -149,7 +149,7 @@ public class ConvertUtil {
    * @return Bool值
    */
   public static Boolean toBool(Object value, boolean isPrimitive) {
-    if (Objects.isNull(value))
+    if (null == value)
       return isPrimitive ? false : null;
 
     if (value instanceof Boolean) {
@@ -185,7 +185,7 @@ public class ConvertUtil {
    * @return 枚举
    */
   public static <T extends Enum<T>> T toEnum(Class<T> clazz, Object value) {
-    if (Objects.isNull(value)) return null;
+    if (null == value) return null;
 
     String str;
     if (value instanceof String) {
@@ -210,7 +210,7 @@ public class ConvertUtil {
    * @return String值
    */
   public static String toStr(Object value) {
-    if (Objects.isNull(value)) return null;
+    if (null == value) return null;
     return value.toString();
   }
 
@@ -225,7 +225,7 @@ public class ConvertUtil {
    */
   @SuppressWarnings("unchecked")
   public static <T extends Date> T toDate(Class<T> clazz, Object value, Function<Long, T> dateFunction) {
-    if (Objects.isNull(value)) return null;
+    if (null == value) return null;
     if (clazz.isInstance(value)) return (T) value;
     if (value instanceof Date) return dateFunction.apply(((Date) value).getTime());
     if (value instanceof Number) return dateFunction.apply(((Number) value).longValue());
@@ -249,13 +249,13 @@ public class ConvertUtil {
    * @return UUID
    */
   public static UUID toUUID(Object value) {
-    if (Objects.isNull(value))
+    if (null == value)
       return null;
 
     if (value instanceof String) {
       String str = ((String) value).trim();
       str = str.isEmpty() ? null : str;
-      if (Objects.isNull(str))
+      if (null == str)
         return null;
       return UUID.fromString(str);
     }

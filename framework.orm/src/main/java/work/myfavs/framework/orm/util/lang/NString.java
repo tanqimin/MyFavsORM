@@ -71,6 +71,7 @@ public final class NString implements java.io.Serializable, Comparable<NString>,
   }
 
 
+  @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
   public boolean equals(Object anObject) {
     return internalString.equals(anObject);
   }
@@ -84,7 +85,7 @@ public final class NString implements java.io.Serializable, Comparable<NString>,
   }
 
   public boolean equalsIgnoreCase(NString anotherNString) {
-    String anotherString = Objects.isNull(anotherNString) ? null : anotherNString.internalString;
+    String anotherString = null == anotherNString ? null : anotherNString.internalString;
     return internalString.equalsIgnoreCase(anotherString);
   }
 
@@ -212,6 +213,7 @@ public final class NString implements java.io.Serializable, Comparable<NString>,
     return new NString(internalString.concat(str));
   }
 
+  @SuppressWarnings({"unused", "InfiniteRecursion"})
   public NString concat(NString str) {
     return new NString(this.concat(str));
   }

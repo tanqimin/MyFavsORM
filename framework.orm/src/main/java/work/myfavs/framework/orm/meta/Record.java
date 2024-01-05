@@ -48,7 +48,7 @@ public class Record extends LinkedHashMap<String, Object> implements IRecord<Str
   public <T> T get(String attr, T defaultValue) {
     final Object obj = super.get(attr);
 
-    if (Objects.isNull(obj)) {
+    if (null == obj) {
       return defaultValue;
     }
     return (T) obj;
@@ -201,7 +201,7 @@ public class Record extends LinkedHashMap<String, Object> implements IRecord<Str
    * @return Record
    */
   public static <T> Record toRecord(T bean) {
-    if (Objects.isNull(bean)) return null;
+    if (null == bean) return null;
 
     Record      record = new Record();
     List<Field> fields = ReflectUtil.getFields(bean.getClass());

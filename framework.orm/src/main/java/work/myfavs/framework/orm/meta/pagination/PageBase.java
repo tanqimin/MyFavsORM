@@ -1,12 +1,12 @@
 package work.myfavs.framework.orm.meta.pagination;
 
+import work.myfavs.framework.orm.DBTemplate;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
-
-import work.myfavs.framework.orm.DBTemplate;
 
 /**
  * 分页基类
@@ -56,8 +56,7 @@ public class PageBase<TModel> extends HashMap<String, Object> {
   protected <TOther> List<TOther> convertData(Function<TModel, TOther> fun) {
 
     List<TOther> list = new ArrayList<>();
-    for (Iterator<TModel> iterator = this.getData().iterator(); iterator.hasNext(); ) {
-      TModel item  = iterator.next();
+    for (TModel item : this.getData()) {
       TOther apply = fun.apply(item);
       list.add(apply);
     }

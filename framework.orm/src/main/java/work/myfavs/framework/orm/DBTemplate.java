@@ -4,16 +4,14 @@ import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
-import work.myfavs.framework.orm.util.id.PKGenerator;
 import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.id.PKGenerator;
 
 import javax.sql.DataSource;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -86,13 +84,11 @@ public class DBTemplate {
    * @param mapper Mapper
    */
   private void registerMapper(Mapper mapper) {
-    if (Objects.isNull(mapper) || mapper.map.isEmpty()) {
+    if (mapper.map.isEmpty()) {
       PropertyHandlerFactory.registerDefault();
       return;
     }
-    for (Entry<Class<?>, PropertyHandler> entry : mapper.map.entrySet()) {
-      PropertyHandlerFactory.register(entry.getKey(), entry.getValue());
-    }
+    mapper.map.forEach(PropertyHandlerFactory::register);
   }
   // endregion
 
@@ -149,9 +145,7 @@ public class DBTemplate {
   private ConnFactory createConnFactory(Class<? extends ConnFactory> cls, DataSource dataSource) {
     try {
       //使用cls反射创建 ConnFactory 的实例
-
-      Constructor<? extends ConnFactory> constructor = cls.getDeclaredConstructor(DataSource.class);
-      return constructor.newInstance(dataSource);
+      return cls.getDeclaredConstructor(DataSource.class).newInstance(dataSource);
     } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
       throw new DBException("创建 ConnFactory 实例时发生异常: %s", e.getMessage());
     }
@@ -223,7 +217,7 @@ public class DBTemplate {
     instance.setData(data);
     instance.setCurrentPage(currentPage);
     instance.setPageSize(pageSize);
-    if (Objects.nonNull(data)) {
+    if (null != data) {
       instance.setHasNext(data.size() == pageSize);
     }
     return instance;
@@ -234,7 +228,7 @@ public class DBTemplate {
     private final String     dsName;
     private       DataSource dataSource;
     private       DBConfig   config;
-    public        Mapper     mapper = new Mapper();
+    public final  Mapper     mapper = new Mapper();
 
     public Builder() {
       this(DBConfig.DEFAULT_DATASOURCE_NAME);
@@ -275,7 +269,7 @@ public class DBTemplate {
 
       Objects.requireNonNull(this.dataSource, "DataSource is required.");
 
-      if (Objects.isNull(this.config)) {
+      if (null == this.config) {
         this.config = new DBConfig();
       }
 

@@ -23,7 +23,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Objects;
 
 public class NStringPropertyHandler extends PropertyHandler<NString> {
 
@@ -36,7 +35,7 @@ public class NStringPropertyHandler extends PropertyHandler<NString> {
   public NString convert(ResultSet rs, int columnIndex, Class<NString> clazz) throws SQLException {
 
     String val = rs.getNString(columnIndex);
-    if (Objects.isNull(val)) {
+    if (null == val) {
       return null;
     }
 

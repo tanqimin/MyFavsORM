@@ -3,8 +3,8 @@ package work.myfavs.framework.orm.meta.schema;
 
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
-import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
@@ -97,7 +97,7 @@ public class ClassMeta {
     List<Attribute> attributes = new ArrayList<>();
     for (String column : columns) {
       Attribute attribute = updateAttributes.get(column.toUpperCase());
-      if (Objects.isNull(attribute)) continue;
+      if (null == attribute) continue;
       attributes.add(attribute);
     }
 
@@ -121,7 +121,7 @@ public class ClassMeta {
     this.clazz = clazz;
 
     final Table table = clazz.getAnnotation(Table.class);
-    if (Objects.nonNull(table)) {
+    if (null != table) {
       this.isEntity = true;
       this.strategy = table.strategy();
       this.tableName = getTableName(table, clazz);
@@ -133,7 +133,7 @@ public class ClassMeta {
 
     for (Field field : fields) {
       final Attribute attr = Attribute.createInstance(field);
-      if (Objects.isNull(attr)) {
+      if (null == attr) {
         continue;
       }
 
@@ -170,7 +170,7 @@ public class ClassMeta {
   public static ClassMeta createInstance(Class<?> clazz) {
     String    className = clazz.getName();
     ClassMeta classMeta = CLASS_META_CACHE.get(className);
-    if (Objects.isNull(classMeta)) {
+    if (null == classMeta) {
       classMeta = new ClassMeta(clazz);
       CLASS_META_CACHE.put(className, classMeta);
     }
@@ -193,7 +193,7 @@ public class ClassMeta {
    */
   public Attribute checkPrimaryKey() {
 
-    if (Objects.isNull(primaryKey)) {
+    if (null == primaryKey) {
       throw new DBException("类型 %s 中没有发现使用 @PrimaryKey 注释标记的主键字段", this.clazz.getName());
     }
     return primaryKey;

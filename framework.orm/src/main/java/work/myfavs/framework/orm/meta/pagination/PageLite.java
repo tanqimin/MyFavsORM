@@ -1,9 +1,9 @@
 package work.myfavs.framework.orm.meta.pagination;
 
+import work.myfavs.framework.orm.DBTemplate;
+
 import java.util.List;
 import java.util.function.Function;
-
-import work.myfavs.framework.orm.DBTemplate;
 
 /**
  * 简单分页对象

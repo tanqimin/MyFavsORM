@@ -6,7 +6,10 @@ import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.*;
-import work.myfavs.framework.orm.*;
+import work.myfavs.framework.orm.DBConfig;
+import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.Database;
+import work.myfavs.framework.orm.Query;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.TableAlias;
 import work.myfavs.framework.orm.meta.annotation.Criteria;
@@ -194,7 +197,7 @@ public abstract class AbstractOrm implements Orm {
   public <TModel> int create(Class<TModel> modelClass, TModel entity) {
 
     int result = 0;
-    if (Objects.isNull(entity)) return result;
+    if (null == entity) return result;
 
     final ClassMeta      classMeta   = Metadata.entityMeta(modelClass);
     final Attribute      primaryKey  = classMeta.checkPrimaryKey();
@@ -235,7 +238,7 @@ public abstract class AbstractOrm implements Orm {
       sql.getParams().add(entry.getValue().getValue(entity));
     }
 
-    if (Objects.nonNull(logicDelete)) {
+    if (null != logicDelete) {
       columns.add(DruidUtil.createColumn(logicDelete.getColumnName()));
       values.add(new SQLIntegerExpr(0));
     }
@@ -330,7 +333,7 @@ public abstract class AbstractOrm implements Orm {
           valuesClause.append("?,", attr.getFieldVisitor().<TModel>getValue(entity));
         }
 
-        if (Objects.nonNull(entityMeta.getLogicDelete())) {
+        if (null != entityMeta.getLogicDelete()) {
           if (!insertClauseCompleted) {
             insertClause.append(entityMeta.getLogicDelete().getColumnName() + ",");
           }
@@ -407,7 +410,7 @@ public abstract class AbstractOrm implements Orm {
   protected <TModel> Object generatePrimaryKey(GenerationType strategy, Attribute primaryKey, TModel entity) {
     Object pkVal = primaryKey.getValue(entity);
 
-    if (Objects.isNull(pkVal)) {
+    if (null == pkVal) {
       PKGenerator pkGenerator = this.dbTemplate.getPkGenerator();
       switch (strategy) {
         case SNOW_FLAKE:
@@ -437,7 +440,7 @@ public abstract class AbstractOrm implements Orm {
    */
   public <TModel> int update(Class<TModel> modelClass, TModel entity) {
 
-    if (Objects.isNull(entity)) return 0;
+    if (null == entity) return 0;
 
     final Sql sql = this.update(modelClass, entity, false);
     return execute(sql);
@@ -456,7 +459,7 @@ public abstract class AbstractOrm implements Orm {
         SQLBinaryOperator.Equality,
         DruidUtil.createParam());
 
-    if (Objects.nonNull(logicDelete)) {
+    if (null != logicDelete) {
       condition = new SQLBinaryOpExpr(
           condition,
           SQLBinaryOperator.BooleanAnd,
@@ -480,7 +483,7 @@ public abstract class AbstractOrm implements Orm {
    */
   public <TModel> int updateIgnoreNull(Class<TModel> modelClass, TModel entity) {
 
-    if (Objects.isNull(entity)) return 0;
+    if (null == entity) return 0;
 
     final Sql sql = this.update(modelClass, entity, true);
     return execute(sql);
@@ -497,7 +500,7 @@ public abstract class AbstractOrm implements Orm {
    */
   public <TModel> int update(Class<TModel> modelClass, TModel entity, String[] columns) {
 
-    if (Objects.isNull(entity)) return 0;
+    if (null == entity) return 0;
 
     return update(modelClass, List.of(entity), columns);
   }
@@ -581,7 +584,7 @@ public abstract class AbstractOrm implements Orm {
       }
 
       //构建逻辑删除条件
-      if (Objects.isNull(logicDelete)) {
+      if (null == logicDelete) {
         updateStatement.addWhere(condition);
       } else {
         updateStatement.addWhere(new SQLBinaryOpExpr(
@@ -642,7 +645,7 @@ public abstract class AbstractOrm implements Orm {
    */
   public <TModel> int delete(Class<TModel> modelClass, TModel entity) {
 
-    if (Objects.isNull(entity)) {
+    if (null == entity) {
       return 0;
     }
 
@@ -672,7 +675,7 @@ public abstract class AbstractOrm implements Orm {
     for (TModel entity : entities) {
       final Object pkVal = primaryKey.getValue(entity);
 
-      if (Objects.isNull(pkVal)) continue;
+      if (null == pkVal) continue;
 
       ids.add(pkVal);
     }
@@ -712,7 +715,7 @@ public abstract class AbstractOrm implements Orm {
    */
   public <TModel> int deleteById(Class<TModel> modelClass, Object id) {
 
-    if (Objects.isNull(id)) {
+    if (null == id) {
       return 0;
     }
     final ClassMeta entityMeta = Metadata.entityMeta(modelClass);
@@ -743,7 +746,7 @@ public abstract class AbstractOrm implements Orm {
    */
   public <TModel> int deleteByCond(Class<TModel> modelClass, Cond cond) {
 
-    if (Objects.isNull(cond)) {
+    if (null == cond) {
       return 0;
     }
 
@@ -780,7 +783,7 @@ public abstract class AbstractOrm implements Orm {
     final Attribute primaryKey  = entityMeta.checkPrimaryKey();
     final Attribute logicDelete = entityMeta.getLogicDelete();
     final Sql       sql;
-    if (Objects.nonNull(logicDelete)) {
+    if (null != logicDelete) {
       sql = Sql.Update(tableName)
                .set(String.format("%s = %s", logicDelete.getColumnName(), primaryKey.getColumnName()))
                .where(deleteCond).and(Cond.logicalDelete(logicDelete));
@@ -1020,7 +1023,7 @@ public abstract class AbstractOrm implements Orm {
    * @return 记录
    */
   public <TView> TView getById(Class<TView> viewClass, Object id) {
-    if (Objects.isNull(id)) {
+    if (null == id) {
       return null;
     }
 
@@ -1287,13 +1290,13 @@ public abstract class AbstractOrm implements Orm {
    * @return 存在返回 {@code true}，不存在返回 {@code false}
    */
   public <TModel> boolean exists(Class<TModel> modelClass, TModel entity) {
-    if (Objects.isNull(entity)) return false;
+    if (null == entity) return false;
 
     final ClassMeta entityMeta = Metadata.entityMeta(modelClass);
     final Attribute primaryKey = entityMeta.checkPrimaryKey();
     final Object    pkVal      = primaryKey.getValue(entity);
 
-    if (Objects.isNull(pkVal)) return false;
+    if (null == pkVal) return false;
 
     final Sql existSql = this.countSql(entityMeta).where(Cond.eq(primaryKey.getColumnName(), pkVal));
     return exists(existSql);
@@ -1646,7 +1649,7 @@ public abstract class AbstractOrm implements Orm {
       values.add(DruidUtil.createParam());
     }
 
-    if (Objects.nonNull(logicDelete)) {
+    if (null != logicDelete) {
       columns.add(DruidUtil.createColumn(logicDelete.getColumnName()));
       values.add(new SQLIntegerExpr(0));
     }
@@ -1681,7 +1684,7 @@ public abstract class AbstractOrm implements Orm {
 
     for (Map.Entry<String, Attribute> entry : updateAttributes.entrySet()) {
       final Object fieldValue = entry.getValue().getValue(model);
-      if (ignoreNullValue && Objects.isNull(fieldValue)) continue;
+      if (ignoreNullValue && null == fieldValue) continue;
 
       final SQLUpdateSetItem sqlUpdateSetItem = DruidUtil.createUpdateSetItem(entry.getValue().getColumnName());
       updateStatement.addItem(sqlUpdateSetItem);

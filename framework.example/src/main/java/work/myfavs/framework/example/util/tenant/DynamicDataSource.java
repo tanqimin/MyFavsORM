@@ -10,7 +10,6 @@ import work.myfavs.framework.orm.util.common.StringUtil;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -18,9 +17,9 @@ import java.util.Properties;
  */
 public class DynamicDataSource extends AbstractRoutingDataSource {
 
-  private static Logger              logger            = LoggerFactory.getLogger(DynamicDataSource.class);
-  private static Map<Object, Object> targetDataSources = new HashMap<>();
-  public static  Properties          connectProperties = null;
+  private static final Logger              logger            = LoggerFactory.getLogger(DynamicDataSource.class);
+  private static       Map<Object, Object> targetDataSources = new HashMap<>();
+  public static        Properties          connectProperties = null;
 
   @Override
   protected Object determineCurrentLookupKey() {
@@ -55,7 +54,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
     if (isExistDataSource(name)) return true;
 
     DruidDataSource ds = new DruidDataSource();
-    if (Objects.nonNull(DynamicDataSource.connectProperties))
+    if (null != DynamicDataSource.connectProperties)
       ds.setConnectProperties(DynamicDataSource.connectProperties);
     ds.setDriverClassName(tenant.getJdbcClass());
     ds.setUrl(tenant.getJdbcUrl());

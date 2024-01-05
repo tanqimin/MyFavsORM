@@ -15,7 +15,7 @@ public class EnumPropertyHandler extends PropertyHandler<Object> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public Object convert(ResultSet rs, int columnIndex, Class clazz) throws SQLException {
+  public Object convert(ResultSet rs, int columnIndex, @SuppressWarnings("rawtypes") Class clazz) throws SQLException {
 
     String val = rs.getString(columnIndex);
     if (StringUtil.isEmpty(val)) return null;

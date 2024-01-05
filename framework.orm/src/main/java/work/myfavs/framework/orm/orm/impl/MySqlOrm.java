@@ -11,7 +11,6 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.util.common.DruidUtil;
 
 import java.util.Collection;
-import java.util.Objects;
 
 /**
  * Orm MySql实现
@@ -40,7 +39,7 @@ public class MySqlOrm extends AbstractOrm {
     SQLSelectQueryBlock queryBlock = (SQLSelectQueryBlock) select.getQuery();
     SQLLimit            sqlLimit   = queryBlock.getLimit();
 
-    if (Objects.isNull(sqlLimit)) {
+    if (null == sqlLimit) {
       sqlLimit = new SQLLimit();
       queryBlock.setLimit(sqlLimit);
     }

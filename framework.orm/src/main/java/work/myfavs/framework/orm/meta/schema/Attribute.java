@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Objects;
 
 /**
  * 数据库列元数据
@@ -117,18 +116,18 @@ public class Attribute implements Serializable {
    */
   static Attribute createInstance(Field field) {
 
-    if (Objects.isNull(field.getAnnotation(Column.class)))
+    if (null == field.getAnnotation(Column.class))
       return null;
 
     return new Attribute(field);
   }
 
   private static boolean isPrimaryKey(Field field) {
-    return Objects.nonNull(field.getAnnotation(PrimaryKey.class));
+    return null != field.getAnnotation(PrimaryKey.class);
   }
 
   private static boolean isLogicDelete(Field field) {
-    return Objects.nonNull(field.getAnnotation(LogicDelete.class));
+    return null != field.getAnnotation(LogicDelete.class);
   }
 
   public <TModel> void setValue(TModel model, ResultSet rs, int columnIndex) throws SQLException {

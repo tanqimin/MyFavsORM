@@ -1,9 +1,10 @@
 package work.myfavs.framework.orm.meta.annotation;
 
+import work.myfavs.framework.orm.meta.enumeration.Operator;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.RetentionPolicy;
-import work.myfavs.framework.orm.meta.enumeration.Operator;
 
 /** 用于构造查询条件 */
 @java.lang.annotation.Inherited

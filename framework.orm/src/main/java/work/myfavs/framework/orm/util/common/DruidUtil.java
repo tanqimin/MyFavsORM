@@ -7,10 +7,9 @@ import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.util.JdbcConstants;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.util.List;
-
-import work.myfavs.framework.orm.util.exception.DBException;
 
 public class DruidUtil {
   public static com.alibaba.druid.DbType convert(String dbType) {

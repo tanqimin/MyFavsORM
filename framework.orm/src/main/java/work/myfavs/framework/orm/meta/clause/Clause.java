@@ -1,7 +1,7 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.util.ArrayList;
@@ -13,9 +13,9 @@ import java.util.List;
  */
 public abstract class Clause {
 
-  protected static String        SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
-  protected        StringBuilder sql;
-  protected        List<Object>  params;
+  protected static final String        SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
+  protected              StringBuilder sql;
+  protected              List<Object>  params;
 
   // region Getter && Setter
   public StringBuilder getSql() {

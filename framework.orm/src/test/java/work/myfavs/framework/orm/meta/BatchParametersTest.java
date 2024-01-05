@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 
 public class BatchParametersTest {
 
-  BatchParameters batchParameters = new BatchParameters();
+  final BatchParameters batchParameters = new BatchParameters();
 
   @Test
   public void getCurrentBatchParameters() {

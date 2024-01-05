@@ -34,7 +34,7 @@ public class SqlLog {
 
   public void showParams(BatchParameters batchParameters) {
     if (!this.showSql) return;
-    if (Objects.isNull(batchParameters) || batchParameters.isEmpty()) return;
+    if (null == batchParameters || batchParameters.isEmpty()) return;
 
     log.debug(TITLE_PAR);
     if (batchParameters.isBatch()) {
@@ -112,7 +112,7 @@ public class SqlLog {
   }
 
   private String format(Object param) {
-    if (Objects.isNull(param)) return "null";
+    if (null == param) return "null";
     if (param instanceof Number) return param.toString();
     if (param instanceof Date) return String.format("'%s'", Constant.DATE_FORMATTER.format(param));
     if (param instanceof Parameters) return CollectionUtil.join(((Parameters) param).getParameters().values(), Constant.SYMBOL_COMMA, this::format);

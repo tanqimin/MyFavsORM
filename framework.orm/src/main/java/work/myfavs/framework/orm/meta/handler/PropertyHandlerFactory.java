@@ -8,7 +8,6 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 public class PropertyHandlerFactory {
@@ -74,7 +73,7 @@ public class PropertyHandlerFactory {
     String clazzName = clazz.getName();
 
     PropertyHandler<?> propertyHandler = HANDLER_MAP.get(clazzName);
-    if (Objects.nonNull(propertyHandler)) return propertyHandler;
+    if (null != propertyHandler) return propertyHandler;
 
     if (clazz.isEnum()) {
       HANDLER_MAP.put(clazzName, ENUM_PROPERTY_HANDLER);

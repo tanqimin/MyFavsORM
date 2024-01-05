@@ -14,7 +14,6 @@ import work.myfavs.framework.example.util.tenant.DynamicDataSourceContextHolder;
 import work.myfavs.framework.orm.util.common.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
 
 @Component
 @Aspect
@@ -30,7 +29,7 @@ public class DataSourceAspect {
   public void before(JoinPoint joinPoint) {
     ServletRequestAttributes attributes =
         (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-    if (Objects.isNull(attributes)) return;
+    if (null == attributes) return;
     HttpServletRequest request = attributes.getRequest();
     // 租户标识
     String sign = request.getHeader("tenant-name");

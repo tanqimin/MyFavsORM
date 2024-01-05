@@ -1,8 +1,8 @@
 package work.myfavs.framework.orm.meta.schema;
 
 
-import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.util.*;

@@ -35,7 +35,7 @@ public class SqlLogTest {
     log.debug("use : {}", stop - start);
   }
 
-  class Person {
+  static class Person {
 
     private String name;
     private int    age;

@@ -10,7 +10,6 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.util.common.DruidUtil;
 
 import java.util.Collection;
-import java.util.Objects;
 
 /**
  * Orm SqlServer实现 2012或以上版本
@@ -33,7 +32,7 @@ public class SqlServer2012Orm extends SqlServerOrm {
     SQLServerSelectQueryBlock queryBlock =
         (SQLServerSelectQueryBlock) selectStmt.getSelect().getQuery();
 
-    if (Objects.isNull(queryBlock.getOrderBy())) {
+    if (null == queryBlock.getOrderBy()) {
       queryBlock.setOrderBy(new SQLOrderBy(SQLUtils.toSQLExpr("CURRENT_TIMESTAMP")));
     }
 

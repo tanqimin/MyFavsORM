@@ -22,8 +22,8 @@ import java.io.Serializable;
  * <p>
  * 并且可以通过生成的id反推出生成时间,datacenterId和workerId
  * <p>
- * 参考：http://www.cnblogs.com/relucent/p/4955340.html<br>
- * 关于长度是18还是19的问题见：https://blog.csdn.net/unifirst/article/details/80408050
+ * 参考：<a href="http://www.cnblogs.com/relucent/p/4955340.html">...</a><br>
+ * 关于长度是18还是19的问题见：<a href="https://blog.csdn.net/unifirst/article/details/80408050">...</a>
  *
  * @author Looly
  * @since 3.0.1
@@ -35,11 +35,11 @@ public class Snowflake implements Serializable {
   /**
    * 默认的起始时间，为Thu, 04 Nov 2010 01:42:54 GMT
    */
-  public static long DEFAULT_TWEPOCH     = 1288834974657L;
+  public static final long DEFAULT_TWEPOCH     = 1288834974657L;
   /**
    * 默认回拨时间，2S
    */
-  public static long DEFAULT_TIME_OFFSET = 2000L;
+  public static final long DEFAULT_TIME_OFFSET = 2000L;
 
   private static final long WORKER_ID_BITS       = 5L;
   // 最大支持机器节点数0~31，一共32个

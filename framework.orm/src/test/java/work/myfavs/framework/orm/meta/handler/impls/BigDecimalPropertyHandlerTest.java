@@ -1,8 +1,9 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
+import org.junit.Test;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import org.junit.Test;
 
 public class BigDecimalPropertyHandlerTest {
 

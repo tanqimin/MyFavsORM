@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 数据库类型转换
@@ -61,7 +60,7 @@ public class DBConvert {
         
         String    columnLabel = metaData.getColumnLabel(columnIndex).toUpperCase();
         Attribute attr        = attributes.get(columnLabel);
-        if (Objects.isNull(attr)) continue;
+        if (null == attr) continue;
         attr.setValue(model, rs, columnIndex);
       }
       result.add(model);

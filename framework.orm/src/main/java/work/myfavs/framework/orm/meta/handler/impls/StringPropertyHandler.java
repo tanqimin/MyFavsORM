@@ -22,7 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Objects;
 
 public class StringPropertyHandler extends PropertyHandler<String> {
 
@@ -35,7 +34,7 @@ public class StringPropertyHandler extends PropertyHandler<String> {
   public String convert(ResultSet rs, int columnIndex, Class<String> clazz) throws SQLException {
 
     Object val = rs.getObject(columnIndex);
-    if (Objects.isNull(val)) {
+    if (null == val) {
       return null;
     }
 

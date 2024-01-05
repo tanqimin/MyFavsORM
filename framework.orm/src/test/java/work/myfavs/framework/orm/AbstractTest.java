@@ -6,13 +6,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
-import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.common.IOUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class AbstractTest {
   protected static final String DB_TYPE       = DbType.SQL_SERVER;
@@ -31,7 +30,7 @@ public class AbstractTest {
   protected static Database database;
 
   private static void initDBTemplate() {
-    if (Objects.isNull(dbTemplate)) {
+    if (null == dbTemplate) {
       HikariConfig configuration = new HikariConfig();
       configuration.setDriverClassName(DRIVER_CLASS);
       configuration.setJdbcUrl(JDBC_URL);
@@ -70,7 +69,7 @@ public class AbstractTest {
   }
 
   private static void initDatabase() {
-    if (Objects.isNull(database)) {
+    if (null == database) {
       database = dbTemplate.createDatabase();
     }
   }
