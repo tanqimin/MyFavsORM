@@ -118,7 +118,7 @@ public class SqlServerOrm extends AbstractOrm {
     Collection<Attribute> updateAttributes = entityMeta.getUpdateAttributes(columns);
 
     if (updateAttributes.isEmpty())
-      throw new DBException("Could not match update attributes.");
+      throw new DBException("不能匹配到标记为可更新的属性Attribute.");
 
     String tableName = getTableName(entityMeta);
 

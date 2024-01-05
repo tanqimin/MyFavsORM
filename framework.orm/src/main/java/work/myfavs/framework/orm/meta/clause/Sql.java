@@ -2,6 +2,7 @@ package work.myfavs.framework.orm.meta.clause;
 
 
 import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
@@ -153,7 +154,7 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql appendLine(Sql sql) {
 
-    return this.append(sql).append(System.lineSeparator());
+    return this.append(sql).append(Constant.LINE_SEPARATOR);
   }
 
   /**
@@ -163,7 +164,7 @@ public class Sql extends Clause implements Serializable {
    * @return 拼接后的 SQL
    */
   public Sql appendLine(Cond cond) {
-    return this.append(cond).append(System.lineSeparator());
+    return this.append(cond).append(Constant.LINE_SEPARATOR);
   }
 
   /**
@@ -174,7 +175,7 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql appendLine(String sql) {
 
-    return this.append(sql).append(System.lineSeparator());
+    return this.append(sql).append(Constant.LINE_SEPARATOR);
   }
 
   /**
@@ -187,7 +188,7 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql appendLine(String sql, Object param, Object... params) {
 
-    return this.append(sql, param, params).append(System.lineSeparator());
+    return this.append(sql, param, params).append(Constant.LINE_SEPARATOR);
   }
 
   /**
@@ -199,7 +200,7 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql appendLine(String sql, Collection<?> params) {
 
-    return this.append(sql, params).append(System.lineSeparator());
+    return this.append(sql, params).append(Constant.LINE_SEPARATOR);
   }
 
   /**
@@ -689,7 +690,7 @@ public class Sql extends Clause implements Serializable {
    */
   public Sql orderBy(String field, String... fields) {
 
-    if (StringUtil.isEmpty(field)) throw new DBException("参数 field 不能为空");
+    if (StringUtil.isEmpty(field)) throw new DBException("调用 orderBy 方法时需至少传入一个排序字段.");
 
     final String orderByField = checkInjection(field);
 

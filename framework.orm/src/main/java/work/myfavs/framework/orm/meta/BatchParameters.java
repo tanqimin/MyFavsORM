@@ -54,7 +54,7 @@ public class BatchParameters {
         }
       }
     } catch (SQLException ex) {
-      throw new DBException(ex, "Error apply batch parameters: %s", ex.getMessage());
+      throw new DBException(ex, "设置批量参数时发生异常: %s", ex.getMessage());
     }
   }
 

@@ -1,6 +1,7 @@
 package work.myfavs.framework.orm.meta.clause;
 
 import org.junit.Test;
+import work.myfavs.framework.orm.util.common.Constant;
 
 import java.util.List;
 
@@ -66,34 +67,34 @@ public class SqlTest {
   @Test
   public void appendLine() {
     Sql sql = new Sql().appendLine("SELECT ?");
-    assertEquals("SELECT ?".concat(System.lineSeparator()), sql.toString());
+    assertEquals("SELECT ?".concat(Constant.LINE_SEPARATOR), sql.toString());
   }
 
   @Test
   public void testAppendLine() {
     Sql sql = new Sql().appendLine(Cond.eq("id", 1));
-    assertEquals(" id = ?".concat(System.lineSeparator()), sql.toString());
+    assertEquals(" id = ?".concat(Constant.LINE_SEPARATOR), sql.toString());
     assertEquals(1, sql.params.size());
   }
 
   @Test
   public void testAppendLine1() {
     Sql sql = new Sql().appendLine(new Sql("SELECT ?", 1));
-    assertEquals("SELECT ?".concat(System.lineSeparator()), sql.toString());
+    assertEquals("SELECT ?".concat(Constant.LINE_SEPARATOR), sql.toString());
     assertEquals(1, sql.params.size());
   }
 
   @Test
   public void testAppendLine2() {
     Sql sql = new Sql().appendLine("SELECT ?,?,?", 1, 2, 3);
-    assertEquals("SELECT ?,?,?".concat(System.lineSeparator()), sql.toString());
+    assertEquals("SELECT ?,?,?".concat(Constant.LINE_SEPARATOR), sql.toString());
     assertEquals(3, sql.params.size());
   }
 
   @Test
   public void testAppendLine3() {
     Sql sql = new Sql().appendLine("SELECT ?,?,?", List.of(1, 2, 3));
-    assertEquals("SELECT ?,?,?".concat(System.lineSeparator()), sql.toString());
+    assertEquals("SELECT ?,?,?".concat(Constant.LINE_SEPARATOR), sql.toString());
     assertEquals(3, sql.params.size());
   }
 

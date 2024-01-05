@@ -1,5 +1,6 @@
 package work.myfavs.framework.orm.util.reflection;
 
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.lang.reflect.Constructor;
@@ -56,19 +57,26 @@ public class ReflectUtil {
     try {
       return (T) field.get(entity);
     } catch (IllegalAccessException e) {
-      throw new DBException(e, "could not get field %s on class %s", field.getName(), entity.getClass().toString());
+      throw new DBException(e, "从类型 %s 中获取 %s 字段时发生异常: %s",
+                            field.getName(),
+                            StringUtil.toStr(entity.getClass()),
+                            e.getMessage());
     }
   }
 
   public static void setFieldValue(Field field, Object entity, Object value) {
     if (Objects.isNull(value) && field.getType().isPrimitive()) {
-      return; // dont try set null to a primitive field
+      return; // 基础类型不能设置null值
     }
 
     try {
       field.set(entity, value);
     } catch (IllegalAccessException e) {
-      throw new DBException(e, "could not set field %s on class %s", field.getName(), entity.getClass().toString());
+      throw new DBException(e, "从类型 %s 中对 %s 字段赋值为 %s 时发生异常: %s",
+                            field.getName(),
+                            StringUtil.toStr(entity.getClass()),
+                            StringUtil.toStr(value),
+                            e.getMessage());
     }
   }
 
@@ -77,7 +85,7 @@ public class ReflectUtil {
     try {
       return clazz.getDeclaredConstructor(parameterTypes);
     } catch (NoSuchMethodException e) {
-      throw new DBException("Error get constructor: %s", clazz.getName());
+      throw new DBException(e, "获取 %s 类型的构造方法时发生异常: %s", clazz.getName(), e.getMessage());
     }
   }
 
@@ -89,7 +97,7 @@ public class ReflectUtil {
         return (T) getConstructor(clazz).newInstance();
       return (T) getConstructor(clazz, getClasses(params)).newInstance(params);
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new DBException("Error create instance for class: %s", clazz.getName());
+      throw new DBException(e, "创建 %s 类型实例时发生异常: %s", clazz.getName(), e.getMessage());
     }
   }
 

@@ -31,6 +31,6 @@ public class Metadata {
     ClassMeta classMeta = classMeta(clazz);
     if (classMeta.isEntity())
       return classMeta;
-    throw new DBException("Class %s is not an entity class", clazz.getName());
+    throw new DBException("类型 %s 不是实体类, 实体类必须使用 @Table 注释. ", clazz.getName());
   }
 }

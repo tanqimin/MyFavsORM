@@ -2,6 +2,7 @@ package work.myfavs.framework.orm.meta;
 
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.sql.PreparedStatement;
@@ -25,7 +26,7 @@ public class Parameters {
 
   public void addParameter(int paramIndex, Object param) {
     if (parameters.containsKey(paramIndex))
-      throw new DBException("Error adding parameter: error index %d", paramIndex);
+      throw new DBException("设置参数 %s 时出现异常: 参数索引 %d 已存在! ", StringUtil.toStr(param), paramIndex);
 
     parameters.put(paramIndex, param);
   }
@@ -54,7 +55,7 @@ public class Parameters {
               .addParameter(statement, paramIndex, value);
       }
     } catch (SQLException ex) {
-      throw new DBException(ex, "Error apply parameters: %s", ex.getMessage());
+      throw new DBException(ex, "设置参数时发生异常: %s", ex.getMessage());
     }
   }
 

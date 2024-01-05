@@ -14,10 +14,9 @@ public class SqlLog {
 
   private static final Logger log = LoggerFactory.getLogger(SqlLog.class);
 
-  private static final String LINE_SEPARATOR = System.lineSeparator();
-  private static final String TITLE_SQL      = "---------------------- SQL --------------------------------";
-  private static final String TITLE_PAR      = "---------------------- PARAMETERS -------------------------";
-  private static final String TITLE_RES      = "---------------------- QUERY RESULTS ----------------------";
+  private static final String TITLE_SQL      = "---------------------- SQL语句 ----------------------";
+  private static final String TITLE_PAR      = "---------------------- SQL参数 ----------------------";
+  private static final String TITLE_RES      = "---------------------- 查询结果 ----------------------";
 
   private final boolean showSql;
   private final boolean showResult;
@@ -30,7 +29,7 @@ public class SqlLog {
   public void showSql(String sql) {
     if (!this.showSql) return;
 
-    log.debug(TITLE_SQL.concat(LINE_SEPARATOR).concat(sql));
+    log.debug(TITLE_SQL.concat(Constant.LINE_SEPARATOR).concat(sql));
   }
 
   public void showParams(BatchParameters batchParameters) {
@@ -57,9 +56,9 @@ public class SqlLog {
     if (!this.showResult) return;
 
     if (Math.abs(result) > 1)
-      log.debug("Executed successfully, affected {} rows", result);
+      log.debug("语句执行成功, {} 行受影响. ", result);
     else
-      log.debug("Executed successfully.");
+      log.debug("语句执行成功. ");
   }
 
   public <TView> void showResult(Class<TView> viewClass, List<TView> result) {
@@ -72,7 +71,7 @@ public class SqlLog {
     } else {
       showEntities(viewClass, result);
     }
-    log.debug(String.format("Query results : %d rows", result.size()));
+    log.debug(String.format("查询执行成功, %d 行受影响. ", result.size()));
   }
 
   public void showResult(String format, Object... arguments) {
@@ -84,9 +83,9 @@ public class SqlLog {
     ClassMeta             classMeta  = Metadata.classMeta(viewClass);
     Collection<Attribute> attributes = classMeta.getQueryAttributes().values();
     log.debug(TITLE_RES);
-    log.debug(this.formatAttribuiteName(attributes));
+    log.debug(this.formatAttrName(attributes));
     for (TView tView : result) {
-      log.debug(this.formatAttribuiteValue(tView, attributes));
+      log.debug(this.formatAttrValue(tView, attributes));
     }
   }
 
@@ -116,23 +115,23 @@ public class SqlLog {
     if (Objects.isNull(param)) return "null";
     if (param instanceof Number) return param.toString();
     if (param instanceof Date) return String.format("'%s'", Constant.DATE_FORMATTER.format(param));
-    if (param instanceof Parameters) return CollectionUtil.join(((Parameters) param).getParameters().values(), ", ", this::format);
+    if (param instanceof Parameters) return CollectionUtil.join(((Parameters) param).getParameters().values(), Constant.SYMBOL_COMMA, this::format);
     return String.format("'%s'", param);
   }
 
-  private String formatAttribuiteName(Collection<Attribute> attributes) {
-    return CollectionUtil.join(attributes, ", ", Attribute::getColumnName);
+  private String formatAttrName(Collection<Attribute> attributes) {
+    return CollectionUtil.join(attributes, Constant.SYMBOL_COMMA, Attribute::getColumnName);
   }
 
-  private <TView> String formatAttribuiteValue(TView tView, Collection<Attribute> attributes) {
-    return CollectionUtil.join(attributes, ", ", attribute -> format(attribute.getValue(tView)));
+  private <TView> String formatAttrValue(TView tView, Collection<Attribute> attributes) {
+    return CollectionUtil.join(attributes, Constant.SYMBOL_COMMA, attribute -> format(attribute.getValue(tView)));
   }
 
   private String formatRecordKeySet(Record record) {
-    return CollectionUtil.join(record.keySet(), ", ", str -> str);
+    return CollectionUtil.join(record.keySet(), Constant.SYMBOL_COMMA, str -> str);
   }
 
   private String formatRecordValues(Record record) {
-    return CollectionUtil.join(record.values(), ", ", this::format);
+    return CollectionUtil.join(record.values(), Constant.SYMBOL_COMMA, this::format);
   }
 }

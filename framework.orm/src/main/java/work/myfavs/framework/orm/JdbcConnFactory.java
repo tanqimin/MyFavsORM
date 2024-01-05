@@ -72,7 +72,7 @@ public class JdbcConnFactory extends ConnFactory {
     try {
       return dataSource.getConnection();
     } catch (SQLException e) {
-      throw new DBException(e, "Could not get connection from datasource, error message: ");
+      throw new DBException(e, "从数据源中获取数据库连接时发生异常: %s", e.getMessage());
     }
   }
 
@@ -90,7 +90,7 @@ public class JdbcConnFactory extends ConnFactory {
         conn.commit();
       }
     } catch (SQLException e) {
-      throw new DBException(e, "Fail to committed transaction");
+      throw new DBException(e, "提交事务时发生异常: %s", e.getMessage());
     } finally {
       closeConn(conn);
     }
@@ -100,7 +100,7 @@ public class JdbcConnFactory extends ConnFactory {
     try {
       conn.close();
     } catch (SQLException e) {
-      throw new DBException(e, "Fail to close connection");
+      throw new DBException(e, "关闭数据库连接时发生异常: %s", e.getMessage());
     }
   }
 }

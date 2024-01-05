@@ -73,7 +73,7 @@ public abstract class Clause {
 
   protected static String checkInjection(String sql) {
     if (StringUtil.isNotEmpty(sql) && !sql.matches(SQL_PATTERN)) {
-      throw new DBException("参数 %s 存在非法字符串", sql);
+      throw new DBException("参数 %s 中的内容存在注入风险, 请检查!", sql);
     }
 
     return sql;

@@ -30,4 +30,8 @@ public interface Constant {
   String FUZZY_SINGLE = "_";
 
   String FUZZY_ESCAPE = "¦";
+
+  String SYMBOL_COMMA = ",";
+
+  String LINE_SEPARATOR = System.lineSeparator();
 }

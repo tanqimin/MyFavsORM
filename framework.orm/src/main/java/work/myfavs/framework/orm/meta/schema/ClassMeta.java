@@ -182,7 +182,7 @@ public class ClassMeta {
     try {
       return (T) this.modelConstructor.newInstance();
     } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-      throw new DBException("Error create model instance: %s", e.getMessage());
+      throw new DBException("创建实体实例时发生异常: %s", e.getMessage());
     }
   }
 
@@ -194,7 +194,7 @@ public class ClassMeta {
   public Attribute checkPrimaryKey() {
 
     if (Objects.isNull(primaryKey)) {
-      throw new DBException("The view class [%s] could not contain primary key", this.clazz.getName());
+      throw new DBException("类型 %s 中没有发现使用 @PrimaryKey 注释标记的主键字段", this.clazz.getName());
     }
     return primaryKey;
   }

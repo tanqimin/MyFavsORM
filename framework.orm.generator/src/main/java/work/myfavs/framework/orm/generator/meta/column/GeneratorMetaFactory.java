@@ -24,7 +24,7 @@ public abstract class GeneratorMetaFactory {
     if (DbType.MYSQL.equals(dbType)) {
       generatorMetaFactory = new MySQLGeneratorMetaFactory(generatorConfig);
     } else {
-      throw new DBException("%s database is not supported.", dbType);
+      throw new DBException("不支持的数据库类型: %s. ", dbType);
     }
     generatorMetaFactory.generatorConfig = generatorConfig;
     return generatorMetaFactory;

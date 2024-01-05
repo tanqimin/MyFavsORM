@@ -417,9 +417,9 @@ public abstract class AbstractOrm implements Orm {
           pkVal = pkGenerator.nextUUID();
           break;
         case ASSIGNED:
-          throw new DBException("Assigned ID can not be null.");
+          throw new DBException("使用 ASSIGNED 主键策略时，必须要为主键赋值.");
         default:
-          throw new DBException("Can not generate ID value.");
+          throw new DBException("自动生成主键失败.");
       }
 
       primaryKey.setValue(entity, pkVal);
@@ -527,7 +527,7 @@ public abstract class AbstractOrm implements Orm {
     final Collection<Attribute> updAttrs    = entityMeta.getUpdateAttributes(columns);
 
     if (updAttrs.isEmpty()) {
-      throw new DBException("Could not match update attributes.");
+      throw new DBException("不能匹配到标记为可更新的属性Attribute.");
     }
 
     final int                batchSize = this.database.getDbConfig().getBatchSize();

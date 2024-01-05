@@ -39,7 +39,7 @@ public class ConvertUtil {
       return (Collection<?>) object;
     }
 
-    throw new DBException("The argument (Type: %s) can't convert to Collection", object.getClass().getName());
+    throw new DBException("不能把类型 %s 转换为 Collection. ", object.getClass().getName());
   }
 
   /**
@@ -66,7 +66,7 @@ public class ConvertUtil {
         return clazz.isPrimitive() ? numberFunc.apply(0) : null;
       return stringFunc.apply(str);
     }
-    throw new DBException("Cannot convert type %s to %s.", value.getClass().getName(), clazz.getName());
+    throw new DBException("不能把类型 %s 转换为 %s. ", value.getClass().getName(), clazz.getName());
   }
 
   /**
@@ -173,7 +173,7 @@ public class ConvertUtil {
           "T".equalsIgnoreCase(strVal) || "J".equalsIgnoreCase(strVal);
     }
 
-    throw new DBException("Don't know how to convert type %s to %s", value.getClass().getName(), Boolean.class.getName());
+    throw new DBException("不能把类型 %s 转换为 %s. ", value.getClass().getName(), Boolean.class.getName());
   }
 
   /**
@@ -199,7 +199,7 @@ public class ConvertUtil {
     try {
       return Enum.valueOf(clazz, str);
     } catch (IllegalArgumentException e) {
-      throw new DBException("Cannot convert type %s to enum: %s", value.getClass(), clazz.getName());
+      throw new DBException("不能把类型 %s 转换为枚举 %s. ", value.getClass(), clazz.getName());
     }
   }
 
@@ -229,7 +229,7 @@ public class ConvertUtil {
     if (clazz.isInstance(value)) return (T) value;
     if (value instanceof Date) return dateFunction.apply(((Date) value).getTime());
     if (value instanceof Number) return dateFunction.apply(((Number) value).longValue());
-    throw new DBException("Cannot convert type %s to java.util.Date", value.getClass());
+    throw new DBException("不能把类型 %s 转换为 java.util.Date. ", value.getClass());
   }
 
   /**
@@ -260,6 +260,6 @@ public class ConvertUtil {
       return UUID.fromString(str);
     }
 
-    throw new DBException("Cannot convert type %s to %s.", value.getClass().getName(), UUID.class.getName());
+    throw new DBException("不能把类型 %s 转换为 %s. ", value.getClass().getName(), UUID.class.getName());
   }
 }

@@ -31,7 +31,7 @@ public class DBTemplate {
     if (POOL.containsKey(dsName)) {
       return POOL.get(dsName);
     }
-    throw new DBException("The DataSource named %s not exists.", dsName);
+    throw new DBException("数据源 %s 不存在.", dsName);
   }
 
   public static DBTemplate add(String dsName, DBTemplate dbTemplate) {
@@ -153,7 +153,7 @@ public class DBTemplate {
       Constructor<? extends ConnFactory> constructor = cls.getDeclaredConstructor(DataSource.class);
       return constructor.newInstance(dataSource);
     } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-      throw new DBException("Error create ConnFactory instance : %s", e.getMessage());
+      throw new DBException("创建 ConnFactory 实例时发生异常: %s", e.getMessage());
     }
   }
 

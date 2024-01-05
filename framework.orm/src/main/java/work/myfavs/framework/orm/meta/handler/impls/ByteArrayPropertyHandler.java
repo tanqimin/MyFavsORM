@@ -34,7 +34,7 @@ public class ByteArrayPropertyHandler extends PropertyHandler<byte[]> {
           }
         }
       } catch (SQLException | IOException e) {
-        throw new DBException(e, "Error converting Blob to byte[]");
+        throw new DBException(e, "转换 Blob 到 byte[] 时发生异常: %s", e.getMessage());
       }
     }
 
@@ -42,7 +42,7 @@ public class ByteArrayPropertyHandler extends PropertyHandler<byte[]> {
       return (byte[]) val;
     }
 
-    throw new DBException("could not convert %s to byte[]", val.getClass().getName());
+    throw new DBException("不能把 %s 类型转换成 byte[] 类型", val.getClass().getName());
   }
 
   @Override

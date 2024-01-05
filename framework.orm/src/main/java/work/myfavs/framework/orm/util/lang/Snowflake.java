@@ -63,13 +63,13 @@ public class Snowflake implements Serializable {
   /**
    * 初始化时间点
    */
-  private final long    twepoch;
-  private final long    workerId;
-  private final long    dataCenterId;
+  private final long twepoch;
+  private final long workerId;
+  private final long dataCenterId;
   /**
    * 允许的时钟回拨毫秒数
    */
-  private final long    timeOffset;
+  private final long timeOffset;
 
 
   /**
@@ -93,10 +93,9 @@ public class Snowflake implements Serializable {
   }
 
 
-
   private static long checkBetween(long value, long min, long max) {
     if (value > min && value < max) return value;
-    throw new DBException("Value must between %d and %d .", min, max);
+    throw new DBException("值必须在 %d 和 %d 的范围内. ", min, max);
   }
 
   /**

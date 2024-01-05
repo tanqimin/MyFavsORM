@@ -189,6 +189,6 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
       }
     }
 
-    throw new DBException("%s type is not registered.", dataType);
+    throw new DBException("类型 %s 未注册. ", dataType);
   }
 }

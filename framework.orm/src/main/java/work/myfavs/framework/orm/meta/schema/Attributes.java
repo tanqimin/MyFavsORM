@@ -32,7 +32,7 @@ public class Attributes {
   public Attribute getAttribute(String columnName) {
 
     if (StringUtil.isEmpty(columnName))
-      throw new DBException("Column name can not be empty");
+      throw new DBException("数据库字段名不能为空! ");
 
     return map.get(columnName.toUpperCase());
   }
@@ -63,7 +63,7 @@ public class Attributes {
   public Attribute put(String columnName, Attribute value) {
 
     if (StringUtil.isEmpty(columnName))
-      throw new DBException("Column name can not be empty");
+      throw new DBException("数据库字段名不能为空! ");
 
     Objects.requireNonNull(value);
 
@@ -83,7 +83,7 @@ public class Attributes {
   public boolean containsColumn(String columnName) {
 
     if (StringUtil.isEmpty(columnName))
-      throw new DBException("Column name can not be empty");
+      throw new DBException("数据库字段名不能为空! ");
 
     return map.containsKey(columnName.toUpperCase());
   }

@@ -32,7 +32,7 @@ public class OrmFactory {
       case DbType.H2:
         return new H2Orm(database);
       default:
-        throw new DBException("%s database is not supported.", dbType);
+        throw new DBException("暂时不支持 %s 数据库.", dbType);
     }
   }
 }

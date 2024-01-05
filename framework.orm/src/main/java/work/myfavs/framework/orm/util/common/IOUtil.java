@@ -63,13 +63,13 @@ public class IOUtil {
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
         String line;
         while ((line = reader.readLine()) != null) {
-          content.append(line).append(System.lineSeparator());
+          content.append(line).append(Constant.LINE_SEPARATOR);
         }
       }
 
       return content.toString();
     } catch (IOException e) {
-      throw new DBException(e, "Error read file in path: %s, message: %s", filePath, e.getMessage());
+      throw new DBException(e, "读取文件(%s)时发生异常: %s", filePath, e.getMessage());
     }
   }
 }

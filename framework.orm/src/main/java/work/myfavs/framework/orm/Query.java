@@ -96,7 +96,7 @@ public class Query implements Closeable {
           this.preparedStatement = this.database.getConnection().prepareStatement(this.sql);
       }
     } catch (SQLException e) {
-      throw new DBException(e, "Error preparing statement: %s", e.getMessage());
+      throw new DBException(e, "创建 preparedStatement 时发生异常: %s", e.getMessage());
     }
     return this.preparedStatement;
   }
@@ -152,7 +152,7 @@ public class Query implements Closeable {
     try (final ResultSet resultSet = this.execQuery(preparedStatement)) {
       return this.convertToList(modelClass, resultSet);
     } catch (SQLException ex) {
-      throw new DBException(ex, "Error execute query: %s", ex.getMessage());
+      throw new DBException(ex, "执行 executeQuery 查询时发生异常: %s", ex.getMessage());
     } finally {
       this.clearParameters();
     }
@@ -190,7 +190,7 @@ public class Query implements Closeable {
       this.generatedKeys(preparedStatement, keysConsumer);
       return result;
     } catch (SQLException e) {
-      throw new DBException(e, "Error execute update: %s", e.getMessage());
+      throw new DBException(e, "执行 executeUpdate 查询时发生异常: %s", e.getMessage());
     } finally {
       this.clearParameters();
     }
@@ -228,7 +228,7 @@ public class Query implements Closeable {
       this.generatedKeys(preparedStatement, keysConsumer);
       return result;
     } catch (SQLException e) {
-      throw new DBException(e, "Error execute batch: %s", e.getMessage());
+      throw new DBException(e, "执行 executeBatch 查询时发生异常: %s", e.getMessage());
     } finally {
       this.clearParameters();
     }
@@ -264,7 +264,7 @@ public class Query implements Closeable {
       }
 
     } catch (SQLException ex) {
-      throw new DBException(ex, "Error set fetch size: %s", ex.getMessage());
+      throw new DBException(ex, "设置 fetch size 时发生异常: %s", ex.getMessage());
     }
   }
 
@@ -280,7 +280,7 @@ public class Query implements Closeable {
     ResultSet  resultSet = preparedStatement.executeQuery();
     final long end       = System.currentTimeMillis();
 
-    this.sqlLog.showResult("Query execution time : {} ms", end - start);
+    this.sqlLog.showResult("执行 executeQuery 查询消耗时间: {} ms", end - start);
     return resultSet;
   }
 
@@ -298,7 +298,7 @@ public class Query implements Closeable {
     List<TModel> result = DBConvert.toList(modelClass, resultSet);
     final long   end    = System.currentTimeMillis();
     this.sqlLog.showResult(modelClass, result);
-    this.sqlLog.showResult("ResultSet convert execution time : {} ms", end - start);
+    this.sqlLog.showResult("ResultSet 转换成 List<{}> 消耗时间: {} ms", modelClass.getSimpleName(), end - start);
     return result;
   }
 
@@ -315,7 +315,7 @@ public class Query implements Closeable {
     ResultSet  resultSet = preparedStatement.getGeneratedKeys();
     final long end       = System.currentTimeMillis();
 
-    this.sqlLog.showResult("Get generated keys execution time : {} ms", end - start);
+    this.sqlLog.showResult("生成主键消耗时间: {} ms", end - start);
     return resultSet;
   }
 
@@ -332,7 +332,7 @@ public class Query implements Closeable {
     final long end    = System.currentTimeMillis();
 
     this.sqlLog.showAffectedRows(result);
-    this.sqlLog.showResult("Execute update execution time : {} ms", end - start);
+    this.sqlLog.showResult("执行 executeUpdate 查询消耗时间: {} ms", end - start);
     return result;
   }
 
@@ -349,7 +349,7 @@ public class Query implements Closeable {
     final long end    = System.currentTimeMillis();
 
     this.sqlLog.showAffectedRows(result.length);
-    this.sqlLog.showResult("Execute update execution time : {} ms", end - start);
+    this.sqlLog.showResult("执行 executeBatch 查询消耗时间: {} ms", end - start);
     return result;
   }
 
@@ -364,7 +364,7 @@ public class Query implements Closeable {
     runnable.run();
     final long end = System.currentTimeMillis();
 
-    this.sqlLog.showResult("Generated key ResultSet convert execution time : {} ms", end - start);
+    this.sqlLog.showResult("主键 ResultSet 转换消耗时间: {} ms", end - start);
   }
 
   /**
@@ -423,7 +423,7 @@ public class Query implements Closeable {
         if (!this.preparedStatement.isClosed())
           this.preparedStatement.close();
       } catch (SQLException e) {
-        throw new DBException(e, "Error close preparedStatement: %s", e.getMessage());
+        throw new DBException(e, "关闭 preparedStatement 时发生异常: %s", e.getMessage());
       } finally {
         this.preparedStatement = null;
       }
