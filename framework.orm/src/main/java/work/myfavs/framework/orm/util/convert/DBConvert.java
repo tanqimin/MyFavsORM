@@ -57,7 +57,7 @@ public class DBConvert {
     while (rs.next()) {
       TModel model = ReflectUtil.newInstance(modelClass);
       for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-        
+
         String    columnLabel = metaData.getColumnLabel(columnIndex).toUpperCase();
         Attribute attr        = attributes.get(columnLabel);
         if (null == attr) continue;
@@ -101,6 +101,4 @@ public class DBConvert {
     }
     return list;
   }
-
-
 }

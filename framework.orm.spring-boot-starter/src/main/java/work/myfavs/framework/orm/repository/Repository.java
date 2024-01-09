@@ -5,8 +5,8 @@ import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.schema.Metadata;
+import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -26,13 +26,11 @@ public class Repository<TModel> extends Query {
    *
    * @param dbTemplate DBTemplate
    */
-  @SuppressWarnings("unchecked")
+
   public Repository(DBTemplate dbTemplate) {
 
     super(dbTemplate);
-    this.modelClass = (Class<TModel>)
-        ((ParameterizedType) this.getClass().getGenericSuperclass())
-            .getActualTypeArguments()[0];
+    this.modelClass = ReflectUtil.getGenericActualTypeArguments(this.getClass());
   }
 
   /**

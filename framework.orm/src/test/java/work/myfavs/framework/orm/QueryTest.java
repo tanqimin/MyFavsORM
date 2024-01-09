@@ -4,8 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import work.myfavs.framework.orm.entity.Identity;
-import work.myfavs.framework.orm.entity.Snowflake;
+import work.myfavs.framework.orm.entity.IdentityExample;
+import work.myfavs.framework.orm.entity.SnowflakeExample;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.entity.test.IIdentityTest;
 import work.myfavs.framework.orm.entity.test.ILogicDeleteTest;
@@ -27,7 +27,7 @@ public class QueryTest extends AbstractTest
   @Test
   public void createQuery() {
     Orm orm = database.createOrm();
-    orm.truncate(Snowflake.class);
+    orm.truncate(SnowflakeExample.class);
 
     String sql = "INSERT INTO tb_snowflake (id, created, name, disable, price , type, config) VALUES (?, ?, ?, ?, ? , ?, ?)";
     try (Query query = database.createQuery(sql)) {
@@ -39,7 +39,7 @@ public class QueryTest extends AbstractTest
       query.addParameter(6, TypeEnum.FOOD);
       query.addParameter(7, null);
       assertEquals(query.execute(), 1);
-      List<Snowflake> snowflakes = query.createQuery("SELECT * FROM tb_snowflake").find(Snowflake.class);
+      List<SnowflakeExample> snowflakes = query.createQuery("SELECT * FROM tb_snowflake").find(SnowflakeExample.class);
       assertEquals(snowflakes.size(), 1);
 
     }
@@ -48,7 +48,7 @@ public class QueryTest extends AbstractTest
   @Test
   public void testCreateQuery() {
     Orm orm = database.createOrm();
-    orm.truncate(Identity.class);
+    orm.truncate(IdentityExample.class);
 
     String sql = "INSERT INTO tb_identity (created, name, disable, price , type, config) VALUES (?, ?, ?, ? , ?, ?)";
     try (Query query = database.createQuery(sql, true)) {

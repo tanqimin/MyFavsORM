@@ -7,7 +7,7 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 @Table(
     value = "tb_logic_delete",
     strategy = GenerationType.SNOW_FLAKE)
-public class LogicDelete extends Snowflake {
+public class LogicDeleteExample extends SnowflakeExample {
 
   @Column("deleted")
   @work.myfavs.framework.orm.meta.annotation.LogicDelete

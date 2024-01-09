@@ -45,13 +45,12 @@ public class BatchParameters {
       for (Map.Entry<Integer, Parameters> entry : batchParameters.entrySet()) {
         Parameters parameters = entry.getValue();
         if (parameters.isEmpty()) continue;
-        parameters.applyParameters(statement);
 
+        parameters.applyParameters(statement);
         statement.addBatch();
-        if (batchSize > 0) {
-          if (entry.getKey() % batchSize == 0)
-            statement.executeBatch();
-        }
+
+        if (batchSize > 0 && entry.getKey() % batchSize == 0)
+          statement.executeBatch();
       }
     } catch (SQLException ex) {
       throw new DBException(ex, "设置批量参数时发生异常: %s", ex.getMessage());

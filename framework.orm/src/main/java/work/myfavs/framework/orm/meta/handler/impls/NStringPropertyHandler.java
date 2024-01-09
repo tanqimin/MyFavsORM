@@ -17,14 +17,14 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
-import work.myfavs.framework.orm.util.lang.NString;
+import work.myfavs.framework.orm.util.lang.NVarchar;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class NStringPropertyHandler extends PropertyHandler<NString> {
+public class NStringPropertyHandler extends PropertyHandler<NVarchar> {
 
 
   public NStringPropertyHandler() {
@@ -32,18 +32,18 @@ public class NStringPropertyHandler extends PropertyHandler<NString> {
   }
 
   @Override
-  public NString convert(ResultSet rs, int columnIndex, Class<NString> clazz) throws SQLException {
+  public NVarchar convert(ResultSet rs, int columnIndex, Class<NVarchar> clazz) throws SQLException {
 
     String val = rs.getNString(columnIndex);
     if (null == val) {
       return null;
     }
 
-    return new NString(val);
+    return new NVarchar(val);
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, NString param) throws SQLException {
+  public void addParameter(PreparedStatement ps, int paramIndex, NVarchar param) throws SQLException {
 
     ps.setNString(paramIndex, param.toString());
   }

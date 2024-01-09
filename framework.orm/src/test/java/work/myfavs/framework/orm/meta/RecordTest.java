@@ -3,8 +3,8 @@ package work.myfavs.framework.orm.meta;
 import org.junit.Before;
 import org.junit.Test;
 import work.myfavs.framework.orm.AbstractTest;
-import work.myfavs.framework.orm.entity.Snowflake;
-import work.myfavs.framework.orm.entity.Uuid;
+import work.myfavs.framework.orm.entity.SnowflakeExample;
+import work.myfavs.framework.orm.entity.UuidExample;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 
 import java.math.BigDecimal;
@@ -46,11 +46,11 @@ public class RecordTest extends AbstractTest {
   @Test
   public void getBean() {
     record.clear();
-    String id   = UUID.randomUUID().toString();
-    Uuid   uuid = new Uuid();
+    String      id   = UUID.randomUUID().toString();
+    UuidExample uuid = new UuidExample();
     uuid.setId(id);
     record.set("uuid", uuid);
-    assertEquals(record.<Uuid>getBean("uuid").getId(), id);
+    assertEquals(record.<UuidExample>getBean("uuid").getId(), id);
   }
 
   @Test
@@ -156,14 +156,14 @@ public class RecordTest extends AbstractTest {
   public void toBean() {
     record.clear();
     record.set("id", UUID.randomUUID().toString());
-    Uuid uuid = record.toBean(new Uuid());
+    UuidExample uuid = record.toBean(new UuidExample());
     assertNotNull(uuid);
     assertEquals(uuid.getId(), record.get("id"));
-    Uuid uuid2 = record.toBean(Uuid.class);
+    UuidExample uuid2 = record.toBean(UuidExample.class);
     assertNotNull(uuid2);
     assertEquals(uuid2.getId(), record.get("id"));
     record.set("NaMe", "Hello");
-    Uuid uuid3 = record.toBeanIgnoreCase(Uuid.class);
+    UuidExample uuid3 = record.toBeanIgnoreCase(UuidExample.class);
     assertNotNull(uuid3);
     assertEquals(uuid3.getName(), record.get("NaMe"));
   }
@@ -171,7 +171,7 @@ public class RecordTest extends AbstractTest {
   @Test
   public void toRecord() {
     record.clear();
-    Snowflake snowflake = new Snowflake();
+    SnowflakeExample snowflake = new SnowflakeExample();
     snowflake.setId(123L);
     snowflake.setName("Hello");
     snowflake.setPrice(BigDecimal.ONE);

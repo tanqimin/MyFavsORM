@@ -1,11 +1,13 @@
 package work.myfavs.framework.orm.util.reflection;
 
+import com.esotericsoftware.reflectasm.ConstructorAccess;
 import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 /**
@@ -13,7 +15,9 @@ import java.util.*;
  */
 public class ReflectUtil {
 
-  private final static Map<Class<?>, List<Field>> CLASS_CACHE = new WeakHashMap<>();
+  private final static Map<Class<?>, List<Field>>       CLASS_CACHE       = new WeakHashMap<>();
+  @SuppressWarnings("rawtypes")
+  private final static Map<Class<?>, ConstructorAccess> CONSTRUCTOR_CACHE = new WeakHashMap<>();
 
   /**
    * 获取指定类的所有 {@link Field}，并设置 Accessible 为 {@code true}
@@ -80,38 +84,57 @@ public class ReflectUtil {
     }
   }
 
-  public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... parameterTypes) {
-    Objects.requireNonNull(clazz);
-    try {
-      return clazz.getDeclaredConstructor(parameterTypes);
-    } catch (NoSuchMethodException e) {
-      throw new DBException(e, "获取 %s 类型的构造方法时发生异常: %s", clazz.getName(), e.getMessage());
+  @SuppressWarnings("unchecked")
+  public static <T> T newInstance(Class<T> clazz) {
+
+    ConstructorAccess<T> constructorAccess = CONSTRUCTOR_CACHE.get(clazz);
+    if (null == constructorAccess) {
+      constructorAccess = ConstructorAccess.get(clazz);
+      CONSTRUCTOR_CACHE.put(clazz, constructorAccess);
     }
+
+    return constructorAccess.newInstance();
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T newInstance(Class<T> clazz, Object... params) {
-
-    try {
-      if (null == params)
-        return (T) getConstructor(clazz).newInstance();
-      return (T) getConstructor(clazz, getClasses(params)).newInstance(params);
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new DBException(e, "创建 %s 类型实例时发生异常: %s", clazz.getName(), e.getMessage());
-    }
+  public static <T> Class<T> getGenericActualTypeArguments(Class<?> clazz) {
+    return (Class<T>)
+        ((ParameterizedType) clazz.getGenericSuperclass())
+            .getActualTypeArguments()[0];
   }
 
-  public static Class<?>[] getClasses(Object... objects) {
-    Class<?>[] classes = new Class<?>[objects.length];
-    Object     obj;
-    for (int i = 0; i < objects.length; i++) {
-      obj = objects[i];
-      if (null == obj) {
-        classes[i] = Object.class;
-      } else {
-        classes[i] = obj.getClass();
-      }
-    }
-    return classes;
-  }
+//  public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... parameterTypes) {
+//    Objects.requireNonNull(clazz);
+//    try {
+//      return clazz.getDeclaredConstructor(parameterTypes);
+//    } catch (NoSuchMethodException e) {
+//      throw new DBException(e, "获取 %s 类型的构造方法时发生异常: %s", clazz.getName(), e.getMessage());
+//    }
+//  }
+//
+//  @SuppressWarnings("unchecked")
+//  public static <T> T newInstance(Class<T> clazz, Object... params) {
+//
+//    try {
+//      if (null == params)
+//        return (T) getConstructor(clazz).newInstance();
+//      return (T) getConstructor(clazz, getClasses(params)).newInstance(params);
+//    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+//      throw new DBException(e, "创建 %s 类型实例时发生异常: %s", clazz.getName(), e.getMessage());
+//    }
+//  }
+//
+//  public static Class<?>[] getClasses(Object... objects) {
+//    Class<?>[] classes = new Class<?>[objects.length];
+//    Object     obj;
+//    for (int i = 0; i < objects.length; i++) {
+//      obj = objects[i];
+//      if (null == obj) {
+//        classes[i] = Object.class;
+//      } else {
+//        classes[i] = obj.getClass();
+//      }
+//    }
+//    return classes;
+//  }
 }

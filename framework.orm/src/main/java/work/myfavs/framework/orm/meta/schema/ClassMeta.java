@@ -8,9 +8,7 @@ import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -49,7 +47,7 @@ public class ClassMeta {
    */
   private       Attribute      logicDelete;
 
-  private final Constructor<?>                          modelConstructor;
+//  private final Constructor<?>                          modelConstructor;
   /**
    * 更新字段
    */
@@ -121,28 +119,27 @@ public class ClassMeta {
     this.clazz = clazz;
 
     final Table table = clazz.getAnnotation(Table.class);
+
     if (null != table) {
       this.isEntity = true;
       this.strategy = table.strategy();
       this.tableName = getTableName(table, clazz);
     }
 
-    this.modelConstructor = ReflectUtil.getConstructor(clazz);
+//    this.modelConstructor = ReflectUtil.getConstructor(clazz);
 
     final List<Field> fields = ReflectUtil.getFields(clazz);
 
     for (Field field : fields) {
+
       final Attribute attr = Attribute.createInstance(field);
-      if (null == attr) {
-        continue;
-      }
+
+      if (null == attr) continue;
 
       String columnName = attr.getColumnName().toUpperCase();
       this.queryAttributes.put(columnName, attr);
 
-      if (attr.isReadonly()) {
-        continue;
-      }
+      if (attr.isReadonly()) continue;
 
       if (attr.isPrimaryKey()) {
         this.primaryKey = attr;
@@ -175,15 +172,6 @@ public class ClassMeta {
       CLASS_META_CACHE.put(className, classMeta);
     }
     return classMeta;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> T createModel() {
-    try {
-      return (T) this.modelConstructor.newInstance();
-    } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-      throw new DBException("创建实体实例时发生异常: %s", e.getMessage());
-    }
   }
 
   /**

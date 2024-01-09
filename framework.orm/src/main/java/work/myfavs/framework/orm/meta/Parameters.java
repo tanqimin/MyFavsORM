@@ -42,16 +42,20 @@ public class Parameters {
   @SuppressWarnings("unchecked")
   public void applyParameters(PreparedStatement statement) {
     if (isEmpty()) return;
+
     try {
       for (Map.Entry<Integer, Object> entry : parameters.entrySet()) {
         Integer paramIndex = entry.getKey();
         Object  value      = entry.getValue();
-        if (null == value)
+
+        if (null == value) {
           statement.setObject(paramIndex, null);
-        else
-          PropertyHandlerFactory
-              .getInstance(value.getClass())
-              .addParameter(statement, paramIndex, value);
+          continue;
+        }
+
+        PropertyHandlerFactory
+            .getInstance(value.getClass())
+            .addParameter(statement, paramIndex, value);
       }
     } catch (SQLException ex) {
       throw new DBException(ex, "设置参数时发生异常: %s", ex.getMessage());

@@ -16,7 +16,7 @@ import work.myfavs.framework.orm.*;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.handler.impls.*;
-import work.myfavs.framework.orm.util.lang.NString;
+import work.myfavs.framework.orm.util.lang.NVarchar;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -112,7 +112,7 @@ public class TenantDataSourceConfig {
             mapper ->
                 mapper
                     .register(String.class, new StringPropertyHandler())
-                    .register(NString.class, new NStringPropertyHandler())
+                    .register(NVarchar.class, new NStringPropertyHandler())
                     .register(BigDecimal.class, new BigDecimalPropertyHandler())
                     .register(Long.class, new LongPropertyHandler())
                     .register(long.class, new LongPropertyHandler(true))

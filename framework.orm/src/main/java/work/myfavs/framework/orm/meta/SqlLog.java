@@ -14,9 +14,9 @@ public class SqlLog {
 
   private static final Logger log = LoggerFactory.getLogger(SqlLog.class);
 
-  private static final String TITLE_SQL      = "---------------------- SQL语句 ----------------------";
-  private static final String TITLE_PAR      = "---------------------- SQL参数 ----------------------";
-  private static final String TITLE_RES      = "---------------------- 查询结果 ----------------------";
+  private static final String TITLE_SQL = "---------------------- SQL语句 ----------------------";
+  private static final String TITLE_PAR = "---------------------- SQL参数 ----------------------";
+  private static final String TITLE_RES = "---------------------- 查询结果 ----------------------";
 
   private final boolean showSql;
   private final boolean showResult;
@@ -44,34 +44,44 @@ public class SqlLog {
 
         log.debug(format(parameters));
       }
-    } else {
-      Parameters parameters = batchParameters.getCurrentBatchParameters();
-      if (parameters.isEmpty()) return;
-
-      log.debug(format(parameters));
+      return;
     }
+
+    Parameters parameters = batchParameters.getCurrentBatchParameters();
+    if (parameters.isEmpty()) return;
+
+    log.debug(format(parameters));
   }
 
   public void showAffectedRows(int result) {
     if (!this.showResult) return;
 
-    if (Math.abs(result) > 1)
+    if (Math.abs(result) > 1) {
       log.debug("语句执行成功, {} 行受影响. ", result);
-    else
-      log.debug("语句执行成功. ");
+      return;
+    }
+    log.debug("语句执行成功. ");
   }
 
   public <TView> void showResult(Class<TView> viewClass, List<TView> result) {
     if (!this.showResult) return;
 
-    if (viewClass == Record.class) {
+    if (isRecord(viewClass)) {
       showRecords(result);
-    } else if (viewClass.isPrimitive() || Constant.PRIMITIVE_TYPES.contains(viewClass)) {
+    } else if (isPrimitive(viewClass)) {
       showScalar(result);
     } else {
       showEntities(viewClass, result);
     }
     log.debug(String.format("查询执行成功, %d 行受影响. ", result.size()));
+  }
+
+  private static <TView> boolean isRecord(Class<TView> viewClass) {
+    return viewClass == Record.class;
+  }
+
+  private static <TView> boolean isPrimitive(Class<TView> viewClass) {
+    return viewClass.isPrimitive() || Constant.PRIMITIVE_TYPES.contains(viewClass);
   }
 
   public void showResult(String format, Object... arguments) {

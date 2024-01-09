@@ -205,6 +205,7 @@ public class Record extends LinkedHashMap<String, Object> implements IRecord<Str
 
     Record      record = new Record();
     List<Field> fields = ReflectUtil.getFields(bean.getClass());
+    
     for (Field field : fields) {
       record.put(field.getName(), ReflectUtil.getFieldValue(field, bean));
     }

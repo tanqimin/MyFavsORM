@@ -5,7 +5,7 @@ import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
-import work.myfavs.framework.orm.util.lang.NString;
+import work.myfavs.framework.orm.util.lang.NVarchar;
 
 import java.util.Date;
 
@@ -17,11 +17,11 @@ public class User {
   @Column
   private Date    created;
   @Column
-  private Date    modified;
+  private Date     modified;
   @Column
-  private NString username;
+  private NVarchar username;
   @Column
-  private String  email;
+  private String   email;
   @Column
   private String  password;
 
@@ -52,11 +52,11 @@ public class User {
     this.modified = modified;
   }
 
-  public NString getUsername() {
+  public NVarchar getUsername() {
     return username;
   }
 
-  public void setUsername(NString username) {
+  public void setUsername(NVarchar username) {
     this.username = username;
   }
 

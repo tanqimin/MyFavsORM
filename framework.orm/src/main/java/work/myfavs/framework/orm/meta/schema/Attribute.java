@@ -21,7 +21,6 @@ import java.util.Collection;
  */
 @SuppressWarnings("unchecked")
 public class Attribute implements Serializable {
-
   private static final long serialVersionUID = 6913045257426812101L;
 
   // region Attributes
@@ -82,11 +81,6 @@ public class Attribute implements Serializable {
     return logicDelete;
   }
 
-  @SuppressWarnings("rawtypes")
-  public PropertyHandler getPropertyHandler() {
-    return propertyHandler;
-  }
-
   // endregion
 
   // region Constructor
@@ -131,7 +125,8 @@ public class Attribute implements Serializable {
   }
 
   public <TModel> void setValue(TModel model, ResultSet rs, int columnIndex) throws SQLException {
-    this.setValue(model, this.propertyHandler.convert(rs, columnIndex, this.fieldVisitor.getType()));
+    Object value = this.propertyHandler.convert(rs, columnIndex, this.fieldVisitor.getType());
+    this.setValue(model, value);
   }
 
   public <TModel> void setValue(TModel model, Object value) {

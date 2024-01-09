@@ -6,7 +6,7 @@ import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 @Table(value = "tb_snowflake", strategy = GenerationType.SNOW_FLAKE)
-public class Snowflake extends BaseEntity {
+public class SnowflakeExample extends BaseEntity {
 
   /** ID */
   @Column(value = "id")

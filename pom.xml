@@ -21,15 +21,17 @@
         <slf4j.version>2.0.7</slf4j.version>
         <druid.version>1.2.18</druid.version>
         <HikariCP.version>5.0.1</HikariCP.version>
-        <mysql-jdbc.version>8.1.0</mysql-jdbc.version>
-        <mssql-jdbc.version>12.2.0.jre11</mssql-jdbc.version>
+        <mysql-jdbc.version>8.2.0</mysql-jdbc.version>
+        <mssql-jdbc.version>12.4.2.jre11</mssql-jdbc.version>
         <beetl.version>3.15.8.RELEASE</beetl.version>
         <junit.version>4.13.2</junit.version>
+        <mockito.version>5.8.0</mockito.version>
+        <reflectasm.version>1.11.9</reflectasm.version>
+
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
-        <reflectasm.version>1.11.9</reflectasm.version>
     </properties>
 
     <!--私服仓库-->
@@ -132,6 +134,13 @@
                 <version>${mssql-jdbc.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/com.esotericsoftware/reflectasm -->
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>reflectasm</artifactId>
+                <version>${reflectasm.version}</version>
+            </dependency>
+
             <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -160,6 +169,24 @@
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 

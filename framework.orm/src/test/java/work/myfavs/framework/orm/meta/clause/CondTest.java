@@ -26,10 +26,10 @@ public class CondTest {
 
   @Before
   public void setUp() {
-    identityClassMeta = Metadata.entityMeta(Identity.class);
-    snowflakeClassMeta = Metadata.entityMeta(Snowflake.class);
-    uuidClassMeta = Metadata.entityMeta(Uuid.class);
-    logicDeleteMeta = Metadata.entityMeta(LogicDelete.class);
+    identityClassMeta = Metadata.entityMeta(IdentityExample.class);
+    snowflakeClassMeta = Metadata.entityMeta(SnowflakeExample.class);
+    uuidClassMeta = Metadata.entityMeta(UuidExample.class);
+    logicDeleteMeta = Metadata.entityMeta(LogicDeleteExample.class);
   }
 
   @After
@@ -203,7 +203,7 @@ public class CondTest {
 
   @Test
   public void create() {
-    Snowflake snowflake = new Snowflake();
+    SnowflakeExample snowflake = new SnowflakeExample();
     snowflake.setName("S1");
     snowflake.setType(TypeEnum.FOOD);
 
@@ -213,7 +213,7 @@ public class CondTest {
 
   @Test
   public void testCreate() {
-    Snowflake snowflake = new Snowflake();
+    SnowflakeExample snowflake = new SnowflakeExample();
     snowflake.setName("S1");
     snowflake.setType(TypeEnum.FOOD);
 

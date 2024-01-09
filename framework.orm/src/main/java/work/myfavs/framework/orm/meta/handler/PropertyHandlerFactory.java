@@ -1,7 +1,7 @@
 package work.myfavs.framework.orm.meta.handler;
 
 import work.myfavs.framework.orm.meta.handler.impls.*;
-import work.myfavs.framework.orm.util.lang.NString;
+import work.myfavs.framework.orm.util.lang.NVarchar;
 
 import java.math.BigDecimal;
 import java.sql.Blob;
@@ -24,7 +24,7 @@ public class PropertyHandlerFactory {
   public static void registerDefault() {
 
     register(String.class, new StringPropertyHandler());
-    register(NString.class, new NStringPropertyHandler());
+    register(NVarchar.class, new NStringPropertyHandler());
     register(java.util.Date.class, new DatePropertyHandler());
     register(BigDecimal.class, new BigDecimalPropertyHandler());
     register(boolean.class, new BooleanPropertyHandler(true));

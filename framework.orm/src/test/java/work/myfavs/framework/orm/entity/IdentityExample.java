@@ -5,20 +5,20 @@ import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
-@Table(value = "tb_uuid", strategy = GenerationType.UUID)
-public class Uuid extends BaseEntity {
+@Table(value = "tb_identity", strategy = GenerationType.IDENTITY)
+public class IdentityExample extends BaseEntity {
 
   /** ID */
   @Column(value = "id")
   @PrimaryKey
-  private String id = null;
+  private Long id = null;
 
-  public String getId() {
+  public Long getId() {
 
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
 
     this.id = id;
   }

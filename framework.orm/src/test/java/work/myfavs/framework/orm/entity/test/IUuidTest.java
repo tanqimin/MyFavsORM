@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.entity.test;
 
-import work.myfavs.framework.orm.entity.Uuid;
+import work.myfavs.framework.orm.entity.UuidExample;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 
 import java.math.BigDecimal;
@@ -9,24 +9,24 @@ import java.util.Date;
 import java.util.List;
 
 public interface IUuidTest {
-  List<Uuid> UUIDS = new ArrayList<>();
+  List<UuidExample> UUIDS = new ArrayList<>();
 
   default void initUuids() {
     UUIDS.clear();
 
-    Uuid obj1 = new Uuid();
+    UuidExample obj1 = new UuidExample();
     obj1.setCreated(new Date());
     obj1.setName("S1");
     obj1.setPrice(new BigDecimal("199.00"));
     obj1.setType(TypeEnum.FOOD);
 
-    Uuid obj2 = new Uuid();
+    UuidExample obj2 = new UuidExample();
     obj2.setCreated(new Date());
     obj2.setName("S2");
     obj2.setPrice(new BigDecimal("299.00"));
     obj2.setType(TypeEnum.DRINK);
 
-    Uuid obj3 = new Uuid();
+    UuidExample obj3 = new UuidExample();
     obj3.setCreated(new Date());
     obj3.setName("S3");
     obj3.setPrice(new BigDecimal("399.00"));
