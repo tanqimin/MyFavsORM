@@ -7,7 +7,7 @@ import work.myfavs.framework.orm.util.lang.NVarchar;
 
 import java.io.IOException;
 
-public class NStringJsonSerializer extends JsonSerializer<NVarchar> {
+public class NVarcharJsonSerializer extends JsonSerializer<NVarchar> {
   @Override
   public void serialize(NVarchar nVarchar, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
     jsonGenerator.writeString(nVarchar.toString());

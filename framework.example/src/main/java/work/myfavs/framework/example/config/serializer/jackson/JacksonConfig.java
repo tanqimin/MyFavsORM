@@ -9,6 +9,6 @@ public class JacksonConfig {
 
   @Bean
   public Jackson2ObjectMapperBuilderCustomizer customizer() {
-    return builder -> builder.modules(new NStringModule());
+    return builder -> builder.modules(new NVarcharModule());
   }
 }
