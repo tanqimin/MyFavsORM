@@ -134,13 +134,6 @@
                 <version>${mssql-jdbc.version}</version>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/com.esotericsoftware/reflectasm -->
-            <dependency>
-                <groupId>com.esotericsoftware</groupId>
-                <artifactId>reflectasm</artifactId>
-                <version>${reflectasm.version}</version>
-            </dependency>
-
             <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
             <dependency>
                 <groupId>org.slf4j</groupId>
