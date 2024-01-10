@@ -144,4 +144,10 @@ public class StringUtilTest {
     String s1 = "$ABC";
     assertEquals(-1, StringUtil.indexOf(s1, 'B', 3));
   }
+
+  @Test
+  public void leftPad() {
+    String pad = StringUtil.leftPad("001", "0", 10);
+    assertEquals(pad, "0000000001");
+  }
 }

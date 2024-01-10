@@ -17,11 +17,11 @@ public class EnumPropertyHandler extends PropertyHandler<Object> {
   @SuppressWarnings("unchecked")
   public Object convert(ResultSet rs, int columnIndex, @SuppressWarnings("rawtypes") Class clazz) throws SQLException {
 
-    String val = rs.getString(columnIndex);
-    if (StringUtil.isEmpty(val)) return null;
+    Object val = rs.getObject(columnIndex);
+    if(null == val) return null;
 
     try {
-      return Enum.valueOf(clazz, val);
+      return Enum.valueOf(clazz, StringUtil.toStr(val));
     } catch (IllegalArgumentException e) {
       return null;
     }

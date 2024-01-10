@@ -58,8 +58,11 @@ public class ConvertUtil {
                                Function<String, T> stringFunc) {
     if (null == value)
       return clazz.isPrimitive() ? numberFunc.apply(0) : null;
-    else if (value instanceof Number) return numberFunc.apply((Number) value);
-    else if (value instanceof String) {
+
+    if (value instanceof Number)
+      return numberFunc.apply((Number) value);
+
+    if (value instanceof String) {
       String str = ((String) value).trim();
       str = str.isEmpty() ? null : str;
       if (null == str)

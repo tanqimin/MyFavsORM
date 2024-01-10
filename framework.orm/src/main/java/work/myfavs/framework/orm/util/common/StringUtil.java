@@ -360,4 +360,16 @@ public class StringUtil {
   public static int indexOf(String str, char searchChar, int start) {
     return str.indexOf(searchChar, start);
   }
+
+  public static int length(Object obj) {
+    if (null == obj) return 0;
+    return StringUtil.toStr(obj).length();
+  }
+
+  public static String leftPad(String str, String placeholder, int length) {
+    if (str.length() > length)
+      throw new IllegalArgumentException(String.format("参数 [%s] 的长度必须大于 %d ", str, length));
+    String prefix = placeholder.repeat(length).concat(str);
+    return prefix.concat(str).substring(prefix.length() - length, prefix.length());
+  }
 }

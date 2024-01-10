@@ -24,7 +24,7 @@ public class PropertyHandlerFactory {
   public static void registerDefault() {
 
     register(String.class, new StringPropertyHandler());
-    register(NVarchar.class, new NStringPropertyHandler());
+    register(NVarchar.class, new NVarcharPropertyHandler());
     register(java.util.Date.class, new DatePropertyHandler());
     register(BigDecimal.class, new BigDecimalPropertyHandler());
     register(boolean.class, new BooleanPropertyHandler(true));

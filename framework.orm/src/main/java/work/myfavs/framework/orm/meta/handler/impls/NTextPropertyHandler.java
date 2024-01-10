@@ -17,33 +17,33 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
-import work.myfavs.framework.orm.util.lang.NVarchar;
+import work.myfavs.framework.orm.util.lang.NText;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class NStringPropertyHandler extends PropertyHandler<NVarchar> {
+public class NTextPropertyHandler extends PropertyHandler<NText> {
 
 
-  public NStringPropertyHandler() {
+  public NTextPropertyHandler() {
 
   }
 
   @Override
-  public NVarchar convert(ResultSet rs, int columnIndex, Class<NVarchar> clazz) throws SQLException {
+  public NText convert(ResultSet rs, int columnIndex, Class<NText> clazz) throws SQLException {
 
-    String val = rs.getNString(columnIndex);
+    Object val = rs.getObject(columnIndex);
     if (null == val) {
       return null;
     }
 
-    return new NVarchar(val);
+    return new NText(val.toString());
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, NVarchar param) throws SQLException {
+  public void addParameter(PreparedStatement ps, int paramIndex, NText param) throws SQLException {
 
     ps.setNString(paramIndex, param.toString());
   }
@@ -51,6 +51,6 @@ public class NStringPropertyHandler extends PropertyHandler<NVarchar> {
   @Override
   public int getSqlType() {
 
-    return Types.NVARCHAR;
+    return Types.LONGNVARCHAR;
   }
 }

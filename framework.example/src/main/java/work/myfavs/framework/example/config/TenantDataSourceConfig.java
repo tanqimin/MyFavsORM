@@ -112,7 +112,7 @@ public class TenantDataSourceConfig {
             mapper ->
                 mapper
                     .register(String.class, new StringPropertyHandler())
-                    .register(NVarchar.class, new NStringPropertyHandler())
+                    .register(NVarchar.class, new NVarcharPropertyHandler())
                     .register(BigDecimal.class, new BigDecimalPropertyHandler())
                     .register(Long.class, new LongPropertyHandler())
                     .register(long.class, new LongPropertyHandler(true))
