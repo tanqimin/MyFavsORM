@@ -99,7 +99,14 @@ public class Cond extends Clause {
     if (null == param) {
       return ignoreNull ? new Cond() : isNull(field);
     }
-    return new Cond(String.format(" %s = ?", field), param);
+
+    Cond cond = new Cond(String.format(" %s = ?", field), param);
+
+    if (param instanceof String && StringUtil.length(param) == 0) {
+      return ignoreNull ? new Cond() : cond;
+    }
+
+    return cond;
   }
 
   /**
