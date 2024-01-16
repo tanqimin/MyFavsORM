@@ -3,6 +3,7 @@ package work.myfavs.framework.example.config.serializer.fastjson;
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
 import com.alibaba.fastjson.serializer.SerializeWriter;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import work.myfavs.framework.orm.util.lang.NVarchar;
 
 import java.io.IOException;
@@ -17,10 +18,12 @@ public class NVarcharObjectSerializer implements ObjectSerializer {
                     int features) throws IOException {
     SerializeWriter writer = serializer.out;
 
-    if (object instanceof NVarchar) {
-      NVarchar nvarchar = (NVarchar) object;
-      writer.writeString(nvarchar.toString());
+    NVarchar nvarchar = (NVarchar) object;
+    if (nvarchar == null) {
+      writer.writeNull(SerializerFeature.WriteNullStringAsEmpty);
+      return;
     }
 
+    writer.writeString(nvarchar.toString());
   }
 }

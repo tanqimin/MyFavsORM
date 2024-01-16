@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import work.myfavs.framework.example.business.UserService;
+import work.myfavs.framework.example.domain.entity.TestNvarchar;
 import work.myfavs.framework.example.domain.entity.User;
 import work.myfavs.framework.orm.meta.pagination.Page;
 
@@ -34,5 +35,11 @@ public class UserController {
   @RequestMapping(value = "/find-by-page")
   public ResponseEntity<Page<User>> findByPage() {
     return ResponseEntity.ok().body(userService.findByPage());
+  }
+
+  @RequestMapping(value = "/test-nvarchar", method = RequestMethod.POST)
+  public ResponseEntity<TestNvarchar> testNvarchar(RequestEntity<TestNvarchar> entity) {
+
+    return ResponseEntity.ok().body(entity.getBody());
   }
 }
