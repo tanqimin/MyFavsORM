@@ -20,6 +20,7 @@
         <spring-jdbc.version>5.3.29</spring-jdbc.version>
         <slf4j.version>2.0.7</slf4j.version>
         <druid.version>1.2.18</druid.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <HikariCP.version>5.0.1</HikariCP.version>
         <mysql-jdbc.version>8.2.0</mysql-jdbc.version>
         <mssql-jdbc.version>12.4.2.jre11</mssql-jdbc.version>
@@ -111,6 +112,13 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
                 <version>${druid.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->

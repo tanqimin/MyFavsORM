@@ -1,3 +1,4 @@
+/*
 package work.myfavs.framework.example.config.serializer.jackson;
 
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
@@ -12,3 +13,4 @@ public class JacksonConfig {
     return builder -> builder.modules(new NVarcharModule());
   }
 }
+*/

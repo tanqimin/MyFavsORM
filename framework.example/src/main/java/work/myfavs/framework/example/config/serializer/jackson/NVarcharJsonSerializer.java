@@ -1,3 +1,4 @@
+/*
 package work.myfavs.framework.example.config.serializer.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -13,3 +14,4 @@ public class NVarcharJsonSerializer extends JsonSerializer<NVarchar> {
     jsonGenerator.writeString(nVarchar.toString());
   }
 }
+*/

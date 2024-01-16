@@ -1,5 +1,6 @@
 package work.myfavs.framework.example.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,12 +27,12 @@ public class UserController {
   }
 
   @RequestMapping(value = "/update/{id}", method = RequestMethod.POST)
-  public ResponseEntity<Long> updateUser(@PathVariable Long id, RequestEntity<User> entity){
+  public ResponseEntity<Long> updateUser(@PathVariable Long id, RequestEntity<User> entity) {
     return ResponseEntity.ok().body(userService.updateUser(id, entity.getBody()));
   }
 
   @RequestMapping(value = "/find-by-page")
-  public ResponseEntity<Page<User>> findByPage(){
+  public ResponseEntity<Page<User>> findByPage() {
     return ResponseEntity.ok().body(userService.findByPage());
   }
 }
