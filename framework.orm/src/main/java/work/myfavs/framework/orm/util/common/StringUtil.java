@@ -1,5 +1,6 @@
 package work.myfavs.framework.orm.util.common;
 
+import java.util.Arrays;
 import java.util.function.Predicate;
 
 /**
@@ -91,6 +92,10 @@ public class StringUtil {
     } else {
       return str1.toString().contentEquals(str2);
     }
+  }
+
+  public static boolean equalsAny(CharSequence str1, CharSequence... strAny) {
+    return Arrays.stream(strAny).anyMatch(str2 -> equals(str1, str2));
   }
 
   /**

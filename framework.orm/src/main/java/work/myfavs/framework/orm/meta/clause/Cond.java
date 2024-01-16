@@ -250,7 +250,11 @@ public class Cond extends Clause {
   public static Cond like(String field, Object param, FuzzyMode fuzzyMode) {
     if (null == param) return new Cond();
 
-    String paramVal   = param.toString();
+    String paramVal = param.toString();
+
+    if (StringUtil.equalsAny(paramVal, FUZZY_SINGLE, FUZZY_MULTIPLE))
+      return new Cond();
+
     String likeClause = String.format(" %s LIKE ?", field);
     if (fuzzyMode == FuzzyMode.SINGLE && paramVal.contains(FUZZY_SINGLE)) {
       return escapeFuzzy(likeClause, paramVal, FUZZY_MULTIPLE);
