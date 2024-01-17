@@ -1,7 +1,9 @@
 package work.myfavs.framework.orm.util.common;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 /**
  * 字符串工具类
@@ -94,8 +96,24 @@ public class StringUtil {
     }
   }
 
-  public static boolean equalsAny(CharSequence str1, CharSequence... strAny) {
-    return Arrays.stream(strAny).anyMatch(str2 -> equals(str1, str2));
+  public static boolean equalsAny(char c, char... any) {
+    if (null != any) {
+      for (char c1 : any) {
+        if (c == c1) return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean onlyMatchAny(CharSequence str, char... any) {
+    int length = str.length();
+
+    for (int i = 0; i < length; i++) {
+      char c = str.charAt(i);
+      if (equalsAny(c, any)) continue;
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -298,7 +316,6 @@ public class StringUtil {
     return str;
   }
 
-  final static char UNDERLINE = '_';
 
   /**
    * 把_分割的字符串转为驼峰格式
@@ -310,14 +327,14 @@ public class StringUtil {
     if (isEmpty(str))
       return str;
 
-    if (contains(str, UNDERLINE)) {
+    if (contains(str, Constant.UNDERLINE)) {
       final int           length    = str.length();
       final StringBuilder sb        = new StringBuilder(length);
       boolean             upperCase = false;
       for (int i = 0; i < length; i++) {
         char c = str.charAt(i);
 
-        if (c == UNDERLINE) {
+        if (c == Constant.UNDERLINE) {
           upperCase = true;
         } else if (upperCase) {
           sb.append(Character.toUpperCase(c));
@@ -377,4 +394,6 @@ public class StringUtil {
     String prefix = placeholder.repeat(length).concat(str);
     return prefix.concat(str).substring(prefix.length() - length, prefix.length());
   }
+
+
 }

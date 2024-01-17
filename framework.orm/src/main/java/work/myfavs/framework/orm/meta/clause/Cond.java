@@ -252,19 +252,19 @@ public class Cond extends Clause {
 
     String paramVal = param.toString();
 
-    if (StringUtil.equalsAny(paramVal, FUZZY_SINGLE, FUZZY_MULTIPLE))
+    if (StringUtil.onlyMatchAny(paramVal, FUZZY_SINGLE, FUZZY_MULTIPLE))
       return new Cond();
 
     String likeClause = String.format(" %s LIKE ?", field);
-    if (fuzzyMode == FuzzyMode.SINGLE && paramVal.contains(FUZZY_SINGLE)) {
+    if (fuzzyMode == FuzzyMode.SINGLE && StringUtil.contains(paramVal, FUZZY_SINGLE)) {
       return escapeFuzzy(likeClause, paramVal, FUZZY_MULTIPLE);
     }
 
-    if (fuzzyMode == FuzzyMode.MULTIPLE && paramVal.contains(FUZZY_MULTIPLE)) {
+    if (fuzzyMode == FuzzyMode.MULTIPLE && StringUtil.contains(paramVal, FUZZY_MULTIPLE)) {
       return escapeFuzzy(likeClause, paramVal, FUZZY_SINGLE);
     }
 
-    if (paramVal.contains(FUZZY_MULTIPLE) || paramVal.contains(FUZZY_SINGLE)) {
+    if (StringUtil.contains(paramVal, FUZZY_MULTIPLE) || StringUtil.contains(paramVal, FUZZY_SINGLE)) {
       return escapeFuzzy(likeClause, paramVal, null);
     }
 
@@ -274,17 +274,16 @@ public class Cond extends Clause {
   /**
    * 转义模糊查询条件
    *
-   * @param sql            原 SQL
-   * @param param          参数值
-   * @param fuzzySearchStr 需要转义的模糊查询通配符
+   * @param sql             原 SQL
+   * @param param           参数值
+   * @param fuzzySearchChar 需要转义的模糊查询通配符
    * @return {@link Cond}
    */
-  private static Cond escapeFuzzy(String sql, String param, String fuzzySearchStr) {
-    if (StringUtil.isEmpty(fuzzySearchStr)
-        || !param.contains(fuzzySearchStr))
+  private static Cond escapeFuzzy(String sql, String param, Character fuzzySearchChar) {
+    if (null == fuzzySearchChar || !StringUtil.contains(param, fuzzySearchChar))
       return new Cond(sql, param);
 
-    String paramVal = StringUtil.replace(param, fuzzySearchStr, FUZZY_ESCAPE.concat(fuzzySearchStr));
+    String paramVal = StringUtil.replace(param, Character.toString(fuzzySearchChar), "" + FUZZY_ESCAPE + fuzzySearchChar);
     return new Cond(sql, paramVal).escape();
   }
 
@@ -630,7 +629,6 @@ public class Cond extends Clause {
    * @return {@link Cond}
    */
   private Cond escape() {
-    if (StringUtil.isEmpty(FUZZY_ESCAPE)) return this;
     this.sql.append(String.format(" ESCAPE '%s'", FUZZY_ESCAPE));
     return this;
   }

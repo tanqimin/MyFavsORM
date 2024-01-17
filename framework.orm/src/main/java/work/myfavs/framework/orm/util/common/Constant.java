@@ -24,12 +24,13 @@ public interface Constant {
    */
   List<Class<?>> PRIMITIVE_TYPES = List.of(Integer.class, Long.class, Double.class, String.class, Float.class, Boolean.class, Number.class,
                                            Short.class);
+  char UNDERLINE = '_';
 
-  String FUZZY_MULTIPLE = "%";
+  char FUZZY_MULTIPLE = '%';
 
-  String FUZZY_SINGLE = "_";
+  char FUZZY_SINGLE = '_';
 
-  String FUZZY_ESCAPE = "¦";
+  char FUZZY_ESCAPE = '¦';
 
   String SYMBOL_COMMA = ",";
 
