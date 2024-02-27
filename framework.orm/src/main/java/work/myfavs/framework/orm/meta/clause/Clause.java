@@ -13,7 +13,8 @@ import java.util.List;
  */
 public abstract class Clause {
 
-  protected static final String        SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
+//  protected static final String        SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
+  protected static final String        SQL_PATTERN = "[\\w\\p{IsIdeographic}\\ \\,\\.]+";
   protected              StringBuilder sql;
   protected              List<Object>  params;
 

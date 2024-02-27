@@ -329,6 +329,12 @@ public class SqlTest {
   public void orderBy() {
     Sql sql = Sql.SelectAll().from("user").orderBy("id");
     assertEquals("SELECT * FROM user ORDER BY id", sql.toString());
+
+    sql = Sql.SelectAll().from("user").orderBy("编码");
+    assertEquals("SELECT * FROM user ORDER BY 编码", sql.toString());
+
+    sql = Sql.SelectAll().from("user").orderBy("user_id");
+    assertEquals("SELECT * FROM user ORDER BY user_id", sql.toString());
   }
 
   @Test

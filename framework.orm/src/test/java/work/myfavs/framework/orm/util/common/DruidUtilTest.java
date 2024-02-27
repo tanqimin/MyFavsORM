@@ -1,11 +1,16 @@
 package work.myfavs.framework.orm.util.common;
 
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
 import com.alibaba.druid.sql.ast.statement.*;
+import com.alibaba.druid.sql.visitor.VisitorFeature;
 import com.alibaba.druid.util.JdbcConstants;
 import org.junit.Test;
 import work.myfavs.framework.orm.meta.DbType;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -69,5 +74,21 @@ public class DruidUtilTest {
   public void createTableSource() {
     SQLExprTableSource tableSource = DruidUtil.createTableSource("TB_USER");
     assertEquals(tableSource.getName().getSimpleName(), "TB_USER");
+  }
+
+  @Test
+  public void formatSql() {
+    String sql = "SELECT t1.id AS sku_id, t2.code AS product_code, t2.name AS product_name, t4.code AS brand_code, t4.name AS brand_name\n" +
+        "FROM sku t1 LEFT JOIN PRODUCT t2 ON t1.product_id=t2.id JOIN(SELECT DISTINCT TOP 100 sku_id FROM rfid WHERE 1=1 /* and created = 创建日期 */) t3 ON t1.id=t3.sku_id LEFT JOIN BRAND t4 ON t4.id=t2.brand_id\n" +
+        "WHERE 1=1 /* and t1.created = 创建日期 */ /* or t2.code = 单号 */";
+
+    List<SQLStatement> sqlStatements = SQLUtils.parseStatements(sql, com.alibaba.druid.DbType.sqlserver);
+    for (SQLStatement sqlStatement : sqlStatements) {
+      System.out.println(sqlStatement.toParameterizedString());
+    }
+
+    SQLSelectStatement sqlSelectStatement = DruidUtil.createSQLSelectStatement(com.alibaba.druid.DbType.sqlserver, sql);
+    String             formatSql          = sqlSelectStatement.toString();
+    System.out.println(formatSql);
   }
 }
