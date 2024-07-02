@@ -117,6 +117,7 @@ public class TenantDataSourceConfig {
                     .register(Long.class, new LongPropertyHandler())
                     .register(long.class, new LongPropertyHandler(true))
                     .register(Boolean.class, new BooleanPropertyHandler())
+                    .register(boolean.class, new BooleanPropertyHandler(true))
                     .register(int.class, new IntegerPropertyHandler(true))
                     .register(Date.class, new DatePropertyHandler()))
         .build();

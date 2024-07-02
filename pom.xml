@@ -16,23 +16,23 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <spring-boot.version>2.7.14</spring-boot.version>
-        <spring-jdbc.version>5.3.29</spring-jdbc.version>
-        <slf4j.version>2.0.7</slf4j.version>
-        <druid.version>1.2.18</druid.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
+        <spring-jdbc.version>5.3.37</spring-jdbc.version>
+        <slf4j.version>2.0.13</slf4j.version>
+        <druid.version>1.2.23</druid.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <HikariCP.version>5.0.1</HikariCP.version>
-        <mysql-jdbc.version>8.2.0</mysql-jdbc.version>
-        <mssql-jdbc.version>12.4.2.jre11</mssql-jdbc.version>
-        <beetl.version>3.15.8.RELEASE</beetl.version>
+        <HikariCP.version>5.1.0</HikariCP.version>
+        <mysql-jdbc.version>8.4.0</mysql-jdbc.version>
+        <mssql-jdbc.version>12.6.3.jre11</mssql-jdbc.version>
+        <beetl.version>3.16.2.RELEASE</beetl.version>
         <junit.version>4.13.2</junit.version>
-        <mockito.version>5.8.0</mockito.version>
+        <mockito.version>5.12.0</mockito.version>
         <reflectasm.version>1.11.9</reflectasm.version>
 
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
-        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+        <maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
     </properties>
 
     <!--私服仓库-->
@@ -187,7 +187,23 @@
                 <scope>test</scope>
             </dependency>
 
+            <dependency>
+                <groupId>work.myfavs</groupId>
+                <artifactId>framework.orm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
+            <dependency>
+                <groupId>work.myfavs</groupId>
+                <artifactId>framework.orm-generator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>work.myfavs</groupId>
+                <artifactId>framework.orm-spring-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

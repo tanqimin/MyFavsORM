@@ -213,8 +213,7 @@ public class ConvertUtil {
    * @return String值
    */
   public static String toStr(Object value) {
-    if (null == value) return null;
-    return value.toString();
+    return StringUtil.toStr(value);
   }
 
   /**

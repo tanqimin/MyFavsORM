@@ -94,19 +94,16 @@
         <dependency>
             <groupId>work.myfavs</groupId>
             <artifactId>framework.orm</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>work.myfavs</groupId>
             <artifactId>framework.orm-generator</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>work.myfavs</groupId>
             <artifactId>framework.orm-spring-starter</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

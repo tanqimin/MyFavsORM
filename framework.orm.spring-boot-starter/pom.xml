@@ -25,7 +25,6 @@
         <dependency>
             <groupId>work.myfavs</groupId>
             <artifactId>framework.orm</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->

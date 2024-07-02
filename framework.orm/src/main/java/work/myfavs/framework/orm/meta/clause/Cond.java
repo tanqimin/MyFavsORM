@@ -403,7 +403,7 @@ public class Cond extends Clause {
     }
 
     if (paramCnt == 1) {
-      return ne(field, sqlParams.get(0),false);
+      return ne(field, sqlParams.get(0), false);
     }
     return new Cond(String.format(" %s NOT IN (%s)", field, sql), sqlParams);
   }
@@ -433,6 +433,7 @@ public class Cond extends Clause {
         if (null == param) {
           continue;
         }
+
         sqlBuilder.append("?,");
         sqlParams.add(param);
       }
