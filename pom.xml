@@ -16,6 +16,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
+
         <spring-boot.version>2.7.18</spring-boot.version>
         <spring-jdbc.version>5.3.37</spring-jdbc.version>
         <slf4j.version>2.0.13</slf4j.version>
@@ -25,6 +26,7 @@
         <mysql-jdbc.version>8.4.0</mysql-jdbc.version>
         <mssql-jdbc.version>12.6.3.jre11</mssql-jdbc.version>
         <beetl.version>3.16.2.RELEASE</beetl.version>
+
         <junit.version>4.13.2</junit.version>
         <mockito.version>5.12.0</mockito.version>
         <reflectasm.version>1.11.9</reflectasm.version>
