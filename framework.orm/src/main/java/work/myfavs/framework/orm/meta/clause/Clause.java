@@ -1,17 +1,22 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import cn.hutool.core.util.StrUtil;
+import work.myfavs.framework.orm.util.common.CollectionUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.orm.util.exception.DBException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import work.myfavs.framework.orm.util.exception.DBException;
 
-/** SQL 语句基类 */
+/**
+ * SQL 语句基类
+ */
 public abstract class Clause {
 
-  protected static String SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
-  protected StringBuilder sql;
-  protected List<Object> params;
+//  protected static final String        SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
+  protected static final String        SQL_PATTERN = "[\\w\\p{IsIdeographic}\\ \\,\\.]+";
+  protected              StringBuilder sql;
+  protected              List<Object>  params;
 
   // region Getter && Setter
   public StringBuilder getSql() {
@@ -51,7 +56,7 @@ public abstract class Clause {
   public Clause(String sql, Collection<?> params) {
 
     this(sql);
-    if (params != null && params.size() > 0) {
+    if (CollectionUtil.isNotEmpty(params)) {
       this.params.addAll(params);
     }
   }
@@ -59,7 +64,7 @@ public abstract class Clause {
 
   @Override
   public String toString() {
-    return StrUtil.toString(sql);
+    return StringUtil.toStr(sql);
   }
 
   public Clause deleteLastChar(String str) {
@@ -68,8 +73,8 @@ public abstract class Clause {
   }
 
   protected static String checkInjection(String sql) {
-    if (StrUtil.isNotEmpty(sql) && !sql.matches(SQL_PATTERN)) {
-      throw new DBException("参数 {} 存在非法字符串", sql);
+    if (StringUtil.isNotEmpty(sql) && !sql.matches(SQL_PATTERN)) {
+      throw new DBException("参数 %s 中的内容存在注入风险, 请检查!", sql);
     }
 
     return sql;

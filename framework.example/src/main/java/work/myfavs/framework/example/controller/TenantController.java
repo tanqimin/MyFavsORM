@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import work.myfavs.framework.example.business.TenantService;
 import work.myfavs.framework.example.domain.entity.Tenant;
-import work.myfavs.framework.example.domain.entity.User;
 import work.myfavs.framework.orm.meta.pagination.Page;
 
 @RestController

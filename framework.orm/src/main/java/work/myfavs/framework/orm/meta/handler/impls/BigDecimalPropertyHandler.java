@@ -2,33 +2,32 @@ package work.myfavs.framework.orm.meta.handler.impls;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 /**
  * @author tanqimin
- * @date 2016/1/29
  */
-public class BigDecimalPropertyHandler extends PropertyHandler<BigDecimal> {
-
-  @Override
-  public BigDecimal convert(ResultSet rs, String columnName, Class<BigDecimal> clazz)
-      throws SQLException {
-
-    BigDecimal i = rs.getBigDecimal(columnName);
-    return rs.wasNull() ? null : i;
+public class BigDecimalPropertyHandler extends NumberPropertyHandler<BigDecimal> {
+  public BigDecimalPropertyHandler() {
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, BigDecimal param)
-      throws SQLException {
-
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
+  protected BigDecimal convertNumber(Number val) {
+    if (val instanceof BigDecimal) {
+      return (BigDecimal) val;
+    } else {
+      return BigDecimal.valueOf(val.doubleValue());
     }
+  }
+
+  @Override
+  protected BigDecimal convertString(String val) {
+    return BigDecimal.valueOf(Double.parseDouble(val));
+  }
+
+  @Override
+  protected void setParameter(PreparedStatement ps, int paramIndex, BigDecimal param) throws SQLException {
     ps.setBigDecimal(paramIndex, param);
   }
 

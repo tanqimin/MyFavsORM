@@ -1,7 +1,7 @@
 package work.myfavs.framework.orm;
 
-import java.sql.Connection;
 import javax.sql.DataSource;
+import java.sql.Connection;
 
 /**
  * 数据库链接工厂
@@ -10,7 +10,7 @@ import javax.sql.DataSource;
  */
 public abstract class ConnFactory {
 
-  protected DataSource dataSource;
+  protected final DataSource dataSource;
 
   public ConnFactory(DataSource dataSource) {
 

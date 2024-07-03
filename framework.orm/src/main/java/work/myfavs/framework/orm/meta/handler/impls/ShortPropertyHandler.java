@@ -17,42 +17,30 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class ShortPropertyHandler extends PropertyHandler<Short> {
+public class ShortPropertyHandler extends NumberPropertyHandler<Short> {
 
-  private boolean isPrimitive;
-
-  public ShortPropertyHandler() {}
+  public ShortPropertyHandler() {
+  }
 
   public ShortPropertyHandler(boolean isPrimitive) {
-
-    this.isPrimitive = isPrimitive;
+    super(isPrimitive);
   }
 
   @Override
-  public Short convert(ResultSet rs, String columnName, Class<Short> clazz) throws SQLException {
-
-    short i = rs.getShort(columnName);
-    if (rs.wasNull()) {
-      if (isPrimitive) {
-        return 0;
-      } else {
-        return null;
-      }
-    }
-    return i;
+  protected Short convertNumber(Number val) {
+    return val.shortValue();
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Short param) throws SQLException {
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
+  protected Short convertString(String val) {
+    return Short.parseShort(val);
+  }
+
+  @Override
+  protected void setParameter(PreparedStatement ps, int paramIndex, Short param) throws SQLException {
     ps.setShort(paramIndex, param);
   }
 

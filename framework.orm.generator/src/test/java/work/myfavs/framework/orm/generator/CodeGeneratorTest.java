@@ -12,7 +12,7 @@ public class CodeGeneratorTest {
   CodeGenerator codeGenerator;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
 
     String url =
         "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
@@ -62,5 +62,5 @@ public class CodeGeneratorTest {
   }
 
   @After
-  public void tearDown() throws Exception {}
+  public void tearDown() {}
 }

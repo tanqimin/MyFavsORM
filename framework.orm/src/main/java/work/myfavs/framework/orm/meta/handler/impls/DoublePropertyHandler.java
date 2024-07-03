@@ -17,45 +17,33 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class DoublePropertyHandler extends PropertyHandler<Double> {
+public class DoublePropertyHandler extends NumberPropertyHandler<Double> {
 
-  private boolean isPrimitive;
-
-  public DoublePropertyHandler() {}
+  public DoublePropertyHandler() {
+  }
 
   public DoublePropertyHandler(boolean isPrimitive) {
-
-    this.isPrimitive = isPrimitive;
+    super(isPrimitive);
   }
 
   @Override
-  public Double convert(ResultSet rs, String columnName, Class<Double> clazz) throws SQLException {
-
-    double i = rs.getDouble(columnName);
-    if (rs.wasNull()) {
-      if (isPrimitive) {
-        return 0.0d;
-      } else {
-        return null;
-      }
-    }
-    return i;
+  protected Double convertNumber(Number val) {
+    return val.doubleValue();
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Double param) throws SQLException {
+  protected Double convertString(String val) {
+    return Double.parseDouble(val);
+  }
 
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
+  @Override
+  protected void setParameter(PreparedStatement ps, int paramIndex, Double param) throws SQLException {
     ps.setDouble(paramIndex, param);
   }
+
 
   @Override
   public int getSqlType() {

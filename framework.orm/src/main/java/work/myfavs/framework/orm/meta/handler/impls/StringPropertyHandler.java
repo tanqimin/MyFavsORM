@@ -16,33 +16,40 @@
  */
 package work.myfavs.framework.orm.meta.handler.impls;
 
+import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 public class StringPropertyHandler extends PropertyHandler<String> {
 
-  @Override
-  public String convert(ResultSet rs, String columnName, Class<String> clazz) throws SQLException {
 
-    final String str = rs.getString(columnName);
-    return rs.wasNull() ? null : str;
+  public StringPropertyHandler() {
+
+  }
+
+  @Override
+  public String convert(ResultSet rs, int columnIndex, Class<String> clazz) throws SQLException {
+
+    Object val = rs.getObject(columnIndex);
+    if (null == val) {
+      return null;
+    }
+
+    return val.toString();
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, String param) throws SQLException {
 
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
     ps.setString(paramIndex, param);
   }
 
   @Override
   public int getSqlType() {
+
     return Types.VARCHAR;
   }
 }

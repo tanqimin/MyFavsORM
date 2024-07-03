@@ -1,17 +1,18 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import cn.hutool.core.util.StrUtil;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.LogicDelete;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
-import work.myfavs.framework.orm.util.StringUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.orm.util.reflection.FieldVisitor;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
 
 /**
  * 数据库列元数据
@@ -20,30 +21,38 @@ import work.myfavs.framework.orm.util.exception.DBException;
  */
 @SuppressWarnings("unchecked")
 public class Attribute implements Serializable {
-
   private static final long serialVersionUID = 6913045257426812101L;
 
   // region Attributes
-  /** 数据库 列名称 */
-  private String columnName;
-  /** 类 属性名称 */
-  private String fieldName;
-  /** 类 属性类型 */
-  private Class<?> fieldType;
-  /** java.sql.Types 类型 */
-  private int sqlType;
-  /** 是否只读？ */
-  private boolean readonly = false;
-  /** 是否主键？ */
-  private boolean primaryKey = false;
+  /**
+   * 数据库 列名称
+   */
+  private final String          columnName;
+  /**
+   * Field访问器
+   */
+  private final FieldVisitor    fieldVisitor;
+  /**
+   * java.sql.Types 类型
+   */
+  private final int             sqlType;
+  /**
+   * 是否只读？
+   */
+  private final boolean         readonly;
+  /**
+   * 是否主键？
+   */
+  private final boolean         primaryKey;
   /**
    * 是否逻辑删除字段？
    */
-  private boolean logicDelete     = false;
-
-  /** 类型处理器 */
+  private final boolean         logicDelete;
+  /**
+   * 类型处理器
+   */
   @SuppressWarnings("rawtypes")
-  private PropertyHandler propertyHandler = null;
+  private final PropertyHandler propertyHandler;
   // endregion
 
   // region Getter && Setter
@@ -52,12 +61,8 @@ public class Attribute implements Serializable {
     return columnName;
   }
 
-  public String getFieldName() {
-    return fieldName;
-  }
-
-  public Class<?> getFieldType() {
-    return fieldType;
+  public FieldVisitor getFieldVisitor() {
+    return fieldVisitor;
   }
 
   public int getSqlType() {
@@ -76,12 +81,24 @@ public class Attribute implements Serializable {
     return logicDelete;
   }
 
-
   // endregion
 
   // region Constructor
 
-  private Attribute() {}
+  private Attribute(Field field) {
+    Column column = field.getAnnotation(Column.class);
+    this.readonly = column.readonly();
+    this.fieldVisitor = new FieldVisitor(field);
+    this.primaryKey = isPrimaryKey(field);
+    this.logicDelete = isLogicDelete(field);
+    this.columnName = StringUtil.isEmpty(column.value())
+        ? StringUtil.toUnderlineCase(field.getName())
+        : column.value();
+
+    this.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
+    this.sqlType = this.propertyHandler.getSqlType();
+  }
+
 
   // endregion
 
@@ -92,37 +109,42 @@ public class Attribute implements Serializable {
    * @return 属性元数据
    */
   static Attribute createInstance(Field field) {
-    Attribute attribute = null;
-    final Column column = field.getAnnotation(Column.class);
-    if (column != null) {
-      attribute = new Attribute();
-      attribute.fieldName = field.getName();
-      attribute.fieldType = field.getType();
-      attribute.readonly = column.readonly();
-      attribute.primaryKey = isPrimaryKey(field);
-      attribute.logicDelete = isLogicDelete(field);
-      attribute.columnName =
-          StrUtil.isEmpty(column.value())
-              ? StringUtil.toUnderlineCase(field.getName())
-              : column.value();
-      attribute.propertyHandler = PropertyHandlerFactory.getInstance(field.getType());
-      attribute.sqlType = attribute.propertyHandler.getSqlType();
-    }
-    return attribute;
+
+    if (null == field.getAnnotation(Column.class))
+      return null;
+
+    return new Attribute(field);
   }
 
   private static boolean isPrimaryKey(Field field) {
-    return field.getAnnotation(PrimaryKey.class) != null;
+    return null != field.getAnnotation(PrimaryKey.class);
   }
-  private static boolean isLogicDelete(Field field) {
-    return field.getAnnotation(LogicDelete.class) != null;
-  }
-  public Object value(ResultSet rs) {
 
-    try {
-      return this.propertyHandler.convert(rs, columnName, fieldType);
-    } catch (SQLException ex) {
-      throw new DBException(ex);
+  private static boolean isLogicDelete(Field field) {
+    return null != field.getAnnotation(LogicDelete.class);
+  }
+
+  public <TModel> void setValue(TModel model, ResultSet rs, int columnIndex) throws SQLException {
+    Object value = this.propertyHandler.convert(rs, columnIndex, this.fieldVisitor.getType());
+    this.setValue(model, value);
+  }
+
+  public <TModel> void setValue(TModel model, Object value) {
+    this.fieldVisitor.setValue(model, value);
+  }
+
+  public <TModel> Object getValue(TModel model) {
+    return this.fieldVisitor.getValue(model);
+  }
+
+  public <TModel> void setPrimaryKey(TModel model, ResultSet rs) throws SQLException {
+    if (rs.next())
+      setValue(model, rs, 1);
+  }
+
+  public <TModel> void setPrimaryKeys(Collection<TModel> models, ResultSet rs) throws SQLException {
+    for (TModel model : models) {
+      setPrimaryKey(model, rs);
     }
   }
 }

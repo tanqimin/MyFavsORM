@@ -1,20 +1,31 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
+
+import work.myfavs.framework.orm.meta.annotation.Criterion;
+import work.myfavs.framework.orm.meta.enumeration.FuzzyMode;
+import work.myfavs.framework.orm.meta.enumeration.Operator;
+import work.myfavs.framework.orm.meta.schema.Attribute;
+import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.CollectionUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.orm.util.convert.ConvertUtil;
+import work.myfavs.framework.orm.util.reflection.FieldVisitor;
+import work.myfavs.framework.orm.util.reflection.ReflectUtil;
+
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Supplier;
-import work.myfavs.framework.orm.meta.annotation.Criterion;
-import work.myfavs.framework.orm.meta.enumeration.Operator;
-import work.myfavs.framework.orm.meta.schema.ClassMeta;
-import work.myfavs.framework.orm.util.convert.ObjectConvert;
 
-/** SQL 条件构建 */
+import static work.myfavs.framework.orm.util.common.Constant.*;
+
+/**
+ * SQL 条件构建
+ */
 public class Cond extends Clause {
 
-  /** 构造方法 */
+  /**
+   * 构造方法
+   */
   private Cond() {}
 
   /**
@@ -30,15 +41,15 @@ public class Cond extends Clause {
   /**
    * 构造方法
    *
-   * @param sql SQL 语句
-   * @param param 参数
+   * @param sql    SQL 语句
+   * @param param  参数
    * @param params 更多参数
    */
   private Cond(String sql, Object param, Object... params) {
 
     super(sql);
     super.params.add(param);
-    if (params != null && params.length > 0) {
+    if (ArrayUtil.isNotEmpty(params)) {
       super.params.addAll(Arrays.asList(params));
     }
   }
@@ -50,14 +61,17 @@ public class Cond extends Clause {
   }
 
   /**
-   * 创建逻辑删除条件
+   * 创建逻辑删除条件<br/>
+   * 如果 logicDelete 不为空，则创建逻辑删除条件
    *
-   * @param classMeta 类元数据
-   * @return Cond
+   * @param logicDelete {@link Attribute} 逻辑删除标记字段
+   * @return {@link Cond}
    */
-  public static Cond logicalDeleteCond(ClassMeta classMeta) {
-    if (classMeta.getLogicDelete() == null) return new Cond();
-    return Cond.eq(classMeta.getLogicDelete().getColumnName(), 0);
+  public static Cond logicalDelete(Attribute logicDelete) {
+
+    if (null == logicDelete) return new Cond();
+    if (!logicDelete.isLogicDelete()) return new Cond();
+    return Cond.eq(logicDelete.getColumnName(), 0);
   }
 
   /**
@@ -65,7 +79,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数值
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond eq(String field, Object param) {
 
@@ -75,17 +89,24 @@ public class Cond extends Clause {
   /**
    * 创建 = 条件，如 field = param，如果 param 为 null， 且 ignoreNull = false 时，创建 field IS NULL
    *
-   * @param field 字段
-   * @param param 参数值
+   * @param field      字段
+   * @param param      参数值
    * @param ignoreNull 是否忽略 null 值
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond eq(String field, Object param, boolean ignoreNull) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (null == param) {
       return ignoreNull ? new Cond() : isNull(field);
     }
-    return new Cond(StrUtil.format(" {} = ?", field), param);
+
+    Cond cond = new Cond(String.format(" %s = ?", field), param);
+
+    if (param instanceof String && StringUtil.length(param) == 0) {
+      return ignoreNull ? new Cond() : cond;
+    }
+
+    return cond;
   }
 
   /**
@@ -93,7 +114,7 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数值
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond ne(String field, Object param) {
 
@@ -103,39 +124,39 @@ public class Cond extends Clause {
   /**
    * 创建 != 条件，如 field != param，如果 param 为 null， 且 ignoreNull = false 时，创建 field IS NOT NULL
    *
-   * @param field 字段
-   * @param param 参数值
+   * @param field      字段
+   * @param param      参数值
    * @param ignoreNull 是否忽略 null 值
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond ne(String field, Object param, boolean ignoreNull) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (null == param) {
       return ignoreNull ? new Cond() : isNotNull(field);
     }
-    return new Cond(StrUtil.format(" {} <> ?", field), param);
+    return new Cond(String.format(" %s <> ?", field), param);
   }
 
   /**
    * 创建 IS NULL 条件
    *
    * @param field 字段
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond isNull(String field) {
 
-    return new Cond(StrUtil.format(" {} IS NULL", field));
+    return new Cond(String.format(" %s IS NULL", field));
   }
 
   /**
    * 创建 IS NOT NULL 条件
    *
    * @param field 字段
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond isNotNull(String field) {
 
-    return new Cond(StrUtil.format(" {} IS NOT NULL", field));
+    return new Cond(String.format(" %s IS NOT NULL", field));
   }
 
   /**
@@ -143,14 +164,14 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond gt(String field, Object param) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (null == param) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} > ?", field), param);
+    return new Cond(String.format(" %s > ?", field), param);
   }
 
   /**
@@ -158,14 +179,14 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond ge(String field, Object param) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (null == param) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} >= ?", field), param);
+    return new Cond(String.format(" %s >= ?", field), param);
   }
 
   /**
@@ -173,14 +194,14 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond lt(String field, Object param) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (null == param) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} < ?", field), param);
+    return new Cond(String.format(" %s < ?", field), param);
   }
 
   /**
@@ -188,14 +209,14 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond le(String field, Object param) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    if (null == param) {
       return new Cond();
     }
-    return new Cond(StrUtil.format(" {} <= ?", field), param);
+    return new Cond(String.format(" %s <= ?", field), param);
   }
 
   /**
@@ -203,51 +224,99 @@ public class Cond extends Clause {
    *
    * @param field 字段
    * @param param 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond like(String field, Object param) {
 
-    if (StrUtil.isBlankIfStr(param)) {
+    return like(field, param, FuzzyMode.ALL);
+  }
+
+  /**
+   * 根据 {@link FuzzyMode} 创建 field LIKE ? 条件：<br/>
+   * {@link FuzzyMode#ALL} : 参数 {@code param} 中如检测到任意通配符 {@code %} 或 {@code _}，使用模糊查询<br/>
+   * {@link FuzzyMode#SINGLE} : 参数 {@code param} 中如检测到任意通配符 {@code _}，使用模糊查询，并把 {@code %} 转义为 {@code ¦%}<br/>
+   * {@link FuzzyMode#MULTIPLE} : 参数 {@code param} 中如检测到任意通配符 {@code %}，使用模糊查询，并把 {@code _} 转义为 {@code ¦_}<br/>
+   * <br/>
+   * 示例：查询参数 param 的值为："_ABC%"<br/>
+   * 如果 {@code fuzzyMode = } {@link FuzzyMode#ALL} 返回 {@code field LIKE '_ABC%'} ;<br/>
+   * 如果 {@code fuzzyMode = } {@link FuzzyMode#SINGLE} 返回 {@code field LIKE '_ABC¦%' ESCAPE '¦'} ;<br/>
+   * 如果 {@code fuzzyMode = } {@link FuzzyMode#MULTIPLE} 返回 {@code field LIKE '¦_ABC%' ESCAPE '¦'} ;<br/>
+   *
+   * @param field     字段
+   * @param param     参数
+   * @param fuzzyMode 模糊模式
+   * @return {@link Cond}
+   */
+  public static Cond like(String field, Object param, FuzzyMode fuzzyMode) {
+    if (null == param) return new Cond();
+
+    String paramVal = param.toString();
+
+    if (StringUtil.onlyMatchAny(paramVal, FUZZY_SINGLE, FUZZY_MULTIPLE))
       return new Cond();
+
+    String likeClause = String.format(" %s LIKE ?", field);
+    if (fuzzyMode == FuzzyMode.SINGLE && StringUtil.contains(paramVal, FUZZY_SINGLE)) {
+      return escapeFuzzy(likeClause, paramVal, FUZZY_MULTIPLE);
     }
 
-    if (param.toString().contains("%") || param.toString().contains("_")) {
-      return new Cond(StrUtil.format(" {} LIKE ?", field), param);
+    if (fuzzyMode == FuzzyMode.MULTIPLE && StringUtil.contains(paramVal, FUZZY_MULTIPLE)) {
+      return escapeFuzzy(likeClause, paramVal, FUZZY_SINGLE);
+    }
+
+    if (StringUtil.contains(paramVal, FUZZY_MULTIPLE) || StringUtil.contains(paramVal, FUZZY_SINGLE)) {
+      return escapeFuzzy(likeClause, paramVal, null);
     }
 
     return eq(field, param);
   }
 
   /**
+   * 转义模糊查询条件
+   *
+   * @param sql             原 SQL
+   * @param param           参数值
+   * @param fuzzySearchChar 需要转义的模糊查询通配符
+   * @return {@link Cond}
+   */
+  private static Cond escapeFuzzy(String sql, String param, Character fuzzySearchChar) {
+    if (null == fuzzySearchChar || !StringUtil.contains(param, fuzzySearchChar))
+      return new Cond(sql, param);
+
+    String paramVal = StringUtil.replace(param, Character.toString(fuzzySearchChar), "" + FUZZY_ESCAPE + fuzzySearchChar);
+    return new Cond(sql, paramVal).escape();
+  }
+
+  /**
    * 创建 field BETWEEN ? AND ? 条件 如果参数1 不为 null， 参数2 为 null，则构建 field &ge; ? 条件 如果参数1 为 null， 参数2 不为
    * null，则构建 field &le; ? 条件
    *
-   * @param field 字段
+   * @param field  字段
    * @param param1 参数1
    * @param param2 参数2
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond between(String field, Object param1, Object param2) {
 
-    if (param1 == null && param2 == null) {
+    if (null == param1 && null == param2) {
       return new Cond();
     }
-    if (param2 == null) {
+    if (null == param2) {
       return ge(field, param1);
     }
-    if (param1 == null) {
+    if (null == param1) {
       return le(field, param2);
     }
-    return new Cond(StrUtil.format(" {} BETWEEN ? AND ?", field), param1, param2);
+    return new Cond(String.format(" %s BETWEEN ? AND ?", field), param1, param2);
   }
 
   /**
    * 构建 field IN (?,?..?) 语句 如果 params 集合为空，则不构建语句 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params
    * 集合数量大于 1， 则构建 field IN (?,?..?) 语句
    *
-   * @param field 字段
+   * @param field  字段
    * @param params 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond in(String field, Collection<?> params) {
 
@@ -259,47 +328,47 @@ public class Cond extends Clause {
    * 为 false，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params 集合数量大于 1， 则构建 field IN
    * (?,?..?) 语句
    *
-   * @param field 字段
-   * @param params 参数
+   * @param field       字段
+   * @param params      参数
    * @param ignoreEmpty 是否忽略空参数集合
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond in(String field, Collection<?> params, boolean ignoreEmpty) {
 
-    Sql inClauseSql = createInClauseParams(params);
-    String sql = inClauseSql.sql.toString();
-    List<Object> sqlParams = inClauseSql.params;
-    int paramCnt = sqlParams.size();
+    Sql          inClauseSql = createInClauseParams(params);
+    String       sql         = inClauseSql.sql.toString();
+    List<Object> sqlParams   = inClauseSql.params;
+    int          paramCnt    = sqlParams.size();
 
     if (paramCnt == 0) {
-      return ignoreEmpty ? new Cond() : new Cond(StrUtil.format(" 1 > 2"));
+      return ignoreEmpty ? new Cond() : new Cond(" 1 > 2");
     }
 
     if (paramCnt == 1) {
-      return eq(field, sqlParams.get(0));
+      return eq(field, sqlParams.get(0), false);
     }
-    return new Cond(StrUtil.format(" {} IN ({})", field, sql), sqlParams);
+    return new Cond(String.format(" %s IN (%s)", field, sql), sqlParams);
   }
 
   /**
    * 构建 field IN ({sql}) 条件
    *
    * @param field 字段
-   * @param sql SQL
-   * @return Cond
+   * @param sql   SQL
+   * @return {@link Cond}
    */
   public static Cond in(String field, Sql sql) {
-    if( Objects.isNull(sql)) return new Cond();
-    return new Cond(StrUtil.format(" {} IN ({})", field, sql.sql), sql.params);
+    if (null == sql) return new Cond();
+    return new Cond(String.format(" %s IN (%s)", field, sql.sql), sql.params);
   }
 
   /**
    * 构建 field NOT IN (?,?..?) 语句 如果 params 集合为空，则不构建语句 如果 params 集合数量为 1， 则构建语句 field = ? 如果 params
    * 集合数量大于 1， 则构建 field NOT IN (?,?..?) 语句
    *
-   * @param field 字段
+   * @param field  字段
    * @param params 参数
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond notIn(String field, Collection<?> params) {
 
@@ -311,17 +380,17 @@ public class Cond extends Clause {
    * ignoreEmpty 为 false，则构建语句 1 &gt; 2 如果 params 集合数量为 1， 则构建语句 field != ? 如果 params 集合数量大于 1， 则构建
    * field NOT IN (?,?..?) 语句
    *
-   * @param field 字段
-   * @param params 参数
+   * @param field       字段
+   * @param params      参数
    * @param ignoreEmpty 是否忽略空参数集合
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond notIn(String field, Collection<?> params, boolean ignoreEmpty) {
 
-    Sql inClauseSql;
-    String sql;
+    Sql          inClauseSql;
+    String       sql;
     List<Object> sqlParams;
-    int paramCnt;
+    int          paramCnt;
 
     inClauseSql = createInClauseParams(params);
     sql = inClauseSql.sql.toString();
@@ -330,40 +399,41 @@ public class Cond extends Clause {
     paramCnt = sqlParams.size();
 
     if (paramCnt == 0) {
-      return ignoreEmpty ? new Cond() : new Cond(StrUtil.format(" 1 > 2"));
+      return ignoreEmpty ? new Cond() : new Cond(" 1 > 2");
     }
 
     if (paramCnt == 1) {
-      return ne(field, sqlParams.get(0));
+      return ne(field, sqlParams.get(0), false);
     }
-    return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql), sqlParams);
+    return new Cond(String.format(" %s NOT IN (%s)", field, sql), sqlParams);
   }
 
   /**
    * 构建 field NOT IN ({sql}) 条件
    *
    * @param field 字段
-   * @param sql SQL
-   * @return Cond
+   * @param sql   SQL
+   * @return {@link Cond}
    */
   public static Cond notIn(String field, Sql sql) {
-    if( Objects.isNull(sql)) return new Cond();
-    return new Cond(StrUtil.format(" {} NOT IN ({})", field, sql.sql), sql.params);
+    if (null == sql) return new Cond();
+    return new Cond(String.format(" %s NOT IN (%s)", field, sql.sql), sql.params);
   }
 
   private static Sql createInClauseParams(Collection<?> params) {
 
-    Sql sql;
+    Sql           sql;
     StringBuilder sqlBuilder;
-    List<Object> sqlParams;
+    List<Object>  sqlParams;
 
     sqlBuilder = new StringBuilder();
     sqlParams = new ArrayList<>();
-    if (CollUtil.isNotEmpty(params)) {
+    if (CollectionUtil.isNotEmpty(params)) {
       for (Object param : params) {
-        if (StrUtil.isBlankIfStr(param)) {
+        if (null == param) {
           continue;
         }
+
         sqlBuilder.append("?,");
         sqlParams.add(param);
       }
@@ -380,18 +450,18 @@ public class Cond extends Clause {
    * 构建 EXIST ({subSql}) 条件
    *
    * @param subSql SQL
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond exists(Sql subSql) {
-    if( Objects.isNull(subSql)) return new Cond();
-    return new Cond(StrUtil.format(" EXISTS ({})", subSql.sql), subSql.params.toArray());
+    if (null == subSql) return new Cond();
+    return new Cond(String.format(" EXISTS (%s)", subSql.sql), subSql.params.toArray());
   }
 
   /**
    * 构建 EXIST ({supplier}) 条件
    *
    * @param supplier Supplier
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond exists(Supplier<Sql> supplier) {
 
@@ -402,18 +472,18 @@ public class Cond extends Clause {
    * 构建 NOT EXIST ({subSql}) 条件
    *
    * @param subSql SQL
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond notExists(Sql subSql) {
-    if( Objects.isNull(subSql)) return new Cond();
-    return new Cond(StrUtil.format(" NOT EXISTS ({})", subSql.sql), subSql.params.toArray());
+    if (null == subSql) return new Cond();
+    return new Cond(String.format(" NOT EXISTS (%s)", subSql.sql), subSql.params.toArray());
   }
 
   /**
    * 构建 NOT EXIST ({supplier}) 条件
    *
    * @param supplier Supplier
-   * @return Cond
+   * @return {@link Cond}
    */
   public static Cond notExists(Supplier<Sql> supplier) {
 
@@ -424,14 +494,14 @@ public class Cond extends Clause {
    * 使用 AND {cond} 拼接多个条件
    *
    * @param cond Cond
-   * @return Cond
+   * @return {@link Cond}
    */
   public Cond and(Cond cond) {
 
-    if (StrUtil.isBlankIfStr(cond.sql)) {
+    if (StringUtil.isBlank(cond.sql)) {
       return this;
     }
-    this.sql.append(StrUtil.format(" AND {}", StrUtil.trimStart(cond.sql)));
+    this.sql.append(String.format(" AND %s", StringUtil.trimStart(cond.sql)));
     this.params.addAll(cond.params);
     return this;
   }
@@ -440,14 +510,14 @@ public class Cond extends Clause {
    * 使用 OR {cond} 拼接多个条件
    *
    * @param cond Cond
-   * @return Cond
+   * @return {@link Cond}
    */
   public Cond or(Cond cond) {
 
-    if (StrUtil.isBlankIfStr(cond.sql)) {
+    if (StringUtil.isBlank(cond.sql)) {
       return this;
     }
-    this.sql.append(StrUtil.format(" OR {}", StrUtil.trimStart(cond.sql)));
+    this.sql.append(String.format(" OR %s", StringUtil.trimStart(cond.sql)));
     this.params.addAll(cond.params);
     return this;
   }
@@ -456,25 +526,25 @@ public class Cond extends Clause {
    * 根据@Condition 注解创建Cond
    *
    * @param object 包含@Condition注解Field的对象
-   * @return Cond
+   * @return {@link Cond}
    */
-  public static Cond create(Object object) {
+  public static Cond createByCriteria(Object object) {
 
-    return create(object, Criterion.Default.class);
+    return createByCriteria(object, Criterion.Default.class);
   }
 
   /**
    * 根据@Condition 注解创建Cond
    *
-   * @param object 包含@Condition注解Field的对象
+   * @param object        包含@Condition注解Field的对象
    * @param criteriaGroup 条件组名
-   * @return Cond
+   * @return {@link Cond}
    */
-  public static Cond create(Object object, Class<?> criteriaGroup) {
+  public static Cond createByCriteria(Object object, Class<?> criteriaGroup) {
 
-    Cond cond = null;
+    Cond                   cond              = null;
     List<ConditionMatcher> conditionMatchers = new ArrayList<>();
-    final Field[] fields = ReflectUtil.getFields(object.getClass());
+    final List<Field>      fields            = ReflectUtil.getFields(object.getClass());
     for (Field field : fields) {
       final Criterion[] annotations = field.getAnnotationsByType(Criterion.class);
       for (Criterion annotation : annotations) {
@@ -483,8 +553,8 @@ public class Cond extends Clause {
         }
         ConditionMatcher conditionMatcher = new ConditionMatcher();
         conditionMatcher.fieldName =
-            StrUtil.isBlank(annotation.value()) ? field.getName() : annotation.value();
-        conditionMatcher.fieldValue = ReflectUtil.getFieldValue(object, field);
+            StringUtil.isBlank(annotation.value()) ? field.getName() : annotation.value();
+        conditionMatcher.fieldValue = new FieldVisitor(field).getValue(object);
         conditionMatcher.operator = annotation.operator();
         conditionMatcher.order = annotation.order();
         conditionMatchers.add(conditionMatcher);
@@ -494,7 +564,7 @@ public class Cond extends Clause {
     conditionMatchers.sort(Comparator.comparingInt(o -> o.order));
 
     for (ConditionMatcher condMat : conditionMatchers) {
-      if (cond == null) {
+      if (null == cond) {
         cond = createCondByOperator(condMat.operator, condMat.fieldName, condMat.fieldValue);
       } else {
         cond.and(createCondByOperator(condMat.operator, condMat.fieldName, condMat.fieldValue));
@@ -506,10 +576,10 @@ public class Cond extends Clause {
 
   static class ConditionMatcher {
 
-    String fieldName;
-    Object fieldValue;
+    String   fieldName;
+    Object   fieldValue;
     Operator operator;
-    int order;
+    int      order;
   }
 
   private static Cond createCondByOperator(Operator operator, String fieldName, Object paramVal) {
@@ -536,12 +606,12 @@ public class Cond extends Clause {
       case LESS_THAN_OR_EQUALS:
         return Cond.le(fieldName, paramVal);
       case IN:
-        Collection<?> inParam = ObjectConvert.toCollection(paramVal);
-        if(inParam.isEmpty()) return new Cond();
+        Collection<?> inParam = ConvertUtil.toCollection(paramVal);
+        if (inParam.isEmpty()) return new Cond();
         return Cond.in(fieldName, inParam);
       case NOT_IN:
-        Collection<?> notInParam = ObjectConvert.toCollection(paramVal);
-        if(notInParam.isEmpty()) return new Cond();
+        Collection<?> notInParam = ConvertUtil.toCollection(paramVal);
+        if (notInParam.isEmpty()) return new Cond();
         return Cond.notIn(fieldName, notInParam);
       default:
         throw new IllegalArgumentException("The operator is not supported");
@@ -552,5 +622,15 @@ public class Cond extends Clause {
   public String toString() {
 
     return this.sql.toString();
+  }
+
+  /**
+   * 设置转义符，用于使用 {@link Cond#like(String, Object, FuzzyMode)} 方法后设置
+   *
+   * @return {@link Cond}
+   */
+  private Cond escape() {
+    this.sql.append(String.format(" ESCAPE '%s'", FUZZY_ESCAPE));
+    return this;
   }
 }

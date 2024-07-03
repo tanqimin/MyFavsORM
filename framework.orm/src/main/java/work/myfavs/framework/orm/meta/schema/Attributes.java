@@ -1,16 +1,15 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
+
+import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * 字段集合封装
@@ -19,28 +18,10 @@ import java.util.function.Function;
  */
 public class Attributes {
 
-  private final Map<String, Attribute> map = new TreeMap<>();
+  private final Map<String /* columnName */, Attribute> map = new LinkedHashMap<>();
 
   private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
   private final Lock          writeLock     = readWriteLock.writeLock();
-
-  /**
-   * 根据实体属性名获取Attribute
-   *
-   * @param fieldName 实体属性名
-   * @return Attribute
-   */
-  public Attribute getAttributeByFieldName(String fieldName) {
-
-    Assert.notBlank(fieldName);
-
-    for (Attribute value : map.values()) {
-      if (StrUtil.equalsIgnoreCase(value.getFieldName(), fieldName)) {
-        return value;
-      }
-    }
-    return null;
-  }
 
   /**
    * 根据数据库字段名获取Attribute
@@ -50,7 +31,8 @@ public class Attributes {
    */
   public Attribute getAttribute(String columnName) {
 
-    Assert.notBlank(columnName);
+    if (StringUtil.isEmpty(columnName))
+      throw new DBException("数据库字段名不能为空! ");
 
     return map.get(columnName.toUpperCase());
   }
@@ -58,14 +40,16 @@ public class Attributes {
   public List<Attribute> getAttributes(String[] columnNames) {
 
     if (ArrayUtil.isEmpty(columnNames)) {
-      return CollUtil.list(true, map.values());
+      return new ArrayList<>(map.values());
     }
 
-    List<Attribute> res = new LinkedList<>();
+    List<Attribute> res = new ArrayList<>();
     for (String columnName : columnNames) {
-      final String col = StrUtil.trim(columnName);
+      final String col       = StringUtil.trim(columnName);
+      Attribute    attribute = getAttribute(col);
+
       if (containsColumn(col)) {
-        res.add(getAttribute(col));
+        res.add(attribute);
       }
     }
     return res;
@@ -78,8 +62,10 @@ public class Attributes {
 
   public Attribute put(String columnName, Attribute value) {
 
-    Assert.notBlank(columnName);
-    Assert.notNull(value);
+    if (StringUtil.isEmpty(columnName))
+      throw new DBException("数据库字段名不能为空! ");
+
+    Objects.requireNonNull(value);
 
     final String key = columnName.toUpperCase();
     writeLock.lock();
@@ -91,26 +77,13 @@ public class Attributes {
   }
 
   public void forEach(BiConsumer<String, Attribute> action) {
-
     map.forEach(action);
-  }
-
-  public Attribute computeIfAbsent(String columnName, Function<String, Attribute> mappingFunction) {
-
-    Assert.notBlank(columnName);
-
-    final String key = columnName.toUpperCase();
-    writeLock.lock();
-    try {
-      return map.computeIfAbsent(key, mappingFunction);
-    } finally {
-      writeLock.unlock();
-    }
   }
 
   public boolean containsColumn(String columnName) {
 
-    Assert.notBlank(columnName);
+    if (StringUtil.isEmpty(columnName))
+      throw new DBException("数据库字段名不能为空! ");
 
     return map.containsKey(columnName.toUpperCase());
   }
@@ -123,10 +96,5 @@ public class Attributes {
   public int size() {
 
     return map.size();
-  }
-
-  public boolean isEmpty() {
-
-    return map.isEmpty();
   }
 }

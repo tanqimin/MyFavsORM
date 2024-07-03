@@ -1,12 +1,16 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
+import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+import work.myfavs.framework.orm.util.convert.ConvertUtil;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-/** Created by tanqimin on 2016/1/29. */
+/**
+ * Created by tanqimin on 2016/1/29.
+ */
 public class BooleanPropertyHandler extends PropertyHandler<Boolean> {
 
   private boolean isPrimitive;
@@ -19,29 +23,15 @@ public class BooleanPropertyHandler extends PropertyHandler<Boolean> {
   }
 
   @Override
-  public Boolean convert(ResultSet rs, String columnName, Class<Boolean> clazz)
+  public Boolean convert(ResultSet rs, int columnIndex, Class<Boolean> clazz)
       throws SQLException {
-
-    boolean i = rs.getBoolean(columnName);
-    if (rs.wasNull()) {
-      if (isPrimitive) {
-        return false;
-      } else {
-        return null;
-      }
-    }
-
-    return i;
+    return ConvertUtil.toBool(rs.getObject(columnIndex), this.isPrimitive);
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Boolean param)
       throws SQLException {
 
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
     ps.setBoolean(paramIndex, param);
   }
 

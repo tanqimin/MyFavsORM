@@ -24,7 +24,8 @@ DataSource dataSource = new HikariDataSource(configuration);
 DBTemplate dbTemplate = new DBTemplate.Builder()
         .dataSource(dataSource)
         .config(config -> {
-            config.setShowSql(true)
+            config
+                .setShowSql(true)
                 .setShowResult(true);
         }).build();
 ```
@@ -32,15 +33,55 @@ DBTemplate dbTemplate = new DBTemplate.Builder()
 然后就可以马上使用：
 
 ```java
-Sql sql = new Sql("SELECT * FROM tb_product");
-List<Record> list = DB.conn().find(sql);
+try (Database database = dbTemplate.createDatabase();
+     Query query = database.createQuery("SELECT * FROM tb_product")) {
+    List<Record> records = query.find(Record.class);
+}
 ```
 
 ## 使用入门
 
-### 查询
+### Query类
 
-#### 使用实体类
+> 在一些系统中追求极致性能，可以直接使用Query类进行数据库操作
+
+#### find方法
+
+```java
+try (Database database = dbTemplate.createDatabase();
+     Query query = database.createQuery("SELECT * FROM tb_product WHERE name = ?")) {
+    List<Record> records = query.addParameter(1, "可口可乐").find(Record.class);
+}
+```
+
+#### execute方法
+
+```java
+try (Database database = dbTemplate.createDatabase();
+     Query query = database.createQuery("INSERT INTO tb_product(code, name) VALUE (?, ?)")) {
+    query.addParameter( "KELE").addParameter("可口可乐").execute();
+    query.addParameter( "ICETEA").addParameter("冰红茶").execute();
+}
+```
+
+#### executeBatch方法
+
+```java
+try (Database database = dbTemplate.createDatabase();
+     Query query = database.createQuery("INSERT INTO tb_product(code, name) VALUE (?, ?)")) {
+    query.addParameter( "KELE").addParameter("可口可乐").addBatch();
+    query.addParameter( "ICETEA").addParameter("冰红茶").addBatch();
+    query.executeBatch();
+}
+```
+
+
+
+### Orm类
+
+> 如果注重研发效率，可使用Orm类对实体进行操作
+
+#### 查询
 
 以下示例，创建一个实体类
 
@@ -54,6 +95,7 @@ public class Product implements Serializable {
     @Column
     private LocalDateTime created;
     @Column
+    @NVarchar
     private String        name;
     @Column
     private boolean       disable;
@@ -62,7 +104,7 @@ public class Product implements Serializable {
 }
 ```
 
-此处用到`@Table`、`@Column`和`@PrimaryKey`三个注解：
+此处用到`@Table`、`@Column`、和`@PrimaryKey`注解：
 
 + `@Table`，定义实体的数据表，其中参数value为数据表名称(如果不设置value，则会把实体名称转成下划线分隔，小写的形式（如实体名称为 *ProductPrice*，对应的数据表名称为 *product_price*），strategy为主键策略；
     * GenerationType.UUID，UUID，如果主键值为null，会自动生成；
@@ -72,9 +114,9 @@ public class Product implements Serializable {
 + `@Column`，定义实体类关联的数据表字段，参数value为数据字段名称(如果不设置value，则会把实体属性名称转成下划线分隔，小写的形式（如实体名称为 *productCode*，对应的数据字段名称为 *product_code*）；参数readOnly默认值为false，当设置为true时，插入和更新操作不会包含该字段；
 + `@PrimaryKey`，定义主键的属性，必须和`@Column`配合使用；
 
-#### Sql构建器
+##### Sql构建器
 
-##### 创建Sql构建器
+###### 创建Sql构建器
 
 ```java
 Sql sql = new Sql();
@@ -82,7 +124,7 @@ Sql sql = new Sql();
 Sql sql = Sql.New();
 ```
 
-##### 创建查询语句
+###### 创建查询语句
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product WHERE id = ?", 1L);
@@ -92,7 +134,7 @@ Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.eq("id", 1L));
 Sql sql = new Sql().select("*").from("tb_product").where(Cond.eq("id", 1L));
 ```
 
-##### 条件构建类Cond
+###### 条件构建类Cond
 
 对于系统中，大家会发现where、and、or等方法中的参数，都是条件构建器`Cond`：
 
@@ -116,89 +158,125 @@ sql.where().and(Cond.in("id", params, false));	 //where 1 = 1 and 1 > 2
 
 
 
-#### 查询一行记录
+##### 查询一行记录
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product WHERE id = ?", 1);
-Product product = DB.conn().get(Product.class, sql);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm     orm     = database.createOrm();
+    Product product = orm.get(Product.class, sql);
+}
 ```
 
-#### 根据主键查询
+##### 根据主键查询
 
 ```java
-Product product = DB.conn().getById(Product.class, 1);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm     orm     = database.createOrm();
+    Product product = orm.getById(Product.class, 1);
+}
 ```
 
-#### 查询多行记录
+##### 查询多行记录
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-List<Product> products = DB.conn().find(Product.class, sql);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm           orm      = database.createOrm();
+    List<Product> products = orm.find(Product.class, sql);
+}
 ```
 
-#### 简单条件查询
+##### 简单条件查询
 
 ```java
-List<Product> products = DB.conn().findByCond(Product.class, Cond.like("name", "%手机%"));
+try (Database database = dbTemplate.createDatabase()) {
+    Orm           orm      = database.createOrm();
+    List<Product> products = orm.findByCond(Product.class, Cond.like("name", "%手机%"));
+}
 ```
 
-#### 查询返回ID集合
+##### 查询返回ID集合
 
 ```java
 Sql sql = new Sql("SELECT id FROM tb_product").where(Cond.like("name", "%手机%"));
-List<Long> ids = DB.conn().find(Long.class, sql);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm        orm      = database.createOrm();
+    List<Long> products = orm.find(Long.class, sql);
+}
 ```
 
-#### 根据某个字段查询
+##### 根据某个字段查询
 
 ```java
-List<Product> products = DB.conn().findByField(Product.class, "name", "手机");
+try (Database database = dbTemplate.createDatabase()) {
+    Orm           orm      = database.createOrm();
+    List<Product> products = orm.findByField(Product.class, "name", "手机");
+}
 ```
 
-#### 查询前N条记录
+##### 查询前N条记录
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-List<Product> products = DB.conn().findTop(Product.class, 10, sql);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm           orm      = database.createOrm();
+    List<Product> products = orm.findTop(Product.class, 10, sql);
+}
 ```
 
-#### 根据主键集合查询
+##### 根据主键集合查询
 
 ```java
 ArrayList<Integer> params = new ArrayList<>();
 Collections.addAll(list, 1,2,3);
-List<Product> products = DB.conn().findByIds(Product.class, params);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm           orm      = database.createOrm();
+    List<Product> products = orm.findByIds(Product.class, params);
+}
 ```
 
-#### 查询返回Map
+##### 查询返回Map
 
 很多时候，我们希望查询返回Map<TPk, TEntity>的结构，可以这样写：
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-Map<Long, Product> map = DB.conn().findMap(Product.class, "id", sql);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm           	   orm      = database.createOrm();
+    Map<Long, Product> products = orm.findMap(Product.class, "id", sql);
+}
 ```
 
-#### 查询记录数
+##### 查询记录数
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-int count = DB.conn().count(sql);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm  orm   = database.createOrm();
+    long count = orm.count(sql);
+}
 ```
 
-#### 检查是否存在记录
+##### 检查是否存在记录
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-boolean exists = DB.conn().exists(sql);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm     orm    = database.createOrm();
+    boolean exists = orm.exists(sql);
+}
 ```
 
-#### 分页查询
+##### 分页查询
 
 ```java
 Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-//第3个参数为是否启用分页, 第4个参数为当前页码, 第5个参数为每页记录数
-Page<Product> page = DB.conn().findPage(Product.class, sql, true, 1, 20);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm orm = database.createOrm();
+    //第3个参数为是否启用分页, 第4个参数为当前页码, 第5个参数为每页记录数
+    Page<Product> page = orm.findPage(Product.class, sql, true, 1, 20);
+}
 ```
 
 建议在分页请求中实现`IPageable`接口：
@@ -210,63 +288,83 @@ public PageRequest implements IPageable {}
 分页查询可写为：
 
 ```java
-Page<Product> page = DB.conn().findPage(Product.class, sql, pageReq);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm           orm  = database.createOrm();
+    Page<Product> page = orm.findPage(Product.class, sql, pageRequest);
+}
 ```
 
 简单分页查询，结果不包含总行数，在某些考虑性能的情况下，可以使用；
 
 ```java
-PageLite<Product> page = DB.conn().findPageLite(Product.class, sql, pageReq);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm               orm  = database.createOrm();
+    PageLite<Product> page = orm.findPageLite(Product.class, sql, pageRequest);
+}
 ```
 
-### 插入
+#### 插入
 
 ```java
-Product p1 = ..;
-DB.conn().create(p1);
-
-List<Product> products = ...;
-DB.conn().create(products);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm orm  = database.createOrm();
+    
+    Product p1 = ..;
+    orm.create(p1);
+    
+    List<Product> products = ...;
+    orm.create(products);
+}
 ```
 
-### 修改
+#### 修改
 
 ```java
-Product p1 = ..;
-DB.conn().update(p1);
-
-List<Product> products = ...;
-DB.conn().update(products);
-//只更新name字段
-DB.conn().update(products, new String[]{"name"});
+try (Database database = dbTemplate.createDatabase()) {
+    Orm orm  = database.createOrm();
+    
+    Product p1 = ..;
+    orm.update(p1);
+    
+    List<Product> products = ...;
+    orm.update(products);
+    
+    //只更新name字段
+    orm.update(products, new String[]{"name"});
+}
 ```
 
-### 删除
+#### 删除
 
 ```java
-Product p1 = ..;
-DB.conn().delete(p1);
-
-List<Product> products = ...;
-DB.conn().delete(products);
-
-DB.conn().deleteById(1);
-
-ArrayList<Integer> params = new ArrayList<>();
-Collections.addAll(list, 1,2,3);
-DB.conn().deleteByIds(params);
+try (Database database = dbTemplate.createDatabase()) {
+    Orm orm  = database.createOrm();
+    
+    Product p1 = ..;
+    orm.delete(p1);
+    
+    List<Product> products = ...;
+    orm.delete(products);
+    
+    //根据id删除
+    orm.deleteById(1);
+    
+    ArrayList<Integer> params = new ArrayList<>();
+    Collections.addAll(list, 1,2,3);
+    orm.deleteByIds(params);
+}
 ```
 
-### 事务
+#### 事务
 
 ```java
-DB.conn().tx(db -> {
-    db.update(p1);
-    db.delete(p2);
-});
+try (Database database = dbTemplate.createDatabase()) {
+    database.tx(orm -> {
+        orm.update(p1);
+        orm.delete(p2);
+    });
+}
 ```
-
-
 
 ## 高级使用
 
@@ -275,23 +373,34 @@ DB.conn().tx(db -> {
 在一些业务场景需要使用另外一个同构表进行操作，可以使用TableAlias类进行操作，假设我们需要根据用户区域进行分表，原始数据表为order，分表为order_1
 
 ```java
-TableAlias.set("order_1");
-Order order = db.getById(Order.class, id);
-//此时查询的语句为：select * from order_1 where id = ?
-TableAlias.clear();		//用完后记得调用clear()方法恢复原表名哦
+try (Database database = dbTemplate.createDatabase()) {
+    Orm orm = database.createOrm();
 
-Order order = db.getById(Order.class, id);
-//此时查询的语句为：select * from order where id = ?
+    TableAlias.set("order_1");
+    Order order = orm.getById(Order.class, id);
+
+    //此时查询的语句为：select * from order_1 where id = ?
+    TableAlias.clear();    //用完后记得调用clear()方法恢复原表名哦
+
+    Order order = orm.getById(Order.class, id);
+    //此时查询的语句为：select * from order where id = ?
+}
 ```
 
 也可以使用以下方式查询：
 
 ```java
-Order order = TableAlias.function("order_1", s -> db.getById(Order.class, id));
-//此时查询的语句为：select * from order_1 where id = ?
+try (Database database = dbTemplate.createDatabase()) {
+    Orm orm = database.createOrm();
 
-Order order = db.getById(Order.class, id);
-//此时查询的语句为：select * from order where id = ?
+    Order order = TableAlias.function(
+        "order_1",	//分表名称
+        s -> orm.getById(Order.class, id));
+    //此时查询的语句为：select * from order_1 where id = ?
+
+    Order order = orm.getById(Order.class, id);
+    //此时查询的语句为：select * from order where id = ?
+}
 ```
 
 
@@ -305,14 +414,14 @@ Order order = db.getById(Order.class, id);
 @Configuration
 public class MyFavsConfig {
     @Bean
-    public DataSource datesource(){
+    public DataSource dataSource(){
         //创建数据源
         return DruidDataSourceBuilder.create().build();
     }
 
     @Bean
     public DBTemplate dbTemplate(){
-        return new DBTemplate.Builder().dataSource(datesource()) 
+        return new DBTemplate.Builder().dataSource(dataSource()) 
             .connectionFactory(SpringConnFactory.class)
             .config(config -> {
                 config.setDbType(DbType.MYSQL)
@@ -353,55 +462,59 @@ public class MyFavsConfig {
 registerPropertyHandler 内置注册的实体属性类型解析器：
 
 ```java
-    registerPropertyHandler(String.class, new StringPropertyHandler());
-    registerPropertyHandler(java.util.Date.class, new DatePropertyHandler());
-    registerPropertyHandler(LocalDateTime.class, new LocalDateTimePropertyHandler());
-    registerPropertyHandler(LocalDate.class, new LocalDatePropertyHandler());
-    registerPropertyHandler(LocalTime.class, new LocalTimePropertyHandler());
-    registerPropertyHandler(BigDecimal.class, new BigDecimalPropertyHandler());
-    registerPropertyHandler(Boolean.class, new BooleanPropertyHandler());
-    registerPropertyHandler(Boolean.TYPE, new BooleanPropertyHandler());
-    registerPropertyHandler(Integer.class, new IntegerPropertyHandler());
-    registerPropertyHandler(Integer.TYPE, new IntegerPropertyHandler());
-    registerPropertyHandler(Long.class, new LongPropertyHandler());
-    registerPropertyHandler(Long.TYPE, new LongPropertyHandler());
-    registerPropertyHandler(UUID.class, new UUIDPropertyHandler());
-    registerPropertyHandler(Short.class, new ShortPropertyHandler());
-    registerPropertyHandler(Short.TYPE, new ShortPropertyHandler());
-    registerPropertyHandler(Double.class, new DoublePropertyHandler());
-    registerPropertyHandler(Double.TYPE, new DoublePropertyHandler());
-    registerPropertyHandler(Float.class, new FloatPropertyHandler());
-    registerPropertyHandler(Float.TYPE, new FloatPropertyHandler());
-    registerPropertyHandler(Byte.class, new BytePropertyHandler());
-    registerPropertyHandler(Byte.TYPE, new BytePropertyHandler());
-    registerPropertyHandler(byte[].class, new ByteArrayPropertyHandler());
-    registerPropertyHandler(Byte[].class, new ByteArrayPropertyHandler());
-    registerPropertyHandler(Blob.class, new BlobPropertyHandler());
-    registerPropertyHandler(Clob.class, new ClobPropertyHandler());
+register(String.class, new StringPropertyHandler());
+register(java.util.Date.class, new DatePropertyHandler());
+register(BigDecimal.class, new BigDecimalPropertyHandler());
+register(boolean.class, new BooleanPropertyHandler(true));
+register(Boolean.class, new BooleanPropertyHandler());
+register(Boolean.TYPE, new BooleanPropertyHandler());
+register(int.class, new IntegerPropertyHandler(true));
+register(Integer.class, new IntegerPropertyHandler());
+register(Integer.TYPE, new IntegerPropertyHandler());
+register(long.class, new LongPropertyHandler(true));
+register(Long.class, new LongPropertyHandler());
+register(Long.TYPE, new LongPropertyHandler());
+register(UUID.class, new UUIDPropertyHandler());
+register(short.class, new ShortPropertyHandler(true));
+register(Short.class, new ShortPropertyHandler());
+register(Short.TYPE, new ShortPropertyHandler());
+register(double.class, new DoublePropertyHandler(true));
+register(Double.class, new DoublePropertyHandler());
+register(Double.TYPE, new DoublePropertyHandler());
+register(float.class, new FloatPropertyHandler(true));
+register(Float.class, new FloatPropertyHandler());
+register(Float.TYPE, new FloatPropertyHandler());
+register(byte.class, new BytePropertyHandler(true));
+register(Byte.class, new BytePropertyHandler());
+register(Byte.TYPE, new BytePropertyHandler());
+register(byte[].class, new ByteArrayPropertyHandler());
+register(Byte[].class, new ByteArrayPropertyHandler());
+register(Blob.class, new BlobPropertyHandler());
+register(Clob.class, new ClobPropertyHandler());
 ```
 ### 自定义实体属性类型解析器
 
-我们来看 LocalDateTimePropertyHandler 的实现，只需继承 PropertyHandler 类，实现 ResultSet 类型与目标类型的转换即可：
+我们来看 UUIDPropertyHandler 的实现，只需继承 PropertyHandler 类，实现 ResultSet 类型与目标类型的转换即可：
 
 ```java
-public class LocalDateTimePropertyHandler extends PropertyHandler<LocalDateTime> {
-    @Override
-    public LocalDateTime convert(ResultSet rs, String columnName, Class<LocalDateTime> clazz) throws SQLException {
-        Timestamp val = rs.getTimestamp(columnName);
-        if (rs.wasNull()) {
-          return null;
-        }
-        return val.toLocalDateTime();
-    }
+public class UUIDPropertyHandler extends PropertyHandler<UUID> {
 
-    @Override
-    public void addParameter(PreparedStatement ps, int paramIndex, LocalDateTime param) throws SQLException {
-        if (param == null) {
-          ps.setNull(paramIndex, Types.TIMESTAMP);
-          return;
-        }
-        ps.setTimestamp(paramIndex, Timestamp.valueOf(param));
-    }
+  @Override
+  public UUID convert(ResultSet rs, int columnIndex, Class<UUID> clazz) throws SQLException {
+
+    return ConvertUtil.toUUID(rs.getObject(columnIndex));
+  }
+
+  @Override
+  public void addParameter(PreparedStatement ps, int paramIndex, UUID param) throws SQLException {
+
+    ps.setString(paramIndex, param.toString());
+  }
+
+  @Override
+  public int getSqlType() {
+    return Types.VARCHAR;
+  }
 }
 ```
 

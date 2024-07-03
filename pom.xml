@@ -6,7 +6,7 @@
 
     <groupId>work.myfavs</groupId>
     <artifactId>framework</artifactId>
-    <version>0.3.2-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -16,21 +16,25 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <spring-boot.version>2.7.14</spring-boot.version>
-        <spring-jdbc.version>5.3.29</spring-jdbc.version>
-        <slf4j.version>2.0.7</slf4j.version>
-        <druid.version>1.2.18</druid.version>
-        <HikariCP.version>5.0.1</HikariCP.version>
-        <mysql-jdbc.version>8.1.0</mysql-jdbc.version>
-        <mssql-jdbc.version>12.2.0.jre11</mssql-jdbc.version>
-        <guava.version>32.1.2-jre</guava.version>
-        <hutool.version>5.8.21</hutool.version>
-        <beetl.version>3.15.13.RELEASE</beetl.version>
+
+        <spring-boot.version>2.7.18</spring-boot.version>
+        <spring-jdbc.version>5.3.37</spring-jdbc.version>
+        <slf4j.version>2.0.13</slf4j.version>
+        <druid.version>1.2.23</druid.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <HikariCP.version>5.1.0</HikariCP.version>
+        <mysql-jdbc.version>8.4.0</mysql-jdbc.version>
+        <mssql-jdbc.version>12.6.3.jre11</mssql-jdbc.version>
+        <beetl.version>3.16.2.RELEASE</beetl.version>
+
         <junit.version>4.13.2</junit.version>
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
-        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+        <mockito.version>5.12.0</mockito.version>
+        <reflectasm.version>1.11.9</reflectasm.version>
+
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+        <maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
     </properties>
 
     <!--私服仓库-->
@@ -112,6 +116,13 @@
                 <version>${druid.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
             <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
             <dependency>
                 <groupId>com.zaxxer</groupId>
@@ -147,27 +158,6 @@
                 <version>${slf4j.version}</version>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-core -->
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-core</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-
-            <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-json -->
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-json</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-
-            <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-
             <!-- https://mvnrepository.com/artifact/com.ibeetl/beetl -->
             <dependency>
                 <groupId>com.ibeetl</groupId>
@@ -181,6 +171,40 @@
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>work.myfavs</groupId>
+                <artifactId>framework.orm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>work.myfavs</groupId>
+                <artifactId>framework.orm-generator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>work.myfavs</groupId>
+                <artifactId>framework.orm-spring-starter</artifactId>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

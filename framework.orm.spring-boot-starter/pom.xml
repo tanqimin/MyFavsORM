@@ -10,7 +10,7 @@
     <parent>
         <groupId>work.myfavs</groupId>
         <artifactId>framework</artifactId>
-        <version>0.3.2-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -25,7 +25,6 @@
         <dependency>
             <groupId>work.myfavs</groupId>
             <artifactId>framework.orm</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->

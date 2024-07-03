@@ -17,48 +17,35 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
-public class LongPropertyHandler extends PropertyHandler<Long> {
+public class LongPropertyHandler extends NumberPropertyHandler<Long> {
 
-  private boolean isPrimitive;
-
-  public LongPropertyHandler() {}
+  public LongPropertyHandler() {
+  }
 
   public LongPropertyHandler(boolean isPrimitive) {
-
-    this.isPrimitive = isPrimitive;
+    super(isPrimitive);
   }
 
   @Override
-  public Long convert(ResultSet rs, String columnName, Class<Long> clazz) throws SQLException {
-
-    long i = rs.getLong(columnName);
-    if (rs.wasNull()) {
-      if (isPrimitive) {
-        return 0L;
-      } else {
-        return null;
-      }
-    }
-    return i;
+  protected Long convertNumber(Number val) {
+    return val.longValue();
   }
 
   @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, Long param) throws SQLException {
+  protected Long convertString(String val) {
+    return Long.parseLong(val);
+  }
 
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
+  @Override
+  protected void setParameter(PreparedStatement ps, int paramIndex, Long param) throws SQLException {
     ps.setLong(paramIndex, param);
   }
 
-    @Override
-    public int getSqlType() {
-        return Types.BIGINT;
-    }
+  @Override
+  public int getSqlType() {
+    return Types.BIGINT;
+  }
 }

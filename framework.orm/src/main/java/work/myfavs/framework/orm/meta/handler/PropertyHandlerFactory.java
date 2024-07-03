@@ -1,48 +1,31 @@
 package work.myfavs.framework.orm.meta.handler;
 
+import work.myfavs.framework.orm.meta.handler.impls.*;
+import work.myfavs.framework.orm.util.lang.NVarchar;
+
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.*;
-import work.myfavs.framework.orm.meta.handler.impls.BigDecimalPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.BlobPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.BooleanPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.ByteArrayPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.BytePropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.ClobPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.DatePropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.DoublePropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.EnumPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.FloatPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.IntegerPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.LocalDatePropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.LocalDateTimePropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.LocalTimePropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.LongPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.ObjectPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.ShortPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.StringPropertyHandler;
-import work.myfavs.framework.orm.meta.handler.impls.UUIDPropertyHandler;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class PropertyHandlerFactory {
 
-  private static final Map<String, PropertyHandler<?>> HANDLER_MAP = new HashMap<>();
-  private static final EnumPropertyHandler ENUM_PROPERTY_HANDLER = new EnumPropertyHandler();
-  private static final ObjectPropertyHandler OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
+  private static final Map<String, PropertyHandler<?>> HANDLER_MAP             = new HashMap<>();
+  private static final EnumPropertyHandler             ENUM_PROPERTY_HANDLER   = new EnumPropertyHandler();
+  private static final ObjectPropertyHandler           OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
 
   private PropertyHandlerFactory() {}
 
-  /** 注册默认的PropertyHandler */
+  /**
+   * 注册默认的PropertyHandler
+   */
   public static void registerDefault() {
 
     register(String.class, new StringPropertyHandler());
+    register(NVarchar.class, new NVarcharPropertyHandler());
     register(java.util.Date.class, new DatePropertyHandler());
-    register(LocalDateTime.class, new LocalDateTimePropertyHandler());
-    register(LocalDate.class, new LocalDatePropertyHandler());
-    register(LocalTime.class, new LocalTimePropertyHandler());
     register(BigDecimal.class, new BigDecimalPropertyHandler());
     register(boolean.class, new BooleanPropertyHandler(true));
     register(Boolean.class, new BooleanPropertyHandler());
@@ -75,7 +58,7 @@ public class PropertyHandlerFactory {
   /**
    * 注册解析器类型
    *
-   * @param clazz Class
+   * @param clazz           Class
    * @param propertyHandler PropertyHandler
    */
   @SuppressWarnings("rawtypes")
@@ -88,11 +71,12 @@ public class PropertyHandlerFactory {
   public static PropertyHandler getInstance(Class<?> clazz) {
 
     String clazzName = clazz.getName();
-    if (HANDLER_MAP.containsKey(clazzName)) {
-      return HANDLER_MAP.get(clazzName);
-    }
+
+    PropertyHandler<?> propertyHandler = HANDLER_MAP.get(clazzName);
+    if (null != propertyHandler) return propertyHandler;
 
     if (clazz.isEnum()) {
+      HANDLER_MAP.put(clazzName, ENUM_PROPERTY_HANDLER);
       return ENUM_PROPERTY_HANDLER;
     }
 

@@ -1,11 +1,11 @@
 package work.myfavs.framework.orm.util;
 
-import cn.hutool.core.date.StopWatch;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SqlLogTest {
 
@@ -23,23 +23,22 @@ public class SqlLogTest {
       personList.add(new Person("name" + i, 18));
     }
 
-    StopWatch stopWatch = new StopWatch();
-    stopWatch.start();
+    long      start     = System.currentTimeMillis();
     StringBuilder sb = new StringBuilder();
     for (Person person : personList) {
       //      sb.append(JSON.parseObj(person)
       //                        .toString());
       sb.append("\n");
     }
-    stopWatch.stop();
+    long stop = System.currentTimeMillis();
     log.debug(sb.toString());
-    log.debug("use : {}", stopWatch.getLastTaskTimeMillis());
+    log.debug("use : {}", stop - start);
   }
 
-  class Person {
+  static class Person {
 
     private String name;
-    private int age;
+    private int    age;
 
     public String getName() {
 

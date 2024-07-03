@@ -1,15 +1,20 @@
 package work.myfavs.framework.orm;
 
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ReflectUtil;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
-import javax.sql.DataSource;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
-import work.myfavs.framework.orm.util.PKGenerator;
+import work.myfavs.framework.orm.meta.pagination.Page;
+import work.myfavs.framework.orm.meta.pagination.PageLite;
+import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.id.PKGenerator;
+
+import javax.sql.DataSource;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * 数据库配置
@@ -18,17 +23,40 @@ import work.myfavs.framework.orm.util.PKGenerator;
  */
 @SuppressWarnings("rawtypes")
 public class DBTemplate {
+  private static final Map<String/* dsName */, DBTemplate> POOL = new ConcurrentHashMap<>();
+
+  public static DBTemplate get(String dsName) {
+    if (POOL.containsKey(dsName)) {
+      return POOL.get(dsName);
+    }
+    throw new DBException("数据源 %s 不存在.", dsName);
+  }
+
+  public static DBTemplate add(String dsName, DBTemplate dbTemplate) {
+    POOL.put(dsName, dbTemplate);
+    return dbTemplate;
+  }
 
   // region Attributes
-  /** 数据源名称 */
-  private final String dsName;
-  /** 数据源 */
-  private final DataSource dataSource;
-  /** 数据库配置 */
-  private final DBConfig dbConfig;
-  /** 数据库连接工厂 */
+  /**
+   * 数据源名称
+   */
+  private final String      dsName;
+  /**
+   * 数据源
+   */
+  private final DataSource  dataSource;
+  /**
+   * 数据库配置
+   */
+  private final DBConfig    dbConfig;
+  /**
+   * 数据库连接工厂
+   */
   private final ConnFactory connectionFactory;
-  /** 主键生成器 */
+  /**
+   * 主键生成器
+   */
   private final PKGenerator pkGenerator;
   // endregion
 
@@ -56,13 +84,11 @@ public class DBTemplate {
    * @param mapper Mapper
    */
   private void registerMapper(Mapper mapper) {
-    if (mapper == null || mapper.map.isEmpty()) {
+    if (mapper.map.isEmpty()) {
       PropertyHandlerFactory.registerDefault();
       return;
     }
-    for (Entry<Class<?>, PropertyHandler> entry : mapper.map.entrySet()) {
-      PropertyHandlerFactory.register(entry.getKey(), entry.getValue());
-    }
+    mapper.map.forEach(PropertyHandlerFactory::register);
   }
   // endregion
 
@@ -112,20 +138,97 @@ public class DBTemplate {
   /**
    * 获取数据库连接工厂
    *
-   * @param cls 数据库连接工厂类型
+   * @param cls        数据库连接工厂类型
    * @param dataSource 数据源
    * @return 数据库连接工厂
    */
   private ConnFactory createConnFactory(Class<? extends ConnFactory> cls, DataSource dataSource) {
-    return ReflectUtil.newInstance(cls, dataSource);
+    try {
+      //使用cls反射创建 ConnFactory 的实例
+      return cls.getDeclaredConstructor(DataSource.class).newInstance(dataSource);
+    } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+      throw new DBException("创建 ConnFactory 实例时发生异常: %s", e.getMessage());
+    }
+  }
+
+  /**
+   * 创建 {@link Database} 对象
+   *
+   * @return {@link Database}
+   */
+  public Database createDatabase() {
+    return new Database(this);
+  }
+
+  /**
+   * 创建 {@link Page} 对象
+   *
+   * @param <TView> 分页对象数据类型泛型
+   * @return {@link Page} 对象
+   */
+  public <TView> Page<TView> createPage() {
+    return new Page<>(this);
+  }
+
+  /**
+   * 创建 {@link Page} 对象
+   *
+   * @param data         分页数据
+   * @param currentPage  当前页码
+   * @param pageSize     每页记录数
+   * @param totalPages   总页数
+   * @param totalRecords 总记录数
+   * @param <TView>      分页对象数据类型泛型
+   * @return {@link Page} 对象
+   */
+  public <TView> Page<TView> createPage(List<TView> data, long currentPage, long pageSize, long totalPages, long totalRecords) {
+    Page<TView> page = createPage();
+    page.setData(data);
+    page.setCurrentPage(currentPage);
+    page.setPageSize(pageSize);
+    page.setTotalPages(totalPages);
+    page.setTotalRecords(totalRecords);
+    return page;
+  }
+
+  /**
+   * 创建 {@link PageLite} 对象
+   *
+   * @param <TModel> 简单分页对象泛型
+   * @return {@link PageLite} 对象
+   */
+  public <TModel> PageLite<TModel> createPageLite() {
+    return new PageLite<>(this);
+  }
+
+  /**
+   * 创建 {@link PageLite} 对象
+   *
+   * @param data        分页数据
+   * @param currentPage 当前页码
+   * @param pageSize    每页记录数
+   * @param <TModel>    简单分页对象泛型
+   * @return {@link PageLite} 对象
+   */
+  public <TModel> PageLite<TModel> createPageLite(
+      List<TModel> data, long currentPage, long pageSize) {
+
+    PageLite<TModel> instance = createPageLite();
+    instance.setData(data);
+    instance.setCurrentPage(currentPage);
+    instance.setPageSize(pageSize);
+    if (null != data) {
+      instance.setHasNext(data.size() == pageSize);
+    }
+    return instance;
   }
 
   public static class Builder {
 
-    private final String dsName;
-    private DataSource dataSource;
-    private DBConfig config;
-    public Mapper mapper = new Mapper();
+    private final String     dsName;
+    private       DataSource dataSource;
+    private       DBConfig   config;
+    public final  Mapper     mapper = new Mapper();
 
     public Builder() {
       this(DBConfig.DEFAULT_DATASOURCE_NAME);
@@ -164,13 +267,13 @@ public class DBTemplate {
 
     public DBTemplate build() {
 
-      Assert.notNull(this.dataSource, "DataSource is required.");
+      Objects.requireNonNull(this.dataSource, "DataSource is required.");
 
-      if (this.config == null) {
+      if (null == this.config) {
         this.config = new DBConfig();
       }
 
-      return DBTemplateContext.add(dsName, new DBTemplate(this));
+      return DBTemplate.add(dsName, new DBTemplate(this));
     }
   }
 

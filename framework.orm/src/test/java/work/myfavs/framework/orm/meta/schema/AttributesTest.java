@@ -2,15 +2,17 @@ package work.myfavs.framework.orm.meta.schema;
 
 import org.junit.Before;
 import org.junit.Test;
-import work.myfavs.framework.orm.entity.Snowflake;
+import work.myfavs.framework.orm.entity.SnowflakeExample;
+
+import java.util.Map;
 
 public class AttributesTest {
 
-  Attributes attributes;
+  Map<String /* columnName */, Attribute> attributes;
 
   @Before
-  public void setUp() throws Exception {
-    attributes = Metadata.get(Snowflake.class).getQueryAttributes();
+  public void setUp() {
+    attributes = Metadata.classMeta(SnowflakeExample.class).getQueryAttributes();
   }
 
   @Test
@@ -18,7 +20,7 @@ public class AttributesTest {
 
   @Test
   public void columns() {
-    for (String column : attributes.columns()) {
+    for (String column : attributes.keySet()) {
       System.out.println(column);
     }
   }
