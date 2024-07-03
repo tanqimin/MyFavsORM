@@ -1,6 +1,5 @@
 package work.myfavs.framework.example.domain.entity;
 
-import work.myfavs.framework.example.domain.enums.UserTypeEnum;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
@@ -13,7 +12,8 @@ public class Tenant {
   @Column @PrimaryKey private Long id;
   @Column private Date created;
   @Column private Date modified;
-  @Column private String tenant;
+  @Column
+  private String tenant;
 
   @Column("jdbc_class")
   private String jdbcClass;

@@ -1,12 +1,13 @@
 package work.myfavs.framework.orm.entity;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 public abstract class BaseEntity implements Serializable {
   public interface Update{}
@@ -15,8 +16,8 @@ public abstract class BaseEntity implements Serializable {
   private Date created = null;
   /** 名称 */
   @Column(value = "name")
-  @Criterion(value = "name", operator = Operator.LIKE, order = 1)
-  @Criterion(value = "name", operator = Operator.NOT_EQUALS, order = 1, group = Update.class)
+  @Criterion(value = "name", operator = Operator.LIKE)
+  @Criterion(value = "name", operator = Operator.NOT_EQUALS, group = Update.class)
   private String name = null;
   /** 是否停用 */
   @Column(value = "disable")

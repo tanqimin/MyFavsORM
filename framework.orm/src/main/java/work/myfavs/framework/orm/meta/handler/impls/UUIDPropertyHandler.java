@@ -1,31 +1,25 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
+import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+import work.myfavs.framework.orm.util.convert.ConvertUtil;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.UUID;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 public class UUIDPropertyHandler extends PropertyHandler<UUID> {
 
   @Override
-  public UUID convert(ResultSet rs, String columnName, Class<UUID> clazz) throws SQLException {
+  public UUID convert(ResultSet rs, int columnIndex, Class<UUID> clazz) throws SQLException {
 
-    String val = rs.getString(columnName);
-    if (rs.wasNull()) {
-      return null;
-    }
-    return UUID.fromString(val);
+    return ConvertUtil.toUUID(rs.getObject(columnIndex));
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, UUID param) throws SQLException {
 
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
     ps.setString(paramIndex, param.toString());
   }
 

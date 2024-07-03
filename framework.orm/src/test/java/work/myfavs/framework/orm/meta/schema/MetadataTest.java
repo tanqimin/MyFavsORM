@@ -1,17 +1,16 @@
 package work.myfavs.framework.orm.meta.schema;
 
 import org.junit.Test;
-import work.myfavs.framework.orm.entity.Snowflake;
-import work.myfavs.framework.orm.meta.dialect.DefaultDialectTest;
+import work.myfavs.framework.orm.entity.SnowflakeExample;
 
-public class MetadataTest extends DefaultDialectTest {
+public class MetadataTest {
 
   @Test
   public void get() {
-    ClassMeta classMeta = Metadata.get(Snowflake.class);
+    ClassMeta classMeta = Metadata.classMeta(SnowflakeExample.class);
     for (int i = 0; i < 10; i++) {
       //
-      classMeta = Metadata.get(Snowflake.class);
+      classMeta = Metadata.classMeta(SnowflakeExample.class);
     }
 
     System.out.println(classMeta);

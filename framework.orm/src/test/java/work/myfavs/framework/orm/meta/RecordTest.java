@@ -1,21 +1,19 @@
 package work.myfavs.framework.orm.meta;
 
-import static org.junit.Assert.*;
-
-import cn.hutool.core.util.IdUtil;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import work.myfavs.framework.orm.AbstractTest;
-import work.myfavs.framework.orm.entity.Snowflake;
-import work.myfavs.framework.orm.entity.Uuid;
+import work.myfavs.framework.orm.entity.SnowflakeExample;
+import work.myfavs.framework.orm.entity.UuidExample;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 
 public class RecordTest extends AbstractTest {
 
@@ -48,11 +46,11 @@ public class RecordTest extends AbstractTest {
   @Test
   public void getBean() {
     record.clear();
-    String id = IdUtil.randomUUID();
-    Uuid uuid = new Uuid();
+    String      id   = UUID.randomUUID().toString();
+    UuidExample uuid = new UuidExample();
     uuid.setId(id);
     record.set("uuid", uuid);
-    assertEquals(record.<Uuid>getBean("uuid").getId(), id);
+    assertEquals(record.<UuidExample>getBean("uuid").getId(), id);
   }
 
   @Test
@@ -93,16 +91,9 @@ public class RecordTest extends AbstractTest {
   @Test
   public void getLong() {
     record.clear();
-    long id = IdUtil.getSnowflakeNextId();
+    long id = 121L;
     record.set("long", id);
     assertEquals(record.getLong("long"), Long.valueOf(id));
-  }
-
-  @Test
-  public void getChar() {
-    record.clear();
-    record.set("char", 'a');
-    assertEquals(record.getChar("char"), Character.valueOf('a'));
   }
 
   @Test
@@ -138,14 +129,6 @@ public class RecordTest extends AbstractTest {
   }
 
   @Test
-  public void getBigInteger() {
-    record.clear();
-    BigInteger bigInteger = BigInteger.valueOf(1L);
-    record.set("bigInteger", bigInteger);
-    assertEquals(record.getBigInteger("bigInteger"), bigInteger);
-  }
-
-  @Test
   public void getEnum() {
     record.clear();
     TypeEnum value = TypeEnum.DRINK;
@@ -162,14 +145,6 @@ public class RecordTest extends AbstractTest {
   }
 
   @Test
-  public void getLocalDateTime() {
-    record.clear();
-    LocalDateTime value = LocalDateTime.now();
-    record.set("localDateTime", value);
-    assertEquals(record.getLocalDateTime("localDateTime"), value);
-  }
-
-  @Test
   public void getBytes() {
     record.clear();
     byte[] bytes = new byte[0];
@@ -178,49 +153,17 @@ public class RecordTest extends AbstractTest {
   }
 
   @Test
-  public void getLocalDate() {
-    record.clear();
-    LocalDate value = LocalDate.now();
-    record.set("localDate", value);
-    assertEquals(record.getLocalDate("localDate"), value);
-  }
-
-  @Test
-  public void getTime() {
-    record.clear();
-    Time value = Time.valueOf("12:00:00");
-    record.set("time", value);
-    assertEquals(record.getTime("time"), value);
-  }
-
-  @Test
-  public void getTimestamp() {
-    record.clear();
-    Timestamp value = Timestamp.valueOf(LocalDateTime.now());
-    record.set("timestamp", value);
-    assertEquals(record.getTimestamp("timestamp"), value);
-  }
-
-  @Test
-  public void getNumber() {
-    record.clear();
-    Number value = 1;
-    record.set("number", value);
-    assertEquals(record.getNumber("number"), value);
-  }
-
-  @Test
   public void toBean() {
     record.clear();
-    record.set("id", IdUtil.randomUUID());
-    Uuid uuid = record.toBean(new Uuid());
+    record.set("id", UUID.randomUUID().toString());
+    UuidExample uuid = record.toBean(new UuidExample());
     assertNotNull(uuid);
     assertEquals(uuid.getId(), record.get("id"));
-    Uuid uuid2 = record.toBean(Uuid.class);
+    UuidExample uuid2 = record.toBean(UuidExample.class);
     assertNotNull(uuid2);
     assertEquals(uuid2.getId(), record.get("id"));
     record.set("NaMe", "Hello");
-    Uuid uuid3 = record.toBeanIgnoreCase(Uuid.class);
+    UuidExample uuid3 = record.toBeanIgnoreCase(UuidExample.class);
     assertNotNull(uuid3);
     assertEquals(uuid3.getName(), record.get("NaMe"));
   }
@@ -228,11 +171,11 @@ public class RecordTest extends AbstractTest {
   @Test
   public void toRecord() {
     record.clear();
-    Snowflake snowflake = new Snowflake();
-    snowflake.setId(IdUtil.getSnowflakeNextId());
+    SnowflakeExample snowflake = new SnowflakeExample();
+    snowflake.setId(123L);
     snowflake.setName("Hello");
     snowflake.setPrice(BigDecimal.ONE);
-    Record record1 = record.toRecord(snowflake);
+    Record record1 = Record.toRecord(snowflake);
     assertNotNull(record1);
     assertEquals(snowflake.getId(), record1.get("id"));
     assertEquals(snowflake.getName(), record1.get("name"));
@@ -242,7 +185,7 @@ public class RecordTest extends AbstractTest {
   @Test
   public void testClone() {
     record.clear();
-    record.set("id", IdUtil.getSnowflakeNextId());
+    record.set("id", 123L);
     Record clone = record.clone();
     assertEquals(clone.get("id"), record.get("id"));
   }

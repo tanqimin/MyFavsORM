@@ -61,7 +61,7 @@ CREATE TABLE [dbo].[tb_user] (
     [id]        [BIGINT]       NOT NULL,
     [created]   [DATETIME]     NULL,
     [modified]  [DATETIME]     NULL,
-    [username]  [VARCHAR](20)  NULL,
+    [username]  [NVARCHAR](20)  NULL,
     [email]     [VARCHAR](50)  NULL,
     [password]  [VARCHAR](100) NULL,
     [user_type] [VARCHAR](20)  NULL,
@@ -75,5 +75,5 @@ GO
 INSERT INTO dbo.[tb_user]
   (id, created, modified, username, email, password, user_type)
 VALUES
-  (1492150022916149248, '2022-02-11 12:00:00', '2022-02-11 12:00:01', 'master_user1', 'master_user1@myfavs_master.com', '123456', 'ADMIN');
+  (1492150022916149248, '2022-02-11 12:00:00', '2022-02-11 12:00:01', N'master_user1', 'master_user1@myfavs_master.com', '123456', 'ADMIN');
 GO

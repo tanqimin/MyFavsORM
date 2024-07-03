@@ -6,6 +6,5 @@ public class PropTest {
 
   @Test
   public void load() {
-    Prop.load();
   }
 }

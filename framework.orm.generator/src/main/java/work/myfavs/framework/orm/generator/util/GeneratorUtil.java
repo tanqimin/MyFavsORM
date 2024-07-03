@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.generator.util;
 
-import cn.hutool.core.util.StrUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 
 public class GeneratorUtil {
 
@@ -12,8 +12,8 @@ public class GeneratorUtil {
    */
   public static String toClass(String tableName) {
 
-    String className = StrUtil.toCamelCase(tableName);
-    return StrUtil.upperFirst(className);
+    String className = StringUtil.toCamelCase(tableName);
+    return StringUtil.capitalize(className);
   }
 
   /**
@@ -25,8 +25,8 @@ public class GeneratorUtil {
    */
   public static String toClass(String tableName, String prefix) {
 
-    final String tableWithoutPrefix = StrUtil.removePrefix(tableName, prefix);
-    final String className = StrUtil.toCamelCase(tableWithoutPrefix);
-    return StrUtil.upperFirst(className);
+    final String tableWithoutPrefix = StringUtil.removePrefix(tableName, prefix);
+    final String className = StringUtil.toCamelCase(tableWithoutPrefix);
+    return StringUtil.capitalize(className);
   }
 }

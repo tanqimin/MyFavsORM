@@ -5,17 +5,25 @@ import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
+import work.myfavs.framework.orm.util.lang.NVarchar;
 
 import java.util.Date;
 
 @Table(value = "tb_user", strategy = GenerationType.SNOW_FLAKE)
 public class User {
-  @Column @PrimaryKey private Long id;
-  @Column private Date created;
-  @Column private Date modified;
-  @Column private String username;
-  @Column private String email;
-  @Column private String password;
+  @Column
+  @PrimaryKey
+  private Long    id;
+  @Column
+  private Date    created;
+  @Column
+  private Date     modified;
+  @Column
+  private NVarchar username;
+  @Column
+  private String   email;
+  @Column
+  private String  password;
 
   @Column(value = "user_type")
   private UserTypeEnum userType;
@@ -44,11 +52,11 @@ public class User {
     this.modified = modified;
   }
 
-  public String getUsername() {
+  public NVarchar getUsername() {
     return username;
   }
 
-  public void setUsername(String username) {
+  public void setUsername(NVarchar username) {
     this.username = username;
   }
 

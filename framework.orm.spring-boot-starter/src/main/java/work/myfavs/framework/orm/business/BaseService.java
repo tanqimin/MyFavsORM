@@ -1,13 +1,13 @@
 package work.myfavs.framework.orm.business;
 
-import cn.hutool.core.util.ArrayUtil;
-import java.sql.Connection;
-import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionCallback;
+
+import java.sql.Connection;
+import java.util.function.Consumer;
 
 /**
  * 事务基类
@@ -17,15 +17,16 @@ import org.springframework.transaction.support.TransactionCallback;
 public abstract class BaseService {
 
   private static final int[] ISOLATION_LEVEL_SCOPE =
-      new int[] {
-        Connection.TRANSACTION_NONE,
-        Connection.TRANSACTION_READ_UNCOMMITTED,
-        Connection.TRANSACTION_READ_COMMITTED,
-        Connection.TRANSACTION_REPEATABLE_READ,
-        Connection.TRANSACTION_SERIALIZABLE
+      new int[]{
+          Connection.TRANSACTION_NONE,
+          Connection.TRANSACTION_READ_UNCOMMITTED,
+          Connection.TRANSACTION_READ_COMMITTED,
+          Connection.TRANSACTION_REPEATABLE_READ,
+          Connection.TRANSACTION_SERIALIZABLE
       };
 
-  @Autowired private PlatformTransactionManager transactionManager;
+  @Autowired
+  private PlatformTransactionManager transactionManager;
 
   protected <T> T tx(TransactionCallback<T> callback) {
     return tx(callback, -1, -1, false);
@@ -101,9 +102,14 @@ public abstract class BaseService {
   private DefaultTransactionDefinition createTransDefinition(
       int isolationLevel, int timeout, boolean readOnly) {
     DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
-    if (ArrayUtil.contains(ISOLATION_LEVEL_SCOPE, isolationLevel)) {
-      definition.setIsolationLevel(isolationLevel);
+
+    for (int i : ISOLATION_LEVEL_SCOPE) {
+      if (i == isolationLevel) {
+        definition.setIsolationLevel(isolationLevel);
+        break;
+      }
     }
+
     definition.setReadOnly(readOnly);
     definition.setTimeout(timeout);
     return definition;

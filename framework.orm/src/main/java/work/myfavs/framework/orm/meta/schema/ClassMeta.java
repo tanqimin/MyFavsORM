@@ -1,27 +1,31 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
+
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
-import work.myfavs.framework.orm.util.StringUtil;
+import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.*;
 
 /**
  * 类元数据
  *
  * @author tanqimin
  */
-public class ClassMeta implements Serializable {
+public class ClassMeta {
 
-  private static final long serialVersionUID = -540703036198571358L;
+  private static final Map<String/* className */, ClassMeta> CLASS_META_CACHE = new HashMap<>();
 
   // region Attributes
 
+  /**
+   * 是否实体类，实体类 {@link #getTableName()} 不为 {@code null}
+   */
+  private       boolean        isEntity;
   /**
    * 类型
    */
@@ -42,14 +46,16 @@ public class ClassMeta implements Serializable {
    * 逻辑删除字段，null为不使用逻辑删除
    */
   private       Attribute      logicDelete;
+
+//  private final Constructor<?>                          modelConstructor;
   /**
    * 更新字段
    */
-  private final Attributes     updateAttributes = new Attributes();
+  private final Map<String /* columnName */, Attribute> updateAttributes = new LinkedHashMap<>();
   /**
    * 查询字段
    */
-  private final Attributes     queryAttributes  = new Attributes();
+  private final Map<String /* columnName */, Attribute> queryAttributes  = new LinkedHashMap<>();
 
   // endregion
 
@@ -75,16 +81,29 @@ public class ClassMeta implements Serializable {
     return logicDelete;
   }
 
-  public Attributes getUpdateAttributes() {
+  public boolean isEntity() {
+    return isEntity;
+  }
+
+  public Map<String /* columnName */, Attribute> getUpdateAttributes() {
     return updateAttributes;
   }
 
-  public List<Attribute> getUpdateAttributes(String[] columns) {
-    return updateAttributes.getAttributes(columns);
+  public Collection<Attribute> getUpdateAttributes(String[] columns) {
+    if (ArrayUtil.isEmpty(columns)) return updateAttributes.values();
+
+    List<Attribute> attributes = new ArrayList<>();
+    for (String column : columns) {
+      Attribute attribute = updateAttributes.get(column.toUpperCase());
+      if (null == attribute) continue;
+      attributes.add(attribute);
+    }
+
+    return attributes;
   }
 
 
-  public Attributes getQueryAttributes() {
+  public Map<String /* columnName */, Attribute> getQueryAttributes() {
     return queryAttributes;
   }
 
@@ -96,44 +115,46 @@ public class ClassMeta implements Serializable {
   /**
    * 构造方法
    */
-  private ClassMeta(Class<?> clazz) {
+  private ClassMeta(Class<?> clazz) throws RuntimeException {
     this.clazz = clazz;
 
     final Table table = clazz.getAnnotation(Table.class);
-    if (table != null) {
+
+    if (null != table) {
+      this.isEntity = true;
       this.strategy = table.strategy();
-      this.tableName =
-          StrUtil.isEmpty(table.value())
-              ? StringUtil.toUnderlineCase(clazz.getSimpleName())
-              : table.value();
+      this.tableName = getTableName(table, clazz);
     }
 
-    final Field[] fields = ReflectUtil.getFields(clazz);
+//    this.modelConstructor = ReflectUtil.getConstructor(clazz);
 
-    if (fields == null) {
-      return;
-    }
+    final List<Field> fields = ReflectUtil.getFields(clazz);
 
     for (Field field : fields) {
+
       final Attribute attr = Attribute.createInstance(field);
-      if (attr == null) {
-        continue;
-      }
 
-      this.queryAttributes.put(attr.getColumnName(), attr);
+      if (null == attr) continue;
 
-      if (attr.isReadonly()) {
-        continue;
-      }
+      String columnName = attr.getColumnName().toUpperCase();
+      this.queryAttributes.put(columnName, attr);
+
+      if (attr.isReadonly()) continue;
 
       if (attr.isPrimaryKey()) {
         this.primaryKey = attr;
       } else if (attr.isLogicDelete()) {
         this.logicDelete = attr;
       } else {
-        this.updateAttributes.put(attr.getColumnName(), attr);
+        this.updateAttributes.put(columnName, attr);
       }
     }
+  }
+
+  private static String getTableName(Table table, Class<?> clazz) {
+    return StringUtil.isEmpty(table.value())
+        ? StringUtil.toUnderlineCase(clazz.getSimpleName())
+        : table.value();
   }
   // endregion
 
@@ -144,7 +165,13 @@ public class ClassMeta implements Serializable {
    * @return 列元数据
    */
   public static ClassMeta createInstance(Class<?> clazz) {
-    return new ClassMeta(clazz);
+    String    className = clazz.getName();
+    ClassMeta classMeta = CLASS_META_CACHE.get(className);
+    if (null == classMeta) {
+      classMeta = new ClassMeta(clazz);
+      CLASS_META_CACHE.put(className, classMeta);
+    }
+    return classMeta;
   }
 
   /**
@@ -154,19 +181,10 @@ public class ClassMeta implements Serializable {
    */
   public Attribute checkPrimaryKey() {
 
-    if (primaryKey == null) {
-      throw new DBException("The view class [{}] could not contain primary key", this.clazz.getName());
+    if (null == primaryKey) {
+      throw new DBException("类型 %s 中没有发现使用 @PrimaryKey 注释标记的主键字段", this.clazz.getName());
     }
     return primaryKey;
-  }
-
-  /**
-   * 检查主键，如果不为 null，则返回主键字段名
-   *
-   * @return 主键字段名
-   */
-  public String getPrimaryKeyFieldName() {
-    return checkPrimaryKey().getFieldName();
   }
 
   /**

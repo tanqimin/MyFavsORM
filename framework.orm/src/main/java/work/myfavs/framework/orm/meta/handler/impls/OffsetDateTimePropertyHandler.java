@@ -1,11 +1,12 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
+import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.OffsetDateTime;
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 
 /**
  * TIMESTAMP WITH TIMEZONE
@@ -15,22 +16,16 @@ import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 public class OffsetDateTimePropertyHandler extends PropertyHandler<OffsetDateTime> {
 
   @Override
-  public OffsetDateTime convert(ResultSet rs, String columnName, Class<OffsetDateTime> clazz)
+  public OffsetDateTime convert(ResultSet rs, int columnIndex, Class<OffsetDateTime> clazz)
       throws SQLException {
-    final OffsetDateTime offsetDateTime = rs.getObject(columnName, OffsetDateTime.class);
-    if (rs.wasNull()) {
-      return null;
-    }
-    return offsetDateTime;
+
+    return rs.getObject(columnIndex, OffsetDateTime.class);
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, OffsetDateTime param)
       throws SQLException {
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
+
     ps.setObject(paramIndex, param);
   }
 

@@ -9,7 +9,7 @@
     <parent>
         <groupId>work.myfavs</groupId>
         <artifactId>framework</artifactId>
-        <version>0.3.2-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -35,6 +35,17 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-json</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
         </dependency>
 
         <dependency>
@@ -83,19 +94,16 @@
         <dependency>
             <groupId>work.myfavs</groupId>
             <artifactId>framework.orm</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>work.myfavs</groupId>
             <artifactId>framework.orm-generator</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>work.myfavs</groupId>
             <artifactId>framework.orm-spring-starter</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

@@ -1,12 +1,6 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import cn.hutool.core.util.StrUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.WeakHashMap;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 /**
  * 元数据构建
@@ -14,11 +8,6 @@ import java.util.WeakHashMap;
  * @author tanqimin
  */
 public class Metadata {
-
-  private static final Logger log = LoggerFactory.getLogger(Metadata.class);
-
-  private static final Map<String, ClassMeta> CLASS_META_CACHE = new WeakHashMap<>();
-  private static final Object SYNC_LOCK = new Object();
 
   private Metadata() {}
 
@@ -28,11 +17,20 @@ public class Metadata {
    * @param clazz 目标类
    * @return 类元数据
    */
-  public static ClassMeta get(Class<?> clazz) {
-    final String className = clazz.getName();
-    return CLASS_META_CACHE.computeIfAbsent(className, key -> {
-      log.debug("ClassMeta : {} keys not exists.", className);
-      return ClassMeta.createInstance(clazz);
-    });
+  public static ClassMeta classMeta(Class<?> clazz) {
+    return ClassMeta.createInstance(clazz);
+  }
+
+  /**
+   * 获取实体类的元数据（必须使用@Table）
+   *
+   * @param clazz 实体类
+   * @return 类元数据
+   */
+  public static ClassMeta entityMeta(Class<?> clazz) {
+    ClassMeta classMeta = classMeta(clazz);
+    if (classMeta.isEntity())
+      return classMeta;
+    throw new DBException("类型 %s 不是实体类, 实体类必须使用 @Table 注释. ", clazz.getName());
   }
 }

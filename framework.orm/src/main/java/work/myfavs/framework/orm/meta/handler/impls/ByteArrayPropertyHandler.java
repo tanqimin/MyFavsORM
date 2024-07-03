@@ -1,29 +1,52 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
+import work.myfavs.framework.orm.util.common.IOUtil;
+import work.myfavs.framework.orm.util.exception.DBException;
 
-/** Created by tanqimin on 2016/1/29. */
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.*;
+
+/**
+ * Created by tanqimin on 2016/1/29.
+ */
 public class ByteArrayPropertyHandler extends PropertyHandler<byte[]> {
 
   @Override
-  public byte[] convert(ResultSet rs, String columnName, Class<byte[]> clazz) throws SQLException {
+  public byte[] convert(ResultSet rs, int columnIndex, Class<byte[]> clazz) throws SQLException {
+    Object val = rs.getObject(columnIndex);
+    if (null == val) return null;
 
-    byte[] val = rs.getBytes(columnName);
+    if (val instanceof Blob) {
+      Blob b = (Blob) val;
+      try {
+        try (InputStream stream = b.getBinaryStream()) {
 
-    return rs.wasNull() ? null : val;
+          return IOUtil.toByteArray(stream);
+        } finally {
+          // ignore stream.close errors
+          try {
+            b.free();
+          } catch (Throwable ignore) {
+            // ignore blob.free errors
+          }
+        }
+      } catch (SQLException | IOException e) {
+        throw new DBException(e, "转换 Blob 到 byte[] 时发生异常: %s", e.getMessage());
+      }
+    }
+
+    if (val instanceof byte[]) {
+      return (byte[]) val;
+    }
+
+    throw new DBException("不能把 %s 类型转换成 byte[] 类型", val.getClass().getName());
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, byte[] param) throws SQLException {
 
-    if (param == null) {
-      ps.setNull(paramIndex, getSqlType());
-      return;
-    }
     ps.setBytes(paramIndex, param);
   }
 

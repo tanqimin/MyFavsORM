@@ -1,13 +1,5 @@
 package work.myfavs.framework.orm.generator.meta.column;
 
-import cn.hutool.core.util.StrUtil;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map.Entry;
 import work.myfavs.framework.orm.generator.GeneratorConfig;
 import work.myfavs.framework.orm.generator.meta.GeneratorMeta;
 import work.myfavs.framework.orm.generator.meta.TableDefinition;
@@ -16,8 +8,14 @@ import work.myfavs.framework.orm.generator.util.GeneratorUtil;
 import work.myfavs.framework.orm.generator.util.ResultSetUtil;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
-import work.myfavs.framework.orm.util.DBUtil;
+import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
+import work.myfavs.framework.orm.util.common.CollectionUtil;
+import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
+
+import java.sql.*;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
 
@@ -35,26 +33,38 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
     generatorMeta.getTypeMapper().putAll(generatorConfig.getTypeMapper());
     List<TableDefinition> tableDefinitions = generatorMeta.getTableDefinitions();
 
-    String url = generatorConfig.getJdbcUrl();
+    String url  = generatorConfig.getJdbcUrl();
     String user = generatorConfig.getJdbcUser();
-    String pwd = generatorConfig.getJdbcPwd();
+    String pwd  = generatorConfig.getJdbcPwd();
 
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+    Connection        conn = null;
+    PreparedStatement ps   = null;
+    ResultSet         rs   = null;
 
     try {
       conn = DriverManager.getConnection(url, user, pwd);
       String dbName = conn.getCatalog();
-      Sql sql = getSql(dbName);
-      ps = DBUtil.getPstForQuery(conn, sql.toString(), sql.getParams());
+      Sql    sql    = getSql(dbName);
+      ps = conn.prepareStatement(sql.toString());
+      List<Object> params = sql.getParams();
+      if (CollectionUtil.isNotEmpty(params)) {
+        int pid = 1;
+        for (Object param : params) {
+          if (null == param)
+            ps.setObject(pid, null);
+          else
+            //noinspection unchecked
+            PropertyHandlerFactory.getInstance(param.getClass()).addParameter(ps, pid, param);
+          pid++;
+        }
+      }
       rs = ps.executeQuery();
 
       while (rs.next()) {
         String table = ResultSetUtil.getString(rs, "table");
 
-        TableDefinition tableDefinition = getTableDefinition(table, tableDefinitions);
-        ColumnDefinition column = getColumnDefinition(rs);
+        TableDefinition  tableDefinition = getTableDefinition(table, tableDefinitions);
+        ColumnDefinition column          = getColumnDefinition(rs);
 
         tableDefinition.getColumns().add(column);
       }
@@ -63,7 +73,44 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
     } catch (SQLException e) {
       throw new DBException(e);
     } finally {
-      DBUtil.close(rs, ps, conn);
+      close(rs, ps, conn);
+    }
+  }
+
+  private static void close(ResultSet rs, PreparedStatement ps, Connection conn) {
+    try {
+      if (null != rs) {
+        if (!rs.isClosed())
+          rs.close();
+      }
+    } catch (SQLException e) {
+      throw new DBException(e);
+    } finally {
+      close(ps, conn);
+    }
+  }
+
+  private static void close(PreparedStatement ps, Connection conn) {
+    try {
+      if (null != ps) {
+        if (!ps.isClosed())
+          ps.close();
+      }
+    } catch (SQLException e) {
+      throw new DBException(e);
+    } finally {
+      close(conn);
+    }
+  }
+
+  private static void close(Connection conn) {
+    try {
+      if (null != conn) {
+        if (!conn.isClosed())
+          conn.close();
+      }
+    } catch (SQLException e) {
+      throw new DBException(e);
     }
   }
 
@@ -82,30 +129,28 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
     where table_schema = 'myfavs_test'
      */
 
-    Sql sql =
-        Sql.Select("table_name AS `table`,")
-            .append(" column_name AS `column`,")
-            .append(" data_type AS `type`,")
-            .append(" CASE is_nullable WHEN 'YES' THEN 1 ELSE 0 END AS `nullable`,")
-            .append(" CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END AS `pk`,")
-            .append(" ordinal_position AS `idx`,")
-            .append(" column_comment AS `comment`")
-            .from("information_schema.`COLUMNS`")
-            .where(Cond.eq("table_schema", dbName));
-    return sql;
+    return Sql.Select("table_name AS `table`,")
+              .append(" column_name AS `column`,")
+              .append(" data_type AS `type`,")
+              .append(" CASE is_nullable WHEN 'YES' THEN 1 ELSE 0 END AS `nullable`,")
+              .append(" CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END AS `pk`,")
+              .append(" ordinal_position AS `idx`,")
+              .append(" column_comment AS `comment`")
+              .from("information_schema.`COLUMNS`")
+              .where(Cond.eq("table_schema", dbName));
   }
 
   private TableDefinition getTableDefinition(String table, List<TableDefinition> tableDefinitions) {
 
     TableDefinition tableDefinition = null;
     for (TableDefinition definition : tableDefinitions) {
-      if (StrUtil.equalsIgnoreCase(table, definition.getTableName())) {
+      if (StringUtil.equalsIgnoreCase(table, definition.getTableName())) {
         tableDefinition = definition;
         break;
       }
     }
 
-    if (tableDefinition == null) {
+    if (null == tableDefinition) {
       tableDefinition = new TableDefinition();
       tableDefinition.setTableName(table);
       tableDefinition.setClassName(GeneratorUtil.toClass(table));
@@ -116,13 +161,13 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
 
   private ColumnDefinition getColumnDefinition(ResultSet rs) throws SQLException {
 
-    String table = ResultSetUtil.getString(rs, "table");
-    String column = ResultSetUtil.getString(rs, "column");
-    Boolean pk = ResultSetUtil.getBoolean(rs, "pk");
+    String  table    = ResultSetUtil.getString(rs, "table");
+    String  column   = ResultSetUtil.getString(rs, "column");
+    Boolean pk       = ResultSetUtil.getBoolean(rs, "pk");
     Boolean nullable = ResultSetUtil.getBoolean(rs, "nullable");
-    Integer idx = ResultSetUtil.getInt(rs, "idx");
-    String dataType = ResultSetUtil.getString(rs, "type");
-    String comment = ResultSetUtil.getString(rs, "comment");
+    Integer idx      = ResultSetUtil.getInt(rs, "idx");
+    String  dataType = ResultSetUtil.getString(rs, "type");
+    String  comment  = ResultSetUtil.getString(rs, "comment");
 
     ColumnDefinition columnDefinition = new ColumnDefinition();
 
@@ -139,9 +184,9 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
 
   private TypeDefinition createTypeDefinition(String dataType, String comment) {
 
-    if (comment != null) {
+    if (null != comment) {
       if (comment.contains("#")) {
-        String className = comment.split("#")[1];
+        String         className      = comment.split("#")[1];
         TypeDefinition typeDefinition = new TypeDefinition(className);
         generatorConfig.getTypeMapper().put(className, typeDefinition);
         return typeDefinition;
@@ -149,11 +194,11 @@ public class MySQLGeneratorMetaFactory extends GeneratorMetaFactory {
     }
 
     for (Entry<String, TypeDefinition> entry : generatorConfig.getTypeMapper().entrySet()) {
-      if (StrUtil.equalsIgnoreCase(dataType, entry.getKey())) {
+      if (StringUtil.equalsIgnoreCase(dataType, entry.getKey())) {
         return entry.getValue();
       }
     }
 
-    throw new DBException("{} type is not registered.", dataType);
+    throw new DBException("类型 %s 未注册. ", dataType);
   }
 }

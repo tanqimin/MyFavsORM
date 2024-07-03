@@ -1,9 +1,8 @@
 package work.myfavs.framework.orm;
 
-import java.sql.Connection;
 import work.myfavs.framework.orm.meta.DbType;
-import work.myfavs.framework.orm.meta.dialect.DialectFactory;
-import work.myfavs.framework.orm.meta.dialect.IDialect;
+
+import java.sql.Connection;
 
 /**
  * 数据库配置
@@ -12,60 +11,73 @@ import work.myfavs.framework.orm.meta.dialect.IDialect;
  */
 public class DBConfig {
 
-  public static final String DEFAULT_DATASOURCE_NAME = "default";
-  /** 数据库方言 */
-  private IDialect dialect;
-  /** 数据库类型 */
-  private String dbType = DbType.MYSQL;
-  /** 一次批量插入数据的数量 */
-  private int batchSize = 200;
-  /** 查询每次抓取数据的数量 */
-  private int fetchSize = 1000;
-  /** 查询超时时间，单位：秒 */
-  private int queryTimeout = 60;
-  /** 是否显示SQL */
-  private boolean showSql = false;
-  /** 是否显示查询结果 */
-  private boolean showResult = false;
-  /** 每页最大记录数 */
-  private int maxPageSize = -1;
-  /** 默认事务级别 */
-  private int defaultIsolation = Connection.TRANSACTION_READ_COMMITTED;
-  /** 终端ID */
-  private long workerId = 1L;
-  /** 数据中心ID */
-  private long dataCenterId = 1L;
-
-  /** 分页查询结果数据集合字段名称 */
-  private String pageDataField = "data";
-
-  /** 分页查询结果当前页码字段名称 */
-  private String pageCurrentField = "currentPage";
-
-  /** 分页查询结果每页记录数字段名称 */
-  private String pageSizeField = "pageSize";
-
-  /** 分页查询结果总页数字段名称 */
-  private String pageTotalPageField = "totalPages";
-
-  /** 分页查询结果总记录数字段名称 */
-  private String pageTotalRecordField = "totalRecords";
-
-  /** 分页查询结果是否存在下一页字段名称 */
-  private String pageHasNextField = "hasNext";
+  public static final String   DEFAULT_DATASOURCE_NAME = "default";
+  /**
+   * 数据库类型
+   */
+  private             String   dbType                  = DbType.MYSQL;
+  /**
+   * 一次批量插入数据的数量
+   */
+  private             int      batchSize               = 200;
+  /**
+   * 查询每次抓取数据的数量
+   */
+  private             int      fetchSize               = 1000;
+  /**
+   * 是否显示SQL
+   */
+  private             boolean  showSql                 = false;
+  /**
+   * 是否显示查询结果
+   */
+  private             boolean  showResult              = false;
+  /**
+   * 每页最大记录数
+   */
+  private             int      maxPageSize             = -1;
+  /**
+   * 默认事务级别
+   */
+  private             int      defaultIsolation        = Connection.TRANSACTION_READ_COMMITTED;
+  /**
+   * 终端ID
+   */
+  private             long     workerId                = 1L;
+  /**
+   * 数据中心ID
+   */
+  private             long     dataCenterId            = 1L;
 
   /**
-   * 获取数据库方言
-   *
-   * @return 数据库方言
+   * 分页查询结果数据集合字段名称
    */
-  public IDialect getDialect() {
+  private String pageDataField = "data";
 
-    if (this.dialect == null) {
-      this.dialect = DialectFactory.getInstance(this.dbType);
-    }
-    return this.dialect;
-  }
+  /**
+   * 分页查询结果当前页码字段名称
+   */
+  private String pageCurrentField = "currentPage";
+
+  /**
+   * 分页查询结果每页记录数字段名称
+   */
+  private String pageSizeField = "pageSize";
+
+  /**
+   * 分页查询结果总页数字段名称
+   */
+  private String pageTotalPageField = "totalPages";
+
+  /**
+   * 分页查询结果总记录数字段名称
+   */
+  private String pageTotalRecordField = "totalRecords";
+
+  /**
+   * 分页查询结果是否存在下一页字段名称
+   */
+  private String pageHasNextField = "hasNext";
 
   /**
    * 获取数据库类型
@@ -130,28 +142,6 @@ public class DBConfig {
   public DBConfig setFetchSize(int fetchSize) {
 
     this.fetchSize = fetchSize;
-    return this;
-  }
-
-  /**
-   * 获取查询超时时间
-   *
-   * @return 查询超时时间
-   */
-  public int getQueryTimeout() {
-
-    return queryTimeout;
-  }
-
-  /**
-   * 设置查询超时时间
-   *
-   * @param queryTimeout 查询超时时间
-   * @return Configuration
-   */
-  public DBConfig setQueryTimeout(int queryTimeout) {
-
-    this.queryTimeout = queryTimeout;
     return this;
   }
 

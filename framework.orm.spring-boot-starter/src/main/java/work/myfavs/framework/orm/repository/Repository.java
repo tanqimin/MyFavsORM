@@ -1,36 +1,36 @@
 package work.myfavs.framework.orm.repository;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import work.myfavs.framework.orm.DB;
 import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.schema.Metadata;
+import work.myfavs.framework.orm.util.reflection.ReflectUtil;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 仓储基类
  *
  * @param <TModel> 实体类
  */
+@SuppressWarnings("unused")
 public class Repository<TModel> extends Query {
 
-  protected Class<TModel> modelClass;
+  protected final Class<TModel> modelClass;
 
   /**
    * 构造方法
    *
    * @param dbTemplate DBTemplate
    */
-  @SuppressWarnings("unchecked")
+
   public Repository(DBTemplate dbTemplate) {
 
     super(dbTemplate);
-    this.modelClass = (Class<TModel>)
-            ((ParameterizedType) this.getClass().getGenericSuperclass())
-                .getActualTypeArguments()[0];
+    this.modelClass = ReflectUtil.getGenericActualTypeArguments(this.getClass());
   }
 
   /**
@@ -41,7 +41,9 @@ public class Repository<TModel> extends Query {
    */
   public TModel getById(Object id) {
 
-    return DB.conn(this.dbTemplate).getById(modelClass, id);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().getById(modelClass, id);
+    }
   }
 
   /**
@@ -53,7 +55,9 @@ public class Repository<TModel> extends Query {
    */
   public TModel getByField(String field, Object param) {
 
-    return DB.conn(this.dbTemplate).getByField(modelClass, field, param);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().getByField(modelClass, field, param);
+    }
   }
 
   /**
@@ -64,7 +68,9 @@ public class Repository<TModel> extends Query {
    */
   protected TModel getByCond(Cond cond) {
 
-    return DB.conn(this.dbTemplate).getByCond(modelClass, cond);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().getByCond(modelClass, cond);
+    }
   }
 
   /**
@@ -75,13 +81,15 @@ public class Repository<TModel> extends Query {
    */
   public TModel getByCondition(Object object) {
 
-    return DB.conn(this.dbTemplate).getByCriteria(modelClass, object);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().getByCriteria(modelClass, object);
+    }
   }
 
   /**
    * 根据SQL获取记录
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 记录
    */
@@ -104,7 +112,7 @@ public class Repository<TModel> extends Query {
   /**
    * 根据SQL查询实体集合
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 实体集合
    */
@@ -127,12 +135,12 @@ public class Repository<TModel> extends Query {
   /**
    * 根据SQL查询实体集合
    *
-   * @param sql SQL
+   * @param sql    SQL
    * @param params 参数
    * @return Map，Key为主键值， Value为实体对象
    */
   public <TKey> Map<TKey, TModel> findMap(String sql, Collection<?> params) {
-    final String fieldName = Metadata.get(modelClass).getPrimaryKey().getFieldName();
+    final String fieldName = Metadata.classMeta(modelClass).getPrimaryKey().getFieldVisitor().getName();
     return findMap(modelClass, fieldName, sql, params);
   }
 
@@ -155,19 +163,23 @@ public class Repository<TModel> extends Query {
    */
   public List<TModel> findByField(String field, Object param) {
 
-    return DB.conn(this.dbTemplate).findByField(modelClass, field, param);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().findByField(modelClass, field, param);
+    }
   }
 
   /**
    * 根据字段查询实体集合
    *
-   * @param field 字段名
+   * @param field  字段名
    * @param params 参数集合
    * @return 实体集合
    */
   public List<TModel> findByField(String field, Collection<?> params) {
 
-    return DB.conn(this.dbTemplate).findByField(modelClass, field, params);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().findByField(modelClass, field, params);
+    }
   }
 
   /**
@@ -178,7 +190,9 @@ public class Repository<TModel> extends Query {
    */
   protected List<TModel> findByCond(Cond cond) {
 
-    return DB.conn(this.dbTemplate).findByCond(modelClass, cond);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().findByCond(modelClass, cond);
+    }
   }
 
   /**
@@ -189,7 +203,9 @@ public class Repository<TModel> extends Query {
    */
   public List<TModel> findByCondition(Object object) {
 
-    return DB.conn(this.dbTemplate).findByCriteria(modelClass, object);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().findByCriteria(modelClass, object);
+    }
   }
 
   /**
@@ -200,7 +216,9 @@ public class Repository<TModel> extends Query {
    */
   public List<TModel> findByIds(Collection<?> ids) {
 
-    return DB.conn(this.dbTemplate).findByIds(modelClass, ids);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().findByIds(modelClass, ids);
+    }
   }
 
   /**
@@ -211,7 +229,9 @@ public class Repository<TModel> extends Query {
    */
   public long countByCond(Cond cond) {
 
-    return DB.conn(this.dbTemplate).countByCond(modelClass, cond);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().countByCond(modelClass, cond);
+    }
   }
 
   /**
@@ -222,7 +242,9 @@ public class Repository<TModel> extends Query {
    */
   public boolean exists(TModel entity) {
 
-    return DB.conn(this.dbTemplate).exists(modelClass, entity);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().exists(modelClass, entity);
+    }
   }
 
   /**
@@ -233,7 +255,9 @@ public class Repository<TModel> extends Query {
    */
   public boolean existsByCond(Cond cond) {
 
-    return DB.conn(this.dbTemplate).existsByCond(modelClass, cond);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().existsByCond(modelClass, cond);
+    }
   }
 
   /**
@@ -250,13 +274,15 @@ public class Repository<TModel> extends Query {
   /**
    * 执行一个SQL语句
    *
-   * @param sql SQL
+   * @param sql          SQL
    * @param queryTimeout 超时时间
    * @return 影响行数
    */
   public int execute(Sql sql, int queryTimeout) {
 
-    return DB.conn(this.dbTemplate).execute(sql, queryTimeout);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().execute(sql, queryTimeout);
+    }
   }
 
   /**
@@ -267,44 +293,52 @@ public class Repository<TModel> extends Query {
    */
   public int[] execute(List<Sql> sqlList) {
 
-    return DB.conn(this.dbTemplate).execute(sqlList);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().execute(sqlList);
+    }
   }
 
   /**
    * 执行多个SQL语句
    *
-   * @param sqlList SQL集合
+   * @param sqlList      SQL集合
    * @param queryTimeout 超时时间
    * @return 返回多个影响行数
    */
   public int[] execute(List<Sql> sqlList, int queryTimeout) {
 
-    return DB.conn(this.dbTemplate).execute(sqlList, queryTimeout);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().execute(sqlList, queryTimeout);
+    }
   }
 
   /**
    * 执行一个SQL语句
    *
-   * @param sql SQL语句
+   * @param sql    SQL语句
    * @param params 参数
    * @return 影响行数
    */
   public int execute(String sql, Collection<?> params) {
 
-    return DB.conn(this.dbTemplate).execute(sql, params);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().execute(sql, params);
+    }
   }
 
   /**
    * 执行一个SQL语句
    *
-   * @param sql SQL语句
-   * @param params 参数
+   * @param sql          SQL语句
+   * @param params       参数
    * @param queryTimeout 超时时间
    * @return 影响行数
    */
   public int execute(String sql, Collection<?> params, int queryTimeout) {
 
-    return DB.conn(this.dbTemplate).execute(sql, params, queryTimeout);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().execute(sql, params, queryTimeout);
+    }
   }
 
   /**
@@ -315,7 +349,9 @@ public class Repository<TModel> extends Query {
    */
   public int create(TModel entity) {
 
-    return DB.conn(this.dbTemplate).create(modelClass, entity);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().create(modelClass, entity);
+    }
   }
 
   /**
@@ -326,7 +362,9 @@ public class Repository<TModel> extends Query {
    */
   public int create(Collection<TModel> entities) {
 
-    return DB.conn(this.dbTemplate).create(modelClass, entities);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().create(modelClass, entities);
+    }
   }
 
   /**
@@ -337,19 +375,23 @@ public class Repository<TModel> extends Query {
    */
   public int update(TModel entity) {
 
-    return DB.conn(this.dbTemplate).update(modelClass, entity);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().update(modelClass, entity);
+    }
   }
 
   /**
    * 更新实体
    *
-   * @param entity 实体
+   * @param entity  实体
    * @param columns 需要更新的列
    * @return 影响行数
    */
   public int update(TModel entity, String[] columns) {
 
-    return DB.conn(this.dbTemplate).update(modelClass, entity, columns);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().update(modelClass, entity, columns);
+    }
   }
 
   /**
@@ -360,19 +402,23 @@ public class Repository<TModel> extends Query {
    */
   public int updateIgnoreNull(TModel entity) {
 
-    return DB.conn(this.dbTemplate).updateIgnoreNull(modelClass, entity);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().updateIgnoreNull(modelClass, entity);
+    }
   }
 
   /**
    * 更新实体
    *
    * @param entities 实体集合
-   * @param columns 需要更新的列
+   * @param columns  需要更新的列
    * @return 影响行数
    */
   public int update(Collection<TModel> entities, String[] columns) {
 
-    return DB.conn(this.dbTemplate).update(modelClass, entities, columns);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().update(modelClass, entities, columns);
+    }
   }
 
   /**
@@ -393,7 +439,9 @@ public class Repository<TModel> extends Query {
    * @return 影响行数
    */
   public int createOrUpdate(TModel entity) {
-    return DB.conn(this.dbTemplate).createOrUpdate(modelClass, entity);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().createOrUpdate(modelClass, entity);
+    }
   }
 
   /**
@@ -404,7 +452,9 @@ public class Repository<TModel> extends Query {
    */
   public int delete(TModel entity) {
 
-    return DB.conn(this.dbTemplate).delete(modelClass, entity);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().delete(modelClass, entity);
+    }
   }
 
   /**
@@ -415,7 +465,9 @@ public class Repository<TModel> extends Query {
    */
   public int delete(Collection<TModel> entities) {
 
-    return DB.conn(this.dbTemplate).delete(modelClass, entities);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().delete(modelClass, entities);
+    }
   }
 
   /**
@@ -426,7 +478,9 @@ public class Repository<TModel> extends Query {
    */
   public int deleteById(Object id) {
 
-    return DB.conn(this.dbTemplate).deleteById(modelClass, id);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().deleteById(modelClass, id);
+    }
   }
 
   /**
@@ -437,7 +491,9 @@ public class Repository<TModel> extends Query {
    */
   protected int deleteByCond(Cond cond) {
 
-    return DB.conn(this.dbTemplate).deleteByCond(modelClass, cond);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().deleteByCond(modelClass, cond);
+    }
   }
 
   /**
@@ -448,7 +504,9 @@ public class Repository<TModel> extends Query {
    */
   public int deleteByIds(Collection<?> ids) {
 
-    return DB.conn(this.dbTemplate).deleteByIds(modelClass, ids);
+    try (Database database = this.dbTemplate.createDatabase()) {
+      return database.createOrm().deleteByIds(modelClass, ids);
+    }
   }
 
   /**
