@@ -3,6 +3,7 @@ package work.myfavs.framework.orm.meta.clause;
 import org.junit.Test;
 import work.myfavs.framework.orm.util.common.Constant;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -335,6 +336,13 @@ public class SqlTest {
 
     sql = Sql.SelectAll().from("user").orderBy("user_id");
     assertEquals("SELECT * FROM user ORDER BY user_id", sql.toString());
+
+    List<String> orderBy = new ArrayList<>();
+    orderBy.add("id");
+    orderBy.add("code desc");
+
+    sql = Sql.SelectAll().from("user").orderBy(orderBy);
+    assertEquals("SELECT * FROM user ORDER BY id, code desc", sql.toString());
   }
 
   @Test

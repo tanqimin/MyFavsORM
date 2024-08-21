@@ -2,15 +2,13 @@ package work.myfavs.framework.orm.meta.clause;
 
 
 import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -677,6 +675,23 @@ public class Sql extends Clause implements Serializable {
     final String orderByField = checkInjection(field);
     if (StringUtil.isNotEmpty(orderByField)) {
       this.append(String.format(" ORDER BY %s", orderByField));
+    }
+    return this;
+  }
+
+  /**
+   * 拼接 ORDER BY {field}, {fields[1]}... 语句
+   *
+   * @param fields 字段集合
+   * @return SQL
+   */
+  public Sql orderBy(List<String> fields) {
+    if (CollectionUtil.isNotEmpty(fields)) {
+      Iterator<String> iterator = fields.iterator();
+      this.append(String.format(" ORDER BY %s", checkInjection(iterator.next())));
+      while (iterator.hasNext()) {
+        this.append(String.format(", %s", checkInjection(iterator.next())));
+      }
     }
     return this;
   }
