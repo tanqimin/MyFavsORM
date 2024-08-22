@@ -6,7 +6,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.RetentionPolicy;
 
-/** 用于构造查询条件 */
+/**
+ * 用于构造查询条件
+ */
 @java.lang.annotation.Inherited
 @java.lang.annotation.Target({ElementType.FIELD})
 @java.lang.annotation.Retention(RetentionPolicy.RUNTIME)

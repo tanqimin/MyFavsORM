@@ -1,6 +1,10 @@
 package work.myfavs.framework.orm.meta.clause;
 
 
+import work.myfavs.framework.orm.meta.annotation.Criteria;
+import work.myfavs.framework.orm.meta.annotation.Criterion;
+import work.myfavs.framework.orm.meta.pagination.ISortable;
+import work.myfavs.framework.orm.meta.pagination.Order;
 import work.myfavs.framework.orm.util.common.ArrayUtil;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.common.Constant;
@@ -516,6 +520,27 @@ public class Sql extends Clause implements Serializable {
   }
 
   /**
+   * 拼接 WHERE {cond} 语句，{cond} 根据 {@link Criteria @Criteria} 注解生成的条件
+   *
+   * @param criteria 包含 {@link Criteria @Criteria} 注解 Field 的对象
+   * @return SQL
+   */
+  public Sql whereCriteria(Object criteria) {
+    return this.where(Cond.createByCriteria(criteria));
+  }
+
+  /**
+   * 拼接 WHERE {cond} 语句，{cond} 根据 {@link Criteria @Criteria} 注解生成的条件
+   *
+   * @param criteria      包含 {@link Criteria @Criteria} 注解 Field 的对象
+   * @param criteriaGroup 条件组名, 参考 {@link Criterion#group() @Criterion(group = CriteriaGroupClass.class)}
+   * @return SQL
+   */
+  public Sql whereCriteria(Object criteria, Class<?> criteriaGroup) {
+    return this.where(Cond.createByCriteria(criteria, criteriaGroup));
+  }
+
+  /**
    * 拼接 AND {cond} 语句
    *
    * @param cond Cond
@@ -544,6 +569,27 @@ public class Sql extends Clause implements Serializable {
     }
     this.append(String.format(" AND (%s)", StringUtil.trimStart(cond.sql)), cond.params);
     return this;
+  }
+
+  /**
+   * 拼接 AND {cond} 语句，{cond} 根据 {@link Criteria @Criteria} 注解生成的条件
+   *
+   * @param criteria 包含 {@link Criteria @Criteria} 注解 Field 的对象
+   * @return SQL
+   */
+  public Sql andCriteria(Object criteria) {
+    return this.and(Cond.createByCriteria(criteria));
+  }
+
+  /**
+   * 拼接 AND {cond} 语句，{cond} 根据 {@link Criteria @Criteria} 注解生成的条件
+   *
+   * @param criteria      包含 {@link Criteria @Criteria} 注解 Field 的对象
+   * @param criteriaGroup 条件组名, 参考 {@link Criterion#group() @Criterion(group = CriteriaGroupClass.class)}
+   * @return SQL
+   */
+  public Sql andCriteria(Object criteria, Class<?> criteriaGroup) {
+    return this.and(Cond.createByCriteria(criteria, criteriaGroup));
   }
 
   /**
@@ -682,15 +728,18 @@ public class Sql extends Clause implements Serializable {
   /**
    * 拼接 ORDER BY {field}, {fields[1]}... 语句
    *
-   * @param fields 字段集合
+   * @param sortable {@link ISortable} 排序条件基类
    * @return SQL
    */
-  public Sql orderBy(List<String> fields) {
-    if (CollectionUtil.isNotEmpty(fields)) {
-      Iterator<String> iterator = fields.iterator();
-      this.append(String.format(" ORDER BY %s", checkInjection(iterator.next())));
-      while (iterator.hasNext()) {
-        this.append(String.format(", %s", checkInjection(iterator.next())));
+  public Sql orderBy(ISortable sortable) {
+    if (Objects.nonNull(sortable)) {
+      List<Order> orderBy = sortable.getOrderBy();
+      if (CollectionUtil.isNotEmpty(orderBy)) {
+        Iterator<Order> iterator = orderBy.iterator();
+        this.append(String.format(" ORDER BY %s", checkInjection(iterator.next().toString())));
+        while (iterator.hasNext()) {
+          this.append(String.format(", %s", checkInjection(iterator.next().toString())));
+        }
       }
     }
     return this;

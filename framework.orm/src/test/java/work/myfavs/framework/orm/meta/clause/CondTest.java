@@ -224,10 +224,11 @@ public class CondTest {
     person.setName("Person1");
     person.setCars(new String[]{"Car1", "Car2"});
     person.setAlias(Arrays.asList("Alias1", "Alias2"));
+    person.setBlurry("%s%");
 
     cond = Cond.createByCriteria(person, Person.PersonQuery.class);
     System.out.println(cond.toString());
-    assertEquals(" person_alias IN (?,?) AND person_name = ?", cond.toString());
+    assertEquals(" person_alias IN (?,?) AND person_name = ? AND (code LIKE ? OR name LIKE ?)", cond.toString());
 
     cond = Cond.createByCriteria(person, Person.PersonList.class);
     assertEquals(" cars NOT IN (?,?)", cond.toString());
@@ -253,6 +254,8 @@ class Person {
   @Criterion(value = "person_alias", operator = Operator.IN, group = PersonQuery.class)
   private List<String> alias;
 
+  @Criterion(value = "code, name", operator = Operator.LIKE, order = 3, group = PersonQuery.class)
+  private String blurry;
 
   public String getName() {
     return name;
@@ -276,5 +279,13 @@ class Person {
 
   public void setAlias(List<String> alias) {
     this.alias = alias;
+  }
+
+  public String getBlurry() {
+    return blurry;
+  }
+
+  public void setBlurry(String blurry) {
+    this.blurry = blurry;
   }
 }

@@ -3,7 +3,6 @@ package work.myfavs.framework.orm.meta.clause;
 import org.junit.Test;
 import work.myfavs.framework.orm.util.common.Constant;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -144,14 +143,14 @@ public class SqlTest {
   @Test
   public void testLeftJoin() {
     Sql user = Sql.SelectAll().from("user");
-    Sql sql = new Sql().leftJoin(user, "u", "u.id = id");
+    Sql sql  = new Sql().leftJoin(user, "u", "u.id = id");
     assertEquals(String.format(" LEFT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
   public void testLeftJoin1() {
     Sql user = Sql.SelectAll().from("user");
-    Sql sql = new Sql().leftJoin(() -> user, "u", "u.id = id");
+    Sql sql  = new Sql().leftJoin(() -> user, "u", "u.id = id");
     assertEquals(String.format(" LEFT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
@@ -164,7 +163,7 @@ public class SqlTest {
   @Test
   public void testRightJoin() {
     Sql user = Sql.SelectAll().from("user");
-    Sql sql = new Sql().rightJoin(user, "u", "u.id = id");
+    Sql sql  = new Sql().rightJoin(user, "u", "u.id = id");
     assertEquals(
         String.format(" RIGHT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
@@ -172,7 +171,7 @@ public class SqlTest {
   @Test
   public void testRightJoin1() {
     Sql user = Sql.SelectAll().from("user");
-    Sql sql = new Sql().rightJoin(() -> user, "u", "u.id = id");
+    Sql sql  = new Sql().rightJoin(() -> user, "u", "u.id = id");
     assertEquals(
         String.format(" RIGHT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
@@ -186,7 +185,7 @@ public class SqlTest {
   @Test
   public void testInnerJoin() {
     Sql user = Sql.SelectAll().from("user");
-    Sql sql = new Sql().innerJoin(user, "u", "u.id = id");
+    Sql sql  = new Sql().innerJoin(user, "u", "u.id = id");
     assertEquals(
         String.format(" INNER JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
@@ -194,7 +193,7 @@ public class SqlTest {
   @Test
   public void testInnerJoin1() {
     Sql user = Sql.SelectAll().from("user");
-    Sql sql = new Sql().innerJoin(() -> user, "u", "u.id = id");
+    Sql sql  = new Sql().innerJoin(() -> user, "u", "u.id = id");
     assertEquals(
         String.format(" INNER JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
@@ -208,14 +207,14 @@ public class SqlTest {
   @Test
   public void testFullJoin() {
     Sql user = Sql.SelectAll().from("user");
-    Sql sql = new Sql().fullJoin(user, "u", "u.id = id");
+    Sql sql  = new Sql().fullJoin(user, "u", "u.id = id");
     assertEquals(String.format(" FULL JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
   public void testFullJoin1() {
     Sql user = Sql.SelectAll().from("user");
-    Sql sql = new Sql().fullJoin(() -> user, "u", "u.id = id");
+    Sql sql  = new Sql().fullJoin(() -> user, "u", "u.id = id");
     assertEquals(String.format(" FULL JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
   }
 
@@ -336,13 +335,6 @@ public class SqlTest {
 
     sql = Sql.SelectAll().from("user").orderBy("user_id");
     assertEquals("SELECT * FROM user ORDER BY user_id", sql.toString());
-
-    List<String> orderBy = new ArrayList<>();
-    orderBy.add("id");
-    orderBy.add("code desc");
-
-    sql = Sql.SelectAll().from("user").orderBy(orderBy);
-    assertEquals("SELECT * FROM user ORDER BY id, code desc", sql.toString());
   }
 
   @Test

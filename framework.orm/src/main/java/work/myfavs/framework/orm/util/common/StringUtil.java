@@ -1,5 +1,7 @@
 package work.myfavs.framework.orm.util.common;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -393,4 +395,12 @@ public class StringUtil {
   }
 
 
+  public static List<String> split(String str, String regex) {
+    if (null == str) throw new IllegalArgumentException("被分割的字符串不能为Null");
+    List<String> res = new ArrayList<>();
+    for (String s : str.split(regex)) {
+      res.add(s.trim());
+    }
+    return res;
+  }
 }

@@ -60,6 +60,7 @@ public class Cond extends Clause {
     super.params.addAll(params);
   }
 
+
   /**
    * 创建逻辑删除条件<br/>
    * 如果 logicDelete 不为空，则创建逻辑删除条件
@@ -565,9 +566,9 @@ public class Cond extends Clause {
 
     for (ConditionMatcher condMat : conditionMatchers) {
       if (null == cond) {
-        cond = createCondByOperator(condMat.operator, condMat.fieldName, condMat.fieldValue);
+        cond = createCondByMatcher(condMat);
       } else {
-        cond.and(createCondByOperator(condMat.operator, condMat.fieldName, condMat.fieldValue));
+        cond.and(createCondByMatcher(condMat));
       }
     }
 
@@ -582,13 +583,35 @@ public class Cond extends Clause {
     int      order;
   }
 
-  private static Cond createCondByOperator(Operator operator, String fieldName, Object paramVal) {
+  private static Cond createCondByMatcher(ConditionMatcher conditionMatcher) {
+    Operator operator  = conditionMatcher.operator;
+    String   fieldName = conditionMatcher.fieldName;
+    Object   paramVal  = conditionMatcher.fieldValue;
 
+    List<String> fieldNames = StringUtil.split(fieldName, ",");
+    if (fieldNames.size() > 1) {
+      Iterator<String> iterator = fieldNames.iterator();
+      Cond             cond     = createCond(operator, iterator.next(), paramVal);
+      while (iterator.hasNext()) {
+        cond.or(createCond(operator, iterator.next(), paramVal));
+      }
+
+      return new Cond(String.format("(%s)", StringUtil.trimStart(cond.sql)), cond.params);
+    }
+
+    return createCond(operator, fieldName, paramVal);
+  }
+
+  private static Cond createCond(Operator operator, String fieldName, Object paramVal) {
     switch (operator) {
       case EQUALS:
         return Cond.eq(fieldName, paramVal);
+      case EQUALS_INC_NULL:
+        return Cond.eq(fieldName, paramVal, false);
       case NOT_EQUALS:
         return Cond.ne(fieldName, paramVal);
+      case NOT_EQUALS_INC_NULL:
+        return Cond.ne(fieldName, paramVal, false);
       case LIKE:
         return Cond.like(fieldName, paramVal);
       case IS_NULL:
@@ -606,13 +629,13 @@ public class Cond extends Clause {
       case LESS_THAN_OR_EQUALS:
         return Cond.le(fieldName, paramVal);
       case IN:
-        Collection<?> inParam = ConvertUtil.toCollection(paramVal);
-        if (inParam.isEmpty()) return new Cond();
-        return Cond.in(fieldName, inParam);
+        return Cond.in(fieldName, ConvertUtil.toCollection(paramVal));
+      case IN_INC_EMPTY:
+        return Cond.in(fieldName, ConvertUtil.toCollection(paramVal), false);
       case NOT_IN:
-        Collection<?> notInParam = ConvertUtil.toCollection(paramVal);
-        if (notInParam.isEmpty()) return new Cond();
-        return Cond.notIn(fieldName, notInParam);
+        return Cond.notIn(fieldName, ConvertUtil.toCollection(paramVal));
+      case NOT_IN_INC_EMPTY:
+        return Cond.notIn(fieldName, ConvertUtil.toCollection(paramVal), false);
       default:
         throw new IllegalArgumentException("The operator is not supported");
     }
