@@ -578,7 +578,7 @@ public class Sql extends Clause implements Serializable {
    * @return SQL
    */
   public Sql andCriteria(Object criteria) {
-    return this.and(Cond.createByCriteria(criteria));
+    return this.append(Cond.createByCriteria(criteria));
   }
 
   /**
@@ -589,7 +589,7 @@ public class Sql extends Clause implements Serializable {
    * @return SQL
    */
   public Sql andCriteria(Object criteria, Class<?> criteriaGroup) {
-    return this.and(Cond.createByCriteria(criteria, criteriaGroup));
+    return this.append(Cond.createByCriteria(criteria, criteriaGroup));
   }
 
   /**

@@ -572,7 +572,7 @@ public class Cond extends Clause {
       }
     }
 
-    return cond;
+    return cond == null ? new Cond() : cond;
   }
 
   static class ConditionMatcher {
