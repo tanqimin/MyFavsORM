@@ -520,27 +520,6 @@ public class Sql extends Clause implements Serializable {
   }
 
   /**
-   * 拼接 WHERE {cond} 语句，{cond} 根据 {@link Criteria @Criteria} 注解生成的条件
-   *
-   * @param criteria 包含 {@link Criteria @Criteria} 注解 Field 的对象
-   * @return SQL
-   */
-  public Sql whereCriteria(Object criteria) {
-    return this.where(Cond.createByCriteria(criteria));
-  }
-
-  /**
-   * 拼接 WHERE {cond} 语句，{cond} 根据 {@link Criteria @Criteria} 注解生成的条件
-   *
-   * @param criteria      包含 {@link Criteria @Criteria} 注解 Field 的对象
-   * @param criteriaGroup 条件组名, 参考 {@link Criterion#group() @Criterion(group = CriteriaGroupClass.class)}
-   * @return SQL
-   */
-  public Sql whereCriteria(Object criteria, Class<?> criteriaGroup) {
-    return this.where(Cond.createByCriteria(criteria, criteriaGroup));
-  }
-
-  /**
    * 拼接 AND {cond} 语句
    *
    * @param cond Cond

@@ -13,7 +13,7 @@ import java.util.List;
  */
 public abstract class Clause {
 
-//  protected static final String        SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
+  //  protected static final String        SQL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
   protected static final String        SQL_PATTERN = "[\\w\\p{IsIdeographic}\\ \\,\\.]+";
   protected              StringBuilder sql;
   protected              List<Object>  params;
@@ -78,5 +78,14 @@ public abstract class Clause {
     }
 
     return sql;
+  }
+
+  /**
+   * 当前语句是否为空
+   *
+   * @return 如果语句和参数列表都为空，返回true
+   */
+  public boolean isBlankClause() {
+    return StringUtil.isBlank(this.sql) && CollectionUtil.isEmpty(this.params);
   }
 }

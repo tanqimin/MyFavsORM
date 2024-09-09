@@ -543,36 +543,41 @@ public class Cond extends Clause {
    */
   public static Cond createByCriteria(Object object, Class<?> criteriaGroup) {
 
-    Cond                   cond              = null;
+    Cond                   cond              = new Cond();
     List<ConditionMatcher> conditionMatchers = new ArrayList<>();
     final List<Field>      fields            = ReflectUtil.getFields(object.getClass());
     for (Field field : fields) {
       final Criterion[] annotations = field.getAnnotationsByType(Criterion.class);
       for (Criterion annotation : annotations) {
-        if (criteriaGroup != annotation.group()) {
+        if (criteriaGroup != annotation.group())
           continue;
-        }
+
         ConditionMatcher conditionMatcher = new ConditionMatcher();
-        conditionMatcher.fieldName =
-            StringUtil.isBlank(annotation.value()) ? field.getName() : annotation.value();
         conditionMatcher.fieldValue = new FieldVisitor(field).getValue(object);
         conditionMatcher.operator = annotation.operator();
+        if (conditionMatcher.ignoreCondition())
+          continue;
+
+        conditionMatcher.fieldName = StringUtil.isBlank(annotation.value()) ? field.getName() : annotation.value();
         conditionMatcher.order = annotation.order();
         conditionMatchers.add(conditionMatcher);
       }
     }
 
+    if (CollectionUtil.isEmpty(conditionMatchers))
+      return cond;
+
+    //排序
     conditionMatchers.sort(Comparator.comparingInt(o -> o.order));
 
+    //生成条件
     for (ConditionMatcher condMat : conditionMatchers) {
-      if (null == cond) {
-        cond = createCondByMatcher(condMat);
-      } else {
-        cond.and(createCondByMatcher(condMat));
-      }
+      Cond condByMatcher = createCondByMatcher(condMat);
+      if (condByMatcher.isBlankClause()) continue;
+      cond.and(condByMatcher);
     }
 
-    return cond == null ? new Cond() : cond;
+    return cond;
   }
 
   static class ConditionMatcher {
@@ -581,6 +586,15 @@ public class Cond extends Clause {
     Object   fieldValue;
     Operator operator;
     int      order;
+
+    public boolean ignoreCondition() {
+      if (null != fieldValue) return false;
+      if (Operator.EQUALS_INC_NULL.equals(operator)) return false;
+      if (Operator.IN_INC_EMPTY.equals(operator)) return false;
+      if (Operator.NOT_EQUALS_INC_NULL.equals(operator)) return false;
+      if (Operator.NOT_IN_INC_EMPTY.equals(operator)) return false;
+      return true;
+    }
   }
 
   private static Cond createCondByMatcher(ConditionMatcher conditionMatcher) {
