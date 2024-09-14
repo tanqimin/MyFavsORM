@@ -1,6 +1,7 @@
 package work.myfavs.framework.orm.meta.pagination;
 
-import work.myfavs.framework.orm.DBTemplate;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.function.Function;
@@ -11,41 +12,12 @@ import java.util.function.Function;
  * @param <TModel> 简单分页对象泛型
  * @author tanqimin
  */
+@Getter
+@Setter
 public class Page<TModel> extends PageBase<TModel> {
 
-  protected final String pageTotalPageField;
-  protected final String pageTotalRecordField;
-
-  // region Getter && Setter
-  public long getTotalPages() {
-    return (long) this.get(pageTotalPageField);
-  }
-
-  public void setTotalPages(long totalPages) {
-    this.put(pageTotalPageField, totalPages);
-  }
-
-  public long getTotalRecords() {
-    return (long) this.get(pageTotalRecordField);
-  }
-
-  public void setTotalRecords(long totalRecords) {
-    this.put(pageTotalRecordField, totalRecords);
-  }
-  // endregion
-
-  // region Constructor
-
-  public Page(DBTemplate dbTemplate) {
-    super(dbTemplate);
-    this.pageTotalPageField = dbTemplate.getDbConfig().getPageTotalPageField();
-    this.pageTotalRecordField = dbTemplate.getDbConfig().getPageTotalRecordField();
-
-    this.setTotalPages(1L);
-    this.setTotalRecords(0L);
-  }
-
-  // endregion
+  private long totalPages = 1L;
+  private long totalRecords;
 
   /**
    * 转换分页对象数据
@@ -55,12 +27,13 @@ public class Page<TModel> extends PageBase<TModel> {
    * @return 新分页数据
    */
   public <TOther> Page<TOther> convert(List<TOther> data) {
-    return super.dbTemplate.createPage(
-        data,
-        this.getCurrentPage(),
-        this.getPageSize(),
-        this.getTotalPages(),
-        this.getTotalRecords());
+    Page<TOther> page = new Page<>();
+    page.setData(data);
+    page.setCurrentPage(this.getCurrentPage());
+    page.setTotalPages(this.getTotalPages());
+    page.setTotalRecords(this.getTotalRecords());
+    page.setPageSize(this.getPageSize());
+    return page;
   }
 
   /**
@@ -71,7 +44,6 @@ public class Page<TModel> extends PageBase<TModel> {
    * @return 新分页数据
    */
   public <TOther> Page<TOther> convert(Function<TModel, TOther> fun) {
-
     return convert(convertData(fun));
   }
 }
