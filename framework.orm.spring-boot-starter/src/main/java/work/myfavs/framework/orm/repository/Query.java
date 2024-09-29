@@ -517,7 +517,7 @@ public class Query extends BaseRepository {
   public <TView> Page<TView> createPage(
       List<TView> data, long currentPage, long pageSize, long totalPages, long totalRecords) {
 
-    return this.dbTemplate.createPage(data, currentPage, pageSize, totalPages, totalRecords);
+    return Page.create(data, currentPage, pageSize, totalPages, totalRecords);
   }
 
   /**
@@ -531,6 +531,6 @@ public class Query extends BaseRepository {
    */
   public <TView> PageLite<TView> createPageLite(List<TView> data, long currentPage, long pageSize) {
 
-    return this.dbTemplate.createPageLite(data, currentPage, pageSize);
+    return PageLite.create(data, currentPage, pageSize);
   }
 }

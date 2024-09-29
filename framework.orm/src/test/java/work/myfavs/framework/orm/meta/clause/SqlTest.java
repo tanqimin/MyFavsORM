@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 public class SqlTest {
 
   @Test
-  public void newTest() {
+  public void createTest() {
     Sql sql = new Sql();
     assertNotNull(sql);
     assertEquals("", sql.toString());
@@ -40,7 +40,7 @@ public class SqlTest {
   @Test
   public void testAppend() {
     Sql sql = new Sql().append(Cond.eq("id", 1));
-    assertEquals(" id = ?", sql.toString());
+    assertEquals("id = ?", sql.toString());
     assertEquals(1, sql.params.size());
   }
 
@@ -73,7 +73,7 @@ public class SqlTest {
   @Test
   public void testAppendLine() {
     Sql sql = new Sql().appendLine(Cond.eq("id", 1));
-    assertEquals(" id = ?".concat(Constant.LINE_SEPARATOR), sql.toString());
+    assertEquals("id = ?".concat(Constant.LINE_SEPARATOR), sql.toString());
     assertEquals(1, sql.params.size());
   }
 
@@ -101,13 +101,13 @@ public class SqlTest {
   @Test
   public void selectAll() {
     assertEquals("SELECT *", Sql.SelectAll().toString());
-    assertEquals(" SELECT *", new Sql().selectAll().toString());
+    assertEquals("SELECT *", new Sql().selectAll().toString());
   }
 
   @Test
   public void select() {
-    assertEquals("SELECT id,name", Sql.Select("id", "name").toString());
-    assertEquals(" SELECT id,name", new Sql().select("id", "name").toString());
+    assertEquals("SELECT id , name", Sql.Select("id", "name").toString());
+    assertEquals("SELECT id , name", new Sql().select("id", "name").toString());
   }
 
   @Test
@@ -125,39 +125,39 @@ public class SqlTest {
   @Test
   public void testFrom1() {
     Sql sql = Sql.SelectAll().from(Sql.SelectAll().from("user"), "u");
-    assertEquals("SELECT * FROM (SELECT * FROM user) u", sql.toString());
+    assertEquals("SELECT * FROM ( SELECT * FROM user ) u", sql.toString());
   }
 
   @Test
   public void testFrom2() {
     Sql sql = Sql.SelectAll().from(() -> Sql.SelectAll().from("user"), "u");
-    assertEquals("SELECT * FROM (SELECT * FROM user) u", sql.toString());
+    assertEquals("SELECT * FROM ( SELECT * FROM user ) u", sql.toString());
   }
 
   @Test
   public void leftJoin() {
     Sql sql = new Sql().leftJoin("user", "u", "u.id = id");
-    assertEquals(" LEFT JOIN user u ON u.id = id", sql.toString());
+    assertEquals("LEFT JOIN user u ON u.id = id", sql.toString());
   }
 
   @Test
   public void testLeftJoin() {
     Sql user = Sql.SelectAll().from("user");
     Sql sql  = new Sql().leftJoin(user, "u", "u.id = id");
-    assertEquals(String.format(" LEFT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
+    assertEquals(String.format("LEFT JOIN ( %s ) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
   public void testLeftJoin1() {
     Sql user = Sql.SelectAll().from("user");
     Sql sql  = new Sql().leftJoin(() -> user, "u", "u.id = id");
-    assertEquals(String.format(" LEFT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
+    assertEquals(String.format("LEFT JOIN ( %s ) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
   public void rightJoin() {
     Sql sql = new Sql().rightJoin("user", "u", "u.id = id");
-    assertEquals(" RIGHT JOIN user u ON u.id = id", sql.toString());
+    assertEquals("RIGHT JOIN user u ON u.id = id", sql.toString());
   }
 
   @Test
@@ -165,7 +165,7 @@ public class SqlTest {
     Sql user = Sql.SelectAll().from("user");
     Sql sql  = new Sql().rightJoin(user, "u", "u.id = id");
     assertEquals(
-        String.format(" RIGHT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
+        String.format("RIGHT JOIN ( %s ) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
@@ -173,13 +173,13 @@ public class SqlTest {
     Sql user = Sql.SelectAll().from("user");
     Sql sql  = new Sql().rightJoin(() -> user, "u", "u.id = id");
     assertEquals(
-        String.format(" RIGHT JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
+        String.format("RIGHT JOIN ( %s ) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
   public void innerJoin() {
     Sql sql = new Sql().innerJoin("user", "u", "u.id = id");
-    assertEquals(" INNER JOIN user u ON u.id = id", sql.toString());
+    assertEquals("INNER JOIN user u ON u.id = id", sql.toString());
   }
 
   @Test
@@ -187,7 +187,7 @@ public class SqlTest {
     Sql user = Sql.SelectAll().from("user");
     Sql sql  = new Sql().innerJoin(user, "u", "u.id = id");
     assertEquals(
-        String.format(" INNER JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
+        String.format("INNER JOIN ( %s ) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
@@ -195,79 +195,79 @@ public class SqlTest {
     Sql user = Sql.SelectAll().from("user");
     Sql sql  = new Sql().innerJoin(() -> user, "u", "u.id = id");
     assertEquals(
-        String.format(" INNER JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
+        String.format("INNER JOIN ( %s ) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
   public void fullJoin() {
     Sql sql = new Sql().fullJoin("user", "u", "u.id = id");
-    assertEquals(" FULL JOIN user u ON u.id = id", sql.toString());
+    assertEquals("FULL JOIN user u ON u.id = id", sql.toString());
   }
 
   @Test
   public void testFullJoin() {
     Sql user = Sql.SelectAll().from("user");
     Sql sql  = new Sql().fullJoin(user, "u", "u.id = id");
-    assertEquals(String.format(" FULL JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
+    assertEquals(String.format("FULL JOIN ( %s ) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
   public void testFullJoin1() {
     Sql user = Sql.SelectAll().from("user");
     Sql sql  = new Sql().fullJoin(() -> user, "u", "u.id = id");
-    assertEquals(String.format(" FULL JOIN (%s) u ON u.id = id", user.toString()), sql.toString());
+    assertEquals(String.format("FULL JOIN ( %s ) u ON u.id = id", user.toString()), sql.toString());
   }
 
   @Test
   public void where() {
-    assertEquals(" WHERE 1 = 1", new Sql().where().toString());
+    assertEquals("WHERE 1 = 1", new Sql().where().toString());
   }
 
   @Test
   public void testWhere() {
-    assertEquals(" WHERE id = ?", new Sql().where(Cond.eq("id", 1)).toString());
+    assertEquals("WHERE id = ?", new Sql().where(Cond.eq("id", 1)).toString());
   }
 
   @Test
   public void testWhere1() {
-    assertEquals(" WHERE 1 = 1", new Sql().where("1 = 1").toString());
+    assertEquals("WHERE 1 = 1", new Sql().where("1 = 1").toString());
   }
 
   @Test
   public void testWhere2() {
     assertEquals(
-        " WHERE id = ?, name = ?",
-        new Sql().where("id = ?, name = ?", List.of(1, "test")).toString());
+        "WHERE id = ? , name = ?",
+        new Sql().where("id = ? , name = ?", List.of(1, "test")).toString());
   }
 
   @Test
   public void and() {
     Sql sql = new Sql().and(Cond.eq("id", 1));
-    assertEquals(" AND id = ?", sql.toString());
+    assertEquals("AND id = ?", sql.toString());
   }
 
   @Test
   public void testAnd() {
     Sql sql = new Sql().and(() -> Cond.eq("id", 1));
-    assertEquals(" AND (id = ?)", sql.toString());
+    assertEquals("AND ( id = ? )", sql.toString());
   }
 
   @Test
   public void or() {
     Sql sql = new Sql().or(Cond.eq("id", 1));
-    assertEquals(" OR id = ?", sql.toString());
+    assertEquals("OR id = ?", sql.toString());
   }
 
   @Test
   public void testOr() {
     Sql sql = new Sql().or(() -> Cond.eq("id", 1));
-    assertEquals(" OR (id = ?)", sql.toString());
+    assertEquals("OR ( id = ? )", sql.toString());
   }
 
   @Test
   public void asSubQuery() {
     Sql sql = Sql.SelectAll().from("user").asSubQuery("u");
-    assertEquals("SELECT * FROM (SELECT * FROM user) u", sql.toString());
+    assertEquals("SELECT * FROM ( SELECT * FROM user ) u", sql.toString());
   }
 
   @Test
@@ -340,7 +340,7 @@ public class SqlTest {
   @Test
   public void testOrderBy() {
     Sql sql = Sql.SelectAll().from("user").orderBy("id", "name DESC");
-    assertEquals("SELECT * FROM user ORDER BY id, name DESC", sql.toString());
+    assertEquals("SELECT * FROM user ORDER BY id , name DESC", sql.toString());
   }
 
   @Test
@@ -352,19 +352,19 @@ public class SqlTest {
   @Test
   public void testLimit() {
     Sql sql = Sql.SelectAll().from("user").limit(1, 2);
-    assertEquals("SELECT * FROM user LIMIT 1, 2", sql.toString());
+    assertEquals("SELECT * FROM user LIMIT 1 , 2", sql.toString());
   }
 
   @Test
   public void insert() {
     Sql sql = Sql.Insert("user", "id", "name");
-    assertEquals("INSERT INTO user (id, name)", sql.toString());
+    assertEquals("INSERT INTO user ( id , name )", sql.toString());
   }
 
   @Test
   public void values() {
     Sql sql = Sql.Insert("user", "id", "name").values(1, "test");
-    assertEquals("INSERT INTO user (id, name) VALUES (?, ?)", sql.toString());
+    assertEquals("INSERT INTO user ( id , name ) VALUES ( ? , ? )", sql.toString());
   }
 
   @Test
@@ -400,6 +400,6 @@ public class SqlTest {
   @Test
   public void deleteLastChar() {
     Sql sql = Sql.SelectAll().from("user").append(",");
-    assertEquals("SELECT * FROM user", sql.deleteLastChar(",").toString());
+    assertEquals("SELECT * FROM user", sql.deleteLast(",").toString());
   }
 }

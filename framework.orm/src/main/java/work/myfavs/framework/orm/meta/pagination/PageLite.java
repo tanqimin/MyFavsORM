@@ -43,4 +43,26 @@ public class PageLite<TModel> extends PageBase<TModel> {
 
     return convert(convertData(fun));
   }
+
+  /**
+   * 创建 {@link PageLite} 对象
+   *
+   * @param data        分页数据
+   * @param currentPage 当前页码
+   * @param pageSize    每页记录数
+   * @param <TModel>    简单分页对象泛型
+   * @return {@link PageLite} 对象
+   */
+  public static <TModel> PageLite<TModel> create(
+      List<TModel> data, long currentPage, long pageSize) {
+
+    PageLite<TModel> instance = new PageLite<>();
+    instance.setData(data);
+    instance.setCurrentPage(currentPage);
+    instance.setPageSize(pageSize);
+    if (null != data) {
+      instance.setHasNext(data.size() == pageSize);
+    }
+    return instance;
+  }
 }

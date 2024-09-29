@@ -66,7 +66,7 @@ public class TenantDataSourceConfig {
       ds.setUsername(tenant.getJdbcUser());
       ds.setPassword(tenant.getJdbcPassword());
       customDataSources.put(tenant.getTenant(), ds);
-      logger.info("已加载租户库数据源" + tenant.getTenant());
+      logger.info("已加载租户库数据源:{}", tenant.getTenant());
     }
 
     dynamicDataSource.setTargetDataSources(customDataSources);

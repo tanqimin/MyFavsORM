@@ -1,11 +1,10 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import work.myfavs.framework.orm.meta.handler.PropertyHandler;
-
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 
 /**
@@ -13,20 +12,29 @@ import java.time.OffsetDateTime;
  *
  * @author tanqimin
  */
-public class OffsetDateTimePropertyHandler extends PropertyHandler<OffsetDateTime> {
+public class OffsetDateTimePropertyHandler extends AbstractTemporalAccessorPropertyHandler<OffsetDateTime> {
+
+  public OffsetDateTimePropertyHandler() {
+    super();
+  }
+
+  public OffsetDateTimePropertyHandler(boolean usingEpochMilli) {
+    super(usingEpochMilli);
+  }
 
   @Override
-  public OffsetDateTime convert(ResultSet rs, int columnIndex, Class<OffsetDateTime> clazz)
-      throws SQLException {
-
-    return rs.getObject(columnIndex, OffsetDateTime.class);
+  protected OffsetDateTime fromInstant(Instant instant) {
+    return OffsetDateTime.ofInstant(instant, super.ZONE_ID);
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, OffsetDateTime param)
       throws SQLException {
-
-    ps.setObject(paramIndex, param);
+    if (usingEpochMilli) {
+      ps.setLong(paramIndex, param.atZoneSameInstant(super.ZONE_ID).toInstant().toEpochMilli());
+      return;
+    }
+    ps.setTimestamp(paramIndex, Timestamp.valueOf(param.toLocalDateTime()));
   }
 
   @Override

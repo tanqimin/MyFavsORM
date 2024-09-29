@@ -11,6 +11,16 @@ public abstract class AbstractDatePropertyHandler<T extends Date> extends Proper
 
   protected abstract T fromMilliseconds(long millisecond);
 
+  protected final boolean usingEpochMilli;
+
+  public AbstractDatePropertyHandler() {
+    this.usingEpochMilli = false;
+  }
+
+  public AbstractDatePropertyHandler(boolean usingEpochMilli) {
+    this.usingEpochMilli = usingEpochMilli;
+  }
+
   @Override
   public T convert(ResultSet rs, int columnIndex, Class<T> clazz) throws SQLException {
     Object val = rs.getObject(columnIndex);

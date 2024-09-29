@@ -1,9 +1,6 @@
 package work.myfavs.framework.orm.util.common;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -94,5 +91,23 @@ public class CollectionUtil {
       }
     }
     return result.toString();
+  }
+
+  /**
+   * 转换成 {@link Collection} 集合
+   *
+   * @param obj1 成员1
+   * @param objs 成员数组
+   * @param <T>  集合成员类型泛型
+   * @return {@link Collection} 集合
+   */
+  @SafeVarargs
+  public static <T> Collection<T> toCollection(T obj1, T... objs) {
+    Collection<T> result = new ArrayList<>();
+    result.add(obj1);
+    if (ArrayUtil.isNotEmpty(objs)) {
+      Collections.addAll(result, objs);
+    }
+    return result;
   }
 }

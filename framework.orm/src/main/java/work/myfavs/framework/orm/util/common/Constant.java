@@ -24,6 +24,7 @@ public interface Constant {
    */
   List<Class<?>> PRIMITIVE_TYPES = List.of(Integer.class, Long.class, Double.class, String.class, Float.class, Boolean.class, Number.class,
                                            Short.class);
+
   char UNDERLINE = '_';
 
   char FUZZY_MULTIPLE = '%';
@@ -31,6 +32,10 @@ public interface Constant {
   char FUZZY_SINGLE = '_';
 
   char FUZZY_ESCAPE = '¦';
+
+  char SPACE_CHAR = ' ';
+
+  String SPACE = " ";
 
   String SYMBOL_COMMA = ",";
 

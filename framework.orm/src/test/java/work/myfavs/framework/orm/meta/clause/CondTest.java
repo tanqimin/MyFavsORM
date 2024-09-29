@@ -38,83 +38,83 @@ public class CondTest {
   @Test
   public void logicalDelete() {
     Cond cond = Cond.logicalDelete(logicDeleteMeta.getLogicDelete());
-    assertEquals(" deleted = ?", cond.toString());
+    assertEquals("deleted = ?", cond.toString());
     assertEquals(1, cond.getParams().size());
     assertFalse(cond.getParams().get(0) instanceof Boolean);
   }
 
   @Test
   public void eq() {
-    assertEquals(" id = ?", Cond.eq("id", 0).toString());
+    assertEquals("id = ?", Cond.eq("id", 0).toString());
   }
 
   @Test
   public void testEq() {
-    assertTrue(StringUtil.equalsIgnoreCase(" id is null", Cond.eq("id", null, false).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase("id is null", Cond.eq("id", null, false).toString()));
     assertEquals("", Cond.eq("id", null, true).toString());
   }
 
   @Test
   public void ne() {
-    assertEquals(" id <> ?", Cond.ne("id", 0).toString());
+    assertEquals("id <> ?", Cond.ne("id", 0).toString());
   }
 
   @Test
   public void testNe() {
-    assertTrue(StringUtil.equalsIgnoreCase(" id is not null", Cond.ne("id", null, false).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase("id is not null", Cond.ne("id", null, false).toString()));
     assertEquals("", Cond.ne("id", null, true).toString());
   }
 
   @Test
   public void isNull() {
-    assertTrue(StringUtil.equalsIgnoreCase(" id is null", Cond.eq("id", null, false).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase("id is null", Cond.eq("id", null, false).toString()));
   }
 
   @Test
   public void isNotNull() {
-    assertTrue(StringUtil.equalsIgnoreCase(" id is not null", Cond.ne("id", null, false).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase("id is not null", Cond.ne("id", null, false).toString()));
   }
 
   @Test
   public void gt() {
-    assertTrue(StringUtil.equalsIgnoreCase(" id > ?", Cond.gt("id", 0).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase("id > ?", Cond.gt("id", 0).toString()));
     assertEquals("", Cond.gt("id", null).toString());
   }
 
   @Test
   public void ge() {
-    assertTrue(StringUtil.equalsIgnoreCase(" id >= ?", Cond.ge("id", 0).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase("id >= ?", Cond.ge("id", 0).toString()));
     assertEquals("", Cond.ge("id", null).toString());
   }
 
   @Test
   public void lt() {
-    assertTrue(StringUtil.equalsIgnoreCase(" id < ?", Cond.lt("id", 0).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase("id < ?", Cond.lt("id", 0).toString()));
     assertEquals("", Cond.lt("id", null).toString());
   }
 
   @Test
   public void le() {
-    assertTrue(StringUtil.equalsIgnoreCase(" id <= ?", Cond.le("id", 0).toString()));
+    assertTrue(StringUtil.equalsIgnoreCase("id <= ?", Cond.le("id", 0).toString()));
     assertEquals("", Cond.le("id", null).toString());
   }
 
   @Test
   public void like() {
     assertEquals("", Cond.like("id", null).toString());
-    assertEquals(" id = ?", Cond.like("id", 1).toString());
-    assertEquals(" id LIKE ?", Cond.like("id", "1%").toString());
+    assertEquals("id = ?", Cond.like("id", 1).toString());
+    assertEquals("id LIKE ?", Cond.like("id", "1%").toString());
 
     String paramVal   = "_ABC%";
     Cond   multiLike  = Cond.like("id", paramVal, FuzzyMode.MULTIPLE);
     Cond   singleLike = Cond.like("id", paramVal, FuzzyMode.SINGLE);
 
-    assertEquals(" id = ?", Cond.like("id", 1, FuzzyMode.ALL).toString());
-    assertEquals(" id = ?", Cond.like("id", 1, FuzzyMode.MULTIPLE).toString());
-    assertEquals(" id = ?", Cond.like("id", 1, FuzzyMode.SINGLE).toString());
-    assertEquals(" id LIKE ?", Cond.like("id", paramVal, FuzzyMode.ALL).toString());
-    assertEquals(" id LIKE ? ESCAPE '¦'", multiLike.toString());
-    assertEquals(" id LIKE ? ESCAPE '¦'", singleLike.toString());
+    assertEquals("id = ?", Cond.like("id", 1, FuzzyMode.ALL).toString());
+    assertEquals("id = ?", Cond.like("id", 1, FuzzyMode.MULTIPLE).toString());
+    assertEquals("id = ?", Cond.like("id", 1, FuzzyMode.SINGLE).toString());
+    assertEquals("id LIKE ?", Cond.like("id", paramVal, FuzzyMode.ALL).toString());
+    assertEquals("id LIKE ? ESCAPE '¦'", multiLike.toString());
+    assertEquals("id LIKE ? ESCAPE '¦'", singleLike.toString());
     assertEquals(multiLike.params.get(0), "¦_ABC%");
     assertEquals(singleLike.params.get(0), "_ABC¦%");
   }
@@ -122,9 +122,9 @@ public class CondTest {
   @Test
   public void between() {
     assertEquals("", Cond.between("id", null, null).toString());
-    assertEquals(" id >= ?", Cond.between("id", 1, null).toString());
-    assertEquals(" id <= ?", Cond.between("id", null, 2).toString());
-    assertEquals(" id BETWEEN ? AND ?", Cond.between("id", 1, 2).toString());
+    assertEquals("id >= ?", Cond.between("id", 1, null).toString());
+    assertEquals("id <= ?", Cond.between("id", null, 2).toString());
+    assertEquals("id BETWEEN ? AND ?", Cond.between("id", 1, 2).toString());
   }
 
   @Test
@@ -132,21 +132,21 @@ public class CondTest {
     List<Long> list = new ArrayList<>();
     assertEquals("", Cond.in("id", list).toString());
     list.add(1L);
-    assertEquals(" id = ?", Cond.in("id", list).toString());
+    assertEquals("id = ?", Cond.in("id", list).toString());
     list.add(2L);
-    assertEquals(" id IN (?,?)", Cond.in("id", list).toString());
+    assertEquals("id IN ( ? , ? )", Cond.in("id", list).toString());
   }
 
   @Test
   public void testIn() {
     List<Long> list = new ArrayList<>();
-    assertEquals(" 1 > 2", Cond.in("id", list, false).toString());
+    assertEquals("1 > 2", Cond.in("id", list, false).toString());
   }
 
   @Test
   public void testIn1() {
-    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(String.format(" id IN (%s)", sql), Cond.in("id", sql).toString());
+    Sql sql = Sql.create("SELECT id FROM tb_snowflake");
+    assertEquals(String.format("id IN ( %s )", sql), Cond.in("id", sql).toString());
   }
 
   @Test
@@ -154,45 +154,45 @@ public class CondTest {
     List<Long> list = new ArrayList<>();
     assertEquals("", Cond.notIn("id", list).toString());
     list.add(1L);
-    assertEquals(" id <> ?", Cond.notIn("id", list).toString());
+    assertEquals("id <> ?", Cond.notIn("id", list).toString());
     list.add(2L);
-    assertEquals(" id NOT IN (?,?)", Cond.notIn("id", list).toString());
+    assertEquals("id NOT IN ( ? , ? )", Cond.notIn("id", list).toString());
   }
 
   @Test
   public void testNotIn() {
     List<Long> list = new ArrayList<>();
-    assertEquals(" 1 > 2", Cond.notIn("id", list, false).toString());
+    assertEquals("1 > 2", Cond.notIn("id", list, false).toString());
   }
 
   @Test
   public void testNotIn1() {
-    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(String.format(" id NOT IN (%s)", sql), Cond.notIn("id", sql).toString());
+    Sql sql = Sql.create("SELECT id FROM tb_snowflake");
+    assertEquals(String.format("id NOT IN ( %s )", sql), Cond.notIn("id", sql).toString());
   }
 
   @Test
   public void exists() {
-    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(String.format(" EXISTS (%s)", sql), Cond.exists(sql).toString());
+    Sql sql = Sql.create("SELECT id FROM tb_snowflake");
+    assertEquals(String.format("EXISTS ( %s )", sql), Cond.exists(sql).toString());
   }
 
   @Test
   public void testExists() {
-    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(String.format(" EXISTS (%s)", sql), Cond.exists(() -> sql).toString());
+    Sql sql = Sql.create("SELECT id FROM tb_snowflake");
+    assertEquals(String.format("EXISTS ( %s )", sql), Cond.exists(() -> sql).toString());
   }
 
   @Test
   public void notExists() {
-    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(String.format(" NOT EXISTS (%s)", sql), Cond.notExists(sql).toString());
+    Sql sql = Sql.create("SELECT id FROM tb_snowflake");
+    assertEquals(String.format("NOT EXISTS ( %s )", sql), Cond.notExists(sql).toString());
   }
 
   @Test
   public void testNotExists() {
-    Sql sql = Sql.New("SELECT id FROM tb_snowflake");
-    assertEquals(String.format(" NOT EXISTS (%s)", sql), Cond.notExists(() -> sql).toString());
+    Sql sql = Sql.create("SELECT id FROM tb_snowflake");
+    assertEquals(String.format("NOT EXISTS ( %s )", sql), Cond.notExists(() -> sql).toString());
   }
 
   @Test
@@ -207,8 +207,8 @@ public class CondTest {
     snowflake.setName("S1");
     snowflake.setType(TypeEnum.FOOD);
 
-    Cond cond = Cond.createByCriteria(snowflake);
-    assertEquals(" name = ? AND type = ?", cond.toString());
+    Cond cond = Cond.criteria(snowflake);
+    assertEquals("name = ? AND type = ?", cond.toString());
   }
 
   @Test
@@ -217,8 +217,8 @@ public class CondTest {
     snowflake.setName("S1");
     snowflake.setType(TypeEnum.FOOD);
 
-    Cond cond = Cond.createByCriteria(snowflake, BaseEntity.Update.class);
-    assertEquals(" name <> ?", cond.toString());
+    Cond cond = Cond.criteria(snowflake, BaseEntity.Update.class);
+    assertEquals("name <> ?", cond.toString());
 
     Person person = new Person();
     person.setName("Person1");
@@ -226,17 +226,17 @@ public class CondTest {
     person.setAlias(Arrays.asList("Alias1", "Alias2"));
     person.setBlurry("%s%");
 
-    cond = Cond.createByCriteria(person, Person.PersonQuery.class);
-    System.out.println(cond.toString());
-    assertEquals(" person_alias IN (?,?) AND person_name = ? AND (code LIKE ? OR name LIKE ?)", cond.toString());
+    cond = Cond.criteria(person, Person.PersonQuery.class);
+    System.out.println(cond);
+    assertEquals("person_alias IN ( ? , ? ) AND person_name = ? AND (code LIKE ? OR name LIKE ?)", cond.toString());
 
-    cond = Cond.createByCriteria(person, Person.PersonList.class);
-    assertEquals(" cars NOT IN (?,?)", cond.toString());
+    cond = Cond.criteria(person, Person.PersonList.class);
+    assertEquals("cars NOT IN ( ? , ? )", cond.toString());
   }
 
   @Test
   public void testToString() {
-    assertEquals(" id = ?", Cond.eq("id", 0).toString());
+    assertEquals("id = ?", Cond.eq("id", 0).toString());
   }
 }
 

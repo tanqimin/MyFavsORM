@@ -19,6 +19,11 @@ public class DatePropertyHandler extends AbstractDatePropertyHandler<Date> {
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Date param) throws SQLException {
 
+    if (usingEpochMilli) {
+      ps.setLong(paramIndex, param.getTime());
+      return;
+    }
+
     if (param instanceof Timestamp) {
       ps.setTimestamp(paramIndex, (Timestamp) param);
       return;

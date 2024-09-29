@@ -315,8 +315,8 @@ public abstract class AbstractOrm implements Orm {
 
     for (List<TModel> entityList : batchList) {
       boolean insertClauseCompleted = false;
-      Sql     insertClause          = Sql.New(String.format("INSERT INTO %s (", tableName));
-      Sql     valuesClause          = Sql.New(") VALUES ");
+      Sql     insertClause          = Sql.create(String.format("INSERT INTO %s (", tableName));
+      Sql     valuesClause          = Sql.create(") VALUES ");
 
       for (TModel entity : entityList) {
         Object pkVal = generatePrimaryKey(strategy, primaryKey, entity);
@@ -342,14 +342,14 @@ public abstract class AbstractOrm implements Orm {
         }
 
         if (!insertClauseCompleted) {
-          insertClause.deleteLastChar(",");
+          insertClause.deleteLast(",");
           insertClauseCompleted = true;
         }
-        valuesClause.deleteLastChar(",");
+        valuesClause.deleteLast(",");
         valuesClause.append("),");
       }
 
-      valuesClause.deleteLastChar(",");
+      valuesClause.deleteLast(",");
       sqlList.add(insertClause.append(valuesClause));
     }
 
@@ -1088,7 +1088,7 @@ public abstract class AbstractOrm implements Orm {
    */
   public <TView> TView getByCriteria(Class<TView> viewClass, Object object) {
 
-    return this.getByCond(viewClass, Cond.createByCriteria(object));
+    return this.getByCond(viewClass, Cond.criteria(object));
   }
 
   /**
@@ -1102,7 +1102,7 @@ public abstract class AbstractOrm implements Orm {
    */
   public <TView> TView getByCriteria(Class<TView> viewClass, Object object, Class<?> criteriaGroup) {
 
-    return this.getByCond(viewClass, Cond.createByCriteria(object, criteriaGroup));
+    return this.getByCond(viewClass, Cond.criteria(object, criteriaGroup));
   }
 
   /**
@@ -1197,7 +1197,7 @@ public abstract class AbstractOrm implements Orm {
    */
   public <TView> List<TView> findByCriteria(Class<TView> viewClass, Object object) {
 
-    return findByCond(viewClass, Cond.createByCriteria(object));
+    return findByCond(viewClass, Cond.criteria(object));
   }
 
   /**
@@ -1211,7 +1211,7 @@ public abstract class AbstractOrm implements Orm {
    */
   public <TView> List<TView> findByCriteria(Class<TView> viewClass, Object object, Class<?> criteriaGroup) {
 
-    return findByCond(viewClass, Cond.createByCriteria(object, criteriaGroup));
+    return findByCond(viewClass, Cond.criteria(object, criteriaGroup));
   }
 
   /**
@@ -1337,7 +1337,7 @@ public abstract class AbstractOrm implements Orm {
 
     final Sql         querySql = this.selectPage(enablePage, sql, params, currentPage, pageSize);
     final List<TView> data     = this.find(viewClass, querySql);
-    return this.dbTemplate.createPageLite(data, currentPage, pageSize);
+    return PageLite.create(data, currentPage, pageSize);
   }
 
   /**
@@ -1491,7 +1491,7 @@ public abstract class AbstractOrm implements Orm {
       totalRecords = data.size();
     }
 
-    return this.dbTemplate.createPage(data, currentPage, pageSize, totalPages, totalRecords);
+    return Page.create(data, currentPage, pageSize, totalPages, totalRecords);
   }
 
   /**

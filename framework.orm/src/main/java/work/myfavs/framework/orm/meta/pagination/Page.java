@@ -46,4 +46,25 @@ public class Page<TModel> extends PageBase<TModel> {
   public <TOther> Page<TOther> convert(Function<TModel, TOther> fun) {
     return convert(convertData(fun));
   }
+
+  /**
+   * 创建 {@link Page} 对象
+   *
+   * @param data         分页数据
+   * @param currentPage  当前页码
+   * @param pageSize     每页记录数
+   * @param totalPages   总页数
+   * @param totalRecords 总记录数
+   * @param <TView>      分页对象数据类型泛型
+   * @return {@link Page} 对象
+   */
+  public static <TView> Page<TView> create(List<TView> data, long currentPage, long pageSize, long totalPages, long totalRecords) {
+    Page<TView> page = new Page<>();
+    page.setData(data);
+    page.setCurrentPage(currentPage);
+    page.setPageSize(pageSize);
+    page.setTotalPages(totalPages);
+    page.setTotalRecords(totalRecords);
+    return page;
+  }
 }

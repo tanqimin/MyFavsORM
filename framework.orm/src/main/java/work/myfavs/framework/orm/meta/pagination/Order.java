@@ -1,71 +1,89 @@
 package work.myfavs.framework.orm.meta.pagination;
 
-import work.myfavs.framework.orm.util.common.StringUtil;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.io.Serializable;
 
+import static work.myfavs.framework.orm.util.common.SqlUtil.checkInjection;
+import static work.myfavs.framework.orm.util.common.StringUtil.*;
+
 /**
  * 排序
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Order implements Serializable {
 
+  /**
+   * 排序字段
+   */
   private String field;
+  /**
+   * 排序方向
+   */
   private String direction;
 
   /**
-   * 获取排序字段
+   * 解析排序字符串
    *
-   * @return 排序字段
+   * @param orderBy 排序字符串
+   * @return {@link Order}
    */
-  public String getField() {
-    return field;
-  }
-
-  /**
-   * 获取排序方向
-   *
-   * @return 排序方向
-   */
-  public String getDirection() {
-    return direction;
-  }
-
-  /**
-   * 设置排序字段
-   *
-   * @param field 排序字段
-   */
-  public void setField(String field) {
-    this.field = field;
-  }
-
-  /**
-   * 设置排序方向
-   *
-   * @param direction 排序方向
-   */
-  public void setDirection(String direction) {
-    this.direction = direction;
-  }
-
-  @Override
-  public String toString() {
-    if (StringUtil.isBlank(field)) {
+  public static Order parse(String orderBy) {
+    if (isBlank(orderBy))
       throw new DBException("排序字段不能为空！");
+
+    String[] split = orderBy.split(Constant.SPACE);
+
+    if (split.length > 2)
+      throw new DBException(String.format("错误的排序格式: %s", orderBy));
+
+    if (split.length == 1) {
+      return new Order(trim(split[0]), "ASC");
     }
+
+    return new Order(trim(split[0]), trim(split[1]));
+  }
+
+  /**
+   * 获取排序语句
+   * <pre>
+   *   {@code {field}}
+   *   或
+   *   {@code {field} DESC}
+   * </pre>
+   *
+   * @return 排序语句
+   */
+  public String getClause() {
+    if (isBlank(this.field))
+      throw new DBException("排序字段不能为空！");
+
+    String orderByField = checkInjection(this.field);
 
     if (isAscending())
-      return this.field;
+      return orderByField;
 
-    if (!StringUtil.equalsIgnoreCase(direction, "DESC")) {
-      throw new DBException("排序方式必须为 ASC 或 DESC！");
-    }
-    return String.format("%s DESC", this.field);
+    if (equalsIgnoreCase(direction, "DESC"))
+      return orderByField.concat(" DESC");
+
+    throw new DBException("排序方向必须为 ASC 或 DESC！");
   }
 
+  /**
+   * 当前排序方向是否为升序
+   *
+   * @return 升序返回 {@code true}
+   */
   public boolean isAscending() {
-    return StringUtil.isEmpty(this.direction)
-        || StringUtil.equalsIgnoreCase(this.direction, "ASC");
+    return isEmpty(this.direction)
+        || equalsIgnoreCase(this.direction, "ASC");
   }
 }

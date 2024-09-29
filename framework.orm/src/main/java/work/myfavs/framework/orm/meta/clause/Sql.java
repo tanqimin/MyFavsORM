@@ -1,234 +1,285 @@
 package work.myfavs.framework.orm.meta.clause;
 
 
-import work.myfavs.framework.orm.meta.annotation.Criteria;
-import work.myfavs.framework.orm.meta.annotation.Criterion;
+import lombok.NonNull;
 import work.myfavs.framework.orm.meta.pagination.ISortable;
 import work.myfavs.framework.orm.meta.pagination.Order;
-import work.myfavs.framework.orm.util.common.ArrayUtil;
-import work.myfavs.framework.orm.util.common.CollectionUtil;
-import work.myfavs.framework.orm.util.common.Constant;
-import work.myfavs.framework.orm.util.common.StringUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.common.*;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.function.Supplier;
 
 /**
  * SQL 语句构建 注意：此处为了解决静态方法与普通方法不能重名的问题，所有静态方法均以大写字母开头
  */
 public class Sql extends Clause implements Serializable {
+  public Sql() {
+  }
 
-  // region Constructor
+  public Sql(@NonNull CharSequence sql) {
+    super(sql);
+  }
 
-  /**
-   * 构造方法
-   */
-  public Sql() {}
+  public Sql(@NonNull CharSequence sql, Object param) {
+    super(sql, param);
+  }
+
+  public Sql(@NonNull CharSequence sql, Collection<?> params) {
+    super(sql, params);
+  }
 
   /**
    * 构造方法
    *
-   * @param sql SQL 语句
+   * @param sql {@link Sql}
    */
-  public Sql(String sql) {
-
-    super(sql);
-  }
-
-  public Sql(String sql, Object param1, Object... params) {
-    super(sql, toCollection(param1, params));
-  }
-
-  private static Collection<Object> toCollection(Object param1, Object... params) {
-    Collection<Object> pars = new ArrayList<>();
-    pars.add(param1);
-    if (ArrayUtil.isNotEmpty(params)) {
-      Collections.addAll(pars, params);
-    }
-    return pars;
+  public Sql(Sql sql) {
+    this(sql.sql, sql.params);
   }
 
   /**
    * 构造方法
+   *
+   * @param sql    SQL 语句
+   * @param param1 参数
+   * @param params 更多参数
+   */
+  public Sql(CharSequence sql, Object param1, Object... params) {
+    this(sql, CollectionUtil.toCollection(param1, params));
+  }
+
+  public static Sql New(String sql) {
+    return new Sql(sql);
+  }
+
+  /**
+   * 静态构造方法
+   *
+   * @param sql SQL 语句
+   * @return {@link Sql}
+   */
+  public static Sql create(CharSequence sql) {
+    return new Sql(sql);
+  }
+
+  /**
+   * 静态构造方法
    *
    * @param sql    SQL 语句
    * @param params 参数
    */
-  public Sql(String sql, Collection<?> params) {
-
-    super(sql, params);
+  public static Sql create(CharSequence sql, Collection<?> params) {
+    return new Sql(sql, params);
   }
 
-  public Sql(Sql sql) {
-    super(sql.toString(), sql.getParams());
-  }
-  // endregion
-
-  public static Sql New(String sql) {
-
+  /**
+   * 构造方法
+   *
+   * @param sql {@link Sql}
+   */
+  public static Sql create(Sql sql) {
     return new Sql(sql);
   }
 
+  /**
+   * 增加参数
+   *
+   * @param param 参数
+   * @return {@link Sql}
+   */
   public Sql addParam(Object param) {
-    this.params.add(param);
-    return this;
-  }
-
-  public Sql addParams(Collection<?> params) {
-    this.params.addAll(params);
+    super.param(param);
     return this;
   }
 
   /**
-   * 追加拼接 SQL
+   * 增加参数集合
    *
-   * @param sql SQL 对象
-   * @return 拼接后的 SQL
+   * @param params {@link Collection} 参数集合
+   * @return {@link Sql}
+   */
+  public Sql addParams(Collection<?> params) {
+    super.params(params);
+    return this;
+  }
+
+  /**
+   * 拼接 SQL 语句
+   *
+   * @param sql SQL 语句
+   * @return {@link Sql}
+   */
+  public Sql append(CharSequence sql) {
+    super.concatWithSpace(sql);
+    return this;
+  }
+
+  /**
+   * 拼接 {@link Sql}
+   *
+   * @param sql {@link Sql}
+   * @return {@link Sql}
    */
   public Sql append(Sql sql) {
-
-    this.sql.append(sql.sql);
-    this.params.addAll(sql.params);
-    return this;
+    return this.append(sql.sql).addParams(sql.params);
   }
 
   /**
-   * 追加拼接 条件
+   * 拼接 {@link Cond}
    *
-   * @param cond Cond对象
-   * @return 拼接后的 SQL
+   * @param cond {@link Cond}
+   * @return {@link Sql}
    */
   public Sql append(Cond cond) {
-    this.sql.append(cond.sql);
-    this.params.addAll(cond.params);
-    return this;
+    return this.append(cond.sql).addParams(cond.params);
+  }
+
+  public Sql append(CharSequence sql, Object param) {
+    return this.append(sql).addParam(param);
   }
 
   /**
-   * 追加拼接 SQL
-   *
-   * @param sql SQL 语句
-   * @return 拼接后的 SQL
-   */
-  public Sql append(String sql) {
-
-    this.sql.append(sql);
-    return this;
-  }
-
-  /**
-   * 追加拼接 SQL
+   * 拼接 SQL 语句
    *
    * @param sql    SQL 语句
-   * @param param  参数
+   * @param param1 参数
    * @param params 更多的参数
-   * @return 拼接后的 SQL
+   * @return {@link Sql}
    */
-  public Sql append(String sql, Object param, Object... params) {
-
-    this.sql.append(sql);
-    this.params.add(param);
-    this.params.addAll(Arrays.asList(params));
-    return this;
+  public Sql append(CharSequence sql, Object param1, Object... params) {
+    return this.append(sql).addParam(param1).addParams(Arrays.asList(params));
   }
 
   /**
-   * 追加拼接 SQL
+   * 拼接 SQL 语句
    *
    * @param sql    SQL 语句
    * @param params 参数集合
-   * @return 拼接后的 SQL
+   * @return {@link Sql}
    */
-  public Sql append(String sql, Collection<?> params) {
+  public Sql append(CharSequence sql, Collection<?> params) {
+    return this.append(sql).addParams(params);
+  }
 
-    this.sql.append(sql);
-    this.params.addAll(params);
+  /**
+   * 拼接换行符 {@link System#lineSeparator()}
+   *
+   * @return {@link Sql}
+   */
+  public Sql appendLine() {
+    this.sql.append(Constant.LINE_SEPARATOR);
     return this;
   }
 
   /**
-   * 追加拼接 SQL
+   * 拼接 {@link Sql} 并换行
    *
-   * @param sql SQL 对象
-   * @return 拼接后的 SQL
+   * @param sql {@link Sql}
+   * @return {@link Sql}
    */
   public Sql appendLine(Sql sql) {
-
-    return this.append(sql).append(Constant.LINE_SEPARATOR);
+    return this.append(sql).appendLine();
   }
 
   /**
-   * 追加拼接 条件
+   * 拼接 {@link Cond} 并换行
    *
-   * @param cond Cond对象
-   * @return 拼接后的 SQL
+   * @param cond {@link Cond}
+   * @return {@link Sql}
    */
   public Sql appendLine(Cond cond) {
-    return this.append(cond).append(Constant.LINE_SEPARATOR);
+    return this.append(cond).appendLine();
   }
 
   /**
-   * 追加拼接 SQL
+   * 追加拼接 SQL 语句并换行
    *
    * @param sql SQL 语句
-   * @return 拼接后的 SQL
+   * @return {@link Sql}
    */
-  public Sql appendLine(String sql) {
-
-    return this.append(sql).append(Constant.LINE_SEPARATOR);
+  public Sql appendLine(CharSequence sql) {
+    return this.append(sql).appendLine();
   }
 
   /**
-   * 追加拼接 SQL
+   * 拼接 SQL 语句并换行
    *
    * @param sql    SQL 语句
-   * @param param  参数
-   * @param params 更多的参数
-   * @return 拼接后的 SQL
+   * @param param1 参数
+   * @param params 更多参数
+   * @return {@link Sql}
    */
-  public Sql appendLine(String sql, Object param, Object... params) {
-
-    return this.append(sql, param, params).append(Constant.LINE_SEPARATOR);
+  public Sql appendLine(CharSequence sql, Object param1, Object... params) {
+    return this.append(sql, param1, params).appendLine();
   }
 
   /**
-   * 追加拼接 SQL
+   * 拼接 SQL 语句并换行
    *
    * @param sql    SQL 语句
    * @param params 参数集合
-   * @return 拼接后的 SQL
+   * @return {@link Sql}
    */
-  public Sql appendLine(String sql, Collection<?> params) {
+  public Sql appendLine(CharSequence sql, Collection<?> params) {
+    return this.append(sql, params).appendLine();
+  }
 
-    return this.append(sql, params).append(Constant.LINE_SEPARATOR);
+  /**
+   * 拼接 {@link Clause} 子查询
+   *
+   * @param sql {@link Clause} 子查询
+   * @return {@link Sql}
+   */
+  public Sql appendSubQuery(Clause sql) {
+    return this.append("(").append(sql.sql, sql.params).append(")");
+  }
+
+  /**
+   * 拼接 {@link Sql} 子查询
+   *
+   * @param sql   {@link Sql} 子查询
+   * @param alias 子查询别名
+   * @return {@link Sql}
+   */
+  public Sql appendSubQuery(Clause sql, CharSequence alias) {
+    return this.appendSubQuery(sql).append(alias);
+  }
+
+  /**
+   * 拼接 {@link Sql} 子查询
+   *
+   * @param supplier {@link Supplier#get()} 子查询
+   * @return {@link Sql}
+   */
+  public Sql appendSubQuery(Supplier<? extends Clause> supplier) {
+    return this.appendSubQuery(supplier.get());
   }
 
   /**
    * 创建 SELECT * 语句
    *
-   * @return SQL
+   * @return {@link Sql}
    */
   public static Sql SelectAll() {
-
-    return new Sql("SELECT *");
+    return new Sql().selectAll();
   }
 
   /**
    * 创建 SELECT {field}, {fields[1]}... 语句
    *
-   * @param field  字段
+   * @param field1 字段
    * @param fields 更多的字段
-   * @return SQL
+   * @return {@link Sql}
    */
-  public static Sql Select(String field, String... fields) {
+  public static Sql Select(String field1, String... fields) {
+    Sql sql = Sql.create("SELECT").append(field1);
+    if (ArrayUtil.isEmpty(fields)) return sql;
 
-    Sql sql = new Sql(String.format("SELECT %s", field));
-    if (ArrayUtil.isNotEmpty(fields)) {
-      for (String s : fields) {
-        sql.append(String.format(",%s", s));
-      }
+    for (String field : fields) {
+      sql.append(Constant.SYMBOL_COMMA).append(field);
     }
     return sql;
   }
@@ -236,28 +287,25 @@ public class Sql extends Clause implements Serializable {
   /**
    * 拼接 SELECT *
    *
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql selectAll() {
-
-    this.append(" ").append(SelectAll());
-    return this;
+    return this.append("SELECT *");
   }
 
   /**
    * 拼接 SELECT {field}, {fields[1]}... 语句
    *
-   * @param field  字段
+   * @param field1 字段
    * @param fields 更多字段
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql select(String field, String... fields) {
+  public Sql select(String field1, String... fields) {
+    this.append("SELECT").append(field1);
+    if (ArrayUtil.isEmpty(fields)) return this;
 
-    this.append(String.format(" SELECT %s", field));
-    if (ArrayUtil.isNotEmpty(fields)) {
-      for (String s : fields) {
-        this.append(String.format(",%s", s));
-      }
+    for (String field : fields) {
+      this.append(Constant.SYMBOL_COMMA).append(field);
     }
     return this;
   }
@@ -266,11 +314,10 @@ public class Sql extends Clause implements Serializable {
    * 拼接 FROM 语句
    *
    * @param tableName 表名
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql from(String tableName) {
-
-    return this.append(String.format(" FROM %s", tableName));
+  public Sql from(CharSequence tableName) {
+    return this.append("FROM").append(tableName);
   }
 
   /**
@@ -278,45 +325,56 @@ public class Sql extends Clause implements Serializable {
    *
    * @param tableName 表名
    * @param alias     表别名
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql from(String tableName, String alias) {
-
-    return this.append(String.format(" FROM %s %s", tableName, alias));
+  public Sql from(CharSequence tableName, CharSequence alias) {
+    return this.from(tableName).append(alias);
   }
 
   /**
    * 拼接 FROM 语句
    *
-   * @param sql   SQL
+   * @param sql   {@link Sql} 子查询
    * @param alias 表别名
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql from(Sql sql, String alias) {
-
-    return this.append(String.format(" FROM (%s) %s", sql.sql, alias), sql.params);
+  public Sql from(Sql sql, CharSequence alias) {
+    return this.append("FROM").appendSubQuery(sql, alias);
   }
 
   /**
    * 拼接 FROM 语句
    *
-   * @param supplier Supplier
+   * @param supplier {@link Supplier#get()} 子查询
    * @param alias    表别名
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql from(Supplier<Sql> supplier, String alias) {
-
+  public Sql from(Supplier<Sql> supplier, CharSequence alias) {
     return this.from(supplier.get(), alias);
   }
 
-  private Sql join(String tableName, String alias, String onClause) {
-
-    return this.append(String.format(" JOIN %s %s ON %s", tableName, alias, onClause));
+  /**
+   * 拼接 JOIN 语句
+   *
+   * @param tableName 表名
+   * @param alias     表别名
+   * @param onClause  ON子句
+   * @return {@link Sql}
+   */
+  private Sql join(CharSequence tableName, CharSequence alias, CharSequence onClause) {
+    return this.append("JOIN").append(tableName).append(alias).append("ON").append(onClause);
   }
 
-  private Sql join(Sql sql, String alias, String onClause) {
-
-    return this.append(String.format(" JOIN (%s) %s ON %s", sql.sql, alias, onClause), sql.params);
+  /**
+   * 拼接 JOIN 语句
+   *
+   * @param sql      {@link Sql}子查询
+   * @param alias    表别名
+   * @param onClause ON子句
+   * @return {@link Sql}
+   */
+  private Sql join(Sql sql, CharSequence alias, CharSequence onClause) {
+    return this.append("JOIN").appendSubQuery(sql, alias).append("ON").append(onClause);
   }
 
   /**
@@ -324,12 +382,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param tableName 表名
    * @param alias     表别名
-   * @param onClause  ON语句
-   * @return SQL
+   * @param onClause  ON子句
+   * @return {@link Sql}
    */
-  public Sql leftJoin(String tableName, String alias, String onClause) {
-
-    return this.append(" LEFT").join(tableName, alias, onClause);
+  public Sql leftJoin(CharSequence tableName, CharSequence alias, CharSequence onClause) {
+    return this.append("LEFT").join(tableName, alias, onClause);
   }
 
   /**
@@ -337,12 +394,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param sql      SQL
    * @param alias    表别名
-   * @param onClause ON语句
-   * @return SQL
+   * @param onClause ON子句
+   * @return {@link Sql}
    */
-  public Sql leftJoin(Sql sql, String alias, String onClause) {
-
-    return this.append(" LEFT").join(sql, alias, onClause);
+  public Sql leftJoin(Sql sql, CharSequence alias, CharSequence onClause) {
+    return this.append("LEFT").join(sql, alias, onClause);
   }
 
   /**
@@ -350,12 +406,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param supplier Supplier
    * @param alias    表别名
-   * @param onClause ON语句
-   * @return SQL
+   * @param onClause ON子句
+   * @return {@link Sql}
    */
-  public Sql leftJoin(Supplier<Sql> supplier, String alias, String onClause) {
-
-    return this.append(" LEFT").join(supplier.get(), alias, onClause);
+  public Sql leftJoin(Supplier<Sql> supplier, CharSequence alias, CharSequence onClause) {
+    return this.append("LEFT").join(supplier.get(), alias, onClause);
   }
 
   /**
@@ -363,12 +418,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param tableName 表名
    * @param alias     表别名
-   * @param onClause  ON语句
-   * @return SQL
+   * @param onClause  ON子句
+   * @return {@link Sql}
    */
-  public Sql rightJoin(String tableName, String alias, String onClause) {
-
-    return this.append(" RIGHT").join(tableName, alias, onClause);
+  public Sql rightJoin(CharSequence tableName, CharSequence alias, CharSequence onClause) {
+    return this.append("RIGHT").join(tableName, alias, onClause);
   }
 
   /**
@@ -376,12 +430,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param sql      SQL
    * @param alias    表别名
-   * @param onClause ON语句
-   * @return SQL
+   * @param onClause ON子句
+   * @return {@link Sql}
    */
-  public Sql rightJoin(Sql sql, String alias, String onClause) {
-
-    return this.append(" RIGHT").join(sql, alias, onClause);
+  public Sql rightJoin(Sql sql, CharSequence alias, CharSequence onClause) {
+    return this.append("RIGHT").join(sql, alias, onClause);
   }
 
   /**
@@ -389,12 +442,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param supplier Supplier
    * @param alias    表别名
-   * @param onClause ON语句
-   * @return SQL
+   * @param onClause ON子句
+   * @return {@link Sql}
    */
-  public Sql rightJoin(Supplier<Sql> supplier, String alias, String onClause) {
-
-    return this.append(" RIGHT").join(supplier.get(), alias, onClause);
+  public Sql rightJoin(Supplier<Sql> supplier, CharSequence alias, CharSequence onClause) {
+    return this.append("RIGHT").join(supplier.get(), alias, onClause);
   }
 
   /**
@@ -402,12 +454,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param tableName 表名
    * @param alias     表别名
-   * @param onClause  ON语句
-   * @return SQL
+   * @param onClause  ON子句
+   * @return {@link Sql}
    */
-  public Sql innerJoin(String tableName, String alias, String onClause) {
-
-    return this.append(" INNER").join(tableName, alias, onClause);
+  public Sql innerJoin(CharSequence tableName, CharSequence alias, CharSequence onClause) {
+    return this.append("INNER").join(tableName, alias, onClause);
   }
 
   /**
@@ -415,12 +466,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param sql      SQL
    * @param alias    表别名
-   * @param onClause ON语句
-   * @return SQL
+   * @param onClause ON子句
+   * @return {@link Sql}
    */
-  public Sql innerJoin(Sql sql, String alias, String onClause) {
-
-    return this.append(" INNER").join(sql, alias, onClause);
+  public Sql innerJoin(Sql sql, CharSequence alias, CharSequence onClause) {
+    return this.append("INNER").join(sql, alias, onClause);
   }
 
   /**
@@ -428,12 +478,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param supplier Supplier
    * @param alias    表别名
-   * @param onClause ON语句
-   * @return SQL
+   * @param onClause ON子句
+   * @return {@link Sql}
    */
-  public Sql innerJoin(Supplier<Sql> supplier, String alias, String onClause) {
-
-    return this.append(" INNER").join(supplier.get(), alias, onClause);
+  public Sql innerJoin(Supplier<Sql> supplier, CharSequence alias, CharSequence onClause) {
+    return this.append("INNER").join(supplier.get(), alias, onClause);
   }
 
   /**
@@ -441,12 +490,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param tableName 表名
    * @param alias     表别名
-   * @param onClause  ON语句
-   * @return SQL
+   * @param onClause  ON子句
+   * @return {@link Sql}
    */
-  public Sql fullJoin(String tableName, String alias, String onClause) {
-
-    return this.append(" FULL").join(tableName, alias, onClause);
+  public Sql fullJoin(CharSequence tableName, CharSequence alias, CharSequence onClause) {
+    return this.append("FULL").join(tableName, alias, onClause);
   }
 
   /**
@@ -454,12 +502,11 @@ public class Sql extends Clause implements Serializable {
    *
    * @param sql      SQL
    * @param alias    表别名
-   * @param onClause ON语句
-   * @return SQL
+   * @param onClause ON子句
+   * @return {@link Sql}
    */
-  public Sql fullJoin(Sql sql, String alias, String onClause) {
-
-    return this.append(" FULL").join(sql, alias, onClause);
+  public Sql fullJoin(Sql sql, CharSequence alias, CharSequence onClause) {
+    return this.append("FULL").join(sql, alias, onClause);
   }
 
   /**
@@ -467,44 +514,40 @@ public class Sql extends Clause implements Serializable {
    *
    * @param supplier Supplier
    * @param alias    表别名
-   * @param onClause ON语句
-   * @return SQL
+   * @param onClause ON子句
+   * @return {@link Sql}
    */
-  public Sql fullJoin(Supplier<Sql> supplier, String alias, String onClause) {
-
-    return this.append(" FULL").join(supplier.get(), alias, onClause);
+  public Sql fullJoin(Supplier<Sql> supplier, CharSequence alias, CharSequence onClause) {
+    return this.append("FULL").join(supplier.get(), alias, onClause);
   }
 
   /**
    * 拼接 WHERE 1 = 1 语句
    *
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql where() {
-
-    return this.append(" WHERE 1 = 1");
+    return this.append("WHERE 1 = 1");
   }
 
   /**
    * 拼接 WHERE {cond} 语句
    *
    * @param cond Cond
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql where(Cond cond) {
-
-    return this.append(String.format(" WHERE%s", cond.sql), cond.params);
+    return this.append("WHERE").append(cond);
   }
 
   /**
-   * 拼接 WHERE {sql} 语句
+   * 拼接 WHERE {condSql} 语句
    *
-   * @param sql SQL语句
-   * @return SQL
+   * @param condSql SQL语句
+   * @return {@link Sql}
    */
-  public Sql where(String sql) {
-
-    return this.append(String.format(" WHERE %s", sql));
+  public Sql where(CharSequence condSql) {
+    return this.append("WHERE").append(condSql);
   }
 
   /**
@@ -512,25 +555,22 @@ public class Sql extends Clause implements Serializable {
    *
    * @param sql    SQL 语句
    * @param params 参数
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql where(String sql, Collection<?> params) {
-
-    return this.append(String.format(" WHERE %s", sql), params);
+  public Sql where(CharSequence sql, Collection<?> params) {
+    return this.append("WHERE").append(sql, params);
   }
 
   /**
    * 拼接 AND {cond} 语句
    *
    * @param cond Cond
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql and(Cond cond) {
-
-    if (StringUtil.isBlank(cond.sql)) {
-      return this;
+    if (cond.notBlank()) {
+      this.append("AND").append(cond);
     }
-    this.append(String.format(" AND%s", cond.sql), cond.params);
     return this;
   }
 
@@ -538,51 +578,26 @@ public class Sql extends Clause implements Serializable {
    * 拼接 AND ({supplier}) 语句
    *
    * @param supplier Supplier
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql and(Supplier<Cond> supplier) {
-
     Cond cond = supplier.get();
-    if (StringUtil.isBlank(cond.sql)) {
-      return this;
+    if (cond.notBlank()) {
+      this.append("AND").appendSubQuery(supplier);
     }
-    this.append(String.format(" AND (%s)", StringUtil.trimStart(cond.sql)), cond.params);
     return this;
-  }
-
-  /**
-   * 拼接 AND {cond} 语句，{cond} 根据 {@link Criteria @Criteria} 注解生成的条件
-   *
-   * @param criteria 包含 {@link Criteria @Criteria} 注解 Field 的对象
-   * @return SQL
-   */
-  public Sql andCriteria(Object criteria) {
-    return this.append(Cond.createByCriteria(criteria));
-  }
-
-  /**
-   * 拼接 AND {cond} 语句，{cond} 根据 {@link Criteria @Criteria} 注解生成的条件
-   *
-   * @param criteria      包含 {@link Criteria @Criteria} 注解 Field 的对象
-   * @param criteriaGroup 条件组名, 参考 {@link Criterion#group() @Criterion(group = CriteriaGroupClass.class)}
-   * @return SQL
-   */
-  public Sql andCriteria(Object criteria, Class<?> criteriaGroup) {
-    return this.append(Cond.createByCriteria(criteria, criteriaGroup));
   }
 
   /**
    * 拼接 OR {cond} 语句
    *
    * @param cond Cond
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql or(Cond cond) {
-
-    if (StringUtil.isBlank(cond.sql)) {
-      return this;
+    if (cond.notBlank()) {
+      this.append("OR").append(cond);
     }
-    this.append(String.format(" OR%s", cond.sql), cond.params);
     return this;
   }
 
@@ -590,15 +605,13 @@ public class Sql extends Clause implements Serializable {
    * 拼接 OR ({supplier}) 语句
    *
    * @param supplier Supplier
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql or(Supplier<Cond> supplier) {
-
     Cond cond = supplier.get();
-    if (StringUtil.isBlank(cond.sql)) {
-      return this;
+    if (cond.notBlank()) {
+      this.append("OR").appendSubQuery(supplier);
     }
-    this.append(String.format(" OR (%s)", StringUtil.trimStart(cond.sql)), cond.params);
     return this;
   }
 
@@ -606,47 +619,45 @@ public class Sql extends Clause implements Serializable {
    * 把当前Sql放入 SELECT * FROM (sql) alias 的子查询中
    *
    * @param alias 别名
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql asSubQuery(String alias) {
-    this.sql.insert(0, "SELECT * FROM (").append(") ").append(alias);
-    return this;
+  public Sql asSubQuery(CharSequence alias) {
+    return Sql.SelectAll().from(this, alias);
   }
 
   /**
    * 拼接 UNION 语句
    *
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql union() {
-
-    return this.append(" UNION ");
+    return this.append("UNION");
   }
 
   /**
    * 拼接 UNION ALL 语句
    *
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql unionAll() {
 
-    return this.append(" UNION ALL ");
+    return this.union().append("ALL");
   }
 
   /**
-   * 拼接 GROUP BY {field}, {fields[1]}... 语句
+   * 拼接 GROUP BY {field1}, {fields[0]}... 语句
    *
-   * @param field  字段
+   * @param field1 字段
    * @param fields 更多字段
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql groupBy(String field, String... fields) {
+  public Sql groupBy(String field1, String... fields) {
+    this.append("GROUP BY").append(field1);
+    if (ArrayUtil.isEmpty(fields))
+      return this;
 
-    this.append(String.format(" GROUP BY %s", field));
-    if (ArrayUtil.isNotEmpty(fields)) {
-      for (String s : fields) {
-        this.append(String.format(", %s", s));
-      }
+    for (String field : fields) {
+      this.append(Constant.SYMBOL_COMMA).append(field);
     }
     return this;
   }
@@ -654,22 +665,20 @@ public class Sql extends Clause implements Serializable {
   /**
    * 拼接 HAVING 1 = 1 语句
    *
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql having() {
-
-    return this.append(" HAVING 1 = 1");
+    return this.append("HAVING 1 = 1");
   }
 
   /**
    * 拼接 HAVING {sql} 语句
    *
    * @param sql SQL
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql having(String sql) {
-
-    return this.append(String.format(" HAVING %s", sql));
+  public Sql having(CharSequence sql) {
+    return this.append("HAVING").append(sql);
   }
 
   /**
@@ -678,48 +687,51 @@ public class Sql extends Clause implements Serializable {
    * @param sql    SQL语句
    * @param param  参数
    * @param params 参数数组
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql having(String sql, Object param, Object... params) {
-
-    return this.append(String.format(" HAVING %s", sql), param, params);
+  public Sql having(CharSequence sql, Object param, Object... params) {
+    return this.having(sql).addParam(param).addParams(Arrays.asList(params));
   }
 
+  /**
+   * 拼接 HAVING {cond} 语句
+   *
+   * @param cond {@link Cond}条件
+   * @return {@link Sql}
+   */
   public Sql having(Cond cond) {
-
-    return this.append(" HAVING").append(cond);
+    return this.having(cond.sql).addParams(cond.params);
   }
 
   /**
    * 拼接 ORDER BY {field}
    *
    * @param field 字段，可包含排序方法，如 code DESC
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql orderBy(String field) {
-    final String orderByField = checkInjection(field);
-    if (StringUtil.isNotEmpty(orderByField)) {
-      this.append(String.format(" ORDER BY %s", orderByField));
-    }
-    return this;
+    Order order = Order.parse(field);
+    return this.append("ORDER BY").append(order.getClause());
   }
 
   /**
    * 拼接 ORDER BY {field}, {fields[1]}... 语句
    *
    * @param sortable {@link ISortable} 排序条件基类
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql orderBy(ISortable sortable) {
-    if (Objects.nonNull(sortable)) {
-      List<Order> orderBy = sortable.getOrderBy();
-      if (CollectionUtil.isNotEmpty(orderBy)) {
-        Iterator<Order> iterator = orderBy.iterator();
-        this.append(String.format(" ORDER BY %s", checkInjection(iterator.next().toString())));
-        while (iterator.hasNext()) {
-          this.append(String.format(", %s", checkInjection(iterator.next().toString())));
-        }
-      }
+    if (null == sortable)
+      return this;
+
+    if (CollectionUtil.isEmpty(sortable.getOrderBy()))
+      return this;
+
+    Iterator<Order> iterator = sortable.getOrderBy().iterator();
+
+    this.orderBy(iterator.next().getClause());
+    while (iterator.hasNext()) {
+      this.append(Constant.SYMBOL_COMMA).append(iterator.next().getClause());
     }
     return this;
   }
@@ -727,21 +739,17 @@ public class Sql extends Clause implements Serializable {
   /**
    * 拼接 ORDER BY {field}, {fields[1]}... 语句
    *
-   * @param field  字段，可包含排序方法，如 code DESC
+   * @param field1 字段，可包含排序方法，如 code DESC
    * @param fields 更多字段
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql orderBy(String field, String... fields) {
+  public Sql orderBy(String field1, String... fields) {
+    this.orderBy(field1);
+    if (ArrayUtil.isEmpty(fields))
+      return this;
 
-    if (StringUtil.isEmpty(field)) throw new DBException("调用 orderBy 方法时需至少传入一个排序字段.");
-
-    final String orderByField = checkInjection(field);
-
-    this.append(String.format(" ORDER BY %s", orderByField));
-    if (ArrayUtil.isNotEmpty(fields)) {
-      for (String s : fields) {
-        this.append(String.format(", %s", checkInjection(s)));
-      }
+    for (String field : fields) {
+      this.append(Constant.SYMBOL_COMMA).append(Order.parse(field).getClause());
     }
     return this;
   }
@@ -750,11 +758,10 @@ public class Sql extends Clause implements Serializable {
    * 拼接 LIMIT {row} 语句
    *
    * @param row 返回行数
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql limit(int row) {
-    final String rowStr = checkInjection(StringUtil.toStr(row));
-    return this.append(String.format(" LIMIT %s", rowStr));
+    return this.append("LIMIT").append(StringUtil.toStr(row));
   }
 
   /**
@@ -762,71 +769,69 @@ public class Sql extends Clause implements Serializable {
    *
    * @param offset 起始记录偏移量
    * @param row    返回行数
-   * @return SQL
+   * @return {@link Sql}
    */
   public Sql limit(int offset, int row) {
-    final String offsetStr = checkInjection(StringUtil.toStr(offset));
-    final String rowStr    = checkInjection(StringUtil.toStr(row));
-    return this.append(String.format(" LIMIT %s, %s", offsetStr, rowStr));
+    return this.append("LIMIT").append(StringUtil.toStr(offset)).append(Constant.SYMBOL_COMMA).append(StringUtil.toStr(row));
   }
 
   /**
    * 创建 INSERT INT {table} ({field}, {fields[1]...}) 语句
    *
    * @param table  表名
-   * @param field  字段
+   * @param field1 字段
    * @param fields 更多字段
-   * @return SQL
+   * @return {@link Sql}
    */
-  public static Sql Insert(String table, String field, String... fields) {
-
-    Sql sql = new Sql(String.format("INSERT INTO %s (%s", table, field));
-    if (ArrayUtil.isNotEmpty(fields)) {
-      for (String s : fields) {
-        sql.append(String.format(", %s", s));
+  public static Sql Insert(CharSequence table, String field1, String... fields) {
+    return Sql.create("INSERT INTO").append(table).appendSubQuery(() -> {
+      Sql fieldSql = Sql.create(field1);
+      if (ArrayUtil.isNotEmpty(fields)) {
+        for (String field : fields) {
+          fieldSql.append(Constant.SYMBOL_COMMA).append(field);
+        }
       }
-    }
-    return sql.append(")");
+      return fieldSql;
+    });
   }
 
   /**
    * 拼接 VALUES ({param}, {param[1]}...) 语句
    *
-   * @param param  参数
+   * @param param1 参数
    * @param params 更多参数
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql values(Object param, Object... params) {
-
-    this.append(" VALUES (?", param);
-    if (ArrayUtil.isNotEmpty(params)) {
-      for (Object o : params) {
-        this.append(", ?", o);
+  public Sql values(Object param1, Object... params) {
+    return this.append("VALUES").appendSubQuery(() -> {
+      Sql valuesSql = new Sql().append("?", param1);
+      if (ArrayUtil.isNotEmpty(params)) {
+        for (Object param : params) {
+          valuesSql.append(Constant.SYMBOL_COMMA).append("?", param);
+        }
       }
-    }
-    return this.append(")");
+      return valuesSql;
+    });
   }
 
   /**
    * 创建 UPDATE {table} 语句
    *
    * @param table 表名
-   * @return SQL
+   * @return {@link Sql}
    */
-  public static Sql Update(String table) {
-
-    return new Sql(String.format("UPDATE %s", table));
+  public static Sql Update(CharSequence table) {
+    return Sql.create("UPDATE").append(table);
   }
 
   /**
    * 拼接 SET {表达式} 语句
    *
    * @param expression 表达式
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql set(String expression) {
-
-    return this.append(String.format(" SET %s", expression));
+  public Sql set(CharSequence expression) {
+    return this.append("SET").append(expression);
   }
 
   /**
@@ -834,22 +839,20 @@ public class Sql extends Clause implements Serializable {
    *
    * @param field 字段名
    * @param param 参数
-   * @return SQL
+   * @return {@link Sql}
    */
-  public Sql set(String field, Object param) {
-
-    return this.append(String.format(" SET %s = ?", field), param);
+  public Sql set(CharSequence field, Object param) {
+    return this.set(field).append("= ?", param);
   }
 
   /**
    * 创建 DELETE {table} 语句
    *
    * @param table 表名称
-   * @return SQL
+   * @return {@link Sql}
    */
-  public static Sql Delete(String table) {
-
-    return new Sql(String.format("DELETE FROM %s", table));
+  public static Sql Delete(CharSequence table) {
+    return Sql.create("DELETE FROM").append(table);
   }
 
   /**
@@ -857,16 +860,14 @@ public class Sql extends Clause implements Serializable {
    *
    * @param table 表名称
    * @param alias 表别名
-   * @return SQL
+   * @return {@link Sql}
    */
-  public static Sql Delete(String table, String alias) {
-
-    return new Sql(String.format("DELETE %s FROM %s %s", alias, table, alias));
+  public static Sql Delete(CharSequence table, CharSequence alias) {
+    return Sql.create("DELETE").append(alias).append("FROM").append(table).append(alias);
   }
 
   @Override
   public String toString() {
-
     return this.sql.toString();
   }
 }

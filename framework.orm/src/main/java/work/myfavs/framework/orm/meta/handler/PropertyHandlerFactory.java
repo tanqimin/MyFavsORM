@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class PropertyHandlerFactory {
     register(NVarchar.class, new NVarcharPropertyHandler());
     register(java.util.Date.class, new DatePropertyHandler());
     register(LocalDateTime.class, new LocalDateTimePropertyHandler());
+    register(OffsetDateTime.class, new OffsetDateTimePropertyHandler());
     register(BigDecimal.class, new BigDecimalPropertyHandler());
     register(boolean.class, new BooleanPropertyHandler(true));
     register(Boolean.class, new BooleanPropertyHandler());
