@@ -5,12 +5,16 @@ import lombok.NonNull;
 import work.myfavs.framework.orm.meta.pagination.ISortable;
 import work.myfavs.framework.orm.meta.pagination.Order;
 import work.myfavs.framework.orm.util.common.*;
+import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Supplier;
+
+import static work.myfavs.framework.orm.util.common.StringUtil.isBlank;
 
 /**
  * SQL 语句构建 注意：此处为了解决静态方法与普通方法不能重名的问题，所有静态方法均以大写字母开头
@@ -710,7 +714,15 @@ public class Sql extends Clause implements Serializable {
    * @return {@link Sql}
    */
   public Sql orderBy(String field) {
-    Order order = Order.parse(field);
+    if (StringUtil.isBlank(field))
+      return this;
+
+    return this.orderBy(Order.parse(field));
+  }
+
+  public Sql orderBy(Order order) {
+    if (null == order)
+      return this;
     return this.append("ORDER BY").append(order.getClause());
   }
 
@@ -724,12 +736,12 @@ public class Sql extends Clause implements Serializable {
     if (null == sortable)
       return this;
 
-    if (CollectionUtil.isEmpty(sortable.getOrderBy()))
+    List<Order> orders = sortable.getOrderBy();
+    if (CollectionUtil.isEmpty(orders))
       return this;
 
-    Iterator<Order> iterator = sortable.getOrderBy().iterator();
-
-    this.orderBy(iterator.next().getClause());
+    Iterator<Order> iterator = orders.iterator();
+    this.orderBy(iterator.next());
     while (iterator.hasNext()) {
       this.append(Constant.SYMBOL_COMMA).append(iterator.next().getClause());
     }
@@ -744,7 +756,9 @@ public class Sql extends Clause implements Serializable {
    * @return {@link Sql}
    */
   public Sql orderBy(String field1, String... fields) {
-    this.orderBy(field1);
+
+    this.append("ORDER BY").append(Order.parse(field1).getClause());
+
     if (ArrayUtil.isEmpty(fields))
       return this;
 

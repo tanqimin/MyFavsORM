@@ -77,7 +77,7 @@ public class Cond extends Clause {
    * @return {@link Cond}
    */
   private Cond appendSubQuery(Clause sql) {
-    if(super.notBlank())
+    if (super.notBlank())
       super.concatWithSpace(String.format("( %s )", StringUtil.trim(sql.sql)))
            .params(sql.params);
     return this;
@@ -501,10 +501,23 @@ public class Cond extends Clause {
    * @return {@link Cond}
    */
   public Cond and(Cond cond) {
-    if (StringUtil.isBlank(cond.sql))
+    if (cond.isBlank())
       return this;
 
     return this.append("AND").append(cond);
+  }
+
+  /**
+   * 使用 AND ({cond}) 拼接条件
+   *
+   * @param supplier {@link Supplier}{@code <Cond> }
+   * @return {@link Cond}
+   */
+  public Cond and(Supplier<Cond> supplier) {
+    Cond cond = supplier.get();
+    if (cond.isBlank())
+      return this;
+    return this.append("AND").appendSubQuery(cond);
   }
 
   /**
@@ -514,11 +527,22 @@ public class Cond extends Clause {
    * @return {@link Cond}
    */
   public Cond or(Cond cond) {
-
-    if (StringUtil.isBlank(cond.sql)) {
+    if (cond.isBlank())
       return this;
-    }
     return this.append("OR").append(cond);
+  }
+
+  /**
+   * 使用 OR ({cond}) 拼接条件
+   *
+   * @param supplier {@link Supplier}{@code <Cond> }
+   * @return {@link Cond}
+   */
+  public Cond or(Supplier<Cond> supplier) {
+    Cond cond = supplier.get();
+    if (cond.isBlank())
+      return this;
+    return this.append("OR").appendSubQuery(cond);
   }
 
   /**
@@ -660,7 +684,6 @@ public class Cond extends Clause {
 
   @Override
   public String toString() {
-
     return this.sql.toString();
   }
 
