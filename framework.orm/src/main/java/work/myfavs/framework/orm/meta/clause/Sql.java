@@ -4,8 +4,10 @@ package work.myfavs.framework.orm.meta.clause;
 import lombok.NonNull;
 import work.myfavs.framework.orm.meta.pagination.ISortable;
 import work.myfavs.framework.orm.meta.pagination.Order;
-import work.myfavs.framework.orm.util.common.*;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.CollectionUtil;
+import work.myfavs.framework.orm.util.common.Constant;
+import work.myfavs.framework.orm.util.common.StringUtil;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -13,8 +15,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
-
-import static work.myfavs.framework.orm.util.common.StringUtil.isBlank;
 
 /**
  * SQL 语句构建 注意：此处为了解决静态方法与普通方法不能重名的问题，所有静态方法均以大写字母开头
@@ -626,7 +626,8 @@ public class Sql extends Clause implements Serializable {
    * @return {@link Sql}
    */
   public Sql asSubQuery(CharSequence alias) {
-    return Sql.SelectAll().from(this, alias);
+    this.sql.insert(0, "SELECT * FROM ( ").append(" ) ").append(alias);
+    return this;
   }
 
   /**
