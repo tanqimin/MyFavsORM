@@ -10,10 +10,7 @@ import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.common.StringUtil;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -718,7 +715,13 @@ public class Sql extends Clause implements Serializable {
     if (StringUtil.isBlank(field))
       return this;
 
-    return this.orderBy(Order.parse(field));
+    String[]    splitFields = field.split(Constant.SYMBOL_COMMA);
+    List<Order> orders      = new ArrayList<>();
+    for (String splitField : splitFields) {
+      orders.add(Order.parse(splitField));
+    }
+
+    return this.orderBy(orders);
   }
 
   public Sql orderBy(Order order) {
@@ -737,7 +740,10 @@ public class Sql extends Clause implements Serializable {
     if (null == sortable)
       return this;
 
-    List<Order> orders = sortable.getOrderBy();
+    return orderBy(sortable.getOrderBy());
+  }
+
+  private Sql orderBy(List<Order> orders) {
     if (CollectionUtil.isEmpty(orders))
       return this;
 

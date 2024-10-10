@@ -40,7 +40,7 @@ public class Order implements Serializable {
     if (isBlank(orderBy))
       throw new DBException("排序字段不能为空！");
 
-    String[] split = orderBy.split(Constant.SPACE);
+    String[] split = trim(orderBy).split(Constant.SPACE);
 
     if (split.length > 2)
       throw new DBException(String.format("错误的排序格式: %s", orderBy));
