@@ -25,11 +25,8 @@ public class PageLite<TModel> extends PageBase<TModel> {
    * @return 新分页数据
    */
   public <TOther> PageLite<TOther> convert(List<TOther> data) {
-    PageLite<TOther> pageLite = new PageLite<>();
-    pageLite.setData(data);
-    pageLite.setCurrentPage(this.getCurrentPage());
-    pageLite.setPageSize(this.getPageSize());
-    return pageLite;
+
+    return create(data, this.getCurrentPage(), this.getPageSize());
   }
 
   /**
