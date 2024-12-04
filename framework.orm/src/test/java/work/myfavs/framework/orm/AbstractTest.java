@@ -47,7 +47,7 @@ public class AbstractTest {
   }
 
   private static void createTablesForSqlServer() {
-    String       sqlContent = IOUtil.read("sql/sql_server.sql");
+    String       sqlContent = IOUtil.read("sql/myfavs_master.sql");
     List<String> sqlList    = new ArrayList<>();
     for (String s : sqlContent.split("GO")) {
       sqlList.add(StringUtil.trim(s));

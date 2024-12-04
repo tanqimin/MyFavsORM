@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.entity.*;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
-import work.myfavs.framework.orm.entity.test.IIdentityTest;
-import work.myfavs.framework.orm.entity.test.ILogicDeleteTest;
-import work.myfavs.framework.orm.entity.test.ISnowflakeTest;
-import work.myfavs.framework.orm.entity.test.IUuidTest;
+import work.myfavs.framework.orm.entity.test.*;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -30,7 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DatabaseTest extends AbstractTest
-    implements ISnowflakeTest, IIdentityTest, IUuidTest, ILogicDeleteTest {
+    implements ISnowflakeTest, IIdentityTest, IUuidTest, ILogicDeleteTest, IAssignedTest {
 
   private static final Logger log = LoggerFactory.getLogger(DatabaseTest.class);
 
@@ -106,13 +103,19 @@ public class DatabaseTest extends AbstractTest
   @Test
   public void find() {
     initSnowflakes();
+    initAssigned();
 
     database.tx(orm -> {
       orm.truncate(SnowflakeExample.class);
+      orm.truncate(AssignedExample.class);
+
       orm.create(SnowflakeExample.class, SNOW_FLAKES);
+      orm.create(AssignedExample.class, ASSIGNEDS);
 
       List<SnowflakeExample> snowflakes = orm.find(SnowflakeExample.class, new Sql("SELECT * FROM tb_snowflake"));
+      List<AssignedExample>  assigneds  = orm.find(AssignedExample.class, new Sql("SELECT * FROM tb_assigned"));
       Assert.assertEquals(3, snowflakes.size());
+      Assert.assertEquals(3, assigneds.size());
 
       snowflakes = orm.find(SnowflakeExample.class, "SELECT * FROM tb_snowflake WHERE name = ?", List.of("S1"));
       Assert.assertEquals(1, snowflakes.size());
@@ -342,7 +345,7 @@ public class DatabaseTest extends AbstractTest
     orm.create(SnowflakeExample.class, SNOW_FLAKES);
     orm.create(UuidExample.class, UUIDS);
 
-    Sql             sql  = Sql.SelectAll().from("tb_snowflake").where(Cond.eq("disable", false));
+    Sql                    sql  = Sql.SelectAll().from("tb_snowflake").where(Cond.eq("disable", false));
     Sql                    sql2 = Sql.Select("id").from("tb_uuid").where(Cond.eq("disable", false));
     Page<SnowflakeExample> page = orm.findPage(SnowflakeExample.class, sql, true, 1, 2);
     Assert.assertEquals(2, page.getData().size());
