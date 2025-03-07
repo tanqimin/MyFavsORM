@@ -57,7 +57,7 @@ public class ReflectUtil {
   public static <T> T getFieldValue(Field field, Object entity) {
     try {
       return (T) field.get(entity);
-    } catch (IllegalAccessException e) {
+    } catch (Exception e) {
       throw new DBException(e, "从类型 %s 中获取 %s 字段时发生异常: %s",
                             field.getName(),
                             StringUtil.toStr(entity.getClass()),
@@ -72,7 +72,7 @@ public class ReflectUtil {
 
     try {
       field.set(entity, value);
-    } catch (IllegalAccessException e) {
+    } catch (Exception e) {
       throw new DBException(e, "从类型 %s 中对 %s 字段赋值为 %s 时发生异常: %s",
                             field.getName(),
                             StringUtil.toStr(entity.getClass()),
