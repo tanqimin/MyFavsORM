@@ -23,7 +23,7 @@
         <fastjson.version>1.2.83</fastjson.version>
         <HikariCP.version>5.1.0</HikariCP.version>
         <mysql-jdbc.version>8.4.0</mysql-jdbc.version>
-        <mssql-jdbc.version>12.6.3.jre11</mssql-jdbc.version>
+        <mssql-jdbc.version>12.6.5.jre11</mssql-jdbc.version>
         <beetl.version>3.16.2.RELEASE</beetl.version>
         <junit.version>4.13.2</junit.version>
         <mockito.version>5.12.0</mockito.version>
