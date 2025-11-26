@@ -18,21 +18,21 @@
 
         <spring-boot.version>2.7.18</spring-boot.version>
         <spring-jdbc.version>5.3.31</spring-jdbc.version>
-        <slf4j.version>2.0.13</slf4j.version>
-        <druid.version>1.2.23</druid.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <druid.version>1.2.27</druid.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <HikariCP.version>5.1.0</HikariCP.version>
+        <HikariCP.version>7.0.2</HikariCP.version>
         <mysql-jdbc.version>9.5.0</mysql-jdbc.version>
-        <mssql-jdbc.version>12.6.5.jre11</mssql-jdbc.version>
+        <mssql-jdbc.version>13.2.1.jre11</mssql-jdbc.version>
         <junit.version>4.13.2</junit.version>
-        <mockito.version>5.12.0</mockito.version>
+        <mockito.version>5.20.0</mockito.version>
         <reflectasm.version>1.11.9</reflectasm.version>
-        <lombok.version>1.18.34</lombok.version>
+        <lombok.version>1.18.42</lombok.version>
 
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
+        <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
     </properties>
 
     <!--私服仓库-->
