@@ -22,9 +22,8 @@
         <druid.version>1.2.23</druid.version>
         <fastjson.version>1.2.83</fastjson.version>
         <HikariCP.version>5.1.0</HikariCP.version>
-        <mysql-jdbc.version>8.4.0</mysql-jdbc.version>
+        <mysql-jdbc.version>9.5.0</mysql-jdbc.version>
         <mssql-jdbc.version>12.6.5.jre11</mssql-jdbc.version>
-        <beetl.version>3.16.2.RELEASE</beetl.version>
         <junit.version>4.13.2</junit.version>
         <mockito.version>5.12.0</mockito.version>
         <reflectasm.version>1.11.9</reflectasm.version>
@@ -164,13 +163,6 @@
                 <version>${slf4j.version}</version>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/com.ibeetl/beetl -->
-            <dependency>
-                <groupId>com.ibeetl</groupId>
-                <artifactId>beetl</artifactId>
-                <version>${beetl.version}</version>
-            </dependency>
-
             <!-- https://mvnrepository.com/artifact/junit/junit -->
             <dependency>
                 <groupId>junit</groupId>
@@ -307,7 +299,6 @@
 
     <modules>
         <module>framework.orm</module>
-        <module>framework.orm.generator</module>
         <module>framework.orm.spring-boot-starter</module>
         <module>framework.example</module>
     </modules>

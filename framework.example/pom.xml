@@ -98,11 +98,6 @@
 
         <dependency>
             <groupId>work.myfavs</groupId>
-            <artifactId>framework.orm-generator</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>work.myfavs</groupId>
             <artifactId>framework.orm-spring-starter</artifactId>
         </dependency>
 
