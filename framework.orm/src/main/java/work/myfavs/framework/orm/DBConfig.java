@@ -194,7 +194,7 @@ public class DBConfig {
    *
    * @return 分页时每页最大记录数
    */
-  public long getMaxPageSize() {
+  public int getMaxPageSize() {
 
     return maxPageSize;
   }

@@ -906,18 +906,29 @@ public abstract class AbstractOrm implements Orm {
    * @return Sql对象
    */
   private Sql selectPage(boolean enablePage, String sql, Collection<?> params, int currentPage, int pageSize) {
-    if (!enablePage) return new Sql(sql, params);
-    if (currentPage < 1)
-      throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
+      if (!enablePage) {
+          // 如果不分页，获取系统设置中每页最大记录数参数
+          int maxPageSize = this.database.getDbConfig().getMaxPageSize();
+          if (maxPageSize <= 0L) {
+              return new Sql(sql, params);
+          } else {
+              return this.selectPage(sql, params, 1, maxPageSize);
+          }
+      }
+      if (currentPage < 1) {
+          throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
+      }
 
-    if (pageSize < 1)
-      throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
+      if (pageSize < 1) {
+          throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
+      }
 
-    long maxPageSize = this.database.getDbConfig().getMaxPageSize();
-    if (maxPageSize > 0L && pageSize > maxPageSize)
-      throw new DBException("每页记录数不能超出系统设置的最大记录数 %d", maxPageSize);
+      int maxPageSize = this.database.getDbConfig().getMaxPageSize();
+      if (maxPageSize > 0L && pageSize > maxPageSize) {
+          throw new DBException("每页记录数不能超出系统设置的最大记录数 %d", maxPageSize);
+      }
 
-    return this.selectPage(sql, params, currentPage, pageSize);
+      return this.selectPage(sql, params, currentPage, pageSize);
   }
 
   /**
