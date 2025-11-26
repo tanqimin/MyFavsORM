@@ -12,17 +12,20 @@ import java.sql.Connection;
  */
 public class DBConfig {
 
-  public static final String  DEFAULT_DATASOURCE_NAME = "default";
+  public static final String DEFAULT_DATASOURCE_NAME = "default";
+
   /**
    * 数据库类型
    */
   @Getter
-  private             String  dbType                  = DbType.MYSQL;
+  private String dbType = DbType.MYSQL;
+
   /**
    * 一次批量插入数据的数量
    */
   @Getter
-  private             int     batchSize               = 200;
+  private int batchSize = 200;
+
   /**
    * 查询每次抓取数据的数量
    * -- GETTER --
@@ -30,15 +33,18 @@ public class DBConfig {
    *
    */
   @Getter
-  private             int     fetchSize               = 1000;
+  private int fetchSize = 1000;
+
   /**
    * 是否显示SQL
    */
-  private             boolean showSql                 = false;
+  private boolean showSql = false;
+
   /**
    * 是否显示查询结果
    */
-  private             boolean showResult              = false;
+  private boolean showResult = false;
+
   /**
    * 每页最大记录数
    * -- GETTER --
@@ -46,7 +52,8 @@ public class DBConfig {
    *
    */
   @Getter
-  private             int     maxPageSize             = -1;
+  private int maxPageSize = -1;
+
   /**
    * 默认事务级别
    * -- GETTER --
@@ -54,7 +61,8 @@ public class DBConfig {
    *
    */
   @Getter
-  private             int     defaultIsolation        = Connection.TRANSACTION_READ_COMMITTED;
+  private int defaultIsolation = Connection.TRANSACTION_READ_COMMITTED;
+
   /**
    * 终端ID
    * -- GETTER --
@@ -62,7 +70,8 @@ public class DBConfig {
    *
    */
   @Getter
-  private             long    workerId                = 1L;
+  private long workerId = 1L;
+
   /**
    * 数据中心ID
    * -- GETTER --
@@ -70,7 +79,7 @@ public class DBConfig {
    *
    */
   @Getter
-  private             long    dataCenterId            = 1L;
+  private long dataCenterId = 1L;
 
   /**
    * 分页查询结果数据集合字段名称
