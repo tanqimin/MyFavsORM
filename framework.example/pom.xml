@@ -4,37 +4,51 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <groupId>work.myfavs</groupId>
   <artifactId>framework.example</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
 
-  <parent>
-    <groupId>work.myfavs</groupId>
-    <artifactId>framework</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-  </parent>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     <java.version>11</java.version>
+
+    <spring-boot.version>2.7.18</spring-boot.version>
+    <druid.version>1.2.27</druid.version>
+    <fastjson.version>1.2.83</fastjson.version>
+    <HikariCP.version>7.0.2</HikariCP.version>
+    <mysql-jdbc.version>9.5.0</mysql-jdbc.version>
+    <mssql-jdbc.version>13.2.1.jre11</mssql-jdbc.version>
+    <lombok.version>1.18.42</lombok.version>
+    <slf4j.version>2.0.17</slf4j.version>
+    <myfavs-orm.version>1.0.0-SNAPSHOT</myfavs-orm.version>
+
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
   </properties>
 
   <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
+      <version>${spring-boot.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
+      <version>${spring-boot.version}</version>
       <optional>true</optional>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+      <version>${spring-boot.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.springframework.boot</groupId>
@@ -46,27 +60,35 @@
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
+      <version>${fastjson.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jdbc</artifactId>
+      <version>${spring-boot.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-aop</artifactId>
+      <version>${spring-boot.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-tomcat</artifactId>
+      <version>${spring-boot.version}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter -->
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>druid-spring-boot-starter</artifactId>
+      <version>${druid.version}</version>
       <exclusions>
         <exclusion>
           <artifactId>spring-boot-autoconfigure</artifactId>
@@ -75,46 +97,54 @@
       </exclusions>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
+      <version>${HikariCP.version}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
     <!--    <dependency>-->
     <!--      <groupId>mysql</groupId>-->
     <!--      <artifactId>mysql-connector-java</artifactId>-->
+    <!--      <version>${mysql-jdbc.version}</version>-->
     <!--    </dependency>-->
 
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
+      <version>${mssql-jdbc.version}</version>
     </dependency>
 
     <dependency>
       <groupId>work.myfavs</groupId>
       <artifactId>framework.orm</artifactId>
+      <version>${myfavs-orm.version}</version>
     </dependency>
 
     <dependency>
       <groupId>work.myfavs</groupId>
       <artifactId>framework.orm-spring-starter</artifactId>
+      <version>${myfavs-orm.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.24</version>
+      <version>${lombok.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-reload4j</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
 
   </dependencies>

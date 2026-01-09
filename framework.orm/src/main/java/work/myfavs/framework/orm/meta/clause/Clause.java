@@ -133,7 +133,7 @@ public abstract class Clause implements Serializable {
    * 拼接字符串，字符串之间使用空格分隔
    * <pre>
    *   如果 clause 为空 或 clause 为 {@link Constant#LINE_SEPARATOR} 则不处理。
-   *   如果 {@link Clause#getSql()} 最后一个字符为空格，则删除最后一个字符
+   *   如果 this.sql 最后一个字符为空格，则删除最后一个字符
    *   如果 clause 第一个字符为空格，则删除第一个字符
    * </pre>
    *
