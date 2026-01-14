@@ -6,12 +6,33 @@
 
   <groupId>work.myfavs</groupId>
   <artifactId>framework</artifactId>
-  <version>1.0.0-260108-1</version>
+  <version>1.0.0-260114-2</version>
   <packaging>pom</packaging>
 
-  <name>myfavs.framework</name>
+  <name>${project.groupId}.${project.artifactId}</name>
   <description>A database orm framework</description>
   <url>https://github.com/tanqimin/MyFavsORM</url>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>TAN Qimin</name>
+      <organization>Work.Myfavs</organization>
+      <organizationUrl>https://github.com/tanqimin</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com:tanqimin/MyFavsORM.git</connection>
+    <developerConnection>scm:git:ssh://github.com:tanqimin/MyFavsORM.git</developerConnection>
+    <url>https://github.com/tanqimin/MyFavsORM</url>
+  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,6 +40,27 @@
     <java.version>11</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
+
+    <lombok.version>1.18.42</lombok.version>
+    <slf4j.version>2.0.17</slf4j.version>
+    <spring-jdbc.version>5.3.31</spring-jdbc.version>
+
+    <junit.version>4.13.2</junit.version>
+    <mockito.version>5.20.0</mockito.version>
+
+    <druid.version>1.2.27</druid.version>
+    <HikariCP.version>7.0.2</HikariCP.version>
+    <mysql-jdbc.version>9.5.0</mysql-jdbc.version>
+    <mssql-jdbc.version>13.2.1.jre11</mssql-jdbc.version>
+
+    <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+    <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+    <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+    <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+    <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+    <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+    <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
+    <versions-maven-plugin.version>2.20.1</versions-maven-plugin.version>
   </properties>
 
   <modules>
@@ -26,4 +68,203 @@
     <module>framework.orm.spring-boot-starter</module>
     <module>framework.example</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-reload4j -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-reload4j</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/junit/junit -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter -->
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>druid</artifactId>
+        <version>${druid.version}</version>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+      <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>${HikariCP.version}</version>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
+      <dependency>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
+        <version>${mysql-jdbc.version}</version>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc_auth -->
+      <dependency>
+        <groupId>com.microsoft.sqlserver</groupId>
+        <artifactId>mssql-jdbc</artifactId>
+        <version>${mssql-jdbc.version}</version>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+        <version>${spring-jdbc.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
+            <encoding>${project.build.sourceEncoding}</encoding>
+            <annotationProcessorPaths>
+              <path>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+              </path>
+            </annotationProcessorPaths>
+          </configuration>
+        </plugin>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven-jar-plugin.version}</version>
+          <configuration>
+            <archive>
+              <manifestFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF
+              </manifestFile>
+            </archive>
+          </configuration>
+        </plugin>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${maven-gpg-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <source>${java.version}</source>
+            <!-- https://docs.oracle.com/javase/9/tools/javadoc.htm -->
+            <doclint>none</doclint>
+          </configuration>
+        </plugin>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>${maven-release-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>${central-publishing-maven-plugin.version}</version>
+          <extensions>true</extensions>
+          <configuration>
+            <!-- 这里的publishingServerId是在settings.xml中配置的server认证信息 -->
+            <publishingServerId>sonatype-central</publishingServerId>
+            <!-- 这里的autoPublish是自动发布，而不是手动发布 -->
+            <autoPublish>true</autoPublish>
+            <!-- 这里的waitUntil配置为published是等待发布完成，因为发布完成的时间比较长，所以可以不加这个参数 -->
+            <waitUntil>published</waitUntil>
+            <!-- 发布到中央仓库的文件名称 -->
+            <!--            <deploymentName>${project.groupId}:${project.artifactId}:${project.version}</deploymentName>-->
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <!-- Source: https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>${versions-maven-plugin.version}</version>
+        <configuration>
+          <generateBackupPoms>false</generateBackupPoms>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
