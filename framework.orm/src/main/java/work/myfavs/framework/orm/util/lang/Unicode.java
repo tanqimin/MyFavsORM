@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.util.lang;
 
-import java.sql.SQLType;
 import java.util.Objects;
 import lombok.Setter;
 

@@ -25,8 +25,7 @@ public class UserService extends BaseService {
   }
 
   public Page<User> findByPage() {
-    Page<User> page = userRepository.findPage(User.class, new Sql("SELECT * FROM tb_user"), true, 1, 10);
-    return page;
+    return userRepository.findPage(User.class, new Sql("SELECT * FROM tb_user"), true, 1, 10);
   }
 
   @Transactional(rollbackFor = Exception.class)
