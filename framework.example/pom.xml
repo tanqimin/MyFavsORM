@@ -9,7 +9,7 @@
   <parent>
     <groupId>work.myfavs.framework</groupId>
     <artifactId>pom</artifactId>
-    <version>1.0.0-260114-2</version>
+    <version>1.0.0-260115-1</version>
   </parent>
 
   <name>${project.groupId}.${project.artifactId}</name>
