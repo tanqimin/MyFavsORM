@@ -15,8 +15,9 @@
 
   <licenses>
     <license>
-      <name>The Apache License, Version 2.0</name>
-      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
 
@@ -29,8 +30,8 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com:tanqimin/MyFavsORM.git</connection>
-    <developerConnection>scm:git:ssh://github.com:tanqimin/MyFavsORM.git</developerConnection>
+    <connection>scm:git:git://github.com:tanqimin/MyFavsORM</connection>
+    <developerConnection>scm:git:git://github.com:tanqimin/MyFavsORM</developerConnection>
     <url>https://github.com/tanqimin/MyFavsORM</url>
   </scm>
 
@@ -208,6 +209,10 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <excludeResources>true</excludeResources>
+          <useDefaultExcludes>true</useDefaultExcludes>
+        </configuration>
       </plugin>
 
       <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
@@ -217,7 +222,8 @@
         <version>${maven-javadoc-plugin.version}</version>
         <executions>
           <execution>
-            <id>attach-javadocs</id>
+            <id>bundle-sources</id>
+            <phase>package</phase>
             <goals>
               <goal>jar</goal>
             </goals>
@@ -225,6 +231,9 @@
         </executions>
         <configuration>
           <source>${java.version}</source>
+          <encoding>UTF-8</encoding>
+          <show>protected</show>
+          <failOnError>false</failOnError>
           <!-- https://docs.oracle.com/javase/9/tools/javadoc.htm -->
           <doclint>none</doclint>
         </configuration>
@@ -260,12 +269,12 @@
         <version>${central-publishing-maven-plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
-          <!-- 这里的publishingServerId是在settings.xml中配置的server认证信息 -->
-          <publishingServerId>sonatype-central</publishingServerId>
-          <!-- 这里的autoPublish是自动发布，而不是手动发布 -->
+          <publishingServerId>central</publishingServerId>
           <autoPublish>true</autoPublish>
-          <!-- 这里的waitUntil配置为published是等待发布完成，因为发布完成的时间比较长，所以可以不加这个参数 -->
           <waitUntil>published</waitUntil>
+          <excludeArtifacts>
+            <artifact>example</artifact>
+          </excludeArtifacts>
           <!-- 发布到中央仓库的文件名称 -->
           <!--            <deploymentName>${project.groupId}:${project.artifactId}:${project.version}</deploymentName>-->
         </configuration>
