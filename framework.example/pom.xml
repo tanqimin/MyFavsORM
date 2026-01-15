@@ -4,14 +4,15 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-
-  <artifactId>framework.example</artifactId>
+  <artifactId>example</artifactId>
 
   <parent>
-    <groupId>work.myfavs</groupId>
-    <artifactId>framework</artifactId>
+    <groupId>work.myfavs.framework</groupId>
+    <artifactId>pom</artifactId>
     <version>1.0.0-260114-2</version>
   </parent>
+
+  <name>${project.groupId}.${project.artifactId}</name>
 
   <properties>
     <spring-boot.version>2.7.18</spring-boot.version>
@@ -133,6 +134,55 @@
 
   <build>
     <plugins>
+      <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+
+      <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.sonatype.central/central-publishing-maven-plugin -->
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+
       <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-deploy-plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
