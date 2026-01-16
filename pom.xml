@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs.framework</groupId>
   <artifactId>pom</artifactId>
-  <version>1.0.0-260115-1</version>
+  <version>1.0.0-260115-1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>${project.groupId}.${project.artifactId}</name>
@@ -284,6 +284,16 @@
           </excludeArtifacts>
           <deploymentName>myfavs-${project.artifactId}-${project.version}
           </deploymentName>
+        </configuration>
+      </plugin>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>${versions-maven-plugin.version}</version>
+        <configuration>
+          <generateBackupPoms>false</generateBackupPoms>
         </configuration>
       </plugin>
     </plugins>
