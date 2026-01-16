@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs.framework</groupId>
   <artifactId>pom</artifactId>
-  <version>1.0.0-260115-1-SNAPSHOT</version>
+  <version>1.0.0-260116-1</version>
   <packaging>pom</packaging>
 
   <name>${project.groupId}.${project.artifactId}</name>
@@ -256,17 +256,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-
-      <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>${maven-release-plugin.version}</version>
-        <configuration>
-          <tagNameFormat>v${project.version}</tagNameFormat>
-          <autoVersionSubmodules>true</autoVersionSubmodules>
-        </configuration>
       </plugin>
 
       <!-- Source: https://mvnrepository.com/artifact/org.sonatype.central/central-publishing-maven-plugin -->
