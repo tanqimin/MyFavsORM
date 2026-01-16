@@ -271,8 +271,7 @@
           <excludeArtifacts>
             <artifact>example</artifact>
           </excludeArtifacts>
-          <deploymentName>myfavs-${project.artifactId}-${project.version}
-          </deploymentName>
+          <deploymentName>myfavs-framework-${project.version}</deploymentName>
         </configuration>
       </plugin>
 

@@ -160,7 +160,6 @@
             <phase>none</phase>
           </execution>
         </executions>
-        <inherited>false</inherited>
       </plugin>
 
       <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
