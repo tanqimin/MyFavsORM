@@ -81,14 +81,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <profiles>
-    <profile>
-      <id>doclint-java8-disable</id>
-      <!-- 指定profile只在JDK版本大于等于1.8时有效-->
-      <activation>
-        <jdk>[1.8,)</jdk>
-      </activation>
-    </profile>
-  </profiles>
 </project>

@@ -1,2 +1,3 @@
-Library-Name: myfavs.orm-spring-starter
-Library-Description: Easy db query library
+Name: myfavs-orm-spring-starter
+Created-By: TAN Qimin
+Manifest-Version: 1.0.0-*

@@ -23,7 +23,7 @@
 
   <developers>
     <developer>
-      <name>TAN Qimin</name>
+      <name>${developer}</name>
       <organization>Work.Myfavs</organization>
       <organizationUrl>https://github.com/tanqimin</organizationUrl>
     </developer>
@@ -36,9 +36,12 @@
   </scm>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+    <developer>TAN Qimin</developer>
     <java.version>11</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
@@ -260,6 +263,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>${maven-release-plugin.version}</version>
+        <configuration>
+          <tagNameFormat>v${project.version}</tagNameFormat>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+        </configuration>
       </plugin>
 
       <!-- Source: https://mvnrepository.com/artifact/org.sonatype.central/central-publishing-maven-plugin -->
@@ -275,18 +282,8 @@
           <excludeArtifacts>
             <artifact>example</artifact>
           </excludeArtifacts>
-          <!-- 发布到中央仓库的文件名称 -->
-          <!--            <deploymentName>${project.groupId}:${project.artifactId}:${project.version}</deploymentName>-->
-        </configuration>
-      </plugin>
-
-      <!-- Source: https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>versions-maven-plugin</artifactId>
-        <version>${versions-maven-plugin.version}</version>
-        <configuration>
-          <generateBackupPoms>false</generateBackupPoms>
+          <deploymentName>myfavs-${project.artifactId}-${project.version}
+          </deploymentName>
         </configuration>
       </plugin>
     </plugins>

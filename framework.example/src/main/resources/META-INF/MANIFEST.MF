@@ -1,2 +1,4 @@
-Library-Name: myfavs.example
-Library-Description: Easy db query library
+Name: myfavs-example
+Created-By: TAN Qimin
+Manifest-Version: 1.0.0-*
+Main-Class: work.myfavs.framework.example.Application
