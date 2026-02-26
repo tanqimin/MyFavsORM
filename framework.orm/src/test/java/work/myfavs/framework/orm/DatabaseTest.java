@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import work.myfavs.framework.orm.util.lang.NVarchar;
 
 public class DatabaseTest extends AbstractTest
     implements ISnowflakeTest, IIdentityTest, IUuidTest, ILogicDeleteTest, IAssignedTest {
@@ -251,6 +252,9 @@ public class DatabaseTest extends AbstractTest
 
     uuidList = orm.findByCriteria(UuidExample.class, condition, BaseEntity.Update.class);
     Assert.assertEquals(uuidList.size(), 2);
+
+    List<NVarchar> usernames = orm.find(NVarchar.class, new Sql("SELECT top 10 username FROM [dbo].[tb_user]"));
+    Assert.assertFalse(usernames.isEmpty());
   }
 
   @Test

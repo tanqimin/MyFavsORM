@@ -1,7 +1,11 @@
 package work.myfavs.framework.orm.util.common;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import work.myfavs.framework.orm.util.lang.NText;
+import work.myfavs.framework.orm.util.lang.NVarchar;
+import work.myfavs.framework.orm.util.lang.Unicode;
 
 public interface Constant {
   /**
@@ -22,8 +26,17 @@ public interface Constant {
   /**
    * 原始类型列表
    */
-  List<Class<?>> PRIMITIVE_TYPES = List.of(Integer.class, Long.class, Double.class, String.class, Float.class, Boolean.class, Number.class,
-                                           Short.class);
+  List<Class<?>> PRIMITIVE_TYPES = List.of(
+      Integer.class,
+      Long.class,
+      Double.class,
+      String.class,
+      Boolean.class,
+      NVarchar.class,
+      NText.class,
+      Float.class,
+      Number.class,
+      Short.class);
 
   char UNDERLINE = '_';
 
