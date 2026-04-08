@@ -2,12 +2,14 @@ package work.myfavs.framework.orm.util.common;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.List;
 import work.myfavs.framework.orm.util.lang.NText;
 import work.myfavs.framework.orm.util.lang.NVarchar;
 import work.myfavs.framework.orm.util.lang.Unicode;
 
 public interface Constant {
+
   /**
    * SQL Server 中参数最大长度
    */
@@ -53,4 +55,6 @@ public interface Constant {
   String SYMBOL_COMMA = ",";
 
   String LINE_SEPARATOR = System.lineSeparator();
+
+  ZoneId ZONE_ID = ZoneId.systemDefault();
 }

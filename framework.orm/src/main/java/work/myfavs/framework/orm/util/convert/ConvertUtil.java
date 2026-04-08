@@ -1,7 +1,10 @@
 package work.myfavs.framework.orm.util.convert;
 
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import work.myfavs.framework.orm.util.common.ArrayUtil;
+import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.DBException;
 
@@ -231,6 +234,7 @@ public class ConvertUtil {
     if (clazz.isInstance(value)) return (T) value;
     if (value instanceof Date) return dateFunction.apply(((Date) value).getTime());
     if (value instanceof Number) return dateFunction.apply(((Number) value).longValue());
+    if (value instanceof LocalDateTime) return dateFunction.apply(((LocalDateTime) value).atZone(Constant.ZONE_ID).toInstant().toEpochMilli());
     throw new DBException("不能把类型 %s 转换为 java.util.Date. ", value.getClass());
   }
 

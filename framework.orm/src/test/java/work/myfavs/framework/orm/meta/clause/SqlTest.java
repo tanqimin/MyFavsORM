@@ -1,12 +1,11 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import org.junit.Test;
-import work.myfavs.framework.orm.util.common.Constant;
-
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.util.List;
+import org.junit.Test;
+import work.myfavs.framework.orm.util.common.Constant;
 
 public class SqlTest {
 

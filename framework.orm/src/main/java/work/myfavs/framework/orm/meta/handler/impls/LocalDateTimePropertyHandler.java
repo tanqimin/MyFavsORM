@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import work.myfavs.framework.orm.util.common.Constant;
 
 public class LocalDateTimePropertyHandler extends AbstractTemporalAccessorPropertyHandler<LocalDateTime> {
 
@@ -19,13 +20,13 @@ public class LocalDateTimePropertyHandler extends AbstractTemporalAccessorProper
 
   @Override
   protected LocalDateTime fromInstant(Instant instant) {
-    return LocalDateTime.ofInstant(instant, super.ZONE_ID);
+    return LocalDateTime.ofInstant(instant, Constant.ZONE_ID);
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, LocalDateTime param) throws SQLException {
     if (usingEpochMilli) {
-      ps.setLong(paramIndex, param.atZone(super.ZONE_ID).toInstant().toEpochMilli());
+      ps.setLong(paramIndex, param.atZone(Constant.ZONE_ID).toInstant().toEpochMilli());
       return;
     }
     ps.setTimestamp(paramIndex, Timestamp.valueOf(param));

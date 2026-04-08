@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import work.myfavs.framework.orm.util.common.Constant;
 
 /**
  * TIMESTAMP WITH TIMEZONE
@@ -24,14 +25,14 @@ public class OffsetDateTimePropertyHandler extends AbstractTemporalAccessorPrope
 
   @Override
   protected OffsetDateTime fromInstant(Instant instant) {
-    return OffsetDateTime.ofInstant(instant, super.ZONE_ID);
+    return OffsetDateTime.ofInstant(instant, Constant.ZONE_ID);
   }
 
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, OffsetDateTime param)
       throws SQLException {
     if (usingEpochMilli) {
-      ps.setLong(paramIndex, param.atZoneSameInstant(super.ZONE_ID).toInstant().toEpochMilli());
+      ps.setLong(paramIndex, param.atZoneSameInstant(Constant.ZONE_ID).toInstant().toEpochMilli());
       return;
     }
     ps.setTimestamp(paramIndex, Timestamp.valueOf(param.toLocalDateTime()));
