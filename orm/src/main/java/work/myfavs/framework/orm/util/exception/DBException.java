@@ -1,17 +1,17 @@
 package work.myfavs.framework.orm.util.exception;
 
 /**
- * 数据库操作异常，ORM 框架的通用异常类型。
+ * 数据库操作异常，ORM 框架所有数据访问异常的基类。
  * <p>
- * 继承 {@link DataAccessException}。此类为 ORM 框架的原始异常类型，保留了完整的构造器签名。
- * 新代码建议使用语义更明确的子类（如 {@link ConnectionException}、{@link DataRetrievalException}、
- * {@link InvalidDataAccessException}、{@link PaginationException}）替代。
+ * 继承 {@link RuntimeException}，属于非受检异常。
+ * 框架中所有数据访问相关异常都应继承此类，以便调用方通过单一 {@code catch (DBException e)}
+ * 统一处理。
  * </p>
  *
  * @since 1.0.0
  * @author tanqimin
  */
-public class DBException extends DataAccessException {
+public class DBException extends RuntimeException {
 
   /**
    * 构造一个不带详细消息和原因的新异常。

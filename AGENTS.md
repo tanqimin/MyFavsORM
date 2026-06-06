@@ -51,6 +51,19 @@ mvn compile -pl orm
 - 数据库类型支持：MYSQL, SQL_SERVER, SQL_SERVER_2012, POSTGRE_SQL, ORACLE, H2（各有对应的 `Orm` 实现）
 - 同构表（分表）操作通过 `TableAlias` 实现
 
+## 异常体系
+
+```
+RuntimeException
+  └── DBException                       ← ORM 框架数据访问异常总基类
+       ├── ConnectionException          ← 连接获取、事务提交/回滚、保存点失败
+       ├── DataRetrievalException       ← SQL 查询、更新、批处理、参数绑定失败
+       ├── InvalidDataAccessException   ← 配置错误、类型转换、反射失败、SQL 注入等
+       └── PaginationException          ← 分页参数越界（继承 InvalidDataAccessException）
+```
+
+`catch (DBException e)` 可统一捕获所有 ORM 异常。各子类按场景细化，`PaginationException` 同时可被 `catch (InvalidDataAccessException e)` 捕获。
+
 ## Spring Boot Starter 模式
 
 - 继承 `Repository<T>` 或 `Query` 基类（都在 `orm-spring-boot2-starter` 中）
@@ -71,6 +84,6 @@ mvn compile -pl orm
 ## 文件风格
 
 - 所有 getter/setter/构造器均为手写，无任何代码生成工具依赖
-- 不写 Javadoc 注释
+- 所有类需编写完整的 Javadoc（类注释、构造器参数说明、方法注释、方法参数说明等）
 - 测试类扩展 `AbstractTest`，使用 JUnit 4 的 `@Test` 和 `Assert`
 - 无 Checkstyle/Spotless/Formatter 配置，无 CI 流水线

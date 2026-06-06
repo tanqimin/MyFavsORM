@@ -10,7 +10,7 @@ package work.myfavs.framework.orm.util.exception;
  * @since 1.0.0
  * @author tanqimin
  */
-public class ConnectionException extends DataAccessException {
+public class ConnectionException extends DBException {
 
   /**
    * 构造一个不带详细消息和原因的新异常。

@@ -405,6 +405,21 @@ try (Database database = dbTemplate.createDatabase()) {
 }
 ```
 
+## 异常体系
+
+ORM 框架的异常继承 `DBException`（`RuntimeException` 子类），可按场景细化捕获：
+
+```
+RuntimeException
+  └── DBException
+       ├── ConnectionException          ← 连接获取、事务失败
+       ├── DataRetrievalException       ← SQL 查询、更新失败
+       ├── InvalidDataAccessException   ← 配置错误、类型转换、SQL 注入
+       └── PaginationException          ← 分页参数越界
+```
+
+统一捕获：`catch (DBException e)`，细化捕获按子类类型即可。
+
 ## 高级使用
 
 ### 同构表（分表）查询
