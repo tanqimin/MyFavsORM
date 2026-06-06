@@ -68,9 +68,9 @@
   </properties>
 
   <modules>
-    <module>framework.orm</module>
-    <module>framework.orm.spring-boot-starter</module>
-    <module>framework.example</module>
+    <module>orm</module>
+    <module>spring-boot-starter/orm-spring-boot2-starter</module>
+    <module>demos/spring-boot2-demo</module>
   </modules>
 
   <distributionManagement>
@@ -269,7 +269,7 @@
           <autoPublish>false</autoPublish>
           <waitUntil>published</waitUntil>
           <excludeArtifacts>
-            <artifact>example</artifact>
+            <artifact>spring-boot2-demo</artifact>
           </excludeArtifacts>
           <deploymentName>myfavs-framework-${project.version}</deploymentName>
         </configuration>

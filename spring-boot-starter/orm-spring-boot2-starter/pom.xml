@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <artifactId>orm-spring-starter</artifactId>
+  <artifactId>orm-spring-boot2-starter</artifactId>
   <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>
 
@@ -15,6 +15,7 @@
     <groupId>work.myfavs.framework</groupId>
     <artifactId>pom</artifactId>
     <version>1.0.0-260408-1</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <dependencies>
