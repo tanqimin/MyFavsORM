@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.meta;
 
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.DataRetrievalException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -88,7 +88,7 @@ public class BatchParameters {
           statement.executeBatch();
       }
     } catch (SQLException ex) {
-      throw new DBException(ex, "设置批量参数时发生异常: %s", ex.getMessage());
+      throw new DataRetrievalException(ex, "设置批量参数时发生异常: %s", ex.getMessage());
     }
   }
 

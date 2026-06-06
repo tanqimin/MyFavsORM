@@ -3,7 +3,7 @@ package work.myfavs.framework.orm.meta.schema;
 
 import work.myfavs.framework.orm.util.common.ArrayUtil;
 import work.myfavs.framework.orm.util.common.StringUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -32,7 +32,7 @@ public class Attributes {
   public Attribute getAttribute(String columnName) {
 
     if (StringUtil.isEmpty(columnName))
-      throw new DBException("数据库字段名不能为空! ");
+      throw new InvalidDataAccessException("数据库字段名不能为空! ");
 
     return map.get(columnName.toUpperCase());
   }
@@ -81,7 +81,7 @@ public class Attributes {
   public Attribute put(String columnName, Attribute value) {
 
     if (StringUtil.isEmpty(columnName))
-      throw new DBException("数据库字段名不能为空! ");
+      throw new InvalidDataAccessException("数据库字段名不能为空! ");
 
     Objects.requireNonNull(value);
 
@@ -112,7 +112,7 @@ public class Attributes {
   public boolean containsColumn(String columnName) {
 
     if (StringUtil.isEmpty(columnName))
-      throw new DBException("数据库字段名不能为空! ");
+      throw new InvalidDataAccessException("数据库字段名不能为空! ");
 
     return map.containsKey(columnName.toUpperCase());
   }

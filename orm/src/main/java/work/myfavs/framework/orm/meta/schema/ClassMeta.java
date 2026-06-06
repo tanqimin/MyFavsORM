@@ -5,7 +5,7 @@ import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.common.ArrayUtil;
 import work.myfavs.framework.orm.util.common.StringUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
 import java.lang.reflect.Field;
@@ -228,7 +228,7 @@ public class ClassMeta {
   public Attribute checkPrimaryKey() {
 
     if (null == primaryKey) {
-      throw new DBException("类型 %s 中没有发现使用 @PrimaryKey 注释标记的主键字段", this.clazz.getName());
+      throw new InvalidDataAccessException("类型 %s 中没有发现使用 @PrimaryKey 注释标记的主键字段", this.clazz.getName());
     }
     return primaryKey;
   }

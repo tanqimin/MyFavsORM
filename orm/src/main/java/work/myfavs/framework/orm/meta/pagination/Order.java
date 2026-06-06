@@ -1,7 +1,7 @@
 package work.myfavs.framework.orm.meta.pagination;
 
 import work.myfavs.framework.orm.util.common.Constant;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 import java.io.Serializable;
 
@@ -83,12 +83,12 @@ public class Order implements Serializable {
    */
   public static Order parse(String orderBy) {
     if (isBlank(orderBy))
-      throw new DBException("排序字段不能为空！");
+      throw new InvalidDataAccessException("排序字段不能为空！");
 
     String[] split = trim(orderBy).split(Constant.SPACE);
 
     if (split.length > 2)
-      throw new DBException(String.format("错误的排序格式: %s", orderBy));
+      throw new InvalidDataAccessException(String.format("错误的排序格式: %s", orderBy));
 
     if (split.length == 1) {
       return new Order(trim(split[0]), "ASC");
@@ -109,7 +109,7 @@ public class Order implements Serializable {
    */
   public String getClause() {
     if (isBlank(this.field))
-      throw new DBException("排序字段不能为空！");
+      throw new InvalidDataAccessException("排序字段不能为空！");
 
     String orderByField = checkInjection(this.field);
 
@@ -119,7 +119,7 @@ public class Order implements Serializable {
     if (equalsIgnoreCase(direction, "DESC"))
       return orderByField.concat(" DESC");
 
-    throw new DBException("排序方向必须为 ASC 或 DESC！");
+    throw new InvalidDataAccessException("排序方向必须为 ASC 或 DESC！");
   }
 
   /**

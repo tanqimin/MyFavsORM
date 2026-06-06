@@ -4,7 +4,7 @@ import work.myfavs.framework.orm.meta.BatchParameters;
 import work.myfavs.framework.orm.meta.SqlLog;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.convert.DBConvert;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.DataRetrievalException;
 import work.myfavs.framework.orm.util.func.ThrowingConsumer;
 import work.myfavs.framework.orm.util.func.ThrowingRunnable;
 
@@ -97,7 +97,7 @@ public class Query implements Closeable {
 
       return this.preparedStatement = getConnection().prepareStatement(this.sql);
     } catch (SQLException e) {
-      throw new DBException(e, "创建 preparedStatement 时发生异常: %s", e.getMessage());
+      throw new DataRetrievalException(e, "创建 preparedStatement 时发生异常: %s", e.getMessage());
     }
   }
 
@@ -163,7 +163,7 @@ public class Query implements Closeable {
     try (final ResultSet resultSet = this.execQuery(preparedStatement)) {
       return this.convertToList(modelClass, resultSet);
     } catch (SQLException ex) {
-      throw new DBException(ex, "执行 executeQuery 查询时发生异常: %s", ex.getMessage());
+      throw new DataRetrievalException(ex, "执行 executeQuery 查询时发生异常: %s", ex.getMessage());
     } finally {
       this.clearParameters();
     }
@@ -204,7 +204,7 @@ public class Query implements Closeable {
       this.generatedKeys(preparedStatement, keysConsumer);
       return result;
     } catch (SQLException e) {
-      throw new DBException(e, "执行 executeUpdate 查询时发生异常: %s", e.getMessage());
+      throw new DataRetrievalException(e, "执行 executeUpdate 查询时发生异常: %s", e.getMessage());
     } finally {
       this.clearParameters();
     }
@@ -246,7 +246,7 @@ public class Query implements Closeable {
       this.generatedKeys(preparedStatement, keysConsumer);
       return result;
     } catch (SQLException e) {
-      throw new DBException(e, "执行 executeBatch 查询时发生异常: %s", e.getMessage());
+      throw new DataRetrievalException(e, "执行 executeBatch 查询时发生异常: %s", e.getMessage());
     } finally {
       this.clearParameters();
     }
@@ -283,7 +283,7 @@ public class Query implements Closeable {
       preparedStatement.setFetchSize(this.fetchSize);
       alreadySetFetchSize = true;
     } catch (SQLException ex) {
-      throw new DBException(ex, "设置 fetch size 时发生异常: %s", ex.getMessage());
+      throw new DataRetrievalException(ex, "设置 fetch size 时发生异常: %s", ex.getMessage());
     }
   }
 
@@ -460,7 +460,7 @@ public class Query implements Closeable {
 
       this.preparedStatement.close();
     } catch (SQLException e) {
-      throw new DBException(e, "关闭 preparedStatement 时发生异常: %s", e.getMessage());
+      throw new DataRetrievalException(e, "关闭 preparedStatement 时发生异常: %s", e.getMessage());
     } finally {
       this.preparedStatement = null;
     }

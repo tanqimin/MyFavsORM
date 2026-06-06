@@ -1,15 +1,14 @@
 package work.myfavs.framework.orm.util.convert;
 
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import work.myfavs.framework.orm.util.common.ArrayUtil;
 import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.common.StringUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 
@@ -42,7 +41,7 @@ public class ConvertUtil {
       return (Collection<?>) object;
     }
 
-    throw new DBException("不能把类型 %s 转换为 Collection. ", object.getClass().getName());
+    throw new InvalidDataAccessException("不能把类型 %s 转换为 Collection. ", object.getClass().getName());
   }
 
   /**
@@ -72,7 +71,7 @@ public class ConvertUtil {
         return clazz.isPrimitive() ? numberFunc.apply(0) : null;
       return stringFunc.apply(str);
     }
-    throw new DBException("不能把类型 %s 转换为 %s. ", value.getClass().getName(), clazz.getName());
+    throw new InvalidDataAccessException("不能把类型 %s 转换为 %s. ", value.getClass().getName(), clazz.getName());
   }
 
   /**
@@ -179,7 +178,7 @@ public class ConvertUtil {
           "T".equalsIgnoreCase(strVal) || "J".equalsIgnoreCase(strVal);
     }
 
-    throw new DBException("不能把类型 %s 转换为 %s. ", value.getClass().getName(), Boolean.class.getName());
+    throw new InvalidDataAccessException("不能把类型 %s 转换为 %s. ", value.getClass().getName(), Boolean.class.getName());
   }
 
   /**
@@ -205,7 +204,7 @@ public class ConvertUtil {
     try {
       return Enum.valueOf(clazz, str);
     } catch (IllegalArgumentException e) {
-      throw new DBException("不能把类型 %s 转换为枚举 %s. ", value.getClass(), clazz.getName());
+      throw new InvalidDataAccessException("不能把类型 %s 转换为枚举 %s. ", value.getClass(), clazz.getName());
     }
   }
 
@@ -235,7 +234,7 @@ public class ConvertUtil {
     if (value instanceof Date) return dateFunction.apply(((Date) value).getTime());
     if (value instanceof Number) return dateFunction.apply(((Number) value).longValue());
     if (value instanceof LocalDateTime) return dateFunction.apply(((LocalDateTime) value).atZone(Constant.ZONE_ID).toInstant().toEpochMilli());
-    throw new DBException("不能把类型 %s 转换为 java.util.Date. ", value.getClass());
+    throw new InvalidDataAccessException("不能把类型 %s 转换为 java.util.Date. ", value.getClass());
   }
 
   /**
@@ -266,6 +265,6 @@ public class ConvertUtil {
       return UUID.fromString(str);
     }
 
-    throw new DBException("不能把类型 %s 转换为 %s. ", value.getClass().getName(), UUID.class.getName());
+    throw new InvalidDataAccessException("不能把类型 %s 转换为 %s. ", value.getClass().getName(), UUID.class.getName());
   }
 }

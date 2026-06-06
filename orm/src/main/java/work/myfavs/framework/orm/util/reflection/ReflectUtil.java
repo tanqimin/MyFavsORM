@@ -1,7 +1,7 @@
 package work.myfavs.framework.orm.util.reflection;
 
 import work.myfavs.framework.orm.util.common.StringUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -67,14 +67,14 @@ public class ReflectUtil {
    * @param entity 实体对象
    * @param <T>    字段值的类型
    * @return 字段值
-   * @throws DBException 获取字段值失败时抛出
+   * @throws InvalidDataAccessException 获取字段值失败时抛出
    */
   @SuppressWarnings("unchecked")
   public static <T> T getFieldValue(Field field, Object entity) {
     try {
       return (T) field.get(entity);
     } catch (Exception e) {
-      throw new DBException(e, "从类型 %s 中获取 %s 字段时发生异常: %s",
+      throw new InvalidDataAccessException(e, "从类型 %s 中获取 %s 字段时发生异常: %s",
                             field.getName(),
                             StringUtil.toStr(entity.getClass()),
                             e.getMessage());
@@ -87,7 +87,7 @@ public class ReflectUtil {
    * @param field  字段对象
    * @param entity 实体对象
    * @param value  要设置的值
-   * @throws DBException 设置字段值失败时抛出
+   * @throws InvalidDataAccessException 设置字段值失败时抛出
    */
   public static void setFieldValue(Field field, Object entity, Object value) {
     if (null == value && field.getType().isPrimitive()) {
@@ -97,7 +97,7 @@ public class ReflectUtil {
     try {
       field.set(entity, value);
     } catch (Exception e) {
-      throw new DBException(e, "从类型 %s 中对 %s 字段赋值为 %s 时发生异常: %s",
+      throw new InvalidDataAccessException(e, "从类型 %s 中对 %s 字段赋值为 %s 时发生异常: %s",
                             field.getName(),
                             StringUtil.toStr(entity.getClass()),
                             StringUtil.toStr(value),
@@ -125,14 +125,14 @@ public class ReflectUtil {
    * @param clazz          类型
    * @param parameterTypes 参数类型列表
    * @return {@link Constructor} 对象
-   * @throws DBException 获取构造方法失败时抛出
+   * @throws InvalidDataAccessException 获取构造方法失败时抛出
    */
   public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... parameterTypes) {
     Objects.requireNonNull(clazz);
     try {
       return clazz.getDeclaredConstructor(parameterTypes);
     } catch (NoSuchMethodException e) {
-      throw new DBException(e, "获取 %s 类型的构造方法时发生异常: %s", clazz.getName(), e.getMessage());
+      throw new InvalidDataAccessException(e, "获取 %s 类型的构造方法时发生异常: %s", clazz.getName(), e.getMessage());
     }
   }
 
@@ -143,7 +143,7 @@ public class ReflectUtil {
    * @param params 构造方法参数
    * @param <T>    类型泛型
    * @return 类型实例
-   * @throws DBException 创建实例失败时抛出
+   * @throws InvalidDataAccessException 创建实例失败时抛出
    */
   @SuppressWarnings("unchecked")
   public static <T> T newInstance(Class<T> clazz, Object... params) {
@@ -153,7 +153,7 @@ public class ReflectUtil {
         return (T) getConstructor(clazz).newInstance();
       return (T) getConstructor(clazz, getClasses(params)).newInstance(params);
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new DBException(e, "创建 %s 类型实例时发生异常: %s", clazz.getName(), e.getMessage());
+      throw new InvalidDataAccessException(e, "创建 %s 类型实例时发生异常: %s", clazz.getName(), e.getMessage());
     }
   }
 

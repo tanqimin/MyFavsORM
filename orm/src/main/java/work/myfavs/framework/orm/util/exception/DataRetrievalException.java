@@ -1,22 +1,22 @@
 package work.myfavs.framework.orm.util.exception;
 
 /**
- * 数据库操作异常，ORM 框架的通用异常类型。
+ * 数据检索异常，当执行 SQL 查询或更新操作失败时抛出。
  * <p>
- * 继承 {@link DataAccessException}。此类为 ORM 框架的原始异常类型，保留了完整的构造器签名。
- * 新代码建议使用语义更明确的子类（如 {@link ConnectionException}、{@link DataRetrievalException}、
- * {@link InvalidDataAccessException}、{@link PaginationException}）替代。
+ * 对应场景包括：创建 {@code PreparedStatement} 失败、执行 {@code executeQuery} / {@code
+ * executeUpdate} / {@code executeBatch} 时发生 SQL 异常、设置 {@code fetchSize} 失败、
+ * 绑定 SQL 参数失败等。
  * </p>
  *
  * @since 1.0.0
  * @author tanqimin
  */
-public class DBException extends DataAccessException {
+public class DataRetrievalException extends DataAccessException {
 
   /**
    * 构造一个不带详细消息和原因的新异常。
    */
-  public DBException() {}
+  public DataRetrievalException() {}
 
   /**
    * 构造一个带格式化消息的新异常。
@@ -24,7 +24,7 @@ public class DBException extends DataAccessException {
    * @param message 异常消息模板，包含 {@link String#format(String, Object...)} 占位符
    * @param params  消息模板参数
    */
-  public DBException(String message, Object... params) {
+  public DataRetrievalException(String message, Object... params) {
     super(String.format(message, params));
   }
 
@@ -35,7 +35,7 @@ public class DBException extends DataAccessException {
    * @param message 异常消息模板，包含 {@link String#format(String, Object...)} 占位符
    * @param params  消息模板参数
    */
-  public DBException(Throwable cause, String message, Object... params) {
+  public DataRetrievalException(Throwable cause, String message, Object... params) {
     super(String.format(message, params), cause);
   }
 
@@ -44,7 +44,7 @@ public class DBException extends DataAccessException {
    *
    * @param cause 导致此异常的原因
    */
-  public DBException(Throwable cause) {
+  public DataRetrievalException(Throwable cause) {
     super(cause);
   }
 }

@@ -33,5 +33,10 @@ public abstract class PropertyHandler<T> {
   public abstract void addParameter(PreparedStatement ps, int paramIndex, T param)
       throws SQLException;
 
+  /**
+   * 获取当前类型的 JDBC SQL 类型代码.
+   *
+   * @return SQL 类型代码
+   */
   public abstract int getSqlType();
 }

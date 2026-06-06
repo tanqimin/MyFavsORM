@@ -1,7 +1,10 @@
 package work.myfavs.framework.orm.meta.enumeration;
 
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
+/**
+ * 主键生成策略，定义实体对象主键值的生成方式。
+ */
 public enum GenerationType {
   /**
    * UUID，值由系统字段生成
@@ -20,6 +23,11 @@ public enum GenerationType {
    */
   ASSIGNED;
 
+  /**
+   * 获取当前主键生成策略的名称。
+   *
+   * @return 策略名称字符串
+   */
   public String getName() {
 
     switch (this) {
@@ -32,7 +40,7 @@ public enum GenerationType {
       case ASSIGNED:
         return "GenerationType.ASSIGNED";
       default:
-        throw new DBException("不支持的主键策略.");
+        throw new InvalidDataAccessException("不支持的主键策略.");
     }
   }
 }

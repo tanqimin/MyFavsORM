@@ -26,7 +26,8 @@ import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.orm.Orm;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.common.DruidUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
+import work.myfavs.framework.orm.util.exception.PaginationException;
 import work.myfavs.framework.orm.util.func.ThrowingConsumer;
 import work.myfavs.framework.orm.util.id.PKGenerator;
 import work.myfavs.framework.orm.util.reflection.ReflectUtil;
@@ -420,9 +421,9 @@ public abstract class AbstractOrm implements Orm {
           pkVal = pkGenerator.nextUUID();
           break;
         case ASSIGNED:
-          throw new DBException("使用 ASSIGNED 主键策略时，必须要为主键赋值.");
+          throw new InvalidDataAccessException("使用 ASSIGNED 主键策略时，必须要为主键赋值.");
         default:
-          throw new DBException("自动生成主键失败.");
+          throw new InvalidDataAccessException("自动生成主键失败.");
       }
 
       primaryKey.setValue(entity, pkVal);
@@ -530,7 +531,7 @@ public abstract class AbstractOrm implements Orm {
     final Collection<Attribute> updAttrs    = entityMeta.getUpdateAttributes(columns);
 
     if (updAttrs.isEmpty()) {
-      throw new DBException("不能匹配到标记为可更新的属性Attribute.");
+      throw new InvalidDataAccessException("不能匹配到标记为可更新的属性Attribute.");
     }
 
     final int                batchSize = this.database.getDbConfig().getBatchSize();
@@ -916,16 +917,16 @@ public abstract class AbstractOrm implements Orm {
           }
       }
       if (currentPage < 1) {
-          throw new DBException("当前页码 (currentPage) 参数必须大于等于 1");
+          throw new PaginationException("当前页码 (currentPage) 参数必须大于等于 1");
       }
 
       if (pageSize < 1) {
-          throw new DBException("每页记录数 (pageSize) 参数必须大于等于 1");
+          throw new PaginationException("每页记录数 (pageSize) 参数必须大于等于 1");
       }
 
       int maxPageSize = this.database.getDbConfig().getMaxPageSize();
       if (maxPageSize > 0L && pageSize > maxPageSize) {
-          throw new DBException("每页记录数不能超出系统设置的最大记录数 %d", maxPageSize);
+          throw new PaginationException("每页记录数不能超出系统设置的最大记录数 %d", maxPageSize);
       }
 
       return this.selectPage(sql, params, currentPage, pageSize);

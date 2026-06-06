@@ -17,7 +17,7 @@ import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.common.DruidUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -134,7 +134,7 @@ public class SqlServerOrm extends AbstractOrm {
     Collection<Attribute> updateAttributes = entityMeta.getUpdateAttributes(columns);
 
     if (updateAttributes.isEmpty())
-      throw new DBException("不能匹配到标记为可更新的属性Attribute.");
+      throw new InvalidDataAccessException("不能匹配到标记为可更新的属性Attribute.");
 
     String tableName = getTableName(entityMeta);
 

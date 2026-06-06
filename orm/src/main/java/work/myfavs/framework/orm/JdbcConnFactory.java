@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm;
 
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.ConnectionException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -84,7 +84,7 @@ public class JdbcConnFactory extends ConnFactory {
     try {
       return dataSource.getConnection();
     } catch (SQLException e) {
-      throw new DBException(e, "从数据源中获取数据库连接时发生异常: %s", e.getMessage());
+      throw new ConnectionException(e, "从数据源中获取数据库连接时发生异常: %s", e.getMessage());
     }
   }
 
@@ -102,7 +102,7 @@ public class JdbcConnFactory extends ConnFactory {
 
       conn.commit();
     } catch (SQLException e) {
-      throw new DBException(e, "提交事务时发生异常: %s", e.getMessage());
+      throw new ConnectionException(e, "提交事务时发生异常: %s", e.getMessage());
     } finally {
       closeConn(conn);
     }
@@ -119,7 +119,7 @@ public class JdbcConnFactory extends ConnFactory {
       }
       conn.close();
     } catch (SQLException e) {
-      throw new DBException(e, "关闭数据库连接时发生异常: %s", e.getMessage());
+      throw new ConnectionException(e, "关闭数据库连接时发生异常: %s", e.getMessage());
     }
   }
 }

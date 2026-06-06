@@ -1,22 +1,21 @@
 package work.myfavs.framework.orm.util.exception;
 
 /**
- * 数据库操作异常，ORM 框架的通用异常类型。
+ * 分页查询异常，当分页查询参数不合法时抛出。
  * <p>
- * 继承 {@link DataAccessException}。此类为 ORM 框架的原始异常类型，保留了完整的构造器签名。
- * 新代码建议使用语义更明确的子类（如 {@link ConnectionException}、{@link DataRetrievalException}、
- * {@link InvalidDataAccessException}、{@link PaginationException}）替代。
+ * 对应场景包括：当前页码（{@code currentPage}）小于 1、每页记录数（{@code pageSize}）小于 1、
+ * 每页记录数超出系统设置的最大值（{@code maxPageSize}）等。
  * </p>
  *
  * @since 1.0.0
  * @author tanqimin
  */
-public class DBException extends DataAccessException {
+public class PaginationException extends InvalidDataAccessException {
 
   /**
    * 构造一个不带详细消息和原因的新异常。
    */
-  public DBException() {}
+  public PaginationException() {}
 
   /**
    * 构造一个带格式化消息的新异常。
@@ -24,7 +23,7 @@ public class DBException extends DataAccessException {
    * @param message 异常消息模板，包含 {@link String#format(String, Object...)} 占位符
    * @param params  消息模板参数
    */
-  public DBException(String message, Object... params) {
+  public PaginationException(String message, Object... params) {
     super(String.format(message, params));
   }
 
@@ -35,7 +34,7 @@ public class DBException extends DataAccessException {
    * @param message 异常消息模板，包含 {@link String#format(String, Object...)} 占位符
    * @param params  消息模板参数
    */
-  public DBException(Throwable cause, String message, Object... params) {
+  public PaginationException(Throwable cause, String message, Object... params) {
     super(String.format(message, params), cause);
   }
 
@@ -44,7 +43,7 @@ public class DBException extends DataAccessException {
    *
    * @param cause 导致此异常的原因
    */
-  public DBException(Throwable cause) {
+  public PaginationException(Throwable cause) {
     super(cause);
   }
 }

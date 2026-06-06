@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.util.common;
 
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -68,7 +68,7 @@ public class IOUtil {
 
       return content.toString();
     } catch (IOException e) {
-      throw new DBException(e, "读取文件(%s)时发生异常: %s", filePath, e.getMessage());
+      throw new InvalidDataAccessException(e, "读取文件(%s)时发生异常: %s", filePath, e.getMessage());
     }
   }
 }

@@ -2,7 +2,7 @@ package work.myfavs.framework.orm;
 
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 import work.myfavs.framework.orm.util.id.PKGenerator;
 
 import javax.sql.DataSource;
@@ -26,7 +26,7 @@ public class DBTemplate {
     if (POOL.containsKey(dsName)) {
       return POOL.get(dsName);
     }
-    throw new DBException("数据源 %s 不存在.", dsName);
+    throw new InvalidDataAccessException("数据源 %s 不存在.", dsName);
   }
 
   public static DBTemplate add(String dsName, DBTemplate dbTemplate) {
@@ -149,7 +149,7 @@ public class DBTemplate {
       //使用cls反射创建 ConnFactory 的实例
       return cls.getDeclaredConstructor(DataSource.class).newInstance(dataSource);
     } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-      throw new DBException("创建 ConnFactory 实例时发生异常: %s", e.getMessage());
+      throw new InvalidDataAccessException("创建 ConnFactory 实例时发生异常: %s", e.getMessage());
     }
   }
 

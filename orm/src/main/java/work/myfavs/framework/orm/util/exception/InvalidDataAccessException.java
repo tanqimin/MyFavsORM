@@ -1,22 +1,21 @@
 package work.myfavs.framework.orm.util.exception;
 
 /**
- * 数据库操作异常，ORM 框架的通用异常类型。
+ * 无效数据访问异常，当数据访问参数、配置或状态不合法时抛出。
  * <p>
- * 继承 {@link DataAccessException}。此类为 ORM 框架的原始异常类型，保留了完整的构造器签名。
- * 新代码建议使用语义更明确的子类（如 {@link ConnectionException}、{@link DataRetrievalException}、
- * {@link InvalidDataAccessException}、{@link PaginationException}）替代。
+ * 对应场景包括：实体缺少 {@code @Table} / {@code @PrimaryKey} 注解、数据库类型不支持、
+ * 反射访问字段失败、类型转换错误、SQL 注入检查失败、参数索引重复等。
  * </p>
  *
  * @since 1.0.0
  * @author tanqimin
  */
-public class DBException extends DataAccessException {
+public class InvalidDataAccessException extends DataAccessException {
 
   /**
    * 构造一个不带详细消息和原因的新异常。
    */
-  public DBException() {}
+  public InvalidDataAccessException() {}
 
   /**
    * 构造一个带格式化消息的新异常。
@@ -24,7 +23,7 @@ public class DBException extends DataAccessException {
    * @param message 异常消息模板，包含 {@link String#format(String, Object...)} 占位符
    * @param params  消息模板参数
    */
-  public DBException(String message, Object... params) {
+  public InvalidDataAccessException(String message, Object... params) {
     super(String.format(message, params));
   }
 
@@ -35,7 +34,7 @@ public class DBException extends DataAccessException {
    * @param message 异常消息模板，包含 {@link String#format(String, Object...)} 占位符
    * @param params  消息模板参数
    */
-  public DBException(Throwable cause, String message, Object... params) {
+  public InvalidDataAccessException(Throwable cause, String message, Object... params) {
     super(String.format(message, params), cause);
   }
 
@@ -44,7 +43,7 @@ public class DBException extends DataAccessException {
    *
    * @param cause 导致此异常的原因
    */
-  public DBException(Throwable cause) {
+  public InvalidDataAccessException(Throwable cause) {
     super(cause);
   }
 }

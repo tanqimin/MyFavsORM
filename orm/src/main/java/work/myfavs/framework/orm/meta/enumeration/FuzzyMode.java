@@ -3,7 +3,7 @@ package work.myfavs.framework.orm.meta.enumeration;
 import work.myfavs.framework.orm.meta.clause.Cond;
 
 /**
- * 模糊查询模式，在 {@link Cond#like(String, Object, FuzzyMode)} )}
+ * 模糊查询模式，用于 {@link Cond#like(String, Object, FuzzyMode)} 指定通配符匹配方式。
  */
 public enum FuzzyMode {
   /**

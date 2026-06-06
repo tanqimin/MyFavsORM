@@ -3,7 +3,7 @@ package work.myfavs.framework.orm.orm;
 import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.orm.impl.*;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 /**
  * ORM 工厂类
@@ -32,7 +32,7 @@ public class OrmFactory {
       case DbType.H2:
         return new H2Orm(database);
       default:
-        throw new DBException("暂时不支持 %s 数据库.", dbType);
+        throw new InvalidDataAccessException("暂时不支持 %s 数据库.", dbType);
     }
   }
 }

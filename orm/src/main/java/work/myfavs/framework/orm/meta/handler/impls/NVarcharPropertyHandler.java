@@ -24,13 +24,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
+/**
+ * {@code NVarchar} 类型的属性处理器.
+ * <p>处理 Java {@code NVarchar} 类型与 JDBC {@code NVARCHAR} 类型之间的相互转换.</p>
+ */
 public class NVarcharPropertyHandler extends PropertyHandler<NVarchar> {
 
-
+  /**
+   * 构造 {@code NVarcharPropertyHandler} 实例.
+   */
   public NVarcharPropertyHandler() {
 
   }
 
+  /**
+   * 从 ResultSet 中读取值并转换为 {@code NVarchar}.
+   *
+   * @param rs          ResultSet
+   * @param columnIndex 字段索引
+   * @param clazz       目标类型
+   * @return NVarchar 对象
+   * @throws SQLException SQLException
+   */
   @Override
   public NVarchar convert(ResultSet rs, int columnIndex, Class<NVarchar> clazz) throws SQLException {
 
@@ -42,12 +57,25 @@ public class NVarcharPropertyHandler extends PropertyHandler<NVarchar> {
     return new NVarchar(val.toString());
   }
 
+  /**
+   * 将 {@code NVarchar} 参数添加到 PreparedStatement.
+   *
+   * @param ps         PreparedStatement
+   * @param paramIndex 参数索引
+   * @param param      参数值
+   * @throws SQLException SQLException
+   */
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, NVarchar param) throws SQLException {
 
     ps.setNString(paramIndex, param.toString());
   }
 
+  /**
+   * 获取 SQL 类型代码.
+   *
+   * @return {@code Types.NVARCHAR}
+   */
   @Override
   public int getSqlType() {
 

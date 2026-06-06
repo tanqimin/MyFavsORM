@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.util.lang;
 
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 import java.io.Serializable;
 
@@ -95,7 +95,7 @@ public class Snowflake implements Serializable {
 
   private static long checkBetween(long value, long min, long max) {
     if (value > min && value < max) return value;
-    throw new DBException("值必须在 %d 和 %d 的范围内. ", min, max);
+    throw new InvalidDataAccessException("值必须在 %d 和 %d 的范围内. ", min, max);
   }
 
   /**

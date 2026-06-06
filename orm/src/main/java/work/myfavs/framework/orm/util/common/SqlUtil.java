@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.util.common;
 
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 /**
  * SQL 工具类，提供 SQL 注入检查和空白字符修剪功能
@@ -17,7 +17,7 @@ public class SqlUtil {
    */
   public static String checkInjection(String sql) {
     if (StringUtil.isNotEmpty(sql) && !sql.matches(SQL_PATTERN)) {
-      throw new DBException("参数 %s 中的内容存在注入风险, 请检查!", sql);
+      throw new InvalidDataAccessException("参数 %s 中的内容存在注入风险, 请检查!", sql);
     }
 
     return sql;

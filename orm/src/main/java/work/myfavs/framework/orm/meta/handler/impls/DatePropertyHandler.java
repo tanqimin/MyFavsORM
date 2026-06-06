@@ -7,7 +7,8 @@ import java.sql.Types;
 import java.util.Date;
 
 /**
- * Created by tanqimin on 2016/1/29.
+ * {@link java.util.Date} 类型的属性处理器.
+ * <p>用于处理 Java {@link java.util.Date} 类型与数据库 {@code TIMESTAMP} 类型之间的相互转换.</p>
  */
 public class DatePropertyHandler extends AbstractDatePropertyHandler<Date> {
 
@@ -16,6 +17,14 @@ public class DatePropertyHandler extends AbstractDatePropertyHandler<Date> {
     return new Date(millisecond);
   }
 
+  /**
+   * 设置 PreparedStatement 参数, 支持毫秒时间戳和 {@link Timestamp} 两种模式.
+   *
+   * @param ps         PreparedStatement
+   * @param paramIndex 参数索引
+   * @param param      参数值
+   * @throws SQLException SQL 异常
+   */
   @Override
   public void addParameter(PreparedStatement ps, int paramIndex, Date param) throws SQLException {
 
@@ -33,6 +42,11 @@ public class DatePropertyHandler extends AbstractDatePropertyHandler<Date> {
 
   }
 
+  /**
+   * 获取 SQL 类型.
+   *
+   * @return {@link Types#TIMESTAMP}
+   */
   @Override
   public int getSqlType() {
 

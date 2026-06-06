@@ -4,7 +4,7 @@ import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.orm.Orm;
 import work.myfavs.framework.orm.orm.OrmFactory;
 import work.myfavs.framework.orm.util.common.StringUtil;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.ConnectionException;
 import work.myfavs.framework.orm.util.func.ThrowingConsumer;
 import work.myfavs.framework.orm.util.func.ThrowingFunction;
 
@@ -144,13 +144,13 @@ public class Database implements Closeable {
    * 设置保存点（无名称）
    *
    * @return {@link Savepoint}
-   * @throws DBException 设置保存点时发生异常
+   * @throws ConnectionException 设置保存点时发生异常
    */
   public Savepoint setSavepoint() {
     try {
       return getConnection().setSavepoint();
     } catch (SQLException e) {
-      throw new DBException(e, "设置 Savepoint 时发生异常: %s", e.getMessage());
+      throw new ConnectionException(e, "设置 Savepoint 时发生异常: %s", e.getMessage());
     }
   }
 
@@ -159,20 +159,20 @@ public class Database implements Closeable {
    *
    * @param name 保存点名称
    * @return {@link Savepoint}
-   * @throws DBException 设置保存点时发生异常
+   * @throws ConnectionException 设置保存点时发生异常
    */
   public Savepoint setSavepoint(String name) {
     try {
       return getConnection().setSavepoint(name);
     } catch (SQLException e) {
-      throw new DBException(e, "设置 Savepoint 时发生异常: %s", e.getMessage());
+      throw new ConnectionException(e, "设置 Savepoint 时发生异常: %s", e.getMessage());
     }
   }
 
   /**
    * 回滚事务
    *
-   * @throws DBException 回滚事务时发生异常
+   * @throws ConnectionException 回滚事务时发生异常
    */
   public void rollback() {
     rollback(null);
@@ -182,7 +182,7 @@ public class Database implements Closeable {
    * 回滚事务到指定保存点
    *
    * @param savepoint {@link Savepoint}，为 {@code null} 时回滚整个事务
-   * @throws DBException 回滚事务时发生异常
+   * @throws ConnectionException 回滚事务时发生异常
    */
   public void rollback(Savepoint savepoint) {
     try {
@@ -193,14 +193,14 @@ public class Database implements Closeable {
       getConnection().rollback(savepoint);
 
     } catch (SQLException e) {
-      throw new DBException(e, "回滚事务时发生异常: %s", e.getMessage());
+      throw new ConnectionException(e, "回滚事务时发生异常: %s", e.getMessage());
     }
   }
 
   /**
    * 提交事务
    *
-   * @throws DBException 提交事务时发生异常
+   * @throws ConnectionException 提交事务时发生异常
    */
   public void commit() {
 
@@ -219,7 +219,7 @@ public class Database implements Closeable {
 
       connection.commit();
     } catch (SQLException e) {
-      throw new DBException(e, "提交事务时发生异常: %s", e.getMessage());
+      throw new ConnectionException(e, "提交事务时发生异常: %s", e.getMessage());
     }
   }
 
@@ -252,7 +252,7 @@ public class Database implements Closeable {
       return result;
     } catch (SQLException e) {
       this.rollback();
-      throw new DBException(e, "执行事务过程中发生异常: %s", e.getMessage());
+      throw new ConnectionException(e, "执行事务过程中发生异常: %s", e.getMessage());
     } finally {
       callback.run();
     }
@@ -282,7 +282,7 @@ public class Database implements Closeable {
       database.commit();
     } catch (SQLException e) {
       this.rollback();
-      throw new DBException(e, "执行事务过程中发生异常: %s", e.getMessage());
+      throw new ConnectionException(e, "执行事务过程中发生异常: %s", e.getMessage());
     } finally {
       callback.run();
     }

@@ -20,15 +20,32 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
+/**
+ * {@code Integer} 类型的属性处理器.
+ * <p>用于处理 Java {@link Integer} 类型与数据库 {@code INTEGER} 类型之间的相互转换.</p>
+ */
 public class IntegerPropertyHandler extends NumberPropertyHandler<Integer> {
 
+  /**
+   * 构造 IntegerPropertyHandler.
+   */
   public IntegerPropertyHandler() {
   }
 
+  /**
+   * 构造 IntegerPropertyHandler, 指定是否为原始类型.
+   *
+   * @param isPrimitive 是否为原始类型 {@code int}
+   */
   public IntegerPropertyHandler(boolean isPrimitive) {
     super(isPrimitive);
   }
 
+  /**
+   * 获取 SQL 类型.
+   *
+   * @return {@link Types#INTEGER}
+   */
   @Override
   public int getSqlType() {
     return Types.INTEGER;

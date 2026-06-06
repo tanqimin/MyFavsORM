@@ -20,11 +20,23 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
+/**
+ * {@code Float} 类型的属性处理器.
+ * <p>用于处理 Java {@link Float} 类型与数据库 {@code FLOAT} 类型之间的相互转换.</p>
+ */
 public class FloatPropertyHandler extends NumberPropertyHandler<Float> {
 
+  /**
+   * 构造 FloatPropertyHandler.
+   */
   public FloatPropertyHandler() {
   }
 
+  /**
+   * 构造 FloatPropertyHandler, 指定是否为原始类型.
+   *
+   * @param isPrimitive 是否为原始类型 {@code float}
+   */
   public FloatPropertyHandler(boolean isPrimitive) {
     super(isPrimitive);
   }
@@ -44,6 +56,11 @@ public class FloatPropertyHandler extends NumberPropertyHandler<Float> {
     ps.setFloat(paramIndex, param);
   }
 
+  /**
+   * 获取 SQL 类型.
+   *
+   * @return {@link Types#FLOAT}
+   */
   @Override
   public int getSqlType() {
     return Types.FLOAT;

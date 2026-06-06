@@ -1,6 +1,6 @@
 package work.myfavs.framework.orm.meta.schema;
 
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 /**
  * 元数据构建
@@ -31,6 +31,6 @@ public class Metadata {
     ClassMeta classMeta = classMeta(clazz);
     if (classMeta.isEntity())
       return classMeta;
-    throw new DBException("类型 %s 不是实体类, 实体类必须使用 @Table 注释. ", clazz.getName());
+    throw new InvalidDataAccessException("类型 %s 不是实体类, 实体类必须使用 @Table 注释. ", clazz.getName());
   }
 }

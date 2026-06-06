@@ -7,7 +7,7 @@ import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.util.JdbcConstants;
-import work.myfavs.framework.orm.util.exception.DBException;
+import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class DruidUtil {
       case work.myfavs.framework.orm.meta.DbType.H2:
         return JdbcConstants.H2;
       default:
-        throw new DBException("不支持的数据库类型: %s", dbType);
+        throw new InvalidDataAccessException("不支持的数据库类型: %s", dbType);
     }
   }
 
@@ -63,9 +63,9 @@ public class DruidUtil {
    */
   public static SQLSelectStatement createSQLSelectStatement(DbType dbType, String sql) {
     List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, dbType);
-    if (stmtList.size() != 1) throw new DBException("不支持的Sql语句: %s", sql);
+    if (stmtList.size() != 1) throw new InvalidDataAccessException("不支持的Sql语句: %s", sql);
     SQLStatement stmt = stmtList.get(0);
-    if (!(stmt instanceof SQLSelectStatement)) throw new DBException("不支持的Sql语句: %s", sql);
+    if (!(stmt instanceof SQLSelectStatement)) throw new InvalidDataAccessException("不支持的Sql语句: %s", sql);
     return (SQLSelectStatement) stmt;
   }
 
