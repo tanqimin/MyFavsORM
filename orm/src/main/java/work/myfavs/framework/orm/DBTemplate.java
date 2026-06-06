@@ -128,6 +128,11 @@ public class DBTemplate {
     return dbConfig;
   }
 
+  /**
+   * 获取主键生成器
+   *
+   * @return 主键生成器
+   */
   public PKGenerator getPkGenerator() {
     return pkGenerator;
   }
@@ -157,6 +162,9 @@ public class DBTemplate {
     return new Database(this);
   }
 
+  /**
+   * {@link DBTemplate} 构建器
+   */
   public static class Builder {
 
     private final String     dsName;
@@ -164,22 +172,42 @@ public class DBTemplate {
     private       DBConfig   config;
     public final  Mapper     mapper = new Mapper();
 
+    /**
+     * 构造方法，使用默认数据源名称
+     */
     public Builder() {
       this(DBConfig.DEFAULT_DATASOURCE_NAME);
     }
 
+    /**
+     * 构造方法
+     *
+     * @param dsName 数据源名称
+     */
     public Builder(String dsName) {
       this.dsName = dsName;
     }
 
     private Class<? extends ConnFactory> connectionFactory = JdbcConnFactory.class;
 
+    /**
+     * 设置数据源
+     *
+     * @param dataSource 数据源
+     * @return {@link Builder}
+     */
     public Builder dataSource(DataSource dataSource) {
 
       this.dataSource = dataSource;
       return this;
     }
 
+    /**
+     * 设置数据库配置
+     *
+     * @param consumer {@link Consumer} 配置消费者
+     * @return {@link Builder}
+     */
     public Builder config(Consumer<DBConfig> consumer) {
 
       config = new DBConfig();
@@ -187,18 +215,35 @@ public class DBTemplate {
       return this;
     }
 
+    /**
+     * 设置连接工厂类型
+     *
+     * @param connectionFactory 连接工厂类型
+     * @return {@link Builder}
+     */
     public Builder connectionFactory(Class<? extends ConnFactory> connectionFactory) {
 
       this.connectionFactory = connectionFactory;
       return this;
     }
 
+    /**
+     * 设置属性映射
+     *
+     * @param consumer {@link Consumer} 映射消费者
+     * @return {@link Builder}
+     */
     public Builder mapping(Consumer<Mapper> consumer) {
 
       consumer.accept(mapper);
       return this;
     }
 
+    /**
+     * 构建 {@link DBTemplate} 实例
+     *
+     * @return {@link DBTemplate}
+     */
     public DBTemplate build() {
 
       Objects.requireNonNull(this.dataSource, "DataSource is required.");
@@ -211,6 +256,9 @@ public class DBTemplate {
     }
   }
 
+  /**
+   * 属性处理器映射
+   */
   public static class Mapper {
 
     private final Map<Class<?>, PropertyHandler> map;
@@ -220,6 +268,13 @@ public class DBTemplate {
       map = new HashMap<>();
     }
 
+    /**
+     * 注册 {@link PropertyHandler}
+     *
+     * @param clazz           实体属性类型
+     * @param propertyHandler {@link PropertyHandler}
+     * @return {@link Mapper}
+     */
     public Mapper register(Class<?> clazz, PropertyHandler propertyHandler) {
 
       map.put(clazz, propertyHandler);

@@ -110,13 +110,8 @@
 
     <dependency>
       <groupId>work.myfavs.framework</groupId>
-      <artifactId>orm-spring-starter</artifactId>
+      <artifactId>orm-spring-boot2-starter</artifactId>
       <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
     </dependency>
 
     <dependency>

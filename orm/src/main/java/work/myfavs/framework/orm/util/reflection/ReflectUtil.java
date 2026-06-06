@@ -40,6 +40,13 @@ public class ReflectUtil {
     return fields;
   }
 
+  /**
+   * 获取指定类中指定名称的字段，包括继承的字段.
+   *
+   * @param clazz     类型
+   * @param fieldName 字段名称
+   * @return {@link Field} 对象，未找到时返回 null
+   */
   public static Field getField(Class<?> clazz, String fieldName) {
     while (clazz != null) {
       try {
@@ -53,6 +60,15 @@ public class ReflectUtil {
     return null;
   }
 
+  /**
+   * 获取实体对象中指定字段的值.
+   *
+   * @param field  字段对象
+   * @param entity 实体对象
+   * @param <T>    字段值的类型
+   * @return 字段值
+   * @throws DBException 获取字段值失败时抛出
+   */
   @SuppressWarnings("unchecked")
   public static <T> T getFieldValue(Field field, Object entity) {
     try {
@@ -65,6 +81,14 @@ public class ReflectUtil {
     }
   }
 
+  /**
+   * 为实体对象中指定字段设置值.
+   *
+   * @param field  字段对象
+   * @param entity 实体对象
+   * @param value  要设置的值
+   * @throws DBException 设置字段值失败时抛出
+   */
   public static void setFieldValue(Field field, Object entity, Object value) {
     if (null == value && field.getType().isPrimitive()) {
       return; // 基础类型不能设置null值
@@ -81,6 +105,13 @@ public class ReflectUtil {
     }
   }
 
+  /**
+   * 获取父类泛型参数的实际类型.
+   *
+   * @param clazz 类型
+   * @param <T>   泛型参数的类型
+   * @return 泛型参数的实际类型
+   */
   @SuppressWarnings("unchecked")
   public static <T> Class<T> getGenericActualTypeArguments(Class<?> clazz) {
     return (Class<T>)
@@ -88,6 +119,14 @@ public class ReflectUtil {
             .getActualTypeArguments()[0];
   }
 
+  /**
+   * 获取指定类型的构造方法.
+   *
+   * @param clazz          类型
+   * @param parameterTypes 参数类型列表
+   * @return {@link Constructor} 对象
+   * @throws DBException 获取构造方法失败时抛出
+   */
   public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... parameterTypes) {
     Objects.requireNonNull(clazz);
     try {
@@ -97,6 +136,15 @@ public class ReflectUtil {
     }
   }
 
+  /**
+   * 创建指定类型的实例.
+   *
+   * @param clazz  类型
+   * @param params 构造方法参数
+   * @param <T>    类型泛型
+   * @return 类型实例
+   * @throws DBException 创建实例失败时抛出
+   */
   @SuppressWarnings("unchecked")
   public static <T> T newInstance(Class<T> clazz, Object... params) {
 
@@ -109,6 +157,12 @@ public class ReflectUtil {
     }
   }
 
+  /**
+   * 获取对象数组中每个对象的 {@link Class}.
+   *
+   * @param objects 对象数组
+   * @return {@link Class} 数组
+   */
   public static Class<?>[] getClasses(Object... objects) {
     Class<?>[] classes = new Class<?>[objects.length];
     Object     obj;

@@ -10,14 +10,17 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import work.myfavs.framework.sb2.demo.util.tenant.DynamicDataSourceContextHolder;
 import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.sb2.demo.util.tenant.DynamicDataSourceContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Component
 @Aspect
 @Order(1)
+/**
+ * 数据源切面，根据请求头 {@code tenant-name} 动态切换数据源.
+ */
 public class DataSourceAspect {
 
   private static final Logger logger = LoggerFactory.getLogger(DataSourceAspect.class);
@@ -25,6 +28,11 @@ public class DataSourceAspect {
   @Pointcut("@annotation(org.springframework.web.bind.annotation.RequestMapping)")
   private void cutController() {}
 
+  /**
+   * 在控制器方法执行前设置数据源.
+   *
+   * @param joinPoint 连接点
+   */
   @Before("cutController()")
   public void before(JoinPoint joinPoint) {
     ServletRequestAttributes attributes =

@@ -16,14 +16,29 @@ import java.util.Map;
 public abstract class BaseRepository extends SimpleRepository {
 
 
+  /**
+   * 构造方法.
+   *
+   * @param dbTemplate {@link DBTemplate} 实例
+   */
   public BaseRepository(DBTemplate dbTemplate) {
     super(dbTemplate);
   }
 
+  /**
+   * 设置 {@link DBTemplate}.
+   *
+   * @param dbTemplate {@link DBTemplate} 实例
+   */
   public void setDbTemplate(DBTemplate dbTemplate) {
     this.dbTemplate = dbTemplate;
   }
 
+  /**
+   * 根据数据源名称设置 {@link DBTemplate}.
+   *
+   * @param dsName 数据源名称
+   */
   public void setDbTemplate(String dsName) {
     this.dbTemplate = DBTemplate.get(dsName);
   }

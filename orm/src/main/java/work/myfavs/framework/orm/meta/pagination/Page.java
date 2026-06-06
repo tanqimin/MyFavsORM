@@ -1,8 +1,5 @@
 package work.myfavs.framework.orm.meta.pagination;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.List;
 import java.util.function.Function;
 
@@ -12,12 +9,46 @@ import java.util.function.Function;
  * @param <TModel> 简单分页对象泛型
  * @author tanqimin
  */
-@Getter
-@Setter
 public class Page<TModel> extends PageBase<TModel> {
 
   private long totalPages = 1L;
   private long totalRecords;
+
+  /**
+   * 获取总页数
+   *
+   * @return 总页数
+   */
+  public long getTotalPages() {
+    return totalPages;
+  }
+
+  /**
+   * 设置总页数
+   *
+   * @param totalPages 总页数
+   */
+  public void setTotalPages(long totalPages) {
+    this.totalPages = totalPages;
+  }
+
+  /**
+   * 获取总记录数
+   *
+   * @return 总记录数
+   */
+  public long getTotalRecords() {
+    return totalRecords;
+  }
+
+  /**
+   * 设置总记录数
+   *
+   * @param totalRecords 总记录数
+   */
+  public void setTotalRecords(long totalRecords) {
+    this.totalRecords = totalRecords;
+  }
 
   /**
    * 转换分页对象数据

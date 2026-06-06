@@ -23,15 +23,34 @@ public class OracleOrm extends AbstractOrm {
   private static final String OUTER_TABLE_ALIAS = "_paginate";
   private static final String COL_ROW_NUM       = "_rn";
 
+  /**
+   * 构造 OracleOrm 实例.
+   *
+   * @param database {@link Database} 实例
+   */
   public OracleOrm(Database database) {
     super(database);
   }
 
+  /**
+   * 获取数据库类型.
+   *
+   * @return 数据库类型 {@link DbType#ORACLE}
+   */
   @Override
   protected String dbType() {
     return DbType.ORACLE;
   }
 
+  /**
+   * 生成 Oracle 分页查询 {@link Sql}，使用 {@code ROWNUM} 实现.
+   *
+   * @param sql         原始 SQL
+   * @param params      SQL 参数集合
+   * @param currentPage 当前页码
+   * @param pageSize    每页大小
+   * @return 分页查询 {@link Sql}
+   */
   @Override
   protected Sql selectPage(String sql, Collection<?> params, int currentPage, int pageSize) {
     int    offset   = pageSize * (currentPage - 1);

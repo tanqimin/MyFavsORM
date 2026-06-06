@@ -1,14 +1,17 @@
 package work.myfavs.framework.sb2.demo.domain.entity;
 
-import work.myfavs.framework.sb2.demo.domain.enums.UserTypeEnum;
 import work.myfavs.framework.orm.meta.annotation.Column;
 import work.myfavs.framework.orm.meta.annotation.PrimaryKey;
 import work.myfavs.framework.orm.meta.annotation.Table;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.util.lang.NVarchar;
+import work.myfavs.framework.sb2.demo.domain.enums.UserTypeEnum;
 
 import java.util.Date;
 
+/**
+ * 用户实体，映射 {@code tb_user} 表，使用雪花算法主键生成策略.
+ */
 @Table(value = "tb_user", strategy = GenerationType.SNOW_FLAKE)
 public class User {
   @Column

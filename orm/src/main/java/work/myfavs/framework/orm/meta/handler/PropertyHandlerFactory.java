@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * {@link PropertyHandler} 工厂类，负责注册和管理属性处理器实例
+ */
 public class PropertyHandlerFactory {
 
   private static final Map<String, PropertyHandler<?>> HANDLER_MAP             = new HashMap<>();
@@ -62,8 +65,8 @@ public class PropertyHandlerFactory {
   /**
    * 注册解析器类型
    *
-   * @param clazz           Class
-   * @param propertyHandler PropertyHandler
+   * @param clazz           目标类型
+   * @param propertyHandler 属性处理器实例
    */
   @SuppressWarnings("rawtypes")
   public static void register(Class<?> clazz, PropertyHandler propertyHandler) {
@@ -71,6 +74,13 @@ public class PropertyHandlerFactory {
     HANDLER_MAP.put(clazz.getName(), propertyHandler);
   }
 
+  /**
+   * 获取指定 {@link Class} 对应的 {@link PropertyHandler} 实例
+   * <p>如果未注册，枚举类型返回 {@link EnumPropertyHandler}，其他类型返回 {@link ObjectPropertyHandler}</p>
+   *
+   * @param clazz 目标类型
+   * @return {@link PropertyHandler} 实例
+   */
   @SuppressWarnings("rawtypes")
   public static PropertyHandler getInstance(Class<?> clazz) {
 

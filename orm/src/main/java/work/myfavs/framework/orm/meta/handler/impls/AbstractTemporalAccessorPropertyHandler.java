@@ -1,23 +1,27 @@
 package work.myfavs.framework.orm.meta.handler.impls;
 
-import lombok.RequiredArgsConstructor;
 import work.myfavs.framework.orm.meta.handler.PropertyHandler;
 import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.exception.DBException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
-@RequiredArgsConstructor
 public abstract class AbstractTemporalAccessorPropertyHandler<T extends TemporalAccessor> extends PropertyHandler<T> {
 
   protected final boolean usingEpochMilli;
 
   public AbstractTemporalAccessorPropertyHandler() {
     this.usingEpochMilli = false;
+  }
+
+  public AbstractTemporalAccessorPropertyHandler(boolean usingEpochMilli) {
+    this.usingEpochMilli = usingEpochMilli;
   }
 
   @Override

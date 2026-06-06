@@ -7,10 +7,18 @@ public final class NText extends Unicode {
 
   public static final String NTEXT = "NTEXT";
 
+  /**
+   * 构造 NText 实例.
+   */
   public NText() {
     this.sqlType = NTEXT;
   }
 
+  /**
+   * 构造 NText 实例.
+   *
+   * @param content 字符串内容
+   */
   public NText(String content) {
     super(content, NTEXT);
   }

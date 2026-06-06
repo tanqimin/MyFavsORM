@@ -7,10 +7,18 @@ public final class NVarchar extends Unicode {
 
   public static final String NVARCHAR = "NVARCHAR";
 
+  /**
+   * 构造 NVarchar 实例.
+   */
   public NVarchar() {
     this.sqlType = NVARCHAR;
   }
 
+  /**
+   * 构造 NVarchar 实例.
+   *
+   * @param content 字符串内容
+   */
   public NVarchar(String content) {
     super(content, NVARCHAR);
   }

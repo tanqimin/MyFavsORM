@@ -11,27 +11,45 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import work.myfavs.framework.orm.util.lang.NVarchar;
 import work.myfavs.framework.sb2.demo.config.serializer.fastjson.NVarcharObjectDeserializer;
 import work.myfavs.framework.sb2.demo.config.serializer.fastjson.NVarcharObjectSerializer;
-import work.myfavs.framework.orm.util.lang.NVarchar;
 
 import java.util.List;
 
 @Configuration
+/**
+ * Spring MVC 配置，包括资源处理、内容协商、跨域和消息转换器.
+ */
 public class WebConfigurer implements WebMvcConfigurer {
 
+  /**
+   * 添加静态资源处理器.
+   *
+   * @param registry 资源处理器注册表
+   */
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
     registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
   }
 
+  /**
+   * 配置内容协商，默认返回 JSON 格式.
+   *
+   * @param configurer 内容协商配置器
+   */
   @Override
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 
     configurer.defaultContentType(MediaType.APPLICATION_JSON).favorParameter(true);
   }
 
+  /**
+   * 配置跨域访问.
+   *
+   * @param registry 跨域注册表
+   */
   @Override
   public void addCorsMappings(CorsRegistry registry) {
 
@@ -39,9 +57,9 @@ public class WebConfigurer implements WebMvcConfigurer {
   }
 
   /**
-   * 使用 Fastjson 需定义以下方法，使用 JSON 不用
+   * 配置消息转换器，使用 Fastjson 替换 Jackson.
    *
-   * @param converters
+   * @param converters HTTP 消息转换器列表
    */
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {

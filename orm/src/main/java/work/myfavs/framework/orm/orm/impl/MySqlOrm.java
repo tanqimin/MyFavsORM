@@ -16,15 +16,34 @@ import java.util.Collection;
  * Orm MySql实现
  */
 public class MySqlOrm extends AbstractOrm {
+  /**
+   * 构造 MySqlOrm 实例.
+   *
+   * @param database {@link Database} 实例
+   */
   public MySqlOrm(Database database) {
     super(database);
   }
 
+  /**
+   * 获取数据库类型.
+   *
+   * @return 数据库类型 {@link DbType#MYSQL}
+   */
   @Override
   protected String dbType() {
     return DbType.MYSQL;
   }
 
+  /**
+   * 生成 MySQL 分页查询 {@link Sql}.
+   *
+   * @param sql         原始 SQL
+   * @param params      SQL 参数集合
+   * @param currentPage 当前页码
+   * @param pageSize    每页大小
+   * @return 分页查询 {@link Sql}
+   */
   @Override
   protected Sql selectPage(String sql, Collection<?> params, int currentPage, int pageSize) {
     int    offset   = pageSize * (currentPage - 1);

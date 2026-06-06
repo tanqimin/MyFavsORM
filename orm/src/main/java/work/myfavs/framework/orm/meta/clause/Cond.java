@@ -1,7 +1,6 @@
 package work.myfavs.framework.orm.meta.clause;
 
 
-import lombok.NonNull;
 import work.myfavs.framework.orm.meta.annotation.Criterion;
 import work.myfavs.framework.orm.meta.enumeration.FuzzyMode;
 import work.myfavs.framework.orm.meta.enumeration.Operator;
@@ -25,16 +24,16 @@ public class Cond extends Clause {
 
   private Cond() {}
 
-  private Cond(@NonNull CharSequence sql) {
-    super(sql);
+  private Cond(CharSequence sql) {
+    super(Objects.requireNonNull(sql, "sql is marked non-null but is null"));
   }
 
-  private Cond(@NonNull CharSequence sql, Object param) {
-    super(sql, param);
+  private Cond(CharSequence sql, Object param) {
+    super(Objects.requireNonNull(sql, "sql is marked non-null but is null"), param);
   }
 
-  private Cond(@NonNull CharSequence sql, Collection<?> params) {
-    super(sql, params);
+  private Cond(CharSequence sql, Collection<?> params) {
+    super(Objects.requireNonNull(sql, "sql is marked non-null but is null"), params);
   }
 
   private static Cond create() {

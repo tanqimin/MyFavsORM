@@ -12,6 +12,11 @@ public abstract class ConnFactory {
 
   protected final DataSource dataSource;
 
+  /**
+   * 构造方法
+   *
+   * @param dataSource 数据源
+   */
   public ConnFactory(DataSource dataSource) {
 
     this.dataSource = dataSource;

@@ -22,6 +22,11 @@ public abstract class SortableCriteria implements ISortable {
     return orderBy;
   }
 
+  /**
+   * 设置排序条件集合
+   *
+   * @param orderBy 排序条件集合
+   */
   public void setOrderBy(List<Order> orderBy) {
     this.orderBy = orderBy;
   }

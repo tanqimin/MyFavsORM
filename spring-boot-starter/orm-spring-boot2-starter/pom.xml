@@ -26,13 +26,6 @@
       <scope>compile</scope>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <optional>true</optional>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
     <dependency>
       <groupId>org.springframework</groupId>

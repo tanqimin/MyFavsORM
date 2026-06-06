@@ -1,8 +1,5 @@
 package work.myfavs.framework.orm.meta.pagination;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.List;
 import java.util.function.Function;
 
@@ -11,11 +8,27 @@ import java.util.function.Function;
  *
  * @param <TModel> 简单分页对象泛型
  */
-@Getter
-@Setter
 public class PageLite<TModel> extends PageBase<TModel> {
 
   private boolean hasNext;
+
+  /**
+   * 是否还有下一页数据
+   *
+   * @return 有下一页返回 {@code true}
+   */
+  public boolean isHasNext() {
+    return hasNext;
+  }
+
+  /**
+   * 设置是否有下一页数据
+   *
+   * @param hasNext 是否有下一页
+   */
+  public void setHasNext(boolean hasNext) {
+    this.hasNext = hasNext;
+  }
 
   /**
    * 转换简单分页对象数据

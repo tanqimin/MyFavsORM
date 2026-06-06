@@ -1,8 +1,9 @@
 package work.myfavs.framework.orm;
 
-import java.sql.Connection;
-import javax.sql.DataSource;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
 
 /**
  * Spring 连接工厂
@@ -11,6 +12,11 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
  */
 public class SpringConnFactory extends JdbcConnFactory {
 
+  /**
+   * 构造方法.
+   *
+   * @param dataSource {@link DataSource} 实例
+   */
   public SpringConnFactory(DataSource dataSource) {
 
     super(dataSource);

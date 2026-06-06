@@ -1,13 +1,12 @@
 package ${package};
 
 import java.io.Serializable;
-import lombok.Data;
 import java.util.Objects;
 <% for(imp in imports){ %>
   <% for(col in columns){ %>
     <% if(imp == col.typeDefinition.name) {%>
 import ${imp};
-    <% break;} %>
+  <% break;} %>
   <% } %>
 <% } %>
 import work.myfavs.framework.orm.meta.annotation.Column;
@@ -19,7 +18,6 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
  * ${class} 实体类
  * PS: 此文件通过代码生成器生成，修改此文件会有被覆盖的风险
  */
-@Data
 @Table(value = ${class}.META.TABLE, strategy = ${generationType})
 public class ${class}
     implements Serializable {
@@ -39,6 +37,17 @@ public class ${class}
   private ${col.typeDefinition.valueType} ${col.fieldName} = ${col.typeDefinition.defValue};
   <% } %>
 <% } %>
+<% } %>
+
+<% for(col in columns){ %>
+  public ${col.typeDefinition.simpleName} get${col.fieldName?cap_first}() {
+    return ${col.fieldName};
+  }
+
+  public void set${col.fieldName?cap_first}(${col.typeDefinition.simpleName} ${col.fieldName}) {
+    this.${col.fieldName} = ${col.fieldName};
+  }
+
 <% } %>
 
   /**

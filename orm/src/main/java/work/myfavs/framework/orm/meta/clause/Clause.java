@@ -1,8 +1,5 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.common.StringUtil;
@@ -11,33 +8,46 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * SQL 语句基类
  */
 public abstract class Clause implements Serializable {
 
-  @Getter
-  @Setter
   protected StringBuilder sql = new StringBuilder();
 
-  @Getter
   protected final List<Object> params = new ArrayList<>();
+
+  public StringBuilder getSql() {
+    return sql;
+  }
+
+  public void setSql(StringBuilder sql) {
+    this.sql = sql;
+  }
+
+  public List<Object> getParams() {
+    return params;
+  }
 
   public Clause() {
   }
 
-  public Clause(@NonNull CharSequence sql) {
+  public Clause(CharSequence sql) {
+    Objects.requireNonNull(sql, "sql is marked non-null but is null");
     this.sql.append(sql);
   }
 
-  public Clause(@NonNull CharSequence sql, Object param) {
-    this(sql);
+  public Clause(CharSequence sql, Object param) {
+    Objects.requireNonNull(sql, "sql is marked non-null but is null");
+    this.sql.append(sql);
     this.param(param);
   }
 
-  public Clause(@NonNull CharSequence sql, Collection<?> params) {
-    this(sql);
+  public Clause(CharSequence sql, Collection<?> params) {
+    Objects.requireNonNull(sql, "sql is marked non-null but is null");
+    this.sql.append(sql);
     this.params(params);
   }
   // endregion

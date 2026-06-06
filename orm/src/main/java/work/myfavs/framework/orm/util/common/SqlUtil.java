@@ -2,6 +2,9 @@ package work.myfavs.framework.orm.util.common;
 
 import work.myfavs.framework.orm.util.exception.DBException;
 
+/**
+ * SQL 工具类，提供 SQL 注入检查和空白字符修剪功能
+ */
 public class SqlUtil {
   @SuppressWarnings("RegExpRedundantEscape")
   private static final String SQL_PATTERN = "[\\w\\p{IsIdeographic}\\ \\,\\.]+";
@@ -20,6 +23,12 @@ public class SqlUtil {
     return sql;
   }
 
+  /**
+   * 去除字符串左侧的空白字符
+   *
+   * @param word 待处理的字符串序列
+   * @return 去除左侧空白后的字符串，若输入为 {@code null} 则返回 {@code null}
+   */
   public static String lTrim(CharSequence word) {
     if (null == word)
       return null;
@@ -30,6 +39,12 @@ public class SqlUtil {
     return res.toString();
   }
 
+  /**
+   * 去除字符串右侧的空白字符
+   *
+   * @param word 待处理的字符串序列
+   * @return 去除右侧空白后的字符串，若输入为 {@code null} 则返回 {@code null}
+   */
   public static String rTrim(CharSequence word) {
     if (null == word)
       return null;

@@ -135,6 +135,7 @@ public class Repository<TModel> extends Query {
   /**
    * 根据SQL查询实体集合
    *
+   * @param <TKey>  map 键类型泛型
    * @param sql    SQL
    * @param params 参数
    * @return Map，Key为主键值， Value为实体对象
@@ -147,6 +148,7 @@ public class Repository<TModel> extends Query {
   /**
    * 根据SQL查询实体集合
    *
+   * @param <TKey>  map 键类型泛型
    * @param sql SQL
    * @return Map，Key为主键值， Value为实体对象
    */

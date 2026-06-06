@@ -21,6 +21,11 @@ public class JdbcConnFactory extends ConnFactory {
     super(dataSource);
   }
 
+  /**
+   * 打开数据库连接
+   *
+   * @return 数据库连接
+   */
   @Override
   public Connection openConnection() {
 
@@ -36,12 +41,22 @@ public class JdbcConnFactory extends ConnFactory {
     return connection;
   }
 
+  /**
+   * 获取当前数据库连接
+   *
+   * @return 数据库连接
+   */
   @Override
   public Connection getCurrentConnection() {
 
     return connectionHolder.get();
   }
 
+  /**
+   * 关闭数据库连接
+   *
+   * @param connection 数据库连接
+   */
   @Override
   public void closeConnection(Connection connection) {
     final Integer connDeep = connectionDeepHolder.get();

@@ -70,14 +70,36 @@ public class StringUtil {
         || c == '\u180e';
   }
 
+  /**
+   * 比较两个字符串是否相等（区分大小写）
+   *
+   * @param str1 字符串1
+   * @param str2 字符串2
+   * @return 相等返回 {@code true}
+   */
   public static boolean equals(CharSequence str1, CharSequence str2) {
     return equals(str1, str2, false);
   }
 
+  /**
+   * 比较两个字符串是否相等（忽略大小写）
+   *
+   * @param str1 字符串1
+   * @param str2 字符串2
+   * @return 相等返回 {@code true}
+   */
   public static boolean equalsIgnoreCase(CharSequence str1, CharSequence str2) {
     return equals(str1, str2, true);
   }
 
+  /**
+   * 比较两个字符串是否相等
+   *
+   * @param str1       字符串1
+   * @param str2       字符串2
+   * @param ignoreCase 是否忽略大小写
+   * @return 相等返回 {@code true}
+   */
   public static boolean equals(CharSequence str1, CharSequence str2, boolean ignoreCase) {
     if (null == str1) {
       // 只有两个都为null才判断相等
@@ -95,6 +117,13 @@ public class StringUtil {
     }
   }
 
+  /**
+   * 判断字符是否与任意一个目标字符相等
+   *
+   * @param c   待判断字符
+   * @param any 目标字符数组
+   * @return 匹配任一目标字符返回 {@code true}
+   */
   public static boolean equalsAny(char c, char... any) {
     if (null != any) {
       for (char c1 : any) {
@@ -104,6 +133,13 @@ public class StringUtil {
     return false;
   }
 
+  /**
+   * 判断字符串是否仅由指定字符集合中的字符组成
+   *
+   * @param str 待判断字符串
+   * @param any 指定字符集合
+   * @return 全部字符均在指定集合中返回 {@code true}
+   */
   public static boolean onlyMatchAny(CharSequence str, char... any) {
     int length = str.length();
 
@@ -382,11 +418,26 @@ public class StringUtil {
     return str.indexOf(searchChar, start);
   }
 
+  /**
+   * 获取对象的字符串长度
+   *
+   * @param obj 对象
+   * @return 字符串长度，若对象为 {@code null} 则返回 0
+   */
   public static int length(Object obj) {
     if (null == obj) return 0;
     return StringUtil.toStr(obj).length();
   }
 
+  /**
+   * 左填充字符串至指定长度
+   *
+   * @param str         原始字符串
+   * @param placeholder 填充字符
+   * @param length      目标长度
+   * @return 填充后的字符串
+   * @throws IllegalArgumentException 原始字符串长度大于目标长度时抛出
+   */
   public static String leftPad(String str, String placeholder, int length) {
     if (str.length() > length)
       throw new IllegalArgumentException(String.format("参数 [%s] 的长度必须大于 %d ", str, length));
@@ -395,6 +446,14 @@ public class StringUtil {
   }
 
 
+  /**
+   * 按正则表达式分割字符串并去除每个元素的前后空格
+   *
+   * @param str   待分割的字符串
+   * @param regex 正则表达式
+   * @return 分割后的字符串列表
+   * @throws IllegalArgumentException 待分割字符串为 {@code null} 时抛出
+   */
   public static List<String> split(String str, String regex) {
     if (null == str) throw new IllegalArgumentException("被分割的字符串不能为Null");
     List<String> res = new ArrayList<>();

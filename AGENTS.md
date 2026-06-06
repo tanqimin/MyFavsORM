@@ -9,7 +9,7 @@
 
 ## 技术栈
 
-- Java 11, Lombok, JUnit 4（不是 5）, Mockito, HikariCP
+- Java 11, JUnit 4（不是 5）, Mockito, HikariCP
 - Spring Boot 2.7.18, spring-jdbc 5.3.39（starter 模块可选依赖）
 
 ## 构建命令
@@ -70,7 +70,7 @@ mvn compile -pl orm
 
 ## 文件风格
 
-- 使用 Lombok `@Getter`/`@Data`，无 setter 风格（多数字段通过构造器或 Builder 设置）
+- 所有 getter/setter/构造器均为手写，无任何代码生成工具依赖
 - 不写 Javadoc 注释
 - 测试类扩展 `AbstractTest`，使用 JUnit 4 的 `@Test` 和 `Assert`
 - 无 Checkstyle/Spotless/Formatter 配置，无 CI 流水线

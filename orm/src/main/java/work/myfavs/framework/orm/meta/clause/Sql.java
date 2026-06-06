@@ -1,7 +1,6 @@
 package work.myfavs.framework.orm.meta.clause;
 
 
-import lombok.NonNull;
 import work.myfavs.framework.orm.meta.pagination.ISortable;
 import work.myfavs.framework.orm.meta.pagination.Order;
 import work.myfavs.framework.orm.util.common.ArrayUtil;
@@ -20,16 +19,16 @@ public class Sql extends Clause implements Serializable {
   public Sql() {
   }
 
-  public Sql(@NonNull CharSequence sql) {
-    super(sql);
+  public Sql(CharSequence sql) {
+    super(Objects.requireNonNull(sql, "sql is marked non-null but is null"));
   }
 
-  public Sql(@NonNull CharSequence sql, Object param) {
-    super(sql, param);
+  public Sql(CharSequence sql, Object param) {
+    super(Objects.requireNonNull(sql, "sql is marked non-null but is null"), param);
   }
 
-  public Sql(@NonNull CharSequence sql, Collection<?> params) {
-    super(sql, params);
+  public Sql(CharSequence sql, Collection<?> params) {
+    super(Objects.requireNonNull(sql, "sql is marked non-null but is null"), params);
   }
 
   /**

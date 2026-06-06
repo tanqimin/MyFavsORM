@@ -7,6 +7,9 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 
 import java.util.Date;
 
+/**
+ * 租户实体，映射 {@code tb_tenant} 表，包含数据库连接信息.
+ */
 @Table(value = "tb_tenant", strategy = GenerationType.SNOW_FLAKE)
 public class Tenant {
   @Column @PrimaryKey private Long id;

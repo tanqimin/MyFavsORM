@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 
+/**
+ * 动态数据源上下文持有者，通过 {@link ThreadLocal} 维护当前线程的数据源名称.
+ */
 public class DynamicDataSourceContextHolder {
   private final static Logger logger = LoggerFactory.getLogger(DynamicDataSourceContextHolder.class);
 
@@ -49,7 +52,7 @@ public class DynamicDataSourceContextHolder {
   }
 
   /**
-   * 返回上一次使用的数据源
+   * 返回上一次使用的数据源.
    */
   public static void returnDataSource() {
     dataSourceIds.removeLast();

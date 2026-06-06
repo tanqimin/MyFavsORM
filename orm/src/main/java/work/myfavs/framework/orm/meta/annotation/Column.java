@@ -4,7 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 数据库字段注释，用于定义实体类中的属性与数据库字段之间的匹配
+ * 数据库字段映射注解，用于定义实体类属性与数据库表字段之间的对应关系.
  *
  * <p>Created by tanqimin on 2015/10/28.
  */

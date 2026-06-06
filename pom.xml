@@ -45,7 +45,6 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
-    <lombok.version>1.18.42</lombok.version>
     <slf4j.version>2.0.18</slf4j.version>
     <spring-jdbc.version>5.3.39</spring-jdbc.version>
 
@@ -86,13 +85,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-      <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <version>${lombok.version}</version>
-      </dependency>
-
       <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -175,13 +167,6 @@
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
           <encoding>${project.build.sourceEncoding}</encoding>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>${lombok.version}</version>
-            </path>
-          </annotationProcessorPaths>
         </configuration>
       </plugin>
 

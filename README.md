@@ -86,7 +86,6 @@ try (Database database = dbTemplate.createDatabase();
 以下示例，创建一个实体类
 
 ```java
-@Data
 @Table(value = "tb_product", strategy = GenerationType.SNOW_FLAKE)
 public class Product implements Serializable {
     @PrimaryKey
@@ -101,6 +100,46 @@ public class Product implements Serializable {
     private boolean       disable;
     @Column
     private BigDecimal    price = BigDecimal.ZERO;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getCreated() {
+        return created;
+    }
+
+    public void setCreated(LocalDateTime created) {
+        this.created = created;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isDisable() {
+        return disable;
+    }
+
+    public void setDisable(boolean disable) {
+        this.disable = disable;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 }
 ```
 

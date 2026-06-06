@@ -10,13 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import work.myfavs.framework.sb2.demo.domain.entity.Tenant;
-import work.myfavs.framework.sb2.demo.util.tenant.DynamicDataSource;
 import work.myfavs.framework.orm.*;
 import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.handler.impls.*;
 import work.myfavs.framework.orm.util.lang.NVarchar;
+import work.myfavs.framework.sb2.demo.domain.entity.Tenant;
+import work.myfavs.framework.sb2.demo.util.tenant.DynamicDataSource;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -26,9 +26,17 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
+/**
+ * 多租户数据源配置，初始化主数据源并加载各租户的动态数据源.
+ */
 public class TenantDataSourceConfig {
   private static final Logger logger = LoggerFactory.getLogger(TenantDataSourceConfig.class);
 
+  /**
+   * 创建主数据源.
+   *
+   * @return 主数据源实例
+   */
   @Bean(name = "primaryDataSource", initMethod = "init", destroyMethod = "close")
   @ConfigurationProperties("spring.datasource.primary")
   public DruidDataSource dataSource() {
@@ -37,6 +45,12 @@ public class TenantDataSourceConfig {
     return datasource;
   }
 
+  /**
+   * 创建动态数据源，从主数据库加载租户列表并初始化各租户的数据源.
+   *
+   * @param primaryDataSource 主数据源
+   * @return 动态数据源实例
+   */
   @Primary
   @Bean(name = "dynamicDataSource")
   public DynamicDataSource dynamicDataSource(
@@ -73,6 +87,12 @@ public class TenantDataSourceConfig {
     return dynamicDataSource;
   }
 
+  /**
+   * 创建数据源事务管理器，使用动态数据源.
+   *
+   * @param dataSource 动态数据源
+   * @return 数据源事务管理器
+   */
   @Bean
   @Primary
   public DataSourceTransactionManager dataSourceTransactionManager(
@@ -81,6 +101,12 @@ public class TenantDataSourceConfig {
     return new DataSourceTransactionManager(dataSource);
   }
 
+  /**
+   * 创建 DBTemplate 实例.
+   *
+   * @param dataSource 数据源
+   * @return DBTemplate 实例
+   */
   @Bean
   public DBTemplate dbTemplate(@Qualifier("dynamicDataSource") DataSource dataSource) {
     return this.buildDbTemplate(dataSource, SpringConnFactory.class);

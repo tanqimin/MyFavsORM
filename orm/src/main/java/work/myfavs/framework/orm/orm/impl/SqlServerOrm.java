@@ -31,10 +31,20 @@ public class SqlServerOrm extends AbstractOrm {
   private static final String COL_ROW_NUM = "_rn";
   private static final String TABLE_ALIAS = "_paginate";
 
+  /**
+   * 构造 SqlServerOrm 实例.
+   *
+   * @param database {@link Database} 实例
+   */
   public SqlServerOrm(Database database) {
     super(database);
   }
 
+  /**
+   * 获取数据库类型.
+   *
+   * @return 数据库类型 {@link DbType#SQL_SERVER}
+   */
   @Override
   protected String dbType() {
     return DbType.SQL_SERVER;
@@ -109,6 +119,13 @@ public class SqlServerOrm extends AbstractOrm {
     return ret;
   }
 
+  /**
+   * 生成 SQL Server 批量更新 SQL 语句.
+   *
+   * @param entityMeta 实体元数据
+   * @param columns    需要更新的列
+   * @return 更新 SQL 语句
+   */
   protected String update(ClassMeta entityMeta, String[] columns) {
 
     Attribute primaryKey  = entityMeta.checkPrimaryKey();
@@ -131,6 +148,15 @@ public class SqlServerOrm extends AbstractOrm {
     return updateStatement.toUnformattedString();
   }
 
+  /**
+   * 生成 SQL Server 2005+ 分页查询 {@link Sql}，使用 {@code ROW_NUMBER()} 实现.
+   *
+   * @param sql         原始 SQL
+   * @param params      SQL 参数集合
+   * @param currentPage 当前页码
+   * @param pageSize    每页大小
+   * @return 分页查询 {@link Sql}
+   */
   @Override
   protected Sql selectPage(String sql, Collection<?> params, int currentPage, int pageSize) {
     int    offset   = pageSize * (currentPage - 1);

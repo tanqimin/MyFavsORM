@@ -10,6 +10,9 @@ import work.myfavs.framework.orm.util.common.Constant;
 
 import java.util.*;
 
+/**
+ * SQL 日志记录器，用于输出 SQL 语句、参数和执行结果
+ */
 public class SqlLog {
 
   private static final Logger log = LoggerFactory.getLogger(SqlLog.class);
@@ -21,17 +24,33 @@ public class SqlLog {
   private final boolean showSql;
   private final boolean showResult;
 
+  /**
+   * 构造 SQL 日志记录器
+   *
+   * @param showSql    是否输出 SQL 语句和参数
+   * @param showResult 是否输出查询结果
+   */
   public SqlLog(boolean showSql, boolean showResult) {
     this.showSql = showSql && log.isDebugEnabled();
     this.showResult = showResult && log.isDebugEnabled();
   }
 
+  /**
+   * 输出 SQL 语句
+   *
+   * @param sql SQL 语句
+   */
   public void showSql(String sql) {
     if (!this.showSql) return;
 
     log.debug(TITLE_SQL.concat(Constant.LINE_SEPARATOR).concat(sql));
   }
 
+  /**
+   * 输出批量参数
+   *
+   * @param batchParameters {@link BatchParameters} 实例
+   */
   public void showParams(BatchParameters batchParameters) {
     if (!this.showSql) return;
     if (null == batchParameters || batchParameters.isEmpty()) return;
@@ -53,6 +72,11 @@ public class SqlLog {
     log.debug(format(parameters));
   }
 
+  /**
+   * 输出受影响行数
+   *
+   * @param result 受影响行数
+   */
   public void showAffectedRows(int result) {
     if (!this.showResult) return;
 
@@ -63,6 +87,13 @@ public class SqlLog {
     log.debug("语句执行成功. ");
   }
 
+  /**
+   * 输出查询结果列表
+   *
+   * @param viewClass 视图类型
+   * @param result    查询结果列表
+   * @param <TView>   视图类型
+   */
   public <TView> void showResult(Class<TView> viewClass, List<TView> result) {
     if (!this.showResult) return;
 
@@ -84,6 +115,12 @@ public class SqlLog {
     return viewClass.isPrimitive() || Constant.PRIMITIVE_TYPES.contains(viewClass);
   }
 
+  /**
+   * 输出格式化结果信息
+   *
+   * @param format   格式化字符串
+   * @param arguments 格式化参数
+   */
   public void showResult(String format, Object... arguments) {
     if (!this.showResult) return;
     log.debug(format, arguments);

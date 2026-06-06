@@ -4,8 +4,8 @@ import com.alibaba.druid.pool.DruidDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
-import work.myfavs.framework.sb2.demo.domain.entity.Tenant;
 import work.myfavs.framework.orm.util.common.StringUtil;
+import work.myfavs.framework.sb2.demo.domain.entity.Tenant;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -21,11 +21,21 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
   private static       Map<Object, Object> targetDataSources = new HashMap<>();
   public static        Properties          connectProperties = null;
 
+  /**
+   * 确定当前数据源查找键.
+   *
+   * @return 当前数据源名称
+   */
   @Override
   protected Object determineCurrentLookupKey() {
     return DynamicDataSourceContextHolder.getDataSource();
   }
 
+  /**
+   * 设置目标数据源映射.
+   *
+   * @param targetDataSources 数据源映射
+   */
   @Override
   public void setTargetDataSources(Map<Object, Object> targetDataSources) {
     super.setTargetDataSources(targetDataSources);

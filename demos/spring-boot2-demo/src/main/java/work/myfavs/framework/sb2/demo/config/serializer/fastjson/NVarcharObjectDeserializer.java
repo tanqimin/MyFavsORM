@@ -8,7 +8,19 @@ import work.myfavs.framework.orm.util.lang.NVarchar;
 
 import java.lang.reflect.Type;
 
+/**
+ * Fastjson {@link NVarchar} 反序列化器.
+ */
 public class NVarcharObjectDeserializer implements ObjectDeserializer {
+  /**
+   * 反序列化为 {@code NVarchar} 对象.
+   *
+   * @param parser    JSON 解析器
+   * @param type      目标类型
+   * @param fieldName 字段名称
+   * @param <T>       返回值类型
+   * @return 反序列化后的 {@code NVarchar} 对象
+   */
   @SuppressWarnings("unchecked")
   @Override
   public <T> T deserialze(
@@ -37,6 +49,11 @@ public class NVarcharObjectDeserializer implements ObjectDeserializer {
     return (T) new NVarchar(value.toString());
   }
 
+  /**
+   * 获取快速匹配的 JSON token 类型.
+   *
+   * @return {@link JSONToken#LITERAL_STRING}
+   */
   @Override
   public int getFastMatchToken() {
     return JSONToken.LITERAL_STRING;

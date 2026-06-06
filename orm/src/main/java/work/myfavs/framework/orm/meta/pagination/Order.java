@@ -1,9 +1,5 @@
 package work.myfavs.framework.orm.meta.pagination;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.exception.DBException;
 
@@ -15,10 +11,6 @@ import static work.myfavs.framework.orm.util.common.StringUtil.*;
 /**
  * 排序
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Order implements Serializable {
 
   /**
@@ -29,6 +21,59 @@ public class Order implements Serializable {
    * 排序方向
    */
   private String direction;
+
+  /**
+   * 构造排序对象
+   */
+  public Order() {
+  }
+
+  /**
+   * 构造排序对象
+   *
+   * @param field     排序字段
+   * @param direction 排序方向（ASC 或 DESC）
+   */
+  public Order(String field, String direction) {
+    this.field = field;
+    this.direction = direction;
+  }
+
+  /**
+   * 获取排序字段
+   *
+   * @return 排序字段
+   */
+  public String getField() {
+    return field;
+  }
+
+  /**
+   * 设置排序字段
+   *
+   * @param field 排序字段
+   */
+  public void setField(String field) {
+    this.field = field;
+  }
+
+  /**
+   * 获取排序方向
+   *
+   * @return 排序方向
+   */
+  public String getDirection() {
+    return direction;
+  }
+
+  /**
+   * 设置排序方向
+   *
+   * @param direction 排序方向（ASC 或 DESC）
+   */
+  public void setDirection(String direction) {
+    this.direction = direction;
+  }
 
   /**
    * 解析排序字符串

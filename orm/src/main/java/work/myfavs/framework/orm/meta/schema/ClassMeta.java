@@ -61,34 +61,75 @@ public class ClassMeta {
 
   // region Getter && Setter
 
+  /**
+   * 获取实体对应的 {@link Class}
+   *
+   * @return {@link Class} 实例
+   */
   public Class<?> getClazz() {
     return clazz;
   }
 
+  /**
+   * 获取数据表名
+   *
+   * @return 数据表名
+   */
   public String getTableName() {
     return tableName;
   }
 
+  /**
+   * 获取主键生成策略
+   *
+   * @return {@link GenerationType} 枚举值
+   */
   public GenerationType getStrategy() {
     return strategy;
   }
 
+  /**
+   * 获取主键属性元数据
+   *
+   * @return {@link Attribute} 实例，可能为 {@code null}
+   */
   public Attribute getPrimaryKey() {
     return primaryKey;
   }
 
+  /**
+   * 获取逻辑删除属性元数据
+   *
+   * @return {@link Attribute} 实例，可能为 {@code null}
+   */
   public Attribute getLogicDelete() {
     return logicDelete;
   }
 
+  /**
+   * 判断是否为实体类
+   *
+   * @return 实体类返回 {@code true}
+   */
   public boolean isEntity() {
     return isEntity;
   }
 
+  /**
+   * 获取所有可更新字段的 {@link Attribute} 映射
+   *
+   * @return 字段名到 {@link Attribute} 的映射
+   */
   public Map<String /* columnName */, Attribute> getUpdateAttributes() {
     return updateAttributes;
   }
 
+  /**
+   * 根据指定列名获取可更新字段的 {@link Attribute} 集合
+   *
+   * @param columns 列名数组，为空则返回所有可更新字段
+   * @return {@link Attribute} 集合
+   */
   public Collection<Attribute> getUpdateAttributes(String[] columns) {
     if (ArrayUtil.isEmpty(columns)) return updateAttributes.values();
 
@@ -103,6 +144,11 @@ public class ClassMeta {
   }
 
 
+  /**
+   * 获取所有查询字段的 {@link Attribute} 映射
+   *
+   * @return 字段名到 {@link Attribute} 的映射
+   */
   public Map<String /* columnName */, Attribute> getQueryAttributes() {
     return queryAttributes;
   }
