@@ -1,4 +1,4 @@
 Name: myfavs-example
 Created-By: TAN Qimin
 Manifest-Version: 1.0.0-*
-Main-Class: work.myfavs.framework.example.Application
+Main-Class: work.myfavs.framework.sb2.demo.Application
