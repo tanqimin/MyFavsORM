@@ -29,6 +29,14 @@ public class DBTemplate {
     throw new InvalidDataAccessException("数据源 %s 不存在.", dsName);
   }
 
+  /**
+   * 添加 {@link DBTemplate} 到静态池
+   * <p>若池中已存在同名数据源，将静默覆盖。</p>
+   *
+   * @param dsName    数据源名称
+   * @param dbTemplate {@link DBTemplate}
+   * @return {@link DBTemplate}
+   */
   public static DBTemplate add(String dsName, DBTemplate dbTemplate) {
     POOL.put(dsName, dbTemplate);
     return dbTemplate;
@@ -77,6 +85,10 @@ public class DBTemplate {
 
   /**
    * 注册 PropertyHandler
+   * <p>设计说明：若用户未通过 {@link Builder#mapping(Consumer)} 注册任何自定义处理器（mapper.map 为空），
+   * 则注册框架内置的 23 种默认 {@link PropertyHandler}；若用户已注册自定义处理器，
+   * 则仅使用用户注册的处理器，不再注册默认处理器。
+   * 即"全默认 or 全自定义"二选一的模式。</p>
    *
    * @param mapper Mapper
    */
@@ -104,7 +116,6 @@ public class DBTemplate {
    * @return 数据源
    */
   public DataSource getDataSource() {
-
     return dataSource;
   }
 
@@ -114,7 +125,6 @@ public class DBTemplate {
    * @return 连接工厂类
    */
   public ConnFactory getConnectionFactory() {
-
     return connectionFactory;
   }
 
@@ -124,7 +134,6 @@ public class DBTemplate {
    * @return 配置
    */
   public DBConfig getDbConfig() {
-
     return dbConfig;
   }
 
@@ -167,10 +176,11 @@ public class DBTemplate {
    */
   public static class Builder {
 
-    private final String     dsName;
-    private       DataSource dataSource;
-    private       DBConfig   config;
-    public final  Mapper     mapper = new Mapper();
+    private final String                                      dsName;
+    private       DataSource                                  dataSource;
+    private       DBConfig                                    config;
+    private       Class<? extends ConnFactory>                connectionFactory = JdbcConnFactory.class;
+    private final Mapper                                      mapper           = new Mapper();
 
     /**
      * 构造方法，使用默认数据源名称
@@ -187,8 +197,6 @@ public class DBTemplate {
     public Builder(String dsName) {
       this.dsName = dsName;
     }
-
-    private Class<? extends ConnFactory> connectionFactory = JdbcConnFactory.class;
 
     /**
      * 设置数据源
@@ -222,7 +230,6 @@ public class DBTemplate {
      * @return {@link Builder}
      */
     public Builder connectionFactory(Class<? extends ConnFactory> connectionFactory) {
-
       this.connectionFactory = connectionFactory;
       return this;
     }
