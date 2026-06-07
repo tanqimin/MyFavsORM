@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <artifactId>orm-spring-boot4-starter</artifactId>
+  <packaging>jar</packaging>
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>${project.groupId}.${project.artifactId}</name>
+  <description>Spring 4.x starter for the myfavs database orm framework</description>
+  <url>https://github.com/tanqimin/MyFavsORM</url>
+
+  <parent>
+    <groupId>work.myfavs.framework</groupId>
+    <artifactId>pom</artifactId>
+    <version>1.0.0-260408-1</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>work.myfavs.framework</groupId>
+      <artifactId>orm-spring-boot-starter-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${spring-jdbc7.version}</version>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+</project>
