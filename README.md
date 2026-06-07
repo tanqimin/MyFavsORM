@@ -1,344 +1,267 @@
 [![GitHub release](https://img.shields.io/github/stars/tanqimin/myfavs.framework?style=flat-square)](https://github.com/tanqimin/myfavs.framework)
+
 # MyFavs ORM
-##### A light-weight ORM Framework
-如果您厌倦了MyBatis复杂的 XML 语法，并且擅长 SQL 的编写，可以试试 MyFavs ORM。
-## Quick Start
 
-首先，我们需要创建数据源，这里使用`HikariDataSource`作为示例：
+轻量级 Java ORM 框架，为擅长手写 SQL 的开发者设计。如果您厌倦了 MyBatis 复杂的 XML 语法，MyFavs ORM 提供了更简洁、更直观的数据库操作方式。
 
-```java
-HikariConfig configuration = new HikariConfig();
-configuration.setDriverClassName("com.mysql.jdbc.Driver");
-configuration.setJdbcUrl(url);
-configuration.setUsername(user);
-configuration.setPassword(password);
-configuration.setAutoCommit(false);
-DataSource dataSource = new HikariDataSource(configuration);
+## 核心特性
+
+- **双模式操作** — `Query` 类追求极致性能（原生 JDBC 封装），`Orm` 类追求研发效率（实体映射 + 自动 CRUD）
+- **注解驱动映射** — `@Table` / `@Column` / `@PrimaryKey` 标注实体，默认驼峰转下划线命名
+- **多种主键策略** — 雪花算法（Snowflake）、UUID、数据库自增（IDENTITY）、手动赋值（ASSIGNED）
+- **SQL 构建器** — 链式 API 构建 SQL，配合 `Cond` 条件构建器，安全防注入
+- **分页支持** — `Page<T>`（含总行数）、`PageLite<T>`（轻量级，含 hasNext），多数据库方言自动适配
+- **多数据库支持** — MySQL、SQL Server（2005+/2012+）、PostgreSQL、Oracle、H2
+- **事务管理** — `Database.tx()` 函数式事务包装器，支持保存点（Savepoint）
+- **Spring Boot 集成** — 通过 `SpringConnFactory` 无缝对接 Spring 声明式事务（`@Transactional`）
+- **PropertyHandler 类型系统** — 可扩展的类型处理器，支持自定义 Java 类型与 JDBC 类型的双向映射
+- **轻量级** — 核心模块仅依赖 `slf4j-api` 和 `druid`（均为 optional），不绑定特定连接池
+
+## 技术栈
+
+| 类别 | 技术 | 说明 |
+|---|---|---|
+| 运行环境 | Java 11+ | 编译目标 Java 11 |
+| 日志 | slf4j-api 2.0.18 | optional，由下游提供实现 |
+| SQL AST | Alibaba Druid 1.2.28 | optional，用于分页 SQL 改写和格式化 |
+| 连接池 | HikariCP 7.0.2（test）/ Druid（可选） | 不强制绑定 |
+| Spring | spring-jdbc 5.3.39（optional） | 仅 `SpringConnFactory` 需要 |
+| 测试 | JUnit 4.13.2 / Mockito 5.23.0 | — |
+
+## 快速入门
+
+### 1. 添加 Maven 依赖
+
+```xml
+<!-- 核心库 -->
+<dependency>
+    <groupId>work.myfavs.framework</groupId>
+    <artifactId>orm</artifactId>
+    <version>1.0.0-260408-1</version>
+</dependency>
+
+<!-- Spring Boot 集成（可选） -->
+<dependency>
+    <groupId>work.myfavs.framework</groupId>
+    <artifactId>orm-spring-boot2-starter</artifactId>
+    <version>1.0.0-260408-1</version>
+</dependency>
 ```
 
-
-
-然后，在程序启动的时候，创建`DBTemplate`：
+### 2. 定义实体类
 
 ```java
-DBTemplate dbTemplate = new DBTemplate.Builder()
-        .dataSource(dataSource)
-        .config(config -> {
-            config
-                .setShowSql(true)
-                .setShowResult(true);
-        }).build();
-```
+import work.myfavs.framework.orm.meta.annotation.*;
+import work.myfavs.framework.orm.meta.enumeration.GenerationType;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-然后就可以马上使用：
+@Table(value = "tb_product", strategy = GenerationType.SNOW_FLAKE)
+public class Product implements Serializable {
 
-```java
-try (Database database = dbTemplate.createDatabase();
-     Query query = database.createQuery("SELECT * FROM tb_product")) {
-    List<Record> records = query.find(Record.class);
+    @PrimaryKey
+    @Column
+    private Long          id;
+
+    @Column
+    private LocalDateTime created;
+
+    @Column
+    private String        name;
+
+    @Column
+    private boolean       disable;
+
+    @Column
+    private BigDecimal    price = BigDecimal.ZERO;
+
+    // getter / setter 省略...
 }
 ```
 
-## 使用入门
+**注解说明：**
 
-### Query类
+| 注解 | 作用域 | 说明 |
+|---|---|---|
+| `@Table(value, strategy)` | 类 | 标记实体。`value` 为空时表名 = 类名转下划线小写；`strategy` 为主键策略，默认 `SNOW_FLAKE` |
+| `@Column(value, readonly)` | 字段 | 标记数据库列。`value` 为空时列名 = 字段名转下划线小写；`readonly=true` 时该列不参与 INSERT/UPDATE |
+| `@PrimaryKey` | 字段 | 标记主键字段，必须与 `@Column` 配合使用 |
+| `@LogicDelete` | 字段 | 标记逻辑删除字段，删除操作时将该字段值置为主键值而非物理删除 |
+| `@Criterion(value, operator, order, group)` | 字段 | 可重复注解，配合 `Cond.criteria()` 自动生成查询条件 |
 
-> 在一些系统中追求极致性能，可以直接使用Query类进行数据库操作
+### 3. 配置 DBTemplate
 
-#### find方法
+```java
+HikariConfig config = new HikariConfig();
+config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+config.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/mydb?...");
+config.setUsername("root");
+config.setPassword("root");
+config.setAutoCommit(false);
+
+DataSource dataSource = new HikariDataSource(config);
+
+DBTemplate dbTemplate = new DBTemplate.Builder()
+    .dataSource(dataSource)
+    .config(c -> c
+        .setDbType("mysql")    // 数据库类型，支持 mysql/sqlserver/sqlserver2012/postgresql/oracle/h2
+        .setShowSql(true)      // 打印 SQL 日志
+        .setShowResult(true)   // 打印查询结果日志
+    )
+    .build();
+```
+
+**DBConfig 常用配置项：**
+
+| 参数 | 默认值 | 说明 |
+|---|---|---|
+| `dbType` | `"mysql"` | 数据库类型 |
+| `showSql` | `false` | 是否打印 SQL 及参数 |
+| `showResult` | `false` | 是否打印查询结果 |
+| `batchSize` | `200` | 批量操作每批处理数量 |
+| `fetchSize` | `1000` | ResultSet 每次抓取行数 |
+| `queryTimeout` | `60` | 查询超时秒数 |
+| `maxPageSize` | `-1`（不限制）| 分页每页最大记录数 |
+| `workerId` | `1` | 雪花算法 Worker ID（1-30） |
+| `dataCenterId` | `1` | 雪花算法数据中心 ID（1-30） |
+
+---
+
+## 使用指南
+
+### Query 类 — 原生 SQL 操作
+
+适合追求极致性能、需要完全控制 SQL 的场景。
+
+#### 查询（find）
 
 ```java
 try (Database database = dbTemplate.createDatabase();
      Query query = database.createQuery("SELECT * FROM tb_product WHERE name = ?")) {
-    List<Record> records = query.addParameter(1, "可口可乐").find(Record.class);
+
+    query.addParameter("可口可乐");
+    List<Record> records = query.find(Record.class);
 }
 ```
 
-#### execute方法
+#### 执行（execute）
 
 ```java
 try (Database database = dbTemplate.createDatabase();
-     Query query = database.createQuery("INSERT INTO tb_product(code, name) VALUE (?, ?)")) {
-    query.addParameter( "KELE").addParameter("可口可乐").execute();
-    query.addParameter( "ICETEA").addParameter("冰红茶").execute();
+     Query query = database.createQuery("INSERT INTO tb_product(code, name) VALUES (?, ?)")) {
+
+    query.addParameter("KELE").addParameter("可口可乐").execute();
+    query.addParameter("ICETEA").addParameter("冰红茶").execute();
 }
 ```
 
-#### executeBatch方法
+#### 批量执行（executeBatch）
 
 ```java
 try (Database database = dbTemplate.createDatabase();
-     Query query = database.createQuery("INSERT INTO tb_product(code, name) VALUE (?, ?)")) {
-    query.addParameter( "KELE").addParameter("可口可乐").addBatch();
-    query.addParameter( "ICETEA").addParameter("冰红茶").addBatch();
-    query.executeBatch();
+     Query query = database.createQuery("INSERT INTO tb_product(code, name) VALUES (?, ?)")) {
+
+    query.addParameter("KELE").addParameter("可口可乐").addBatch();
+    query.addParameter("ICETEA").addParameter("冰红茶").addBatch();
+    int[] results = query.executeBatch();
 }
 ```
 
+### Orm 类 — 实体 CRUD 操作
 
+适合追求研发效率、需要对象-关系映射的场景。
 
-### Orm类
-
-> 如果注重研发效率，可使用Orm类对实体进行操作
-
-#### 查询
-
-以下示例，创建一个实体类
+#### Sql 构建器
 
 ```java
-@Table(value = "tb_product", strategy = GenerationType.SNOW_FLAKE)
-public class Product implements Serializable {
-    @PrimaryKey
-    @Column
-    private Long          id;
-    @Column
-    private LocalDateTime created;
-    @Column
-    @NVarchar
-    private String        name;
-    @Column
-    private boolean       disable;
-    @Column
-    private BigDecimal    price = BigDecimal.ZERO;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getCreated() {
-        return created;
-    }
-
-    public void setCreated(LocalDateTime created) {
-        this.created = created;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isDisable() {
-        return disable;
-    }
-
-    public void setDisable(boolean disable) {
-        this.disable = disable;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-}
-```
-
-此处用到`@Table`、`@Column`、和`@PrimaryKey`注解：
-
-+ `@Table`，定义实体的数据表，其中参数value为数据表名称(如果不设置value，则会把实体名称转成下划线分隔，小写的形式（如实体名称为 *ProductPrice*，对应的数据表名称为 *product_price*），strategy为主键策略；
-    * GenerationType.UUID，UUID，如果主键值为null，会自动生成；
-    * GenerationType.SNOW_FLAKE，雪花值，，如果主键值为null，会自动生成；
-    * GenerationType.IDENTITY，数据库自增，值由数据库生成；
-    * GenerationType.ASSIGNED，自然主键，值由用户自定义；
-+ `@Column`，定义实体类关联的数据表字段，参数value为数据字段名称(如果不设置value，则会把实体属性名称转成下划线分隔，小写的形式（如实体名称为 *productCode*，对应的数据字段名称为 *product_code*）；参数readOnly默认值为false，当设置为true时，插入和更新操作不会包含该字段；
-+ `@PrimaryKey`，定义主键的属性，必须和`@Column`配合使用；
-
-##### Sql构建器
-
-###### 创建Sql构建器
-
-```java
-Sql sql = new Sql();
-//或
-Sql sql = Sql.New();
-```
-
-###### 创建查询语句
-
-```java
+// 方式一：直接拼接 SQL + 参数
 Sql sql = new Sql("SELECT * FROM tb_product WHERE id = ?", 1L);
-//或
-Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.eq("id", 1L));
-//或
-Sql sql = new Sql().select("*").from("tb_product").where(Cond.eq("id", 1L));
+
+// 方式二：链式构建
+Sql sql = new Sql("SELECT * FROM tb_product")
+    .WHERE(Cond.eq("id", 1L));
+
+// 方式三：全链式
+Sql sql = new Sql()
+    .SELECT("*")
+    .FROM("tb_product")
+    .WHERE(Cond.eq("id", 1L));
 ```
 
-###### 条件构建类Cond
+#### Cond 条件构建器
 
-对于系统中，大家会发现where、and、or等方法中的参数，都是条件构建器`Cond`：
+`Cond` 提供丰富的条件方法，支持链式组合：
 
 ```java
-//where id = 1
-sql.where(Cond.eq("id", 1));
+// 等值比较
+Cond.eq("name", "手机");
+Cond.eq("name", "手机", false);  // value 为 null 时忽略该条件（默认 true 忽略）
 
-//where 1 = 1 and id = 1;
-sql.where().and(Cond.eq("id", 1));
+// 模糊查询
+Cond.like("name", "%手机%");
 
-//where 1 = 1 id in (1, 2, 3)
-ArrayList<Integer> params = new ArrayList<>();
-Collections.addAll(list, 1,2,3);
-sql.where().and(Cond.in("id", params));
+// 区间查询 + 列表查询
+Cond.between("price", 100, 500);
+Cond.in("id", Arrays.asList(1, 2, 3));
 
-//如果params为null，或空集合，默认忽略条件;
-params.clear();
-sql.where().and(Cond.in("id", params));			//where 1 = 1
-sql.where().and(Cond.in("id", params, false));	 //where 1 = 1 and 1 > 2
+// 链式组合 AND / OR
+Cond.eq("status", 1).and(Cond.gt("price", 100));
+Cond.like("name", "%手机%").or(Cond.eq("type", "电子"));
+
+// 从 @Criterion 注解自动生成条件
+Cond.criteria(product, BaseEntity.Update.class);  // 按 group 分组生成
 ```
 
-
-
-##### 查询一行记录
+#### 查询单行
 
 ```java
-Sql sql = new Sql("SELECT * FROM tb_product WHERE id = ?", 1);
-try (Database database = dbTemplate.createDatabase()) {
-    Orm     orm     = database.createOrm();
-    Product product = orm.get(Product.class, sql);
-}
-```
-
-##### 根据主键查询
-
-```java
-try (Database database = dbTemplate.createDatabase()) {
-    Orm     orm     = database.createOrm();
-    Product product = orm.getById(Product.class, 1);
-}
-```
-
-##### 查询多行记录
-
-```java
-Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-try (Database database = dbTemplate.createDatabase()) {
-    Orm           orm      = database.createOrm();
-    List<Product> products = orm.find(Product.class, sql);
-}
-```
-
-##### 简单条件查询
-
-```java
-try (Database database = dbTemplate.createDatabase()) {
-    Orm           orm      = database.createOrm();
-    List<Product> products = orm.findByCond(Product.class, Cond.like("name", "%手机%"));
-}
-```
-
-##### 查询返回ID集合
-
-```java
-Sql sql = new Sql("SELECT id FROM tb_product").where(Cond.like("name", "%手机%"));
-try (Database database = dbTemplate.createDatabase()) {
-    Orm        orm      = database.createOrm();
-    List<Long> products = orm.find(Long.class, sql);
-}
-```
-
-##### 根据某个字段查询
-
-```java
-try (Database database = dbTemplate.createDatabase()) {
-    Orm           orm      = database.createOrm();
-    List<Product> products = orm.findByField(Product.class, "name", "手机");
-}
-```
-
-##### 查询前N条记录
-
-```java
-Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-try (Database database = dbTemplate.createDatabase()) {
-    Orm           orm      = database.createOrm();
-    List<Product> products = orm.findTop(Product.class, 10, sql);
-}
-```
-
-##### 根据主键集合查询
-
-```java
-ArrayList<Integer> params = new ArrayList<>();
-Collections.addAll(list, 1,2,3);
-try (Database database = dbTemplate.createDatabase()) {
-    Orm           orm      = database.createOrm();
-    List<Product> products = orm.findByIds(Product.class, params);
-}
-```
-
-##### 查询返回Map
-
-很多时候，我们希望查询返回Map<TPk, TEntity>的结构，可以这样写：
-
-```java
-Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-try (Database database = dbTemplate.createDatabase()) {
-    Orm           	   orm      = database.createOrm();
-    Map<Long, Product> products = orm.findMap(Product.class, "id", sql);
-}
-```
-
-##### 查询记录数
-
-```java
-Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-try (Database database = dbTemplate.createDatabase()) {
-    Orm  orm   = database.createOrm();
-    long count = orm.count(sql);
-}
-```
-
-##### 检查是否存在记录
-
-```java
-Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
-try (Database database = dbTemplate.createDatabase()) {
-    Orm     orm    = database.createOrm();
-    boolean exists = orm.exists(sql);
-}
-```
-
-##### 分页查询
-
-```java
-Sql sql = new Sql("SELECT * FROM tb_product").where(Cond.like("name", "%手机%"));
 try (Database database = dbTemplate.createDatabase()) {
     Orm orm = database.createOrm();
-    //第3个参数为是否启用分页, 第4个参数为当前页码, 第5个参数为每页记录数
-    Page<Product> page = orm.findPage(Product.class, sql, true, 1, 20);
+
+    // 根据主键
+    Product product = orm.getById(Product.class, 1L);
+
+    // 根据 SQL
+    Product product = orm.get(Product.class, new Sql("SELECT * FROM tb_product WHERE id = ?", 1L));
+
+    // 根据字段值
+    Product product = orm.getByField(Product.class, "name", "可口可乐");
 }
 ```
 
-建议在分页请求中实现`IPageable`接口：
-
-```java
-public PageRequest implements IPageable {}
-```
-
-分页查询可写为：
+#### 查询多行
 
 ```java
 try (Database database = dbTemplate.createDatabase()) {
-    Orm           orm  = database.createOrm();
-    Page<Product> page = orm.findPage(Product.class, sql, pageRequest);
-}
-```
+    Orm orm = database.createOrm();
 
-简单分页查询，结果不包含总行数，在某些考虑性能的情况下，可以使用；
+    // 全量查询
+    List<Product> products = orm.find(Product.class, new Sql("SELECT * FROM tb_product"));
 
-```java
-try (Database database = dbTemplate.createDatabase()) {
-    Orm               orm  = database.createOrm();
-    PageLite<Product> page = orm.findPageLite(Product.class, sql, pageRequest);
+    // 条件查询
+    List<Product> products = orm.find(Product.class,
+        new Sql("SELECT * FROM tb_product").WHERE(Cond.like("name", "%手机%")));
+
+    // 简单条件查询
+    List<Product> products = orm.findByCond(Product.class, Cond.like("name", "%手机%"));
+
+    // 按字段查询
+    List<Product> products = orm.findByField(Product.class, "name", "可口可乐");
+
+    // 按主键集合查询
+    List<Product> products = orm.findByIds(Product.class, Arrays.asList(1L, 2L, 3L));
+
+    // 查询前 N 条
+    List<Product> products = orm.findTop(Product.class, 10,
+        new Sql("SELECT * FROM tb_product").ORDER_BY("id DESC"));
+
+    // 查询单列值（返回 ID 列表）
+    List<Long> ids = orm.find(Long.class, new Sql("SELECT id FROM tb_product"));
+
+    // 查询返回 Map<PK, Entity>
+    Map<Long, Product> map = orm.findMap(Product.class, "id",
+        new Sql("SELECT * FROM tb_product"));
 }
 ```
 
@@ -346,13 +269,15 @@ try (Database database = dbTemplate.createDatabase()) {
 
 ```java
 try (Database database = dbTemplate.createDatabase()) {
-    Orm orm  = database.createOrm();
-    
-    Product p1 = ..;
-    orm.create(p1);
-    
-    List<Product> products = ...;
-    orm.create(products);
+    Orm orm = database.createOrm();
+
+    Product product = new Product();
+    product.setName("可口可乐");
+    product.setPrice(new BigDecimal("3.50"));
+    orm.create(product);           // 单条插入，主键自动回填
+
+    List<Product> list = Arrays.asList(p1, p2, p3);
+    orm.create(list);              // 批量插入
 }
 ```
 
@@ -360,16 +285,17 @@ try (Database database = dbTemplate.createDatabase()) {
 
 ```java
 try (Database database = dbTemplate.createDatabase()) {
-    Orm orm  = database.createOrm();
-    
-    Product p1 = ..;
-    orm.update(p1);
-    
-    List<Product> products = ...;
-    orm.update(products);
-    
-    //只更新name字段
-    orm.update(products, new String[]{"name"});
+    Orm orm = database.createOrm();
+
+    Product product = orm.getById(Product.class, 1L);
+    product.setPrice(new BigDecimal("4.00"));
+    orm.update(product);           // 全字段更新
+
+    // 只更新指定字段
+    orm.update(product, new String[]{"price"});
+
+    List<Product> list = Arrays.asList(p1, p2, p3);
+    orm.update(list);              // 批量更新
 }
 ```
 
@@ -377,275 +303,354 @@ try (Database database = dbTemplate.createDatabase()) {
 
 ```java
 try (Database database = dbTemplate.createDatabase()) {
-    Orm orm  = database.createOrm();
-    
-    Product p1 = ..;
-    orm.delete(p1);
-    
-    List<Product> products = ...;
-    orm.delete(products);
-    
-    //根据id删除
-    orm.deleteById(1);
-    
-    ArrayList<Integer> params = new ArrayList<>();
-    Collections.addAll(list, 1,2,3);
-    orm.deleteByIds(params);
+    Orm orm = database.createOrm();
+
+    orm.delete(product);                 // 按实体删除
+    orm.deleteById(Product.class, 1L);   // 按主键删除
+    orm.deleteByIds(Product.class, Arrays.asList(1L, 2L, 3L));  // 按主键集合删除
 }
 ```
 
-#### 事务
+> **逻辑删除**：如果实体用 `@LogicDelete` 标注了逻辑删除字段，执行 `delete()` 时会将主键值写入该字段而非物理删除。
+
+#### 统计与判断
+
+```java
+try (Database database = dbTemplate.createDatabase()) {
+    Orm orm = database.createOrm();
+
+    long count = orm.count(new Sql("SELECT * FROM tb_product").WHERE(Cond.gt("price", 10)));
+    boolean exists = orm.exists(new Sql("SELECT * FROM tb_product WHERE id = ?", 1L));
+}
+```
+
+### 分页查询
+
+```java
+Sql sql = new Sql("SELECT * FROM tb_product").WHERE(Cond.like("name", "%手机%"));
+
+try (Database database = dbTemplate.createDatabase()) {
+    Orm orm = database.createOrm();
+
+    // 完整分页（含总页数、总行数）
+    Page<Product> page = orm.findPage(Product.class, sql, true, 1, 20);
+    // page.getData()        → 当前页数据
+    // page.getTotalPages()  → 总页数
+    // page.getTotalRecords() → 总行数
+
+    // 轻量分页（仅含 hasNext，无 COUNT 查询）
+    PageLite<Product> pageLite = orm.findPageLite(Product.class, sql, true, 1, 20);
+    // pageLite.isHasNext()  → 是否有下一页
+}
+```
+
+**配合 `IPageable` 接口**（请求对象直接控制分页参数）：
+
+```java
+public class PageRequest implements IPageable {
+    private int currentPage = 1;
+    private int pageSize = 20;
+
+    @Override public boolean getEnablePage() { return true; }
+    @Override public int getCurrentPage() { return currentPage; }
+    @Override public int getPageSize() { return pageSize; }
+}
+
+// 使用
+Page<Product> page = orm.findPage(Product.class, sql, pageRequest);
+```
+
+分页结果字段名可通过 `DBConfig` 自定义（如 `pageDataField`、`pageCurrentField` 等）。
+
+### 事务管理
 
 ```java
 try (Database database = dbTemplate.createDatabase()) {
     database.tx(orm -> {
-        orm.update(p1);
-        orm.delete(p2);
+        orm.update(product);
+        orm.delete(oldProduct);
+    });
+    // 成功自动 commit，异常自动 rollback
+}
+```
+
+**带保存点的事务：**
+
+```java
+try (Database database = dbTemplate.createDatabase()) {
+    database.tx(orm -> {
+        orm.create(product1);
+        Savepoint sp = database.setSavepoint("sp1");
+        try {
+            orm.create(product2);
+        } catch (Exception e) {
+            database.rollback(sp);  // 回滚到保存点，product1 保留
+        }
+        orm.create(product3);
     });
 }
 ```
 
-## 异常体系
-
-ORM 框架的异常继承 `DBException`（`RuntimeException` 子类），可按场景细化捕获：
-
-```
-RuntimeException
-  └── DBException
-       ├── ConnectionException          ← 连接获取、事务失败
-       ├── DataRetrievalException       ← SQL 查询、更新失败
-       ├── InvalidDataAccessException   ← 配置错误、类型转换、SQL 注入
-       └── PaginationException          ← 分页参数越界
-```
-
-统一捕获：`catch (DBException e)`，细化捕获按子类类型即可。
-
-## 高级使用
-
 ### 同构表（分表）查询
 
-在一些业务场景需要使用另外一个同构表进行操作，可以使用TableAlias类进行操作，假设我们需要根据用户区域进行分表，原始数据表为order，分表为order_1
+通过 `TableAlias` 在运行时动态切换表名，适用于按租户或日期分表的场景：
 
 ```java
 try (Database database = dbTemplate.createDatabase()) {
     Orm orm = database.createOrm();
 
-    TableAlias.set("order_1");
-    Order order = orm.getById(Order.class, id);
+    // 方式一：手动设置 / 清除
+    TableAlias.set("order_2024");
+    List<Order> orders = orm.find(Order.class, new Sql("SELECT * FROM order_2024"));
+    TableAlias.clear();  // 用完后必须清除！
 
-    //此时查询的语句为：select * from order_1 where id = ?
-    TableAlias.clear();    //用完后记得调用clear()方法恢复原表名哦
-
-    Order order = orm.getById(Order.class, id);
-    //此时查询的语句为：select * from order where id = ?
+    // 方式二：Lambda 自动清除（推荐）
+    List<Order> orders = TableAlias.function("order_2024",
+        alias -> orm.find(Order.class, new Sql("SELECT * FROM order_2024")));
 }
 ```
 
-也可以使用以下方式查询：
+---
 
-```java
-try (Database database = dbTemplate.createDatabase()) {
-    Orm orm = database.createOrm();
-
-    Order order = TableAlias.function(
-        "order_1",	//分表名称
-        s -> orm.getById(Order.class, id));
-    //此时查询的语句为：select * from order_1 where id = ?
-
-    Order order = orm.getById(Order.class, id);
-    //此时查询的语句为：select * from order where id = ?
-}
-```
-
-
-
-## 整合SpringBoot
+## Spring Boot 整合
 
 ### 配置类
 
-如果需要使用实体映射，需要在创建Orm对象的时候，对其进行配置
 ```java
 @Configuration
 public class MyFavsConfig {
+
     @Bean
-    public DataSource dataSource(){
-        //创建数据源
+    public DataSource dataSource() {
         return DruidDataSourceBuilder.create().build();
     }
 
     @Bean
-    public DBTemplate dbTemplate(){
-        return new DBTemplate.Builder().dataSource(dataSource()) 
-            .connectionFactory(SpringConnFactory.class)
-            .config(config -> {
-                config.setDbType(DbType.MYSQL)
+    public DBTemplate dbTemplate(DataSource dataSource) {
+        return new DBTemplate.Builder()
+            .dataSource(dataSource)
+            .connectionFactory(SpringConnFactory.class)  // 关键：启用 Spring 事务集成
+            .config(c -> c
+                .setDbType("mysql")
                 .setBatchSize(200)
                 .setFetchSize(100)
-                .setQueryTimeout(120)
-                .setDataCenterId(1L)
-                .setWorkerId(1L);
-            })
-            .mapping(mapper -> {
-                // 注册数据库与JAVA映射，按需注册可提高性能
-                mapper.register(String.class, new StringPropertyHandler())
-                .register(BigDecimal.class, new BigDecimalPropertyHandler())
-                // 基础类型和包装类需要分开注册
-                .register(Long.class, new LongPropertyHandler())
+                .setWorkerId(1L)
+                .setDataCenterId(1L))
+            .mapping(m -> m
+                .register(String.class, new StringPropertyHandler())
                 .register(long.class, new LongPropertyHandler(true))
-                .register(Boolean.class, new BooleanPropertyHandler())
-                .register(int.class, new IntegerPropertyHandler(true))
-                .register(Date.class, new DatePropertyHandler());
-            })
+                .register(Long.class, new LongPropertyHandler())
+                .register(BigDecimal.class, new BigDecimalPropertyHandler())
+                .register(Date.class, new DatePropertyHandler()))
             .build();
     }
 }
 ```
-配置 参数：
-* dbType: 数据库类型，目前支持 mysql、sqlserver、sqlserver2012；
-* showSql: 是否显示 SQL 和 SQL 参数，设置为true则显示，日志级别为info；
-* showResult: 是否显示查询结果，设置为true则显示，日志级别为info；
-* batchSize: 执行批量插入或更新时，每批次处理数据的数量，默认值为200；
-* fetchSize: 执行查询时ResultSet每次抓取数据的数量，默认值为1000；
-* queryTimeout: 执行查询的超时时间，默认为60秒；
-* maxPageSize: 分页查询时，每页最大记录数，设置小于0时，不限制；
-* workerId: 终端ID(雪花算法生成主键用)；
-* dataCenterId: 数据中心ID(雪花算法生成主键用)；
 
-### 属性类型解析器
+> **关键配置**：`connectionFactory(SpringConnFactory.class)` 使 ORM 的数据库连接由 Spring 的 `DataSourceUtils` 管理，从而与 `@Transactional` 共享同一连接和事务上下文。
 
-registerPropertyHandler 内置注册的实体属性类型解析器：
+### Repository
 
 ```java
-register(String.class, new StringPropertyHandler());
-register(java.util.Date.class, new DatePropertyHandler());
-register(BigDecimal.class, new BigDecimalPropertyHandler());
-register(boolean.class, new BooleanPropertyHandler(true));
-register(Boolean.class, new BooleanPropertyHandler());
-register(Boolean.TYPE, new BooleanPropertyHandler());
-register(int.class, new IntegerPropertyHandler(true));
-register(Integer.class, new IntegerPropertyHandler());
-register(Integer.TYPE, new IntegerPropertyHandler());
-register(long.class, new LongPropertyHandler(true));
-register(Long.class, new LongPropertyHandler());
-register(Long.TYPE, new LongPropertyHandler());
-register(UUID.class, new UUIDPropertyHandler());
-register(short.class, new ShortPropertyHandler(true));
-register(Short.class, new ShortPropertyHandler());
-register(Short.TYPE, new ShortPropertyHandler());
-register(double.class, new DoublePropertyHandler(true));
-register(Double.class, new DoublePropertyHandler());
-register(Double.TYPE, new DoublePropertyHandler());
-register(float.class, new FloatPropertyHandler(true));
-register(Float.class, new FloatPropertyHandler());
-register(Float.TYPE, new FloatPropertyHandler());
-register(byte.class, new BytePropertyHandler(true));
-register(Byte.class, new BytePropertyHandler());
-register(Byte.TYPE, new BytePropertyHandler());
-register(byte[].class, new ByteArrayPropertyHandler());
-register(Byte[].class, new ByteArrayPropertyHandler());
-register(Blob.class, new BlobPropertyHandler());
-register(Clob.class, new ClobPropertyHandler());
-```
-### 自定义实体属性类型解析器
+@org.springframework.stereotype.Repository
+public class ProductQuery extends work.myfavs.framework.orm.repository.Query {
+    @Autowired
+    public ProductQuery(@Qualifier("dbTemplate") DBTemplate dbTemplate) {
+        super(dbTemplate);
+    }
+}
 
-我们来看 UUIDPropertyHandler 的实现，只需继承 PropertyHandler 类，实现 ResultSet 类型与目标类型的转换即可：
+@org.springframework.stereotype.Repository
+public class ProductRepository extends work.myfavs.framework.orm.repository.Repository<Product> {
+    @Autowired
+    public ProductRepository(@Qualifier("dbTemplate") DBTemplate dbTemplate) {
+        super(dbTemplate);
+    }
+}
+```
+
+继承链：`SimpleRepository` → `BaseRepository`（只读快捷方法） → `Query`（分页 + Record） → `Repository<T>`（实体 CRUD）。
+
+### 配合 Spring 事务
+
+```java
+@Service
+public class ProductService extends BaseService {
+
+    private final ProductRepository productRepository;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Product save(Product product) {
+        productRepository.create(product);
+        return product;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void update(Long id, Product entity) {
+        Product product = productRepository.getById(id);
+        product.setName(entity.getName());
+        product.setPrice(entity.getPrice());
+        productRepository.update(product);
+    }
+
+    public Page<Product> findByPage() {
+        return productRepository.findPage(Product.class,
+            new Sql("SELECT * FROM tb_product"), true, 1, 10);
+    }
+}
+```
+
+> **多租户示例**：`demos/spring-boot2-demo` 展示了基于 `AbstractRoutingDataSource` + AOP 的运行时多数据源切换方案，可作为参考实现。
+
+---
+
+## 高级特性
+
+### PropertyHandler 类型处理器
+
+`PropertyHandler<T>` 负责 Java 类型与 JDBC 类型的双向转换。内置支持 23 种类型：
+
+```
+PropertyHandler<T>
+  ├── StringPropertyHandler / NVarcharPropertyHandler
+  ├── NumberPropertyHandler (数值类型抽象基类)
+  │     ├── IntegerPropertyHandler (int/Integer, 基础类型和包装类分开)
+  │     ├── LongPropertyHandler    (long/Long)
+  │     ├── DoublePropertyHandler  (double/Double)
+  │     ├── FloatPropertyHandler   (float/Float)
+  │     ├── ShortPropertyHandler   (short/Short)
+  │     ├── BytePropertyHandler    (byte/Byte)
+  │     ├── BooleanPropertyHandler (boolean/Boolean)
+  │     └── BigDecimalPropertyHandler
+  ├── DatePropertyHandler / LocalDateTimePropertyHandler / OffsetDateTimePropertyHandler
+  ├── UUIDPropertyHandler / EnumPropertyHandler
+  ├── BlobPropertyHandler / ClobPropertyHandler / ByteArrayPropertyHandler
+  └── ObjectPropertyHandler (兜底，rs.getObject / ps.setObject)
+```
+
+**自定义类型处理器示例：**
 
 ```java
 public class UUIDPropertyHandler extends PropertyHandler<UUID> {
 
-  @Override
-  public UUID convert(ResultSet rs, int columnIndex, Class<UUID> clazz) throws SQLException {
+    @Override
+    public UUID convert(ResultSet rs, int columnIndex, Class<UUID> clazz) throws SQLException {
+        return ConvertUtil.toUUID(rs.getObject(columnIndex));
+    }
 
-    return ConvertUtil.toUUID(rs.getObject(columnIndex));
-  }
+    @Override
+    public void addParameter(PreparedStatement ps, int paramIndex, UUID param) throws SQLException {
+        ps.setString(paramIndex, param.toString());
+    }
 
-  @Override
-  public void addParameter(PreparedStatement ps, int paramIndex, UUID param) throws SQLException {
-
-    ps.setString(paramIndex, param.toString());
-  }
-
-  @Override
-  public int getSqlType() {
-    return Types.VARCHAR;
-  }
-}
-```
-
-### Repository
-
-按照DDD的思想，我们把 Repository 分为 Query 和 Repository，Query 负责实现查询功能，Repository 负责实现业务功能：
-
-#### Query
-
-```java
-@org.springframework.stereotype.Repository
-public class ProductQuery extends Query {
-    @Autowired
-    public ProductQuery (@Qualifier("dbTemplate") DBTemplate dbTemplate) {
-        super(dbTemplate);
+    @Override
+    public int getSqlType() {
+        return Types.VARCHAR;
     }
 }
-```
-#### Repository
 
-```java
-@org.springframework.stereotype.Repository
-public class ProductRepository extends Repository<Product> {
-    @Autowired
-    public ProductRepository (@Qualifier("dbTemplate") DBTemplate dbTemplate) {
-        super(dbTemplate);
-    }
-}
+// 注册
+new DBTemplate.Builder()
+    .mapping(m -> m.register(UUID.class, new UUIDPropertyHandler()))
+    .build();
 ```
 
+> **注意**：基础类型（`int.class`）和包装类（`Integer.class`）必须分开注册，因为 `PropertyHandlerFactory` 以 Class 对象精确匹配 key。
 
-### 代码生成器
+### 主键策略
 
-可以根据数据库（目前只支持MySQL）结构生成实体类和Repository类，使用方法：
-```java
-//生成器使用方法
-public class GeneratorTest{
-  public void test(){
-    String url      = "jdbc:mysql://127.0.0.1:3306/myfavs_test?useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
-    String user     = "root";
-    String password = "root";
-    
-    GeneratorConfig             config     = new GeneratorConfig();
-    Map<String, TypeDefinition> typeMapper = config.getTypeMapper();
-    
-    config.setDbType(DbType.MYSQL);                                       //数据库类型
-    config.setJdbcUrl(url);                                               //数据库URL
-    config.setJdbcUser(user);                                             //数据库用户
-    config.setJdbcPwd(password);                                          //数据库密码
-    config.setRootPath("D:");                                             //代码输出根目录
+| 策略 | 生成方式 | 适用场景 |
+|---|---|---|
+| `SNOW_FLAKE`（默认） | Twitter Snowflake 算法，生成 `long` 型 ID | 分布式系统推荐 |
+| `UUID` | `UUID.randomUUID().toString()` | 需要全局唯一字符串 ID |
+| `IDENTITY` | 数据库自增（`getGeneratedKeys()` 回读） | 单库自增场景 |
+| `ASSIGNED` | 手动赋值，主键为 null 时抛异常 | 业务主键（如订单号） |
 
-    config.setPrefix("tb_");                                              //忽略的表前缀    
+### 异常体系
 
-    config.setGenEntities(true);                                          //是否生成实体
-    config.setCoverEntitiesIfExists(true);                                //实体存在时是否覆盖？
-    config.setEntitiesPackage("work.myfavs.framework.example.domain.entity");           //实体Package名称
-    
-    config.setGenRepositories(true);                                      //是否生成Repository
-    config.setCoverRepositoriesIfExists(false);                           //Repository存在时是否覆盖？
-    config.setRepositoriesPackage("work.myfavs.framework.example.repository");          //Repository Package名称
-    
-    //注册生成器类型
-    typeMapper.put("varchar", new TypeDefinition("java.lang.String"));
-    typeMapper.put("datetime", new TypeDefinition("java.util.Date"));
-    typeMapper.put("decimal", new TypeDefinition("java.math.BigDecimal", "BigDecimal.ZERO"));
-    typeMapper.put("bigint", new TypeDefinition("java.lang.Long", "long", "0L"));
-    typeMapper.put("int", new TypeDefinition("java.lang.Integer", "int", "0"));
-    typeMapper.put("bit", new TypeDefinition("java.lang.Boolean", "boolean", "false"));
-    
-    codeGenerator = new CodeGenerator(config);
-    codeGenerator.genEntities();
-    codeGenerator.genRepositories();
-  }
-}
+```
+RuntimeException
+  └── DBException                       ← 框架异常总基类
+       ├── ConnectionException          ← 连接获取、事务提交/回滚、保存点失败
+       ├── DataRetrievalException       ← SQL 查询、更新、批量操作、参数绑定失败
+       ├── InvalidDataAccessException   ← 配置错误、类型转换、反射失败
+       └── PaginationException          ← 分页参数越界
 ```
 
-如果数据表对应类型使用的是枚举类，需要在数据表注释（#字符）后指定枚举类全类名（枚举类需手动创建）：
+使用 `catch (DBException e)` 可统一捕获所有 ORM 异常，也可按子类细化处理。
+
+---
+
+## 构建与运行
+
+### 环境要求
+
+- JDK 11+
+- Maven 3.6+
+
+### 构建命令
+
+```bash
+# 全量构建（跳过测试，避免需要真实数据库）
+mvn clean install -DskipTests
+
+# 仅编译核心模块
+mvn compile -pl orm
+
+# 运行全部测试（需要 SQL Server 数据库连接）
+mvn test -pl orm
+
+# 运行单个测试类
+mvn test -pl orm -Dtest=DatabaseTest
+
+# 运行单个测试方法
+mvn test -pl orm -Dtest=DatabaseTest#find
 ```
-数据字段注释#work.myfavs.framework.example.domain.enums.TypeEnum
+
+### 测试说明
+
+- 测试依赖真实 SQL Server 数据库（硬编码 `192.168.8.246:1433`），无法离线运行
+- 测试基类 `AbstractTest` 在 `@BeforeClass` 中自动重建表结构（DROP → CREATE → INSERT 初始数据）
+- 建表脚本：`orm/src/test/resources/sql/mssql/myfavs_master.sql`
+
+---
+
+## Maven 坐标
+
+```xml
+<!-- 核心库（仅 optional 依赖 slf4j-api + druid） -->
+<dependency>
+    <groupId>work.myfavs.framework</groupId>
+    <artifactId>orm</artifactId>
+    <version>1.0.0-260408-1</version>
+</dependency>
+
+<!-- Spring Boot Starter（依赖 orm + optional spring-jdbc） -->
+<dependency>
+    <groupId>work.myfavs.framework</groupId>
+    <artifactId>orm-spring-boot2-starter</artifactId>
+    <version>1.0.0-260408-1</version>
+</dependency>
 ```
+
+发布至 [Maven Central](https://central.sonatype.com/)（Sonatype OSSRH），需要时添加 Sonatype 仓库：
+
+```xml
+<repositories>
+    <repository>
+        <id>sonatype-snapshots</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+</repositories>
+```
+
+---
+
+## 许可
+
+[Apache License 2.0](LICENSE)
