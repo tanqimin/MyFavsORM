@@ -8,16 +8,16 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link PropertyHandler} 工厂类，负责注册和管理属性处理器实例
  */
 public class PropertyHandlerFactory {
 
-  private static final Map<String, PropertyHandler<?>> HANDLER_MAP             = new HashMap<>();
+  private static final Map<String, PropertyHandler<?>> HANDLER_MAP             = new ConcurrentHashMap<>();
   private static final EnumPropertyHandler             ENUM_PROPERTY_HANDLER   = new EnumPropertyHandler();
   private static final ObjectPropertyHandler           OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
 
@@ -81,19 +81,11 @@ public class PropertyHandlerFactory {
    * @param clazz 目标类型
    * @return {@link PropertyHandler} 实例
    */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public static PropertyHandler getInstance(Class<?> clazz) {
 
-    String clazzName = clazz.getName();
-
-    PropertyHandler<?> propertyHandler = HANDLER_MAP.get(clazzName);
-    if (null != propertyHandler) return propertyHandler;
-
-    if (clazz.isEnum()) {
-      HANDLER_MAP.put(clazzName, ENUM_PROPERTY_HANDLER);
-      return ENUM_PROPERTY_HANDLER;
-    }
-
-    return OBJECT_PROPERTY_HANDLER;
+    return HANDLER_MAP.computeIfAbsent(clazz.getName(), key ->
+        clazz.isEnum() ? ENUM_PROPERTY_HANDLER : OBJECT_PROPERTY_HANDLER
+    );
   }
 }

@@ -8,13 +8,23 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 反射工具类
  */
 public class ReflectUtil {
 
-  private final static Map<Class<?>, List<Field>> CLASS_CACHE = new WeakHashMap<>();
+  /**
+   * 类字段列表缓存（key=Class，value=该类的所有字段列表）
+   */
+  private final static Map<Class<?>, List<Field>> CLASS_CACHE = new ConcurrentHashMap<>();
+
+  /**
+   * 按名称查找字段的缓存（key=Class，value=字段名→Field 的映射）
+   * 避免 {@link #getField(Class, String)} 反复调用 {@link Class#getDeclaredField(String)}
+   */
+  private final static Map<Class<?>, Map<String, Field>> FIELD_CACHE = new ConcurrentHashMap<>();
 
   /**
    * 获取指定类的所有 {@link Field}，并设置 Accessible 为 {@code true}
@@ -23,41 +33,44 @@ public class ReflectUtil {
    * @return 所有
    */
   public static List<Field> getFields(Class<?> clazz) {
-    List<Field> fields = CLASS_CACHE.get(clazz);
-    if (null != fields) return fields;
-
-    fields = new ArrayList<>();
-    Class<?> searchClass = clazz;
-    while (searchClass != null) {
-      Field[] declaredFields = searchClass.getDeclaredFields();
-      for (Field declaredField : declaredFields) {
-        declaredField.setAccessible(true);
-        fields.add(declaredField);
+    return CLASS_CACHE.computeIfAbsent(clazz, key -> {
+      List<Field> fields = new ArrayList<>();
+      Class<?> searchClass = key;
+      while (searchClass != null) {
+        Field[] declaredFields = searchClass.getDeclaredFields();
+        for (Field declaredField : declaredFields) {
+          declaredField.setAccessible(true);
+          fields.add(declaredField);
+        }
+        searchClass = searchClass.getSuperclass();
       }
-      searchClass = searchClass.getSuperclass();
-    }
-    CLASS_CACHE.put(clazz, fields);
-    return fields;
+      return fields;
+    });
   }
 
   /**
    * 获取指定类中指定名称的字段，包括继承的字段.
+   * <p>结果会被缓存，首次查找后不会重复调用 {@link Class#getDeclaredField(String)}</p>
    *
    * @param clazz     类型
    * @param fieldName 字段名称
    * @return {@link Field} 对象，未找到时返回 null
    */
   public static Field getField(Class<?> clazz, String fieldName) {
-    while (clazz != null) {
-      try {
-        Field field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return field;
-      } catch (NoSuchFieldException e) {
-        clazz = clazz.getSuperclass();
+    // 按 clazz 级别缓存整个类的字段名→Field 映射
+    Map<String, Field> fieldMap = FIELD_CACHE.computeIfAbsent(clazz, key -> {
+      Map<String, Field> map = new HashMap<>();
+      Class<?> searchClass = key;
+      while (searchClass != null) {
+        for (Field declaredField : searchClass.getDeclaredFields()) {
+          declaredField.setAccessible(true);
+          map.put(declaredField.getName(), declaredField);
+        }
+        searchClass = searchClass.getSuperclass();
       }
-    }
-    return null;
+      return map;
+    });
+    return fieldMap.get(fieldName);
   }
 
   /**

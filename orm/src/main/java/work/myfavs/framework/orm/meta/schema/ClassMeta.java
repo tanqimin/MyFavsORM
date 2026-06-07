@@ -10,6 +10,7 @@ import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 类元数据
@@ -18,7 +19,7 @@ import java.util.*;
  */
 public class ClassMeta {
 
-  private static final Map<String/* className */, ClassMeta> CLASS_META_CACHE = new HashMap<>();
+  private static final Map<String/* className */, ClassMeta> CLASS_META_CACHE = new ConcurrentHashMap<>();
 
   // region Attributes
 
@@ -211,13 +212,7 @@ public class ClassMeta {
    * @return 列元数据
    */
   public static ClassMeta createInstance(Class<?> clazz) {
-    String    className = clazz.getName();
-    ClassMeta classMeta = CLASS_META_CACHE.get(className);
-    if (null == classMeta) {
-      classMeta = new ClassMeta(clazz);
-      CLASS_META_CACHE.put(className, classMeta);
-    }
-    return classMeta;
+    return CLASS_META_CACHE.computeIfAbsent(clazz.getName(), key -> new ClassMeta(clazz));
   }
 
   /**
