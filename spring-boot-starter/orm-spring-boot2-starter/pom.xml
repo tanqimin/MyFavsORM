@@ -21,29 +21,15 @@
   <dependencies>
     <dependency>
       <groupId>work.myfavs.framework</groupId>
-      <artifactId>orm</artifactId>
+      <artifactId>orm-spring-boot-starter-common</artifactId>
       <version>${project.version}</version>
-      <scope>compile</scope>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
+      <version>${spring-jdbc.version}</version>
       <optional>true</optional>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/junit/junit -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
     </dependency>
   </dependencies>
 </project>

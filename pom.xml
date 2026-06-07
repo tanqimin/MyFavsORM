@@ -47,6 +47,8 @@
 
     <slf4j.version>2.0.18</slf4j.version>
     <spring-jdbc.version>5.3.39</spring-jdbc.version>
+    <spring-jdbc6.version>6.2.18</spring-jdbc6.version>
+    <spring-jdbc7.version>7.0.7</spring-jdbc7.version>
 
     <junit.version>4.13.2</junit.version>
     <mockito.version>5.23.0</mockito.version>
@@ -68,7 +70,10 @@
 
   <modules>
     <module>orm</module>
+    <module>spring-boot-starter/orm-spring-boot-starter-common</module>
     <module>spring-boot-starter/orm-spring-boot2-starter</module>
+    <module>spring-boot-starter/orm-spring-boot3-starter</module>
+    <module>spring-boot-starter/orm-spring-boot4-starter</module>
     <module>demos/spring-boot2-demo</module>
   </modules>
 
@@ -139,13 +144,6 @@
         <groupId>com.microsoft.sqlserver</groupId>
         <artifactId>mssql-jdbc</artifactId>
         <version>${mssql-jdbc.version}</version>
-      </dependency>
-
-      <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-        <version>${spring-jdbc.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
