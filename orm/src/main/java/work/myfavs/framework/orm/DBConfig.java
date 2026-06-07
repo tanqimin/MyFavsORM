@@ -321,4 +321,25 @@ public class DBConfig {
     this.pageHasNextField = pageHasNextField;
     return this;
   }
+
+  @Override
+  public String toString() {
+    return "DBConfig{" +
+        "dbType='" + dbType + '\'' +
+        ", batchSize=" + batchSize +
+        ", fetchSize=" + fetchSize +
+        ", showSql=" + showSql +
+        ", showResult=" + showResult +
+        ", maxPageSize=" + maxPageSize +
+        ", defaultIsolation=" + defaultIsolation +
+        ", workerId=" + workerId +
+        ", dataCenterId=" + dataCenterId +
+        ", pageDataField='" + pageDataField + '\'' +
+        ", pageCurrentField='" + pageCurrentField + '\'' +
+        ", pageSizeField='" + pageSizeField + '\'' +
+        ", pageTotalPageField='" + pageTotalPageField + '\'' +
+        ", pageTotalRecordField='" + pageTotalRecordField + '\'' +
+        ", pageHasNextField='" + pageHasNextField + '\'' +
+        '}';
+  }
 }

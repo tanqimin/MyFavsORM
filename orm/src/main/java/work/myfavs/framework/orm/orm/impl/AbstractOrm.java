@@ -921,13 +921,14 @@ public abstract class AbstractOrm implements Orm {
 
     /**
      * 执行SQL，并返回Map
+     * <p>当 {@code keyField} 在查询结果中出现重复值时，后一条记录会覆盖前一条记录（保留最后一个值）</p>
      *
      * @param viewClass 结果集类型
      * @param keyField  返回 Map 的 Key 的字段，必须是 viewClass 中存在的字段
      * @param sql       SQL语句
      * @param params    SQL参数
      * @param <TView>   结果集类型泛型
-     * @return Map
+     * @return Map（key 重复时保留后一条记录）
      */
     public <TKey, TView> Map<TKey, TView> findMap(
             Class<TView> viewClass, String keyField, String sql, Collection<?> params) {

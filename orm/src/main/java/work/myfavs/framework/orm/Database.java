@@ -251,7 +251,11 @@ public class Database implements Closeable {
       database.commit();
       return result;
     } catch (SQLException e) {
-      this.rollback();
+      try {
+        this.rollback();
+      } catch (Exception rollbackEx) {
+        e.addSuppressed(rollbackEx);
+      }
       throw new ConnectionException(e, "执行事务过程中发生异常: %s", e.getMessage());
     } finally {
       callback.run();
@@ -281,7 +285,11 @@ public class Database implements Closeable {
       consumer.accept(orm);
       database.commit();
     } catch (SQLException e) {
-      this.rollback();
+      try {
+        this.rollback();
+      } catch (Exception rollbackEx) {
+        e.addSuppressed(rollbackEx);
+      }
       throw new ConnectionException(e, "执行事务过程中发生异常: %s", e.getMessage());
     } finally {
       callback.run();
