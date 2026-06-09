@@ -8,8 +8,13 @@ import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
+import work.myfavs.framework.orm.util.common.DruidUtil;
 import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 import work.myfavs.framework.orm.util.id.PKGenerator;
+
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
 
 import java.util.*;
 
@@ -120,43 +125,35 @@ public class OrmInserter {
     int result = 0;
 
     for (List<TModel> entityList : batchList) {
-      StringBuilder sqlBuilder = new StringBuilder();
-      sqlBuilder.append("INSERT INTO ").append(tableName).append(" (");
+      SQLInsertStatement insertStmt = DruidUtil.createSQLInsertStatement(tableName);
+      Sql sql = new Sql();
 
-      boolean firstCol = true;
       for (Attribute attr : updateAttributes.values()) {
-        if (!firstCol) sqlBuilder.append(", ");
-        sqlBuilder.append(attr.getColumnName());
-        firstCol = false;
+        insertStmt.getColumns().add(DruidUtil.createColumn(attr.getColumnName()));
       }
       if (null != logicDelete) {
-        if (!firstCol) sqlBuilder.append(", ");
-        sqlBuilder.append(logicDelete.getColumnName());
+        insertStmt.getColumns().add(DruidUtil.createColumn(logicDelete.getColumnName()));
       }
 
-      sqlBuilder.append(") OUTPUT INSERTED.").append(primaryKey.getColumnName()).append(" VALUES ");
-
-      Sql sql = new Sql();
-      for (int i = 0; i < entityList.size(); i++) {
-        TModel entity = entityList.get(i);
-        if (i > 0) sqlBuilder.append(", ");
-        sqlBuilder.append("(");
-        boolean firstVal = true;
+      for (TModel entity : entityList) {
+        final List<SQLExpr> values = new ArrayList<>();
         for (Attribute attr : updateAttributes.values()) {
-          if (!firstVal) sqlBuilder.append(", ");
-          sqlBuilder.append("?");
+          values.add(DruidUtil.createParam());
           sql.getParams().add(attr.getValue(entity));
-          firstVal = false;
         }
         if (null != logicDelete) {
-          if (!firstVal) sqlBuilder.append(", ");
-          sqlBuilder.append("?");
-          sql.getParams().add(0);
+          values.add(new SQLIntegerExpr(0));
         }
-        sqlBuilder.append(")");
+        insertStmt.addValueCause(new SQLInsertStatement.ValuesClause(values));
       }
 
-      sql.append(sqlBuilder.toString());
+      String baseSql = insertStmt.toUnformattedString();
+      int valuesIdx = baseSql.indexOf(" VALUES ");
+      String outputSql = baseSql.substring(0, valuesIdx)
+          + " OUTPUT INSERTED." + primaryKey.getColumnName()
+          + baseSql.substring(valuesIdx);
+
+      sql.append(outputSql);
 
       try (Query query = this.database.createQuery(sql.toString())) {
         query.addParameters(sql.getParams());
@@ -180,55 +177,48 @@ public class OrmInserter {
     final String tableName = OrmSqlBuilder.getTableName(entityMeta);
     final GenerationType strategy = entityMeta.getStrategy();
     final Attribute primaryKey = entityMeta.checkPrimaryKey();
-
-    final List<Sql> sqlList = new ArrayList<>();
+    final Attribute logicDelete = entityMeta.getLogicDelete();
 
     final int batchSize = this.database.getDbConfig().getBatchSize();
     final List<List<TModel>> batchList = CollectionUtil.split(entities, batchSize);
 
     for (List<TModel> entityList : batchList) {
-      boolean insertClauseCompleted = false;
-      Sql insertClause = Sql.create(String.format("INSERT INTO %s (", tableName));
-      Sql valuesClause = Sql.create(") VALUES ");
+      SQLInsertStatement insertStmt = DruidUtil.createSQLInsertStatement(tableName);
+      Sql sql = new Sql();
+
+      final List<SQLExpr> columns = new ArrayList<>();
+      columns.add(DruidUtil.createColumn(primaryKey.getColumnName()));
+      for (Attribute attr : updateAttributes.values()) {
+        columns.add(DruidUtil.createColumn(attr.getColumnName()));
+      }
+      if (null != logicDelete) {
+        columns.add(DruidUtil.createColumn(logicDelete.getColumnName()));
+      }
+      insertStmt.getColumns().addAll(columns);
 
       for (TModel entity : entityList) {
         Object pkVal = generatePrimaryKey(strategy, primaryKey, entity);
 
-        if (!insertClauseCompleted) {
-          insertClause.append(primaryKey.getColumnName() + ",");
-        }
-        valuesClause.append("(?,", pkVal);
+        final List<SQLExpr> values = new ArrayList<>();
+        values.add(DruidUtil.createParam());
+        sql.getParams().add(pkVal);
 
         for (Attribute attr : updateAttributes.values()) {
-          if (!insertClauseCompleted) {
-            insertClause.append(attr.getColumnName() + ",");
-          }
-          valuesClause.append("?,", attr.getValue(entity));
+          values.add(DruidUtil.createParam());
+          sql.getParams().add(attr.getValue(entity));
         }
 
-        if (null != entityMeta.getLogicDelete()) {
-          if (!insertClauseCompleted) {
-            insertClause.append(entityMeta.getLogicDelete().getColumnName() + ",");
-          }
-
-          valuesClause.append("?,", 0);
+        if (null != logicDelete) {
+          values.add(new SQLIntegerExpr(0));
         }
 
-        if (!insertClauseCompleted) {
-          insertClause.deleteLast(",");
-          insertClauseCompleted = true;
-        }
-        valuesClause.deleteLast(",");
-        valuesClause.append("),");
+        insertStmt.addValueCause(new SQLInsertStatement.ValuesClause(values));
       }
 
-      valuesClause.deleteLast(",");
-      sqlList.add(insertClause.append(valuesClause));
+      sql.append(insertStmt.toUnformattedString());
+      result += this.executor.execute(sql);
     }
 
-    for (Sql batchSql : sqlList) {
-      result += this.executor.execute(batchSql);
-    }
     return result;
   }
 
