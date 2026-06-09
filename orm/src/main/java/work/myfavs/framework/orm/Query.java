@@ -1,13 +1,5 @@
 package work.myfavs.framework.orm;
 
-import java.io.Closeable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Collection;
-import java.util.List;
 import work.myfavs.framework.orm.meta.BatchParameters;
 import work.myfavs.framework.orm.meta.SqlLog;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
@@ -15,6 +7,11 @@ import work.myfavs.framework.orm.util.convert.DBConvert;
 import work.myfavs.framework.orm.util.exception.DataRetrievalException;
 import work.myfavs.framework.orm.util.func.ThrowingConsumer;
 import work.myfavs.framework.orm.util.func.ThrowingRunnable;
+
+import java.io.Closeable;
+import java.sql.*;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 对 JDBC 查询基本封装
@@ -79,7 +76,6 @@ public class Query implements Closeable {
     this.alreadySetFetchSize = false;
     this.clearParameters();
     this.closePreparedStatement();
-    this.sqlLog.showSql(sql);
     return this;
   }
 
@@ -390,11 +386,11 @@ public class Query implements Closeable {
   }
 
   /**
-   * 把参数打印到日志
+   * 把参数打印到日志，使用参数内联的完整 SQL 替代原始 SQL 和参数分开输出的方式.
    */
   private void showParameters() {
 
-    this.sqlLog.showParams(this.batchParameters);
+    this.sqlLog.showCompleteSql(this.sql, this.batchParameters);
   }
 
   /**
