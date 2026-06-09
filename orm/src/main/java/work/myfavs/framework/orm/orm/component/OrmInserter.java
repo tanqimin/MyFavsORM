@@ -203,7 +203,7 @@ public class OrmInserter {
           if (!insertClauseCompleted) {
             insertClause.append(attr.getColumnName() + ",");
           }
-          valuesClause.append("?,", attr.getFieldVisitor().<TModel>getValue(entity));
+          valuesClause.append("?,", attr.getValue(entity));
         }
 
         if (null != entityMeta.getLogicDelete()) {

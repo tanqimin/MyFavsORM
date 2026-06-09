@@ -46,7 +46,8 @@ public class PageStrategyTest {
     String sql = result.toString();
     assertTrue("SQL Server 2012 pagination should contain OFFSET", sql.contains("OFFSET"));
     assertTrue("SQL Server 2012 pagination should contain FETCH", sql.contains("FETCH"));
-    assertEquals(2, result.getParams().size());
+    // OFFSET/FETCH 值嵌入 SQL 字面量，不追加到参数列表
+    assertEquals(0, result.getParams().size());
   }
 
   @Test
@@ -91,6 +92,8 @@ public class PageStrategyTest {
     Sql result = SqlServer2012PageStrategy.INSTANCE.apply(sql, params, 1, 10);
     // OFFSET ? ROWS FETCH NEXT ? ROWS ONLY 追加 2 个参数
     assertEquals(3, result.getParams().size());
+    // OFFSET/FETCH 值已嵌入 SQL 字面量，不再作为 ? 参数追加
+    assertEquals(1, result.getParams().size());
   }
 
 }

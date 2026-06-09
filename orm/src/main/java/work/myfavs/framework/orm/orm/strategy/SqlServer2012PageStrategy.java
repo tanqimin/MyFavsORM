@@ -1,7 +1,9 @@
 package work.myfavs.framework.orm.orm.strategy;
 
 import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLLimit;
 import com.alibaba.druid.sql.ast.SQLOrderBy;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.SQLServerSelectQueryBlock;
 import work.myfavs.framework.orm.meta.DbType;
@@ -29,7 +31,10 @@ public class SqlServer2012PageStrategy implements PageStrategy {
       queryBlock.setOrderBy(new SQLOrderBy(SQLUtils.toSQLExpr("CURRENT_TIMESTAMP")));
     }
 
-    return new Sql(selectStmt.toUnformattedString(), params)
-        .append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY", offset, pageSize);
+    SQLLimit sqlLimit = new SQLLimit(new SQLIntegerExpr(offset), new SQLIntegerExpr(pageSize));
+    sqlLimit.setOffsetClause(true);
+    queryBlock.setLimit(sqlLimit);
+
+    return new Sql(selectStmt.toUnformattedString(), params);
   }
 }
