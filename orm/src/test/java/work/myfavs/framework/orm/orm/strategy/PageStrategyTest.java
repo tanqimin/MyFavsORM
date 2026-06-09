@@ -90,8 +90,6 @@ public class PageStrategyTest {
     List<Object> params = List.of("a");
     String sql = "SELECT * FROM t WHERE x = ? ORDER BY id";
     Sql result = SqlServer2012PageStrategy.INSTANCE.apply(sql, params, 1, 10);
-    // OFFSET ? ROWS FETCH NEXT ? ROWS ONLY 追加 2 个参数
-    assertEquals(3, result.getParams().size());
     // OFFSET/FETCH 值已嵌入 SQL 字面量，不再作为 ? 参数追加
     assertEquals(1, result.getParams().size());
   }
