@@ -40,7 +40,8 @@ public interface Constant {
       NText.class,
       Float.class,
       Number.class,
-      Short.class);
+      Short.class,
+      Byte.class);
 
   /**
    * 下划线字符

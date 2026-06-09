@@ -1,7 +1,6 @@
 package work.myfavs.framework.orm.util.convert;
 
 
-import work.myfavs.framework.orm.util.common.ArrayUtil;
 import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
@@ -23,22 +22,69 @@ public class ConvertUtil {
    * @return 集合
    */
   public static Collection<?> toCollection(Object object) {
-    Collection<Object> collection = new ArrayList<>();
-    if (null == object) return collection;
+    if (null == object) return new ArrayList<>();
 
-    if (ArrayUtil.isArray(object)) {
-      Class<?> componentType = object.getClass().getComponentType();
-      if (componentType.isPrimitive()) {
-        int size = Array.getLength(object);
-        for (int i = 0; i < size; i++) {
-          collection.add(Array.get(object, i));
-        }
-        return collection;
-      } else {
-        return List.of((Object[]) object);
-      }
-    } else if (object instanceof Collection<?>) {
+    if (object instanceof Collection) {
       return (Collection<?>) object;
+    }
+    if (object instanceof Object[]) {
+      return new ArrayList<>(Arrays.asList((Object[]) object));
+    }
+    if (object instanceof int[]) {
+      int[] arr = (int[]) object;
+      List<Integer> list = new ArrayList<>(arr.length);
+      for (int v : arr) list.add(v);
+      return list;
+    }
+    if (object instanceof long[]) {
+      long[] arr = (long[]) object;
+      List<Long> list = new ArrayList<>(arr.length);
+      for (long v : arr) list.add(v);
+      return list;
+    }
+    if (object instanceof double[]) {
+      double[] arr = (double[]) object;
+      List<Double> list = new ArrayList<>(arr.length);
+      for (double v : arr) list.add(v);
+      return list;
+    }
+    if (object instanceof float[]) {
+      float[] arr = (float[]) object;
+      List<Float> list = new ArrayList<>(arr.length);
+      for (float v : arr) list.add(v);
+      return list;
+    }
+    if (object instanceof short[]) {
+      short[] arr = (short[]) object;
+      List<Short> list = new ArrayList<>(arr.length);
+      for (short v : arr) list.add(v);
+      return list;
+    }
+    if (object instanceof byte[]) {
+      byte[] arr = (byte[]) object;
+      List<Byte> list = new ArrayList<>(arr.length);
+      for (byte v : arr) list.add(v);
+      return list;
+    }
+    if (object instanceof boolean[]) {
+      boolean[] arr = (boolean[]) object;
+      List<Boolean> list = new ArrayList<>(arr.length);
+      for (boolean v : arr) list.add(v);
+      return list;
+    }
+    if (object instanceof char[]) {
+      char[] arr = (char[]) object;
+      List<Character> list = new ArrayList<>(arr.length);
+      for (char v : arr) list.add(v);
+      return list;
+    }
+    if (object.getClass().isArray()) {
+      Collection<Object> collection = new ArrayList<>();
+      int size = Array.getLength(object);
+      for (int i = 0; i < size; i++) {
+        collection.add(Array.get(object, i));
+      }
+      return collection;
     }
 
     throw new InvalidDataAccessException("不能把类型 %s 转换为 Collection. ", object.getClass().getName());
@@ -148,6 +194,9 @@ public class ConvertUtil {
 
   /**
    * 对象转换为 Bool
+   * <p>支持的 true 值：Boolean#true、非零 Number、字符 Y/T/J、字符串 "Y"/"YES"/"TRUE"/"T"/"J"/"1"（不区分大小写）</p>
+   * <p>支持的 false 值：Boolean#false、零值 Number、字符（非 Y/T/J）、字符串 "0"</p>
+   * <p>未知字符串统一返回 {@code false}</p>
    *
    * @param value       对象
    * @param isPrimitive 是否原始类型
@@ -166,7 +215,6 @@ public class ConvertUtil {
     }
 
     if (value instanceof Character) {
-      // cast to char is required to compile with java 8
       return (char) value == 'Y'
           || (char) value == 'T'
           || (char) value == 'J';
@@ -174,8 +222,10 @@ public class ConvertUtil {
 
     if (value instanceof String) {
       String strVal = ((String) value).trim();
-      return "Y".equalsIgnoreCase(strVal) || "YES".equalsIgnoreCase(strVal) || "TRUE".equalsIgnoreCase(strVal) ||
-          "T".equalsIgnoreCase(strVal) || "J".equalsIgnoreCase(strVal);
+      if ("Y".equalsIgnoreCase(strVal) || "YES".equalsIgnoreCase(strVal) || "TRUE".equalsIgnoreCase(strVal) ||
+          "T".equalsIgnoreCase(strVal) || "J".equalsIgnoreCase(strVal) || "1".equals(strVal))
+        return true;
+      return false;
     }
 
     throw new InvalidDataAccessException("不能把类型 %s 转换为 %s. ", value.getClass().getName(), Boolean.class.getName());
@@ -256,6 +306,9 @@ public class ConvertUtil {
   public static UUID toUUID(Object value) {
     if (null == value)
       return null;
+
+    if (value instanceof UUID)
+      return (UUID) value;
 
     if (value instanceof String) {
       String str = ((String) value).trim();

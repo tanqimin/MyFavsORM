@@ -2,6 +2,10 @@
 
 This file provides guidance to agents when working with code in this repository.
 
+## 语言规则
+
+- **全局使用简体中文**思考和回答问题，包括但不限于：代码注释、commit message、文档说明、与用户的对话交互。
+
 ## 项目非显而易见的核心约定
 
 - **`@Column`、`@PrimaryKey`、`@LogicDelete`** 使用 `@Inherited`，子类会继承父类字段注解；但 **`@Table` 没有 `@Inherited`**，子类必须独立标注 `@Table` 才能被识别为实体
