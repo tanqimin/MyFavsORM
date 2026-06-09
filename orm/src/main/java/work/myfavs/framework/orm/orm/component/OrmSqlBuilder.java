@@ -131,6 +131,46 @@ public class OrmSqlBuilder {
   }
 
   /**
+   * 创建通用 UPDATE 语句（按指定列更新）。
+   *
+   * @param entityMeta      实体类元数据
+   * @param model           实体
+   * @param ignoreNullValue 是否忽略 {@code null} 值字段
+   * @param columns         需要更新的列名数组（{@code null} 表示更新所有可写列）
+   * @param <TModel>        实体类型泛型
+   * @return {@link Sql}
+   */
+  public <TModel> Sql update(ClassMeta entityMeta, TModel model, boolean ignoreNullValue, String[] columns) {
+
+    final Sql sql = new Sql();
+
+    final Attribute primaryKey = entityMeta.checkPrimaryKey();
+    final Attribute logicDelete = entityMeta.getLogicDelete();
+    final String tableName = getTableName(entityMeta);
+
+    final Collection<Attribute> updAttrs = entityMeta.getUpdateAttributes(columns);
+
+    final SQLUpdateStatement updateStatement = DruidUtil.createSQLUpdateStatement(tableName);
+
+    for (Attribute attr : updAttrs) {
+      final Object fieldValue = attr.getValue(model);
+      if (ignoreNullValue && null == fieldValue) continue;
+
+      final SQLUpdateSetItem sqlUpdateSetItem = DruidUtil.createUpdateSetItem(attr.getColumnName());
+      updateStatement.addItem(sqlUpdateSetItem);
+
+      sql.getParams().add(fieldValue);
+    }
+
+    updateStatement.addWhere(createCondition(primaryKey, logicDelete));
+
+    sql.append(updateStatement.toUnformattedString());
+    sql.getParams().add(primaryKey.getValue(model));
+
+    return sql;
+  }
+
+  /**
    * 创建通用 SELECT 语句
    *
    * @param entityMeta 实体类元数据

@@ -91,7 +91,9 @@ public class OrmUpdater {
 
     if (null == entity) return 0;
 
-    return update(modelClass, List.of(entity), columns);
+    final ClassMeta classMeta = Metadata.entityMeta(modelClass);
+    final Sql sql = this.sqlBuilder.update(classMeta, entity, false, columns);
+    return executor.execute(sql);
   }
 
   /**
@@ -258,11 +260,9 @@ public class OrmUpdater {
    * @return 影响行数
    */
   public <TModel> int createOrUpdate(Class<TModel> modelClass, TModel entity, OrmInserter inserter) {
-    if (exists(modelClass, entity)) {
-      return update(modelClass, entity);
-    } else {
-      return inserter.create(modelClass, entity);
-    }
+    int result = update(modelClass, entity);
+    if(result == 0) return inserter.create(modelClass, entity);
+    return result;
   }
 
   private <TModel> boolean exists(Class<TModel> modelClass, TModel entity) {

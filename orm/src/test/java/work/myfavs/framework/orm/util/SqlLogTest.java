@@ -1,38 +1,128 @@
 package work.myfavs.framework.orm.util;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import work.myfavs.framework.orm.meta.BatchParameters;
+import work.myfavs.framework.orm.meta.Record;
+import work.myfavs.framework.orm.meta.SqlLog;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class SqlLogTest {
 
-  private static final Logger log = LoggerFactory.getLogger(SqlLogTest.class);
+  private static final String TEST_SQL = "SELECT * FROM tb_user WHERE id = ?";
 
   @Test
-  public void showResult() {
+  public void shouldLogSqlWhenShowSqlIsTrue() {
 
-    Person p1 = new Person("karl", 18);
-    Person p2 = new Person("tam", 22);
-    Person p3 = new Man("tam", 22, "worker");
+    SqlLog sqlLog = new SqlLog(true, false);
+    sqlLog.showSql(TEST_SQL);
+  }
 
-    List<Person> personList = new ArrayList<>();
-    for (int i = 0; i < 1000000; i++) {
-      personList.add(new Person("name" + i, 18));
-    }
+  @Test
+  public void shouldNotLogSqlWhenShowSqlIsFalse() {
 
-    long      start     = System.currentTimeMillis();
-    StringBuilder sb = new StringBuilder();
-    for (Person person : personList) {
-      //      sb.append(JSON.parseObj(person)
-      //                        .toString());
-      sb.append("\n");
-    }
-    long stop = System.currentTimeMillis();
-    log.debug(sb.toString());
-    log.debug("use : {}", stop - start);
+    SqlLog sqlLog = new SqlLog(false, false);
+    sqlLog.showSql(TEST_SQL);
+  }
+
+  @Test
+  public void shouldLogAffectedRowsForZero() {
+
+    SqlLog sqlLog = new SqlLog(false, true);
+    sqlLog.showAffectedRows(0);
+  }
+
+  @Test
+  public void shouldLogAffectedRowsForOne() {
+
+    SqlLog sqlLog = new SqlLog(false, true);
+    sqlLog.showAffectedRows(1);
+  }
+
+  @Test
+  public void shouldLogAffectedRowsForMany() {
+
+    SqlLog sqlLog = new SqlLog(false, true);
+    sqlLog.showAffectedRows(100);
+  }
+
+  @Test
+  public void shouldLogResultForRecordList() {
+
+    SqlLog sqlLog = new SqlLog(false, true);
+    List<Record> records = List.of(
+        Record.create().set("name", "Alice").set("age", 30),
+        Record.create().set("name", "Bob").set("age", 25)
+    );
+    sqlLog.showResult(Record.class, records);
+  }
+
+  @Test
+  public void shouldLogResultForScalarList() {
+
+    SqlLog sqlLog = new SqlLog(false, true);
+    sqlLog.showResult(Long.class, List.of(1L, 2L, 3L));
+  }
+
+  @Test
+  public void shouldLogResultForEntityList() {
+
+    SqlLog sqlLog = new SqlLog(false, true);
+    sqlLog.showResult(Person.class, List.of(new Person("Alice", 30)));
+  }
+
+  @Test
+  public void shouldHandleEmptyResultList() {
+
+    SqlLog sqlLog = new SqlLog(false, true);
+    sqlLog.showResult(Record.class, List.of());
+    sqlLog.showResult(Long.class, List.of());
+    sqlLog.showResult(Person.class, List.of());
+  }
+
+  @Test
+  public void shouldShowParamsForSingleBatch() {
+
+    SqlLog       sqlLog   = new SqlLog(true, false);
+    BatchParameters bp     = new BatchParameters();
+    bp.getCurrentBatchParameters().addParameter("Alice");
+    bp.getCurrentBatchParameters().addParameter(30);
+    sqlLog.showParams(bp);
+  }
+
+  @Test
+  public void shouldShowParamsForMultiBatch() {
+
+    SqlLog       sqlLog   = new SqlLog(true, false);
+    BatchParameters bp     = new BatchParameters();
+    bp.getCurrentBatchParameters().addParameter("Alice");
+    bp.addBatch();
+    bp.getCurrentBatchParameters().addParameter("Bob");
+    sqlLog.showParams(bp);
+  }
+
+  @Test
+  public void shouldHandleNullParams() {
+
+    SqlLog sqlLog = new SqlLog(true, false);
+    sqlLog.showParams(null);
+  }
+
+  @Test
+  public void shouldHandleEmptyParams() {
+
+    SqlLog         sqlLog = new SqlLog(true, false);
+    BatchParameters bp    = new BatchParameters();
+    sqlLog.showParams(bp);
+  }
+
+  @Test
+  public void shouldLogFormattedResultMessage() {
+
+    SqlLog sqlLog = new SqlLog(false, true);
+    sqlLog.showResult("语句执行成功, 耗时: {} ms", 42);
   }
 
   static class Person {
@@ -40,51 +130,25 @@ public class SqlLogTest {
     private String name;
     private int    age;
 
-    public String getName() {
+    public Person(String name, int age) {
+      this.name = name;
+      this.age = age;
+    }
 
+    public String getName() {
       return name;
     }
 
     public void setName(String name) {
-
       this.name = name;
     }
 
     public int getAge() {
-
       return age;
     }
 
     public void setAge(int age) {
-
       this.age = age;
-    }
-
-    public Person(String name, int age) {
-
-      this.name = name;
-      this.age = age;
-    }
-  }
-
-  class Man extends Person {
-
-    public Man(String name, int age, String job) {
-
-      super(name, age);
-      this.job = job;
-    }
-
-    private String job;
-
-    public String getJob() {
-
-      return job;
-    }
-
-    public void setJob(String job) {
-
-      this.job = job;
     }
   }
 }
