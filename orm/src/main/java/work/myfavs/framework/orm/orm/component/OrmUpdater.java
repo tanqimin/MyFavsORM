@@ -1,11 +1,20 @@
 package work.myfavs.framework.orm.orm.component;
 
-import com.alibaba.druid.sql.ast.expr.*;
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
+import com.alibaba.druid.sql.ast.expr.SQLCaseExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLInListExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.Query;
-import work.myfavs.framework.orm.meta.clause.Cond;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
@@ -13,8 +22,6 @@ import work.myfavs.framework.orm.meta.schema.Metadata;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.common.DruidUtil;
 import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
-
-import java.util.*;
 
 /**
  * 实体更新器，处理实体更新逻辑。
@@ -263,18 +270,5 @@ public class OrmUpdater {
     int result = update(modelClass, entity);
     if(result == 0) return inserter.create(modelClass, entity);
     return result;
-  }
-
-  private <TModel> boolean exists(Class<TModel> modelClass, TModel entity) {
-    if (null == entity) return false;
-
-    final ClassMeta entityMeta = Metadata.entityMeta(modelClass);
-    final Attribute primaryKey = entityMeta.checkPrimaryKey();
-    final Object pkVal = primaryKey.getValue(entity);
-
-    if (null == pkVal) return false;
-
-    final Sql existSql = this.sqlBuilder.countSql(entityMeta).where(Cond.eq(primaryKey.getColumnName(), pkVal));
-    return this.executor.execute(existSql.toString(), existSql.getParams()) > 0;
   }
 }

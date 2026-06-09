@@ -26,7 +26,7 @@ public class FieldVisitor {
    * @return 字段值
    */
   public <T> T getValue(Object entity) {
-    return ReflectUtil.<T>getFieldValue(this.field, entity);
+    return ReflectUtil.getFieldValue(this.field, entity);
   }
 
   /**

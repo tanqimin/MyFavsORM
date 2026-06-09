@@ -1,13 +1,10 @@
 package work.myfavs.framework.orm.util;
 
+import java.util.List;
 import org.junit.Test;
 import work.myfavs.framework.orm.meta.BatchParameters;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.SqlLog;
-
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class SqlLogTest {
 
