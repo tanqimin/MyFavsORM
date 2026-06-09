@@ -73,28 +73,31 @@ public class SqlLog {
   }
 
   /**
-   * 输出受影响行数
+   * 输出受影响行数及执行耗时
    *
-   * @param result 受影响行数
+   * @param result  受影响行数
+   * @param elapsed 执行耗时(ms)
    */
-  public void showAffectedRows(int result) {
+  public void showAffectedRows(int result, long elapsed) {
     if (!this.showResult) return;
 
     if (Math.abs(result) > 1) {
-      log.debug("语句执行成功, {} 行受影响. ", result);
+      log.debug("语句执行成功, {} 行受影响. (耗时: {} ms)", result, elapsed);
       return;
     }
-    log.debug("语句执行成功. ");
+    log.debug("语句执行成功. (耗时: {} ms)", elapsed);
   }
 
   /**
-   * 输出查询结果列表
+   * 以 CSV 格式输出查询结果列表，包含执行耗时和转换耗时
    *
-   * @param viewClass 视图类型
-   * @param result    查询结果列表
-   * @param <TView>   视图类型
+   * @param viewClass      视图类型
+   * @param result         查询结果列表
+   * @param queryElapsed   查询执行耗时(ms)
+   * @param convertElapsed ResultSet 转换耗时(ms)
+   * @param <TView>        视图类型
    */
-  public <TView> void showResult(Class<TView> viewClass, List<TView> result) {
+  public <TView> void showResult(Class<TView> viewClass, List<TView> result, long queryElapsed, long convertElapsed) {
     if (!this.showResult) return;
 
     if (isRecord(viewClass)) {
@@ -104,7 +107,8 @@ public class SqlLog {
     } else {
       showEntities(viewClass, result);
     }
-    log.debug(String.format("查询执行成功, %d 行受影响. ", result.size()));
+    log.debug("查询执行成功, 返回 {} 条记录. (执行耗时: {} ms, 转换耗时: {} ms)",
+        result.size(), queryElapsed, convertElapsed);
   }
 
   private static <TView> boolean isRecord(Class<TView> viewClass) {
@@ -139,7 +143,7 @@ public class SqlLog {
   private <TView> void showScalar(List<TView> result) {
     log.debug(TITLE_RES);
     for (TView tView : result) {
-      log.debug(format(tView));
+      log.debug(formatCsvValue(tView));
     }
   }
 
@@ -166,12 +170,34 @@ public class SqlLog {
     return String.format("'%s'", param);
   }
 
+  /**
+   * 将值格式化为 CSV 单元格格式（对含逗号、双引号、换行符的值进行双引号转义）
+   *
+   * @param value 值
+   * @return CSV 单元格字符串
+   */
+  private String formatCsvValue(Object value) {
+    if (null == value) return "";
+    String str;
+    if (value instanceof Number) {
+      str = value.toString();
+    } else if (value instanceof Date) {
+      str = Constant.DATE_FORMATTER.format(value);
+    } else {
+      str = value.toString();
+    }
+    if (str.contains(",") || str.contains("\"") || str.contains("\n")) {
+      return "\"" + str.replace("\"", "\"\"") + "\"";
+    }
+    return str;
+  }
+
   private String formatAttrName(Collection<Attribute> attributes) {
     return CollectionUtil.join(attributes, Constant.SYMBOL_COMMA, Attribute::getColumnName);
   }
 
   private <TView> String formatAttrValue(TView tView, Collection<Attribute> attributes) {
-    return CollectionUtil.join(attributes, Constant.SYMBOL_COMMA, attribute -> format(attribute.getValue(tView)));
+    return CollectionUtil.join(attributes, Constant.SYMBOL_COMMA, attribute -> formatCsvValue(attribute.getValue(tView)));
   }
 
   private String formatRecordKeySet(Record record) {
@@ -179,6 +205,6 @@ public class SqlLog {
   }
 
   private String formatRecordValues(Record record) {
-    return CollectionUtil.join(record.values(), Constant.SYMBOL_COMMA, this::format);
+    return CollectionUtil.join(record.values(), Constant.SYMBOL_COMMA, this::formatCsvValue);
   }
 }

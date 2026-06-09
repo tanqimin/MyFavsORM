@@ -28,21 +28,21 @@ public class SqlLogTest {
   public void shouldLogAffectedRowsForZero() {
 
     SqlLog sqlLog = new SqlLog(false, true);
-    sqlLog.showAffectedRows(0);
+    sqlLog.showAffectedRows(0, 0);
   }
 
   @Test
   public void shouldLogAffectedRowsForOne() {
 
     SqlLog sqlLog = new SqlLog(false, true);
-    sqlLog.showAffectedRows(1);
+    sqlLog.showAffectedRows(1, 0);
   }
 
   @Test
   public void shouldLogAffectedRowsForMany() {
 
     SqlLog sqlLog = new SqlLog(false, true);
-    sqlLog.showAffectedRows(100);
+    sqlLog.showAffectedRows(100, 0);
   }
 
   @Test
@@ -53,30 +53,30 @@ public class SqlLogTest {
         Record.create().set("name", "Alice").set("age", 30),
         Record.create().set("name", "Bob").set("age", 25)
     );
-    sqlLog.showResult(Record.class, records);
+    sqlLog.showResult(Record.class, records, 0, 0);
   }
 
   @Test
   public void shouldLogResultForScalarList() {
 
     SqlLog sqlLog = new SqlLog(false, true);
-    sqlLog.showResult(Long.class, List.of(1L, 2L, 3L));
+    sqlLog.showResult(Long.class, List.of(1L, 2L, 3L), 0, 0);
   }
 
   @Test
   public void shouldLogResultForEntityList() {
 
     SqlLog sqlLog = new SqlLog(false, true);
-    sqlLog.showResult(Person.class, List.of(new Person("Alice", 30)));
+    sqlLog.showResult(Person.class, List.of(new Person("Alice", 30)), 0, 0);
   }
 
   @Test
   public void shouldHandleEmptyResultList() {
 
     SqlLog sqlLog = new SqlLog(false, true);
-    sqlLog.showResult(Record.class, List.of());
-    sqlLog.showResult(Long.class, List.of());
-    sqlLog.showResult(Person.class, List.of());
+    sqlLog.showResult(Record.class, List.of(), 0, 0);
+    sqlLog.showResult(Long.class, List.of(), 0, 0);
+    sqlLog.showResult(Person.class, List.of(), 0, 0);
   }
 
   @Test

@@ -183,8 +183,16 @@ public class Query implements Closeable {
     this.applyParameters(preparedStatement);
     this.showParameters();
 
+    final long queryStart = System.nanoTime();
     try (final ResultSet resultSet = this.execQuery(preparedStatement)) {
-      return this.convertToList(modelClass, resultSet);
+      final long queryElapsed = (System.nanoTime() - queryStart) / 1_000_000;
+
+      final long convertStart = System.nanoTime();
+      List<TModel> result = this.convertToList(modelClass, resultSet);
+      final long convertElapsed = (System.nanoTime() - convertStart) / 1_000_000;
+
+      this.sqlLog.showResult(modelClass, result, queryElapsed, convertElapsed);
+      return result;
     } catch (SQLException ex) {
       throw new DataRetrievalException(ex, "执行 executeQuery 查询时发生异常: %s", ex.getMessage());
     } finally {
@@ -211,7 +219,10 @@ public class Query implements Closeable {
       this.applyParameters(preparedStatement);
       this.showParameters();
 
-      final int result = execUpdate(preparedStatement);
+      final long start = System.nanoTime();
+      final int  result = preparedStatement.executeUpdate();
+
+      this.sqlLog.showAffectedRows(result, (System.nanoTime() - start) / 1_000_000);
       this.generatedKeys(preparedStatement, keysConsumer);
       return result;
     } catch (SQLException e) {
@@ -253,7 +264,10 @@ public class Query implements Closeable {
       this.applyBatchParameters(preparedStatement);
       this.showParameters();
 
-      final int[] result = execBatch(preparedStatement);
+      final long start = System.nanoTime();
+      final int[] result = preparedStatement.executeBatch();
+
+      this.sqlLog.showAffectedRows(result.length, (System.nanoTime() - start) / 1_000_000);
       this.generatedKeys(preparedStatement, keysConsumer);
       return result;
     } catch (SQLException e) {
@@ -325,12 +339,7 @@ public class Query implements Closeable {
    */
   private ResultSet execQuery(PreparedStatement preparedStatement) throws SQLException {
 
-    final long start     = System.currentTimeMillis();
-    ResultSet  resultSet = preparedStatement.executeQuery();
-    final long end       = System.currentTimeMillis();
-
-    this.sqlLog.showResult("执行 executeQuery 查询消耗时间: {} ms", end - start);
-    return resultSet;
+    return preparedStatement.executeQuery();
   }
 
   /**
@@ -344,13 +353,7 @@ public class Query implements Closeable {
    */
   private <TModel> List<TModel> convertToList(Class<TModel> modelClass, ResultSet resultSet) throws SQLException {
 
-    final long   start  = System.currentTimeMillis();
-    List<TModel> result = DBConvert.toList(modelClass, resultSet);
-    final long   end    = System.currentTimeMillis();
-
-    this.sqlLog.showResult(modelClass, result);
-    this.sqlLog.showResult("ResultSet 转换成 List<{}> 消耗时间: {} ms", modelClass.getSimpleName(), end - start);
-    return result;
+    return DBConvert.toList(modelClass, resultSet);
   }
 
 
@@ -369,42 +372,6 @@ public class Query implements Closeable {
 
     this.sqlLog.showResult("生成主键消耗时间: {} ms", end - start);
     return resultSet;
-  }
-
-  /**
-   * 执行更新，并进行性能统计
-   *
-   * @param preparedStatement {@link PreparedStatement}
-   * @return 影响行数
-   * @throws SQLException 执行更新过程抛出的异常
-   */
-  private Integer execUpdate(PreparedStatement preparedStatement) throws SQLException {
-
-    final long start  = System.currentTimeMillis();
-    int        result = preparedStatement.executeUpdate();
-    final long end    = System.currentTimeMillis();
-
-    this.sqlLog.showAffectedRows(result);
-    this.sqlLog.showResult("执行 executeUpdate 查询消耗时间: {} ms", end - start);
-    return result;
-  }
-
-  /**
-   * 执行批量更新，并进行性能统计
-   *
-   * @param preparedStatement {@link PreparedStatement}
-   * @return 返回数组，包含每个查询的影响行数
-   * @throws SQLException 执行批量更新过程抛出的异常
-   */
-  private int[] execBatch(PreparedStatement preparedStatement) throws SQLException {
-
-    final long start  = System.currentTimeMillis();
-    int[]      result = preparedStatement.executeBatch();
-    final long end    = System.currentTimeMillis();
-
-    this.sqlLog.showAffectedRows(result.length);
-    this.sqlLog.showResult("执行 executeBatch 查询消耗时间: {} ms", end - start);
-    return result;
   }
 
   /**
