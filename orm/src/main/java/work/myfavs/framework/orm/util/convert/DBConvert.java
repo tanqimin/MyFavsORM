@@ -50,18 +50,22 @@ public class DBConvert {
     ClassMeta                                   classMeta  = Metadata.classMeta(modelClass);
     final Map<String /*columnName*/, Attribute> attributes = classMeta.getQueryAttributes();
 
-    final List<TModel>      result      = new ArrayList<>();
     final ResultSetMetaData metaData    = rs.getMetaData();
     final int               columnCount = metaData.getColumnCount();
 
+    // 缓存列标签（大写）到数组，避免每行重复调用 getColumnLabel + toUpperCase
+    final String[] columnLabels = new String[columnCount];
+    for (int i = 0; i < columnCount; i++) {
+      columnLabels[i] = metaData.getColumnLabel(i + 1).toUpperCase();
+    }
+
+    final List<TModel> result = new ArrayList<>();
     while (rs.next()) {
       TModel model = ReflectUtil.newInstance(modelClass);
-      for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-
-        String    columnLabel = metaData.getColumnLabel(columnIndex).toUpperCase();
-        Attribute attr        = attributes.get(columnLabel);
+      for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+        Attribute attr = attributes.get(columnLabels[columnIndex]);
         if (null == attr) continue;
-        attr.setValue(model, rs, columnIndex);
+        attr.setValue(model, rs, columnIndex + 1);
       }
       result.add(model);
     }
@@ -72,16 +76,21 @@ public class DBConvert {
   private static <TModel> List<TModel> toRecords(Class<TModel> modelClass, ResultSet rs)
       throws SQLException {
 
-    final List<TModel>      result      = new ArrayList<>();
     final ResultSetMetaData metaData    = rs.getMetaData();
     final int               columnCount = metaData.getColumnCount();
 
+    // 缓存列标签到数组，避免每行重复调用 getColumnLabel
+    final String[] columnLabels = new String[columnCount];
+    for (int i = 0; i < columnCount; i++) {
+      columnLabels[i] = metaData.getColumnLabel(i + 1);
+    }
+
+    final List<TModel> result = new ArrayList<>();
     while (rs.next()) {
       TModel tModel = ReflectUtil.newInstance(modelClass);
-      for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-        String columnLabel = metaData.getColumnLabel(columnIndex);
-        Object colValue    = rs.getObject(columnIndex);
-        ((Record) tModel).put(columnLabel, colValue);
+      for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+        Object colValue = rs.getObject(columnIndex + 1);
+        ((Record) tModel).put(columnLabels[columnIndex], colValue);
       }
       result.add(tModel);
     }

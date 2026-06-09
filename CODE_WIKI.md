@@ -1013,37 +1013,57 @@ public class PKGenerator {
 ### 三种分发路径
 
 ```java
-public static <T> List<T> convert(Database db, Query query, Class<T> clazz) {
-    ResultSet rs = query.getResultSet();
+public static <T> List<T> toList(Class<T> modelClass, ResultSet rs) {
     // 1. Record → 动态 Map
-    if (clazz == Record.class) return convertToRecord(rs);
+    if (modelClass == Record.class) return toRecords(modelClass, rs);
     // 2. 基础类型/包装类 → PropertyHandler 单列读取
-    if (isPrimitiveOrWrapper(clazz)) return convertToScalar(rs, clazz);
+    if (isPrimitiveOrWrapper(modelClass)) return toScalar(modelClass, rs);
     // 3. 实体类 → ClassMeta 字段映射
-    return convertToEntity(rs, clazz);
+    return toEntities(modelClass, rs);
 }
 ```
 
 ### Entity 映射流程
 
 ```java
-convertToEntity(rs, clazz):
-  ClassMeta cm = Metadata.classMeta(clazz);
+toEntities(modelClass, rs):
+  ClassMeta cm = Metadata.classMeta(modelClass);
+  String[] columnLabels = [预读取: metaData.getColumnLabel(i).toUpperCase()]  // ① 列标签缓存
   for each row in rs:
-    T instance = clazz.getDeclaredConstructor().newInstance();
-    for each attr in cm.getQueryAttributes():
-      Object val = attr.getPropertyHandler().convert(rs, columnIndex, fieldType);
-      attr.getFieldVisitor().setValue(instance, val);
-    result.add(instance);
+    T instance = ReflectUtil.newInstance(modelClass)  // ② 构造器缓存 (ConcurrentHashMap)
+    for i = 0..columnCount:
+      Attribute attr = queryAttributes.get(columnLabels[i])
+      if attr != null:
+        attr.setValue(instance, rs, columnIndex)
+    result.add(instance)
+```
+
+### 性能优化策略
+
+| 优化点 | 优化方式 | 代码位置 |
+|---|---|---|
+| ① 列标签缓存 | 在行遍历前将 `getColumnLabel()` + `toUpperCase()` 结果预存到 `String[]` | `DBConvert.java:57-60` |
+| ② 构造器缓存 | `ReflectUtil` 中通过 `ConcurrentHashMap<Class<?>, Constructor<?>>` 缓存无参构造器 | `ReflectUtil.java:31, 146-159` |
+
+### Record 映射
+
+```java
+toRecords(modelClass, rs):
+  String[] columnLabels = [预读取: metaData.getColumnLabel(i)]  // 同上列标签缓存
+  for each row:
+    Record rec = ReflectUtil.newInstance(modelClass)
+    for i = 0..columnCount:
+      rec.put(columnLabels[i], rs.getObject(columnIndex))
+    result.add(rec)
 ```
 
 ### Scalar 映射
 
 ```java
-convertToScalar(rs, clazz):
-  PropertyHandler handler = PropertyHandlerFactory.getInstance(clazz);
+toScalar(modelClass, rs):
+  PropertyHandler handler = PropertyHandlerFactory.getInstance(modelClass);
   for each row:
-    result.add(handler.convert(rs, 1, clazz));
+    result.add(handler.convert(rs, 1, modelClass));
 ```
 
 ---
@@ -1138,9 +1158,11 @@ char FUZZY_ESCAPE = '¦';                 // LIKE 转义字符
 
 ```java
 getGenericActualTypeArguments(Class<?>)  // 获取泛型实际类型参数
-getField(Class<?>, String)               // 反射获取字段（含继承）
+getField(Class<?>, String)               // 反射获取字段（含继承，缓存 Field 映射）
 setFieldValue(Object, Field, Object)     // 设置字段值
 getFieldValue(Object, Field)             // 获取字段值
+newInstance(Class, Object...)            // 创建实例（无参构造器通过 ConcurrentHashMap 缓存）
+getConstructor(Class, Class...)          // 获取构造方法（无参构造器通过 ConcurrentHashMap 缓存）
 ```
 
 ### FieldVisitor

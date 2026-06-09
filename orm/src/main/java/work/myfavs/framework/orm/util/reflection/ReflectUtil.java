@@ -27,6 +27,12 @@ public class ReflectUtil {
   private final static Map<Class<?>, Map<String, Field>> FIELD_CACHE = new ConcurrentHashMap<>();
 
   /**
+   * 无参构造方法缓存（key=Class，value=Constructor）
+   * 避免 {@link #newInstance(Class, Object...)} 反复调用 {@link Class#getDeclaredConstructor(Class[])}
+   */
+  private final static Map<Class<?>, Constructor<?>> CONSTRUCTOR_CACHE = new ConcurrentHashMap<>();
+
+  /**
    * 获取指定类的所有 {@link Field}，并设置 Accessible 为 {@code true}
    *
    * @param clazz 类型
@@ -143,6 +149,15 @@ public class ReflectUtil {
   public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... parameterTypes) {
     Objects.requireNonNull(clazz);
     try {
+      if (parameterTypes == null || parameterTypes.length == 0) {
+        return CONSTRUCTOR_CACHE.computeIfAbsent(clazz, key -> {
+          try {
+            return key.getDeclaredConstructor();
+          } catch (NoSuchMethodException e) {
+            throw new InvalidDataAccessException(e, "获取 %s 类型的构造方法时发生异常: %s", key.getName(), e.getMessage());
+          }
+        });
+      }
       return clazz.getDeclaredConstructor(parameterTypes);
     } catch (NoSuchMethodException e) {
       throw new InvalidDataAccessException(e, "获取 %s 类型的构造方法时发生异常: %s", clazz.getName(), e.getMessage());
