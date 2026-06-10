@@ -34,6 +34,14 @@
       <optional>true</optional>
     </dependency>
 
+    <!-- BaseService.java 直接使用 spring-tx 中的 PlatformTransactionManager 等类 -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>${spring-jdbc.version}</version>
+      <optional>true</optional>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/junit/junit -->
     <dependency>
       <groupId>junit</groupId>

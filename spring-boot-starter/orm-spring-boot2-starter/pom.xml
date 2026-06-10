@@ -31,5 +31,12 @@
       <version>${spring-jdbc.version}</version>
       <optional>true</optional>
     </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>${spring-jdbc.version}</version>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 </project>
