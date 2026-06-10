@@ -2,6 +2,7 @@ package work.myfavs.framework.orm.meta.pagination;
 
 import java.io.Serializable;
 import java.util.List;
+import work.myfavs.framework.orm.meta.criteria.SortableCriteria;
 
 /**
  * 排序接口，定义排序条件集合的获取方法。

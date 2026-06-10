@@ -1,5 +1,6 @@
 package work.myfavs.framework.orm.meta.pagination;
 
+import work.myfavs.framework.orm.meta.criteria.SortableCriteria;
 import work.myfavs.framework.orm.util.common.Constant;
 import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
