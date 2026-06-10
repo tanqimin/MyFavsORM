@@ -14,7 +14,7 @@
   <parent>
     <groupId>work.myfavs.framework</groupId>
     <artifactId>pom</artifactId>
-    <version>1.0.0-260408-1</version>
+    <version>1.0.0-260610-1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
