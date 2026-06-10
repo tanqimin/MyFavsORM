@@ -11,6 +11,7 @@ import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
 import work.myfavs.framework.orm.meta.schema.Metadata;
+import work.myfavs.framework.orm.orm.dialect.MySqlDialect;
 
 import static org.junit.Assert.*;
 
@@ -24,7 +25,7 @@ public class OrmSqlBuilderTest {
 
   @Before
   public void setUp() {
-    sqlBuilder = new OrmSqlBuilder("mysql");
+    sqlBuilder = new OrmSqlBuilder(MySqlDialect.INSTANCE);
     snowflakeMeta = Metadata.entityMeta(SnowflakeExample.class);
     identityMeta = Metadata.entityMeta(IdentityExample.class);
     uuidMeta = Metadata.entityMeta(UuidExample.class);

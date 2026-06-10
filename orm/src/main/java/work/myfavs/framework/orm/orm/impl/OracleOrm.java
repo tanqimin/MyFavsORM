@@ -1,13 +1,12 @@
 package work.myfavs.framework.orm.orm.impl;
 
 import work.myfavs.framework.orm.Database;
-import work.myfavs.framework.orm.orm.strategy.OraclePageStrategy;
+import work.myfavs.framework.orm.orm.dialect.OracleDialect;
 
 /**
  * ORM Oracle 实现。
- * <p>使用 {@link OraclePageStrategy}（ROWNUM 双层子查询）作为分页策略。</p>
+ * <p>使用 {@link OracleDialect}（ROWNUM 双层子查询分页 + MERGE UPSERT）。</p>
  *
- * @see OraclePageStrategy
  * @see MySqlOrm
  */
 public class OracleOrm extends AbstractOrm {
@@ -18,6 +17,6 @@ public class OracleOrm extends AbstractOrm {
    * @param database {@link Database} 实例
    */
   public OracleOrm(Database database) {
-    super(database, OraclePageStrategy.INSTANCE);
+    super(database, OracleDialect.INSTANCE);
   }
 }

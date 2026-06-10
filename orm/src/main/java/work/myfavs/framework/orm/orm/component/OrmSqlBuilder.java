@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.orm.component;
 
-import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.PagerUtils;
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLExpr;
@@ -13,24 +12,26 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
 import work.myfavs.framework.orm.meta.schema.Attribute;
 import work.myfavs.framework.orm.meta.schema.ClassMeta;
+import work.myfavs.framework.orm.orm.dialect.SqlDialect;
 import work.myfavs.framework.orm.util.common.DruidUtil;
 
 import java.util.*;
 
 /**
- * SQL 语句构建器，封装 Druid AST 构建的通用 SQL 语句生成逻辑
+ * SQL 语句构建器，封装 Druid AST 构建的通用 SQL 语句生成逻辑。
+ * <p>数据库方言相关的行为（分页、UPSERT 等）委派给 {@link SqlDialect}。</p>
  */
 public class OrmSqlBuilder {
 
-  private final String dbType;
+  private final SqlDialect dialect;
 
   /**
    * 构造 OrmSqlBuilder 实例.
    *
-   * @param dbType 数据库类型字符串（如 "mysql", "sqlserver"），用于 Druid AST 解析和 COUNT 改写
+   * @param dialect {@link SqlDialect} 方言实例
    */
-  public OrmSqlBuilder(String dbType) {
-    this.dbType = dbType;
+  public OrmSqlBuilder(SqlDialect dialect) {
+    this.dialect = dialect;
   }
 
   /**
@@ -206,7 +207,7 @@ public class OrmSqlBuilder {
    * @return COUNT(*) 语句
    */
   public Sql countSql(String sql, Collection<?> params) {
-    DbType druidDbType = DruidUtil.convert(dbType);
+    com.alibaba.druid.DbType druidDbType = this.dialect.getDruidDbType();
     String count = SQLUtils.format(
         PagerUtils.count(sql, druidDbType),
         druidDbType, new SQLUtils.FormatOption(true, false));
@@ -238,5 +239,59 @@ public class OrmSqlBuilder {
       );
     }
     return condition;
+  }
+
+  /**
+   * 创建 UPSERT（INSERT OR UPDATE）SQL 语句模板。
+   * <p>委派给 {@link SqlDialect#getUpsertSql(String, List, String)} 生成，
+   * 各数据库的 UPSERT 语法差异由方言实现隔离。</p>
+   *
+   * @param entityMeta 实体类元数据
+   * @return UPSERT SQL 模板（参数为 {@code ?} 占位符）
+   */
+  public String createOrUpdateSql(ClassMeta entityMeta) {
+
+    final Attribute              primaryKey       = entityMeta.checkPrimaryKey();
+    final Attribute              logicDelete      = entityMeta.getLogicDelete();
+    final Map<String, Attribute> updateAttributes = entityMeta.getUpdateAttributes();
+    final String                 tableName        = getTableName(entityMeta);
+
+    final List<String> columnNames = new ArrayList<>();
+    columnNames.add(primaryKey.getColumnName());
+    for (Attribute attr : updateAttributes.values()) {
+      columnNames.add(attr.getColumnName());
+    }
+    if (null != logicDelete) {
+      columnNames.add(logicDelete.getColumnName());
+    }
+
+    return this.dialect.getUpsertSql(tableName, columnNames, primaryKey.getColumnName());
+  }
+
+  /**
+   * 创建 UPSERT SQL 语句模板（含自增主键标记）。
+   *
+   * @param entityMeta 实体类元数据
+   * @param isIdentity 是否自增主键策略
+   * @return UPSERT SQL 模板
+   * @see SqlDialect#getUpsertSql(String, List, String, boolean)
+   */
+  public String createOrUpdateSql(ClassMeta entityMeta, boolean isIdentity) {
+
+    final Attribute              primaryKey       = entityMeta.checkPrimaryKey();
+    final Attribute              logicDelete      = entityMeta.getLogicDelete();
+    final Map<String, Attribute> updateAttributes = entityMeta.getUpdateAttributes();
+    final String                 tableName        = getTableName(entityMeta);
+
+    final List<String> columnNames = new ArrayList<>();
+    columnNames.add(primaryKey.getColumnName());
+    for (Attribute attr : updateAttributes.values()) {
+      columnNames.add(attr.getColumnName());
+    }
+    if (null != logicDelete) {
+      columnNames.add(logicDelete.getColumnName());
+    }
+
+    return this.dialect.getUpsertSql(tableName, columnNames, primaryKey.getColumnName(), isIdentity);
   }
 }

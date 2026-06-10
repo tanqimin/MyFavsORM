@@ -1,14 +1,13 @@
 package work.myfavs.framework.orm.orm.impl;
 
 import work.myfavs.framework.orm.Database;
-import work.myfavs.framework.orm.orm.strategy.SqlServer2012PageStrategy;
+import work.myfavs.framework.orm.orm.dialect.SqlServer2012Dialect;
 
 /**
  * ORM SQL Server 2012+ 实现。
- * <p>使用 {@link SqlServer2012PageStrategy}（OFFSET...FETCH NEXT 语法）作为分页策略。
+ * <p>使用 {@link SqlServer2012Dialect}（OFFSET...FETCH NEXT 分页 + MERGE UPSERT）。
  * 若使用 SQL Server 2005~2008，请改用 {@link SqlServerOrm}。</p>
  *
- * @see SqlServer2012PageStrategy
  * @see SqlServerOrm
  */
 public class SqlServer2012Orm extends AbstractOrm {
@@ -19,6 +18,6 @@ public class SqlServer2012Orm extends AbstractOrm {
    * @param database {@link Database} 实例
    */
   public SqlServer2012Orm(Database database) {
-    super(database, SqlServer2012PageStrategy.INSTANCE);
+    super(database, SqlServer2012Dialect.INSTANCE);
   }
 }

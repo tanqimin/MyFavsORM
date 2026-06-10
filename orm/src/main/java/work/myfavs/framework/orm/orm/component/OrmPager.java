@@ -6,7 +6,7 @@ import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.pagination.IPageable;
 import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
-import work.myfavs.framework.orm.orm.strategy.PageStrategy;
+import work.myfavs.framework.orm.orm.dialect.SqlDialect;
 import work.myfavs.framework.orm.util.exception.PaginationException;
 
 import java.util.Collection;
@@ -21,13 +21,13 @@ public class OrmPager {
   private final OrmSelector selector;
   private final OrmSqlBuilder sqlBuilder;
   private final DBConfig dbConfig;
-  private final PageStrategy pageStrategy;
+  private final SqlDialect dialect;
 
-  public OrmPager(OrmSelector selector, OrmSqlBuilder sqlBuilder, DBConfig dbConfig, PageStrategy pageStrategy) {
+  public OrmPager(OrmSelector selector, OrmSqlBuilder sqlBuilder, DBConfig dbConfig, SqlDialect dialect) {
     this.selector = selector;
     this.sqlBuilder = sqlBuilder;
     this.dbConfig = dbConfig;
-    this.pageStrategy = pageStrategy;
+    this.dialect = dialect;
   }
 
   public <TView> PageLite<TView> findPageLite(
@@ -119,7 +119,7 @@ public class OrmPager {
       if (maxPageSize <= 0L) {
         return new Sql(sql, params);
       } else {
-        return this.pageStrategy.apply(sql, params, 1, maxPageSize);
+        return this.dialect.applyPageSql(sql, params, 1, maxPageSize);
       }
     }
     if (currentPage < 1) {
@@ -135,6 +135,6 @@ public class OrmPager {
       throw new PaginationException("每页记录数不能超出系统设置的最大记录数 %d", maxPageSize);
     }
 
-    return this.pageStrategy.apply(sql, params, currentPage, pageSize);
+    return this.dialect.applyPageSql(sql, params, currentPage, pageSize);
   }
 }

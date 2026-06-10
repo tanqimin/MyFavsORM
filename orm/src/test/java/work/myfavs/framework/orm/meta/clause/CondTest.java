@@ -1,6 +1,5 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import work.myfavs.framework.orm.entity.*;
@@ -32,9 +31,6 @@ public class CondTest {
     logicDeleteMeta = Metadata.entityMeta(LogicDeleteExample.class);
   }
 
-  @After
-  public void tearDown() {}
-
   @Test
   public void logicalDelete() {
     Cond cond = Cond.logicalDelete(logicDeleteMeta.getLogicDelete());
@@ -63,16 +59,6 @@ public class CondTest {
   public void testNe() {
     assertTrue(StringUtil.equalsIgnoreCase("id is not null", Cond.ne("id", null, false).toString()));
     assertEquals("", Cond.ne("id", null, true).toString());
-  }
-
-  @Test
-  public void isNull() {
-    assertTrue(StringUtil.equalsIgnoreCase("id is null", Cond.eq("id", null, false).toString()));
-  }
-
-  @Test
-  public void isNotNull() {
-    assertTrue(StringUtil.equalsIgnoreCase("id is not null", Cond.ne("id", null, false).toString()));
   }
 
   @Test
@@ -194,12 +180,6 @@ public class CondTest {
     Sql sql = Sql.create("SELECT id FROM tb_snowflake");
     assertEquals(String.format("NOT EXISTS ( %s )", sql), Cond.notExists(() -> sql).toString());
   }
-
-  @Test
-  public void and() {}
-
-  @Test
-  public void or() {}
 
   @Test
   public void create() {

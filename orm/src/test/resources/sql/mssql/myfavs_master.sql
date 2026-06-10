@@ -69,7 +69,7 @@ CREATE TABLE [dbo].[tb_logic_delete] (
     [price] numeric(18,5)  NULL,
     [type] nvarchar(10) COLLATE Chinese_PRC_CI_AS  NULL,
     [config] text COLLATE Chinese_PRC_CI_AS  NULL,
-    [deleted] bit  NULL
+    [deleted] bigint  NULL
     )
     GO
 

@@ -13,9 +13,12 @@ This file provides guidance to agents when working with code in this repository.
 
 ## 架构要点
 
-- **`AbstractOrm` 采用组合模式**：实体 CRUD 委派给 6 个内部组件（`OrmExecutor`、`OrmInserter`、`OrmUpdater`、`OrmDeleter`、`OrmSelector`、`OrmPager`）。各方言子类（`MySqlOrm` 等）仅需在构造器中传入不同 `PageStrategy`，不再覆写方法。修改 CRUD 行为应修改对应组件而非子类
+- **`AbstractOrm` 采用组合模式**：实体 CRUD 委派给 6 个内部组件（`OrmExecutor`、`OrmInserter`、`OrmUpdater`、`OrmDeleter`、`OrmSelector`、`OrmPager`）。各方言子类（`MySqlOrm` 等）通过构造器传入 `SqlDialect` 注入方言行为，不再覆写方法。修改 CRUD 行为应修改对应组件或方言实现而非子类
 - **`OrmSqlBuilder` 依赖 Druid AST**：INSERT/UPDATE SQL 通过 Druid 的 `SQLInsertStatement`/`SQLUpdateStatement` 构建；未引入 Druid 时 INSERT/UPDATE 操作会失败（分页 COUNT 同样依赖 Druid）
 - **`Database` 持有单个 `Query` 实例**：`createQuery()` 返回同一对象（通过 `query.createQuery()` 重置 PreparedStatement），无法同时执行多个独立查询
+- **`SqlDialect` 方言接口统一封装 UPSERT/分页行为**：`MySqlDialect` 使用 `INSERT ... ON DUPLICATE KEY UPDATE`，`PostgreSqlDialect` 使用 `INSERT ... ON CONFLICT ... DO UPDATE`，`SqlServerDialect` 使用 `MERGE ... WHEN MATCHED ... WHEN NOT MATCHED`，`OracleDialect` 使用 `MERGE INTO ... USING (SELECT ... FROM DUAL)`。修改方言行为应修改对应 `SqlDialect` 实现而非 `OrmSqlBuilder` 或子类
+- **`SqlServerDialect.getUpsertSql()` 的 `isIdentity` 参数**控制是否排除 PK 列：`isIdentity=true` 时 PK 不参与 INSERT/UPDATE 子句并附加 `OUTPUT INSERTED.pk`；`isIdentity=false` 时 PK 正常参与所有子句
+- **`SqlServerDialect` 和 `OracleDialect` 处理无更新列边界**：当表仅有 PK 列无其他列时，自动降级为不含 `WHEN MATCHED` 子句的 MERGE
 
 ## 项目非显而易见的核心约定
 
@@ -38,11 +41,14 @@ This file provides guidance to agents when working with code in this repository.
 ## 构建命令
 
 ```bash
-# 全量构建（跳过测试，避免需要真实数据库）
+# 全量构建（跳过测试）
 mvn clean install -DskipTests
 
 # 仅编译核心模块
 mvn compile -pl orm
+
+# 运行纯单元测试（不依赖外部数据库）
+mvn test -pl orm
 
 # 运行单个测试方法
 mvn test -pl orm -Dtest=<TestClassName>#<methodName>
@@ -52,11 +58,87 @@ mvn test -pl orm -Dtest=<TestClassName>#<methodName>
 
 ## 测试须知
 
-- **硬编码连接 SQL Server** `192.168.8.246:1433`（库 `myfavs_master`，用户 `sa`），无法离线运行
+### 测试分类
+
+- **纯单元测试**（默认）：使用 Mockito 模拟数据库，无需真实数据库连接。通过 `@Category(IntegrationTest.class)` 排除集成测试
+- **集成测试**（需指定数据库）：继承 `AbstractTest` 的类，通过 `DatabaseConfigProvider` 读取连接配置
+
+### 运行集成测试
+
+集成测试类标注了 `@Category(IntegrationTest.class)`，默认被排除。
+使用 `-P integration` profile 取消排除。
+
+推荐使用**环境变量**方式传递数据库配置，避免跨平台转义问题：
+
+<details>
+<summary><b>Linux / macOS (Bash)</b></summary>
+
+```bash
+export DB_TYPE=mysql
+export DB_URL="jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false"
+export DB_USER=root
+export DB_PASSWORD=root
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+```
+</details>
+
+<details>
+<summary><b>Windows (PowerShell)</b></summary>
+
+```powershell
+$env:DB_TYPE = "mysql"
+$env:DB_URL  = "jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false"
+$env:DB_USER = "root"
+$env:DB_PASSWORD = "root"
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+```
+</details>
+
+<details>
+<summary><b>Windows (CMD)</b></summary>
+
+```cmd
+set DB_TYPE=mysql
+set DB_URL=jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8^^^^useSSL=false
+set DB_USER=root
+set DB_PASSWORD=root
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+```
+</details>
+
+> 机制：`orm/pom.xml` 中默认 profile（`default-unit-tests`，`activeByDefault=true`）
+> 设置 `<excludedGroups>` 排除集成测试；`integration` profile 使用
+> `<excludedGroups combine.self="override"/>` 清空排除，允许集成测试运行。
+
+### 数据库配置优先级
+
+```
+系统属性 (db.type/db.url/db.user/db.password)
+  → 环境变量 (DB_TYPE/DB_URL/DB_USER/DB_PASSWORD)
+    → 默认 H2 内存数据库 (jdbc:h2:mem:myfavs_test;MODE=MYSQL)
+```
+
+### 集成测试数据
+
 - JUnit 4（不是 5），Mockito 5.23.0
-- `@BeforeClass` 每次重建表（DROP → CREATE → INSERT 初始数据）
+- `@BeforeClass` 每次根据数据库类型自动选择 DDL 脚本重建表
+- DDL 脚本按数据库分离：`sql/{mssql,mysql,postgresql,h2}/myfavs_master.sql`
 - 测试数据通过接口混入（`implements ISnowflakeTest, IUuidTest, ...`）
-- JDBC URL 含 `sendStringParametersAsUnicode=false` + `encrypt=false`
+- 默认 H2 模式为 MODE=MYSQL（兼容 MySQL 语法）
+- SQL Server DDL 使用 `GO` 分隔批处理，其他数据库使用 `;` 分隔
+
+### 核心组件测试覆盖
+
+| 组件 | 测试文件 | 方式 |
+|------|---------|------|
+| OrmExecutor | `OrmExecutorTest.java` | Mockito |
+| OrmSelector | `OrmSelectorTest.java` | Mockito |
+| OrmInserter | `OrmInserterTest.java` | Mockito |
+| OrmUpdater | `OrmUpdaterTest.java` | Mockito |
+| OrmDeleter | `OrmDeleterTest.java` | Mockito |
+| OrmPager | `OrmPagerTest.java` | Mockito |
+| Cond / Sql | `CondTest.java` / `SqlTest.java` | 纯内存 |
+| PageStrategy | `PageStrategyTest.java` | 纯内存 |
 
 ## 代码风格（非标准约定）
 

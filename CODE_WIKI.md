@@ -415,24 +415,24 @@ public abstract class AbstractOrm implements Orm {
     protected final OrmSelector selector;   // 实体查询
     protected final OrmPager pager;         // 分页查询
 
-    public AbstractOrm(Database database, PageStrategy pageStrategy) {
-        OrmSqlBuilder sqlBuilder = new OrmSqlBuilder(dbConfig.getDbType());
+    public AbstractOrm(Database database, SqlDialect dialect) {
+        OrmSqlBuilder sqlBuilder = new OrmSqlBuilder(dialect);
         this.executor = new OrmExecutor(database);
         this.inserter = new OrmInserter(database, dbTemplate, sqlBuilder, executor);
-        this.updater  = new OrmUpdater(database, sqlBuilder, executor);
+        this.updater  = new OrmUpdater(database, sqlBuilder, executor, inserter);
         this.deleter  = new OrmDeleter(database, sqlBuilder, executor);
         this.selector = new OrmSelector(database, sqlBuilder);
-        this.pager    = new OrmPager(selector, sqlBuilder, dbConfig, pageStrategy);
+        this.pager    = new OrmPager(selector, sqlBuilder, dbConfig, dialect);
     }
 }
 ```
 
-**子类职责简化：** 过去子类需实现 `dbType()` 和 `selectPage()` 抽象方法；现在仅需在构造器中传入对应的 `PageStrategy` 单例：
+**子类职责简化：** 过去子类需实现 `dbType()` 和 `selectPage()` 抽象方法；现在仅需在构造器中传入对应的 `SqlDialect` 单例：
 
 ```java
 public class MySqlOrm extends AbstractOrm {
     public MySqlOrm(Database database) {
-        super(database, MySqlPageStrategy.INSTANCE);
+        super(database, MySqlDialect.INSTANCE);
     }
 }
 ```
@@ -522,13 +522,13 @@ findPage(class, sql, enablePage, currentPage, pageSize):
 
 | 组件 | 包路径 | 行数 | 依赖 |
 |---|---|---|---|
-| `OrmSqlBuilder` | `component` | ~180 | Druid AST, `TableAlias`, `ClassMeta` |
-| `OrmExecutor` | `component` | ~85 | `Database`, `Query` |
-| `OrmInserter` | `component` | ~290 | `Database`, `DBTemplate`, `OrmSqlBuilder`, `OrmExecutor` |
-| `OrmUpdater` | `component` | ~195 | `Database`, `OrmSqlBuilder`, `OrmExecutor` |
-| `OrmDeleter` | `component` | ~155 | `Database`, `OrmSqlBuilder`, `OrmExecutor` |
-| `OrmSelector` | `component` | ~285 | `Database`, `OrmSqlBuilder` |
-| `OrmPager` | `component` | ~170 | `OrmSelector`, `OrmSqlBuilder`, `DBConfig`, `PageStrategy` |
+| `OrmSqlBuilder` | `component` | ~297 | Druid AST, `SqlDialect`, `TableAlias`, `ClassMeta` |
+| `OrmExecutor` | `component` | ~150 | `Database`, `Query` |
+| `OrmInserter` | `component` | ~285 | `Database`, `DBTemplate`, `OrmSqlBuilder`, `OrmExecutor` |
+| `OrmUpdater` | `component` | ~415 | `Database`, `OrmSqlBuilder`, `OrmExecutor`, `OrmInserter` |
+| `OrmDeleter` | `component` | ~120 | `Database`, `OrmSqlBuilder`, `OrmExecutor` |
+| `OrmSelector` | `component` | ~245 | `Database`, `OrmSqlBuilder` |
+| `OrmPager` | `component` | ~145 | `OrmSelector`, `OrmSqlBuilder`, `DBConfig`, `SqlDialect` |
 
 ### 主键生成
 
@@ -1242,21 +1242,150 @@ protected void tx(Consumer<TransactionStatus> consumer);
 
 **包：** `orm/src/test/java/work/myfavs/framework/orm/`
 
+### 架构概览
+
+```
+src/test/
+├── java/work/myfavs/framework/orm/
+│   ├── test/
+│   │   ├── IntegrationTest.java          ← @Category 标记接口
+│   │   └── DatabaseConfigProvider.java   ← 集中化数据库连接配置
+│   ├── AbstractTest.java                 ← 集成测试基类（@Category 标记）
+│   ├── DatabaseTest.java                 ← 集成测试：CRUD 全流程
+│   ├── QueryTest.java                    ← 集成测试：Query 类操作
+│   ├── DBTemplateTest.java               ← 集成测试：模板配置
+│   ├── DBConfigTest.java                 ← 单元测试：配置对象
+│   └── orm/component/
+│       ├── OrmExecutorTest.java          ← 单元测试（Mockito）
+│       ├── OrmSelectorTest.java          ← 单元测试（Mockito）
+│       ├── OrmInserterTest.java          ← 单元测试（Mockito）
+│       ├── OrmUpdaterTest.java           ← 单元测试（Mockito）
+│       ├── OrmDeleterTest.java           ← 单元测试（Mockito）
+│       ├── OrmPagerTest.java             ← 单元测试（Mockito）
+│       └── OrmSqlBuilderTest.java        ← 单元测试（纯内存）
+├── resources/sql/
+│   ├── mssql/myfavs_master.sql           ← SQL Server DDL
+│   ├── mysql/myfavs_master.sql           ← MySQL DDL
+│   ├── postgresql/myfavs_master.sql      ← PostgreSQL DDL
+│   └── h2/myfavs_master.sql             ← H2 DDL
+```
+
+### 测试分类
+
+| 类型 | 标记 | 如何运行 | 数据库依赖 |
+|------|------|---------|-----------|
+| 纯单元测试 | 无 `@Category` | `mvn test` | ❌ 无（Mockito） |
+| 集成测试 | `@Category(IntegrationTest.class)` | 通过 `mvn test` 但不包括 `excludedGroups` | ✅ 需要 |
+
+**默认构建**（`mvn test`）：Surefire 通过 `excludedGroups` 排除 `IntegrationTest`，仅运行纯单元测试。
+
+**自动排除机制**（`orm/pom.xml`）：
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <configuration>
+        <excludedGroups>work.myfavs.framework.orm.test.IntegrationTest</excludedGroups>
+    </configuration>
+</plugin>
+```
+
+### IntegrationTest（标记接口）
+
+```java
+public interface IntegrationTest {
+    // 仅作为 JUnit @Category 的标记，无方法
+}
+```
+
+标注了此接口的测试类需要真实数据库连接，被 Surefire 默认排除。
+
+### DatabaseConfigProvider（集中化数据库配置）
+
+```java
+// 按优先级读取配置：系统属性 → 环境变量 → H2 默认值
+DatabaseConfigProvider provider = DatabaseConfigProvider.create();
+
+// 结果
+provider.getDbType()            // "h2" / "mysql" / "sqlserver" / "postgresql"
+provider.getDriverClassName()   // 对应驱动
+provider.getJdbcUrl()           // 连接串
+provider.getUsername()          // 用户名
+provider.getPassword()          // 密码
+```
+
+**优先级：**
+
+| 来源 | System Property | 环境变量 | 默认值 |
+|------|----------------|---------|--------|
+| 数据库类型 | `db.type` | `DB_TYPE` | `h2` |
+| JDBC URL | `db.url` | `DB_URL` | H2 内存数据库 |
+| 用户名 | `db.user` | `DB_USER` | `sa` |
+| 密码 | `db.password` | `DB_PASSWORD` | `sa` |
+
+**支持的数据库类型：** `h2`, `mysql`, `sqlserver`, `sqlserver2012`, `postgresql`, `oracle`
+
+**默认 H2 配置：**
+```
+jdbc:h2:mem:myfavs_test;DB_CLOSE_DELAY=-1;MODE=MYSQL
+```
+
+**使用示例（各平台）：**
+
+环境变量方式完全避免 JDBC URL 中 `&` 字符的转义问题，在各平台表现一致，强烈推荐。
+
+<details>
+<summary><b>🐧 Linux / macOS (Bash)</b></summary>
+
+```bash
+export DB_TYPE=mysql
+export DB_URL="jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false"
+export DB_USER=root
+export DB_PASSWORD=root
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+```
+</details>
+
+<details>
+<summary><b>🪟 Windows (PowerShell)</b></summary>
+
+```powershell
+$env:DB_TYPE = "mysql"
+$env:DB_URL  = "jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false"
+$env:DB_USER = "root"
+$env:DB_PASSWORD = "root"
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+```
+</details>
+
+<details>
+<summary><b>🖥️ Windows (CMD)</b></summary>
+
+```cmd
+set DB_TYPE=mysql
+set DB_URL=jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8^^^^useSSL=false
+set DB_USER=root
+set DB_PASSWORD=root
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+```
+</details>
+
 ### AbstractTest
 
 ```java
-public abstract class AbstractTest {
-    // 硬编码 SQL Server 连接
-    protected static final String DB_TYPE = "sqlserver";
-    protected static final String JDBC_URL = "jdbc:sqlserver://192.168.8.246:1433;DatabaseName=myfavs_master;sendStringParametersAsUnicode=false;encrypt=false";
-    protected static DBTemplate dbTemplate;
-    protected static Database database;
+@Category(IntegrationTest.class)
+public class AbstractTest {
+    // 从 DatabaseConfigProvider 读取连接信息
+    protected static final String DB_TYPE;       // = provider.getDbType()
+    protected static final String JDBC_URL;      // = provider.getJdbcUrl()
+    protected static final String JDBC_USERNAME; // = provider.getUsername()
+    protected static final String JDBC_PASSWORD; // = provider.getPassword()
 
     @BeforeClass
     public static void beforeClass() {
         initDBTemplate();       // HikariDataSource → DBTemplate
         initDatabase();         // DBTemplate → Database
-        createTablesForSqlServer(); // DDL 初始化
+        createTables();         // 根据 DB_TYPE 自动选择 DDL 脚本
     }
 
     @AfterClass
@@ -1265,6 +1394,22 @@ public abstract class AbstractTest {
     }
 }
 ```
+
+**DDL 脚本选择逻辑：**
+
+```java
+private static String getSqlPath(String dbType) {
+    switch (dbType) {
+        case "mysql":         return "sql/mysql/myfavs_master.sql";
+        case "sqlserver":
+        case "sqlserver2012": return "sql/mssql/myfavs_master.sql";
+        case "postgresql":    return "sql/postgresql/myfavs_master.sql";
+        default:              return "sql/h2/myfavs_master.sql";
+    }
+}
+```
+
+**批处理分隔符差异：** SQL Server DDL 使用 `GO` 分隔批处理；其他数据库使用 `;` 分隔。
 
 ### 测试数据接口
 
@@ -1291,15 +1436,42 @@ entity/
     └── TypeEnum.java        # FOOD, DRINK
 ```
 
+### 组件单元测试覆盖
+
+| 组件 | 测试文件 | 测试数 | 覆盖要点 |
+|------|---------|--------|---------|
+| OrmExecutor | `OrmExecutorTest.java` | 8 | SQL 字符串/Sql 对象/批量/超时/空集合 |
+| OrmSelector | `OrmSelectorTest.java` | 10 | find/get/count/exists/findMap/null 边界 |
+| OrmInserter | `OrmInserterTest.java` | 5 | null/空集合/Snowflake/Identity 策略 |
+| OrmUpdater | `OrmUpdaterTest.java` | 7 | 单条/指定列/忽略Null/批量 CASE WHEN |
+| OrmDeleter | `OrmDeleterTest.java` | 10 | 按实体/ID/IDs/条件/集合删除/逻辑删除/truncate |
+| OrmPager | `OrmPagerTest.java` | 8 | PageLite/Page/IPageable/参数校验/Top |
+| OrmSqlBuilder | `OrmSqlBuilderTest.java` | 12 | INSERT/SELECT/COUNT/UPDATE SQL 生成 |
+
 ### 建表 DDL
 
-**文件：** `orm/src/test/resources/sql/mssql/myfavs_master.sql`
+**位置：** `orm/src/test/resources/sql/{db}/myfavs_master.sql`
 
-使用 SQL Server 语法，`GO` 分隔批处理。包含 7 张表：
+每张表统一结构（各数据库语法适配后）：
 
 ```
-tb_assigned, tb_identity, tb_logic_delete, tb_snowflake, tb_tenant, tb_user, tb_uuid
+tb_assigned       — 手动主键测试
+tb_identity       — 自增主键测试
+tb_logic_delete   — 逻辑删除测试
+tb_snowflake      — 雪花算法主键测试
+tb_uuid           — UUID 主键测试
+tb_tenant         — 多租户测试
+tb_user           — 用户表
 ```
+
+**各数据库特性差异处理：**
+
+| 特性 | SQL Server | MySQL | PostgreSQL | H2 |
+|------|-----------|-------|-----------|-----|
+| 自增语法 | `IDENTITY(1,1)` | `AUTO_INCREMENT` | `BIGSERIAL` | `AUTO_INCREMENT` |
+| 布尔类型 | `bit` | `tinyint(1)` | `boolean` | `boolean` |
+| 时间类型 | `datetime` | `datetime` | `timestamp` | `datetime` |
+| 分隔符 | `GO` | `;` | `;` | `;` |
 
 ---
 

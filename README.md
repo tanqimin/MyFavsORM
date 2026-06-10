@@ -26,7 +26,8 @@
 | SQL AST | Alibaba Druid 1.2.28 | optional，用于分页 SQL 改写和格式化 |
 | 连接池 | HikariCP 7.0.2（test）/ Druid（可选） | 不强制绑定 |
 | Spring | spring-jdbc 5.3.39（optional） | 仅 `SpringConnFactory` 需要 |
-| 测试 | JUnit 4.13.2 / Mockito 5.23.0 | — |
+| 测试 | JUnit 4.13.2 / Mockito 5.23.0 | @Category 分离集成测试 |
+| 集成测试数据库 | H2（默认）/ MySQL / SQL Server / PostgreSQL | System Property 或环境变量切换 |
 
 ## 快速入门
 
@@ -595,27 +596,141 @@ RuntimeException
 ### 构建命令
 
 ```bash
-# 全量构建（跳过测试，避免需要真实数据库）
+# 全量构建（跳过测试）
 mvn clean install -DskipTests
 
 # 仅编译核心模块
 mvn compile -pl orm
 
-# 运行全部测试（需要 SQL Server 数据库连接）
+# 运行纯单元测试（不依赖外部数据库，默认使用 H2 内存数据库）
 mvn test -pl orm
 
 # 运行单个测试类
-mvn test -pl orm -Dtest=DatabaseTest
+mvn test -pl orm -Dtest=CondTest
 
 # 运行单个测试方法
-mvn test -pl orm -Dtest=DatabaseTest#find
+mvn test -pl orm -Dtest=CondTest#eq
 ```
 
 ### 测试说明
 
-- 测试依赖真实 SQL Server 数据库（硬编码 `192.168.8.246:1433`），无法离线运行
-- 测试基类 `AbstractTest` 在 `@BeforeClass` 中自动重建表结构（DROP → CREATE → INSERT 初始数据）
-- 建表脚本：`orm/src/test/resources/sql/mssql/myfavs_master.sql`
+**纯单元测试**（默认 `mvn test`）：
+- 使用 Mockito 模拟数据库，**无需真实数据库连接**
+- `@Category(IntegrationTest.class)` 标记的类被自动排除
+- 包含 305+ 个测试用例，覆盖 `OrmExecutor`、`OrmSelector`、`OrmInserter`、`OrmUpdater`、`OrmDeleter`、`OrmPager` 六大组件
+
+**集成测试**（需指定数据库）：
+- 通过 `DatabaseConfigProvider` 按优先级读取：系统属性 → 环境变量 → 默认值
+- 默认使用 **H2 内存数据库**（无需安装），也可指定其他数据库
+- 集成测试类有 `@Category(IntegrationTest.class)`，需通过 `-P integration` 激活 profile 以取消排除
+
+推荐使用环境变量方式传递数据库配置，避免跨平台转义问题（如 `&` 字符、行续符差异）：
+
+<details>
+<summary><b>🐧 Linux / macOS (Bash)</b></summary>
+
+```bash
+# H2 内存数据库（默认，无需安装）
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+
+# MySQL
+export DB_TYPE=mysql
+export DB_URL="jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8"
+export DB_USER=root
+export DB_PASSWORD=root
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+
+# SQL Server
+export DB_TYPE=sqlserver
+export DB_URL="jdbc:sqlserver://192.168.8.246:1433;DatabaseName=myfavs_master;encrypt=false"
+export DB_USER=sa
+export DB_PASSWORD=sa
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+
+# PostgreSQL
+export DB_TYPE=postgresql
+export DB_URL="jdbc:postgresql://localhost:5432/myfavs_master"
+export DB_USER=postgres
+export DB_PASSWORD=postgres
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+```
+</details>
+
+<details>
+<summary><b>🪟 Windows (PowerShell)</b></summary>
+
+```powershell
+# H2 内存数据库（默认，无需安装）
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+
+# MySQL
+$env:DB_TYPE = "mysql"
+$env:DB_URL  = "jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8"
+$env:DB_USER = "root"
+$env:DB_PASSWORD = "root"
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+
+# SQL Server
+$env:DB_TYPE = "sqlserver"
+$env:DB_URL  = "jdbc:sqlserver://192.168.8.246:1433;DatabaseName=myfavs_master;encrypt=false"
+$env:DB_USER = "sa"
+$env:DB_PASSWORD = "sa"
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+
+# PostgreSQL
+$env:DB_TYPE = "postgresql"
+$env:DB_URL  = "jdbc:postgresql://localhost:5432/myfavs_master"
+$env:DB_USER = "postgres"
+$env:DB_PASSWORD = "postgres"
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+```
+</details>
+
+<details>
+<summary><b>🖥️ Windows (CMD)</b></summary>
+
+```cmd
+REM H2 内存数据库（默认，无需安装）
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+
+REM MySQL
+set DB_TYPE=mysql
+set DB_URL=jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8^^^^useSSL=false^^^^serverTimezone=GMT%%2B8
+set DB_USER=root
+set DB_PASSWORD=root
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+
+REM SQL Server
+set DB_TYPE=sqlserver
+set DB_URL=jdbc:sqlserver://192.168.8.246:1433;DatabaseName=myfavs_master;encrypt=false
+set DB_USER=sa
+set DB_PASSWORD=sa
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+
+REM PostgreSQL
+set DB_TYPE=postgresql
+set DB_URL=jdbc:postgresql://localhost:5432/myfavs_master
+set DB_USER=postgres
+set DB_PASSWORD=postgres
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+```
+
+> CMD 中 `&` 是命令分隔符，需要用 `^^^^` 转义；`%` 需要用 `%%` 转义。
+> 如需单行执行，用 `&&` 连接：`set DB_TYPE=mysql && mvn test ...`
+</details>
+
+> **提示**：环境变量方式完全避免 JDBC URL 中 `&` 字符的转义问题，在各平台表现一致，强烈推荐。`DatabaseConfigProvider` 按优先级读取：系统属性 → 环境变量 → H2 默认值。
+
+- 测试基类 `AbstractTest` 在 `@BeforeClass` 中自动根据数据库类型选择对应 DDL 脚本
+- 建表脚本按数据库类型分离：
+
+```
+orm/src/test/resources/sql/
+├── mssql/      myfavs_master.sql     ← SQL Server
+├── mysql/      myfavs_master.sql     ← MySQL
+├── postgresql/ myfavs_master.sql     ← PostgreSQL
+└── h2/         myfavs_master.sql     ← H2
+```
 
 ---
 

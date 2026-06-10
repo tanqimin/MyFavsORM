@@ -2,7 +2,6 @@ package work.myfavs.framework.orm;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 import work.myfavs.framework.orm.entity.IdentityExample;
 import work.myfavs.framework.orm.entity.SnowflakeExample;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
@@ -22,25 +21,6 @@ public class QueryTest extends AbstractTest
   String SQL_INSERT_SNOW_FLAKE = "INSERT INTO tb_snowflake (id, created, name, disable, price , type, config) VALUES (?, ?, ?, ?, ? , ?, ?)";
   String SQL_INSERT_IDENTITY   = "INSERT INTO tb_identity (created, name, disable, price , type, config) VALUES (?, ?, ?, ? , ?, ?)";
   String SQL_INSERT_ASSIGNED   = "INSERT INTO tb_assigned (epc) VALUES (?)";
-
-  @Test
-  public void createQuery() {
-
-    try (Query queryMock = Mockito.mock(Query.class)) {
-      queryMock.createQuery(SQL_INSERT_SNOW_FLAKE);
-      Mockito.verify(queryMock).createQuery(SQL_INSERT_SNOW_FLAKE);
-    }
-
-    try (Query queryMock = Mockito.mock(Query.class)) {
-      queryMock.createQuery(SQL_INSERT_IDENTITY, true);
-      Mockito.verify(queryMock).createQuery(SQL_INSERT_IDENTITY, true);
-    }
-
-    try (Query queryMock = Mockito.mock(Query.class)) {
-      queryMock.createQuery(SQL_INSERT_ASSIGNED, true);
-      Mockito.verify(queryMock).createQuery(SQL_INSERT_ASSIGNED, true);
-    }
-  }
 
   @Test
   public void find() {
@@ -114,19 +94,5 @@ public class QueryTest extends AbstractTest
     }
   }
 
-  @Test
-  public void addBatch() {
-  }
 
-  @Test
-  public void executeBatch() {
-  }
-
-  @Test
-  public void testExecuteBatch() {
-  }
-
-  @Test
-  public void close() {
-  }
 }

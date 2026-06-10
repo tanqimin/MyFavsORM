@@ -45,14 +45,6 @@ public class BatchParametersTest {
   }
 
   @Test
-  public void applyParameters() {
-  }
-
-  @Test
-  public void applyBatchParameters() {
-  }
-
-  @Test
   public void isBatch() {
     assertFalse(batchParameters.isBatch());
   }

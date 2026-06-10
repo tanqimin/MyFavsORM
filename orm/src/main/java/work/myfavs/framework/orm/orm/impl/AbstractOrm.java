@@ -11,7 +11,7 @@ import work.myfavs.framework.orm.meta.pagination.Page;
 import work.myfavs.framework.orm.meta.pagination.PageLite;
 import work.myfavs.framework.orm.orm.Orm;
 import work.myfavs.framework.orm.orm.component.*;
-import work.myfavs.framework.orm.orm.strategy.PageStrategy;
+import work.myfavs.framework.orm.orm.dialect.SqlDialect;
 import work.myfavs.framework.orm.util.func.ThrowingConsumer;
 
 import java.sql.PreparedStatement;
@@ -31,7 +31,7 @@ import java.util.Map;
  *   <li>{@link OrmPager} — 分页查询</li>
  *   <li>{@link OrmSqlBuilder} — SQL 语句构建</li>
  * </ul>
- * 子类通过 {@link PageStrategy} 注入分页方言策略。
+ * 子类通过 {@link work.myfavs.framework.orm.orm.dialect.SqlDialect} 注入方言策略。
  */
 public abstract class AbstractOrm implements Orm {
 
@@ -49,21 +49,21 @@ public abstract class AbstractOrm implements Orm {
   /**
    * 构造 AbstractOrm 实例
    *
-   * @param database     {@link Database} 实例
-   * @param pageStrategy 分页策略
+   * @param database {@link Database} 实例
+   * @param dialect  {@link SqlDialect} 方言实例
    */
-  public AbstractOrm(Database database, PageStrategy pageStrategy) {
+  public AbstractOrm(Database database, SqlDialect dialect) {
     this.database = database;
     this.dbTemplate = this.database.getDbTemplate();
     this.dbConfig = this.dbTemplate.getDbConfig();
 
-    OrmSqlBuilder sqlBuilder = new OrmSqlBuilder(dbConfig.getDbType());
+    OrmSqlBuilder sqlBuilder = new OrmSqlBuilder(dialect);
     this.executor = new OrmExecutor(database);
     this.inserter = new OrmInserter(database, dbTemplate, sqlBuilder, executor);
-    this.updater = new OrmUpdater(database, sqlBuilder, executor);
+    this.updater = new OrmUpdater(database, sqlBuilder, executor, inserter);
     this.deleter = new OrmDeleter(database, sqlBuilder, executor);
     this.selector = new OrmSelector(database, sqlBuilder);
-    this.pager = new OrmPager(selector, sqlBuilder, dbConfig, pageStrategy);
+    this.pager = new OrmPager(selector, sqlBuilder, dbConfig, dialect);
   }
 
   // ======================== execute ========================
@@ -149,7 +149,7 @@ public abstract class AbstractOrm implements Orm {
 
   @Override
   public <TModel> int createOrUpdate(Class<TModel> modelClass, TModel entity) {
-    return updater.createOrUpdate(modelClass, entity, inserter);
+    return updater.createOrUpdate(modelClass, entity);
   }
 
   // ======================== delete ========================

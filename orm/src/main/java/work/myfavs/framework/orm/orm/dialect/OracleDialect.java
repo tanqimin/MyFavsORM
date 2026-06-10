@@ -1,4 +1,4 @@
-package work.myfavs.framework.orm.orm.strategy;
+package work.myfavs.framework.orm.orm.dialect;
 
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
@@ -7,38 +7,39 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSubqueryTableSource;
 import com.alibaba.druid.sql.dialect.oracle.ast.stmt.OracleSelectQueryBlock;
 import com.alibaba.druid.util.JdbcConstants;
-import work.myfavs.framework.orm.meta.DbType;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.util.common.DruidUtil;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
- * Oracle 分页策略：使用 ROWNUM 双层子查询。
- * <p>通过 Druid AST 构建内层子查询限制最大行号（{@code ROWNUM <= maxRow}），
- * 外层子查询过滤偏移量（{@code _rn > offset}）。适用于 Oracle 9i+。</p>
- *
- * @see MySqlPageStrategy
- * @see SqlServerPageStrategy
- * @see SqlServer2012PageStrategy
+ * Oracle 方言实现。
+ * <p>分页使用 ROWNUM 双层子查询；
+ * UPSERT 使用 MERGE INTO ... USING (SELECT ... FROM DUAL) source ... 语法。</p>
  */
-public class OraclePageStrategy implements PageStrategy {
+public class OracleDialect implements SqlDialect {
 
-  public static final OraclePageStrategy INSTANCE = new OraclePageStrategy();
+  public static final OracleDialect INSTANCE = new OracleDialect();
 
   private static final String INNER_TABLE_ALIAS = "_limit";
   private static final String OUTER_TABLE_ALIAS = "_paginate";
   private static final String COL_ROW_NUM       = "_rn";
 
   @Override
-  public Sql apply(String sql, Collection<?> params, int currentPage, int pageSize) {
+  public com.alibaba.druid.DbType getDruidDbType() {
+    return JdbcConstants.ORACLE;
+  }
+
+  @Override
+  public Sql applyPageSql(String sql, Collection<?> params, int currentPage, int pageSize) {
     int    offset   = pageSize * (currentPage - 1);
     String querySql = limit(sql, offset, pageSize).toUnformattedString();
     return new Sql(querySql, params);
   }
 
   private static SQLSelectStatement limit(String sql, int offset, int count) {
-    SQLSelectStatement selectStmt = DruidUtil.createSQLSelectStatement(DbType.ORACLE, sql);
+    SQLSelectStatement selectStmt = DruidUtil.createSQLSelectStatement(JdbcConstants.ORACLE, sql);
     SQLSelect          select     = selectStmt.getSelect();
 
     int                    maxRow     = count + offset;
@@ -55,8 +56,7 @@ public class OraclePageStrategy implements PageStrategy {
     return selectStmt;
   }
 
-  private static OracleSelectQueryBlock createOuterQuery(
-      OracleSelectQueryBlock innerQuery, int offset) {
+  private static OracleSelectQueryBlock createOuterQuery(OracleSelectQueryBlock innerQuery, int offset) {
     OracleSelectQueryBlock outerQuery = new OracleSelectQueryBlock();
     outerQuery.getSelectList().add(createSelectAllItem(OUTER_TABLE_ALIAS));
     outerQuery.setFrom(new SQLSubqueryTableSource(new SQLSelect(innerQuery), OUTER_TABLE_ALIAS));
@@ -68,7 +68,6 @@ public class OraclePageStrategy implements PageStrategy {
     OracleSelectQueryBlock innerQuery = new OracleSelectQueryBlock();
     innerQuery.getSelectList().add(createSelectAllItem(INNER_TABLE_ALIAS));
     innerQuery.getSelectList().add(new SQLSelectItem(new SQLIdentifierExpr("ROWNUM"), COL_ROW_NUM));
-
     innerQuery.setFrom(new SQLSubqueryTableSource(select.clone(), INNER_TABLE_ALIAS));
     innerQuery.setWhere(createLteqCondition(maxRow));
     return innerQuery;
@@ -92,5 +91,45 @@ public class OraclePageStrategy implements PageStrategy {
         SQLBinaryOperator.GreaterThan,
         new SQLNumberExpr(offset),
         JdbcConstants.ORACLE);
+  }
+
+  @Override
+  public String getUpsertSql(String tableName, List<String> columnNames, String pkColumn) {
+    final StringBuilder selectClause = new StringBuilder("SELECT ");
+    final StringBuilder updatePart   = new StringBuilder();
+    final StringBuilder insertPart   = new StringBuilder();
+    boolean first = true;
+    for (String col : columnNames) {
+      if (!first) {
+        selectClause.append(", ");
+        updatePart.append(", ");
+        insertPart.append(", ");
+      }
+      selectClause.append("? AS ").append(col);
+      updatePart.append(col).append(" = source.").append(col);
+      insertPart.append("source.").append(col);
+      first = false;
+    }
+    selectClause.append(" FROM DUAL");
+
+    final String colsJoined = String.join(", ", columnNames);
+
+    if (updatePart.length() == 0) {
+      // 仅 PK 列，无可更新字段 → 退化为仅 INSERT 的 MERGE
+      return String.format(
+          "MERGE INTO %s target USING (%s) source ON (target.%s = source.%s) "
+              + "WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s);",
+          tableName, selectClause,
+          pkColumn, pkColumn,
+          colsJoined, insertPart);
+    }
+
+    return String.format(
+        "MERGE INTO %s target USING (%s) source ON (target.%s = source.%s) "
+            + "WHEN MATCHED THEN UPDATE SET %s "
+            + "WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s);",
+        tableName, selectClause,
+        pkColumn, pkColumn,
+        updatePart, colsJoined, insertPart);
   }
 }

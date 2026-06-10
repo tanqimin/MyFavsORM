@@ -4,7 +4,4 @@ import org.junit.Test;
 
 public class PropTest {
 
-  @Test
-  public void load() {
-  }
 }

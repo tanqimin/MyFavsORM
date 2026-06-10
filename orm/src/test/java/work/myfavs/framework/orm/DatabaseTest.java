@@ -1,10 +1,7 @@
 package work.myfavs.framework.orm;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import work.myfavs.framework.orm.entity.*;
 import work.myfavs.framework.orm.entity.enums.TypeEnum;
 import work.myfavs.framework.orm.entity.test.*;
@@ -25,12 +22,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import work.myfavs.framework.orm.util.lang.NVarchar;
 
 public class DatabaseTest extends AbstractTest
     implements ISnowflakeTest, IIdentityTest, IUuidTest, ILogicDeleteTest, IAssignedTest {
-
-  private static final Logger log = LoggerFactory.getLogger(DatabaseTest.class);
 
   final IPageable pageable =
       new IPageable() {
@@ -50,12 +44,8 @@ public class DatabaseTest extends AbstractTest
         }
       };
 
-  @Before
-  public void setUp() {
-  }
-
   @Test
-  public void tx() {
+  public void shouldRollbackToSavepointAndCommitPartialData() {
 
     initSnowflakes();
     Orm orm = database.createOrm();
@@ -85,24 +75,14 @@ public class DatabaseTest extends AbstractTest
         .tx(
             innerOrm -> {
               innerOrm.delete(SnowflakeExample.class, txSnowflakes);
-              Savepoint savepoint = database.setSavepoint();
-              log.debug("savepoint: {}", savepoint.getSavepointId());
+              Savepoint savepoint = database.setSavepoint("afterDelete");
               database.rollback();
             });
     Assert.assertEquals(2, txSnowflakes.size());
   }
 
   @Test
-  public void testTx() {}
-
-  @Test
-  public void testTx1() {}
-
-  @Test
-  public void testTx2() {}
-
-  @Test
-  public void find() {
+  public void shouldFindEntitiesAndRecordsBySql() {
     initSnowflakes();
     initAssigned();
 
@@ -136,7 +116,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void findMap() {
+  public void shouldFindMapWithKeyColumn() {
     initSnowflakes();
     Orm orm = database.createOrm();
     orm.truncate(SnowflakeExample.class);
@@ -158,7 +138,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void findTop() {
+  public void shouldFindTopRecords() {
     initSnowflakes();
     Orm orm = database.createOrm();
     orm.truncate(SnowflakeExample.class);
@@ -180,7 +160,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void get() {
+  public void shouldGetSingleEntityOrRecord() {
     initSnowflakes();
     Orm orm = database.createOrm();
     orm.truncate(SnowflakeExample.class);
@@ -198,7 +178,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void getByXX() {
+  public void shouldGetEntityByIdCondAndCriteria() {
     initSnowflakes();
     Orm orm = database.createOrm();
     orm.truncate(SnowflakeExample.class);
@@ -224,7 +204,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void findByXX() {
+  public void shouldFindEntitiesByMultipleMethods() {
     initUuids();
     Orm orm = database.createOrm();
     orm.truncate(UuidExample.class);
@@ -233,32 +213,29 @@ public class DatabaseTest extends AbstractTest
     List<String> uuids = UUIDS.stream().map(UuidExample::getId).collect(Collectors.toList());
 
     List<UuidExample> uuidList = orm.findByIds(UuidExample.class, uuids);
-    Assert.assertEquals(uuidList.size(), 3);
+    Assert.assertEquals(3, uuidList.size());
 
     uuidList = orm.findByField(UuidExample.class, "name", "S1");
-    Assert.assertEquals(uuidList.size(), 1);
+    Assert.assertEquals(1, uuidList.size());
 
     uuidList = orm.findByField(UuidExample.class, "id", uuids);
-    Assert.assertEquals(uuidList.size(), 3);
+    Assert.assertEquals(3, uuidList.size());
 
     uuidList = orm.findByCond(UuidExample.class, Cond.eq("name", "S1"));
-    Assert.assertEquals(uuidList.size(), 1);
+    Assert.assertEquals(1, uuidList.size());
 
     UuidExample condition = new UuidExample();
     condition.setName("S1");
 
     uuidList = orm.findByCriteria(UuidExample.class, condition);
-    Assert.assertEquals(uuidList.size(), 1);
+    Assert.assertEquals(1, uuidList.size());
 
     uuidList = orm.findByCriteria(UuidExample.class, condition, BaseEntity.Update.class);
-    Assert.assertEquals(uuidList.size(), 2);
-
-    List<NVarchar> usernames = orm.find(NVarchar.class, new Sql("SELECT top 10 username FROM [dbo].[tb_user]"));
-    Assert.assertFalse(usernames.isEmpty());
+    Assert.assertEquals(2, uuidList.size());
   }
 
   @Test
-  public void count() {
+  public void shouldCountRecords() {
     initUuids();
     Orm orm = database.createOrm();
     orm.truncate(UuidExample.class);
@@ -276,7 +253,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void exists() {
+  public void shouldCheckEntityExistence() {
     initIdentities();
     Orm orm = database.createOrm();
     orm.truncate(IdentityExample.class);
@@ -298,7 +275,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void findPageLite() {
+  public void shouldFindPageLite() {
     initSnowflakes();
     Orm orm = database.createOrm();
     orm.truncate(SnowflakeExample.class);
@@ -339,7 +316,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void findPage() {
+  public void shouldFindPage() {
     initSnowflakes();
     initUuids();
 
@@ -398,7 +375,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void execute() {
+  public void shouldExecuteUpdateSql() {
     initSnowflakes();
     Orm orm = database.createOrm();
     orm.truncate(SnowflakeExample.class);
@@ -442,7 +419,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void create() {
+  public void shouldCreateEntityAndReturnGeneratedIds() {
     initSnowflakes();
     initUuids();
     initIdentities();
@@ -484,7 +461,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void testId() {
+  public void shouldGenerateSnowflakeIdAndUuid() {
     long   snowFlakeId = dbTemplate.getPkGenerator().nextSnowFakeId();
     String uuid        = dbTemplate.getPkGenerator().nextUUID();
     Assert.assertTrue(snowFlakeId > 0);
@@ -492,7 +469,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void testCreate() {
+  public void shouldCreateMultipleEntitiesWithGeneratedIds() {
     initSnowflakes();
     initUuids();
     initIdentities();
@@ -526,7 +503,7 @@ public class DatabaseTest extends AbstractTest
   }
 
   @Test
-  public void update() {
+  public void shouldUpdateEntitiesWithVariousStrategies() {
     initSnowflakes();
     initUuids();
     initIdentities();
@@ -559,9 +536,9 @@ public class DatabaseTest extends AbstractTest
               UuidExample      dbUuid      = innerOrm.getById(UuidExample.class, uuid.getId());
               IdentityExample  dbIdentity  = innerOrm.getById(IdentityExample.class, identity.getId());
 
-              Assert.assertEquals(dbSnowflake.getPrice().compareTo(new BigDecimal("999.00")), 0);
-              Assert.assertEquals(dbUuid.getPrice().compareTo(new BigDecimal("999.00")), 0);
-              Assert.assertEquals(dbIdentity.getPrice().compareTo(new BigDecimal("999.00")), 0);
+              Assert.assertEquals(0, dbSnowflake.getPrice().compareTo(new BigDecimal("999.00")));
+              Assert.assertEquals(0, dbUuid.getPrice().compareTo(new BigDecimal("999.00")));
+              Assert.assertEquals(0, dbIdentity.getPrice().compareTo(new BigDecimal("999.00")));
 
               SnowflakeExample condSnowflake = new SnowflakeExample();
               condSnowflake.setId(dbTemplate.getPkGenerator().nextSnowFakeId());
@@ -574,13 +551,13 @@ public class DatabaseTest extends AbstractTest
               Assert.assertEquals(snowflake.getType(), dbSnowflake.getType());
               Assert.assertEquals(snowflake.getDisable(), dbSnowflake.getDisable());
               Assert.assertEquals(snowflake.getCreated(), dbSnowflake.getCreated());
-              Assert.assertEquals(snowflake.getPrice().compareTo(dbSnowflake.getPrice()), 0);
+              Assert.assertEquals(0, snowflake.getPrice().compareTo(dbSnowflake.getPrice()));
 
               dbUuid.setPrice(new BigDecimal("199.00"));
               innerOrm.update(UuidExample.class, dbUuid, new String[]{"price"});
 
               dbUuid = innerOrm.getById(UuidExample.class, uuid.getId());
-              Assert.assertEquals(dbUuid.getPrice().compareTo(new BigDecimal("199.00")), 0);
+              Assert.assertEquals(0, dbUuid.getPrice().compareTo(new BigDecimal("199.00")));
 
               for (IdentityExample i : IDENTITIES) {
                 i.setPrice(new BigDecimal("1099.00"));
@@ -590,7 +567,7 @@ public class DatabaseTest extends AbstractTest
               List<IdentityExample> identities = innerOrm.find(IdentityExample.class, new Sql("select * from tb_identity"));
 
               for (IdentityExample i : identities) {
-                Assert.assertEquals(i.getPrice().compareTo(new BigDecimal("1099.00")), 0);
+                Assert.assertEquals(0, i.getPrice().compareTo(new BigDecimal("1099.00")));
               }
 
               for (UuidExample u : UUIDS) {
@@ -601,13 +578,13 @@ public class DatabaseTest extends AbstractTest
 
               List<UuidExample> uuids = innerOrm.find(UuidExample.class, new Sql("select * from tb_uuid"));
               for (UuidExample u : uuids) {
-                Assert.assertEquals(u.getType(), TypeEnum.DRINK);
+                Assert.assertEquals(TypeEnum.DRINK, u.getType());
               }
             });
   }
 
   @Test
-  public void createOrUpdate() {
+  public void shouldCreateOrUpdateEntity() {
     initSnowflakes();
     initUuids();
     initIdentities();
@@ -653,13 +630,13 @@ public class DatabaseTest extends AbstractTest
     dbUuid = orm.getByCond(UuidExample.class, Cond.eq("name", "S1"));
     dbIdentity = orm.getByCond(IdentityExample.class, Cond.eq("name", "S1"));
 
-    Assert.assertEquals(dbSnowflake.getPrice().compareTo(new BigDecimal("999.99")), 0);
-    Assert.assertEquals(dbUuid.getPrice().compareTo(new BigDecimal("999.99")), 0);
-    Assert.assertEquals(dbIdentity.getPrice().compareTo(new BigDecimal("999.99")), 0);
+    Assert.assertEquals(0, dbSnowflake.getPrice().compareTo(new BigDecimal("999.99")));
+    Assert.assertEquals(0, dbUuid.getPrice().compareTo(new BigDecimal("999.99")));
+    Assert.assertEquals(0, dbIdentity.getPrice().compareTo(new BigDecimal("999.99")));
   }
 
   @Test
-  public void delete() {
+  public void shouldDeleteWithMultipleStrategies() {
     initSnowflakes();
     initUuids();
     initIdentities();
@@ -692,9 +669,69 @@ public class DatabaseTest extends AbstractTest
     long c3 = orm.count(new Sql("SELECT * FROM tb_identity"));
     long c4 = orm.count(new Sql("SELECT * FROM tb_logic_delete"));
 
-    Assert.assertEquals(c1, 0);
-    Assert.assertEquals(c2, 0);
-    Assert.assertEquals(c3, 0);
-    Assert.assertEquals(c4, 3);
+    Assert.assertEquals(0, c1);
+    Assert.assertEquals(0, c2);
+    Assert.assertEquals(0, c3);
+    Assert.assertEquals(3, c4);
+  }
+
+  @Test
+  public void shouldReviveLogicDeletedEntityOnCreateOrUpdate() {
+    initLogicDeletes();
+
+    Orm orm = database.createOrm();
+    orm.truncate(LogicDeleteExample.class);
+
+    // 创建实体
+    LogicDeleteExample entity = LOGIC_DELETES.get(0);
+    orm.create(LogicDeleteExample.class, entity);
+    Long pk = entity.getId();
+    Assert.assertNotNull(pk);
+
+    // 逻辑删除
+    orm.delete(LogicDeleteExample.class, entity);
+
+    // 逻辑删除后普通查询查不到
+    LogicDeleteExample deleted = orm.getById(LogicDeleteExample.class, pk);
+    Assert.assertNull(deleted);
+
+    // createOrUpdate 应"恢复"（UPSERT 将逻辑删除字段置为 0）
+    entity.setPrice(new BigDecimal("888.00"));
+    orm.createOrUpdate(LogicDeleteExample.class, entity);
+
+    LogicDeleteExample revived = orm.getById(LogicDeleteExample.class, pk);
+    Assert.assertNotNull("createOrUpdate 应恢复逻辑删除的记录", revived);
+    Assert.assertEquals(0, revived.getPrice().compareTo(new BigDecimal("888.00")));
+  }
+
+  @Test
+  public void shouldCreateOrUpdateWithAssignedStrategy() {
+    AssignedExample entity = new AssignedExample("ASSIGN001");
+
+    Orm orm = database.createOrm();
+    orm.truncate(AssignedExample.class);
+
+    // 创建
+    int r1 = orm.createOrUpdate(AssignedExample.class, entity);
+    Assert.assertEquals(1, r1);
+
+    AssignedExample db1 = orm.getById(AssignedExample.class, "ASSIGN001");
+    Assert.assertNotNull(db1);
+  }
+
+  @Test
+  public void shouldAssignIdOnCreateOrUpdateForIdentityEntity() {
+    initIdentities();
+
+    Orm orm = database.createOrm();
+    orm.truncate(IdentityExample.class);
+
+    IdentityExample entity = IDENTITIES.get(0);
+    // Identity PK 为 null → createOrUpdate 走 Insert 回退，应设置自增 ID 回实体
+    Assert.assertNull("IDENTITY 策略初始 PK 应为 null", entity.getId());
+
+    orm.createOrUpdate(IdentityExample.class, entity);
+
+    Assert.assertNotNull("createOrUpdate 后实体的 ID 应被自动回设", entity.getId());
   }
 }
