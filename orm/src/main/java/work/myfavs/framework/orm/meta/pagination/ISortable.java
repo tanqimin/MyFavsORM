@@ -4,7 +4,12 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 排序接口，定义排序所需的操作方法
+ * 排序接口，定义排序条件集合的获取方法。
+ * <p>实现此接口的对象可作为排序参数传递到 {@code Sql.orderBy(ISortable)} 方法中。</p>
+ *
+ * @see Order
+ * @see SortableCriteria
+ * @see work.myfavs.framework.orm.meta.clause.Sql#orderBy(ISortable)
  */
 public interface ISortable extends Serializable {
   /**

@@ -9,7 +9,12 @@ import static work.myfavs.framework.orm.util.common.SqlUtil.checkInjection;
 import static work.myfavs.framework.orm.util.common.StringUtil.*;
 
 /**
- * 排序
+ * 排序对象，封装排序字段和排序方向。
+ * <p>支持通过 {@link #parse(String)} 方法从字符串解析，格式为 {@code "fieldName ASC"} 或 {@code "fieldName DESC"}。
+ * 默认升序。字段名经过 SQL 注入检查。</p>
+ *
+ * @see SortableCriteria
+ * @see work.myfavs.framework.orm.meta.clause.Sql#orderBy(String)
  */
 public class Order implements Serializable {
 

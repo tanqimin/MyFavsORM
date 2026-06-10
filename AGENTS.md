@@ -6,6 +6,17 @@ This file provides guidance to agents when working with code in this repository.
 
 - **全局使用简体中文**思考和回答问题，包括但不限于：代码注释、commit message、文档说明、与用户的对话交互。
 
+## 项目结构
+
+- **多模块 Maven 项目**（6 个模块）：`orm`（核心库）、`spring-boot-starter/orm-spring-boot-starter-common`（Spring 集成源码）、`spring-boot-starter/orm-spring-boot{2,3,4}-starter`（仅 POM，无 Java 源码）、`demos/spring-boot2-demo`（多租户参考实现）
+- **无 CI/CD**：`.github/modernize/` 仅含迁移脚本，无 CI 工作流配置
+
+## 架构要点
+
+- **`AbstractOrm` 采用组合模式**：实体 CRUD 委派给 6 个内部组件（`OrmExecutor`、`OrmInserter`、`OrmUpdater`、`OrmDeleter`、`OrmSelector`、`OrmPager`）。各方言子类（`MySqlOrm` 等）仅需在构造器中传入不同 `PageStrategy`，不再覆写方法。修改 CRUD 行为应修改对应组件而非子类
+- **`OrmSqlBuilder` 依赖 Druid AST**：INSERT/UPDATE SQL 通过 Druid 的 `SQLInsertStatement`/`SQLUpdateStatement` 构建；未引入 Druid 时 INSERT/UPDATE 操作会失败（分页 COUNT 同样依赖 Druid）
+- **`Database` 持有单个 `Query` 实例**：`createQuery()` 返回同一对象（通过 `query.createQuery()` 重置 PreparedStatement），无法同时执行多个独立查询
+
 ## 项目非显而易见的核心约定
 
 - **`@Column`、`@PrimaryKey`、`@LogicDelete`** 使用 `@Inherited`，子类会继承父类字段注解；但 **`@Table` 没有 `@Inherited`**，子类必须独立标注 `@Table` 才能被识别为实体
@@ -29,6 +40,9 @@ This file provides guidance to agents when working with code in this repository.
 ```bash
 # 全量构建（跳过测试，避免需要真实数据库）
 mvn clean install -DskipTests
+
+# 仅编译核心模块
+mvn compile -pl orm
 
 # 运行单个测试方法
 mvn test -pl orm -Dtest=<TestClassName>#<methodName>

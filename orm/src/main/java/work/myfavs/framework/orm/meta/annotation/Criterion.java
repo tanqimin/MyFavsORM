@@ -7,7 +7,15 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 用于构造查询条件
+ * 查询条件注解，用于声明式构建动态查询条件。
+ * <p>标注在实体的字段上，配合 {@link work.myfavs.framework.orm.meta.clause.Cond#criteria(Object)}
+ * 或 {@link work.myfavs.framework.orm.meta.clause.Cond#criteria(Object, Class)} 方法，
+ * 可根据字段值自动生成 SQL 条件子句。</p>
+ * <p>支持 {@code @Repeatable}，同一字段可定义多个不同运算符的条件。</p>
+ *
+ * @see Criteria
+ * @see work.myfavs.framework.orm.meta.clause.Cond#criteria(Object)
+ * @see work.myfavs.framework.orm.meta.enumeration.Operator
  */
 @java.lang.annotation.Inherited
 @java.lang.annotation.Target({ElementType.FIELD})

@@ -48,7 +48,6 @@ public class ClassMeta {
    */
   private       Attribute      logicDelete;
 
-//  private final Constructor<?>                          modelConstructor;
   /**
    * 更新字段
    */
@@ -173,8 +172,6 @@ public class ClassMeta {
       this.tableName = getTableName(table, clazz);
     }
 
-//    this.modelConstructor = ReflectUtil.getConstructor(clazz);
-
     final List<Field> fields = ReflectUtil.getFields(clazz);
 
     for (Field field : fields) {
@@ -213,6 +210,14 @@ public class ClassMeta {
    */
   public static ClassMeta createInstance(Class<?> clazz) {
     return CLASS_META_CACHE.computeIfAbsent(clazz.getName(), key -> new ClassMeta(clazz));
+  }
+
+  /**
+   * 清空类元数据缓存。
+   * <p>在 Web 应用热部署或动态类加载场景下，可调用此方法释放旧的 {@link ClassLoader} 引用的元数据，避免元空间内存泄漏。</p>
+   */
+  public static void clearCache() {
+    CLASS_META_CACHE.clear();
   }
 
   /**

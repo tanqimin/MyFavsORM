@@ -13,7 +13,14 @@ import work.myfavs.framework.orm.util.common.DruidUtil;
 import java.util.Collection;
 
 /**
- * SQL Server 2012+ 分页策略：使用 OFFSET...FETCH NEXT 语法
+ * SQL Server 2012+ 分页策略：使用 OFFSET...FETCH NEXT 语法。
+ * <p>通过 Druid AST 在原 SQL 上附加 {@code OFFSET {offset} ROWS FETCH NEXT {count} ROWS ONLY}。
+ * 若原 SQL 无 ORDER BY，自动补充 {@code ORDER BY CURRENT_TIMESTAMP}（语法要求）。</p>
+ * <p>若使用 SQL Server 2005~2008，请改用 {@link SqlServerPageStrategy}。</p>
+ *
+ * @see SqlServerPageStrategy
+ * @see MySqlPageStrategy
+ * @see OraclePageStrategy
  */
 public class SqlServer2012PageStrategy implements PageStrategy {
 

@@ -7,9 +7,13 @@ import java.util.HashMap;
 import java.util.Objects;
 
 /**
- * 页面模型，如果需要返回自定义的格式，请使用此类封装分页
+ * 页面模型，用于将 {@link Page} 或 {@link PageLite} 转换为以 Map 结构输出的前端友好格式。
+ * <p>继承 {@link HashMap}，字段名称可通过 {@link DBConfig} 配置自定义。</p>
  *
- * @param <TModel>
+ * @param <TModel> 分页数据类型泛型
+ * @see Page
+ * @see PageLite
+ * @see DBConfig
  */
 public class PageModel<TModel> extends HashMap<String, Object> {
 

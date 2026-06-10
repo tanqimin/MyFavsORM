@@ -13,7 +13,14 @@ import work.myfavs.framework.orm.util.common.DruidUtil;
 import java.util.Collection;
 
 /**
- * SQL Server 2005+ 分页策略：使用 ROW_NUMBER() OVER 语法
+ * SQL Server 2005~2008 分页策略：使用 ROW_NUMBER() OVER 语法。
+ * <p>通过 Druid AST 在原 SQL 中内嵌 {@code ROW_NUMBER() OVER (ORDER BY ...)} 窗口函数，
+ * 外层按行号范围 {@code BETWEEN offset+1 AND count+offset} 过滤。适用于 SQL Server 2005~2008。</p>
+ * <p>若使用 SQL Server 2012+，请改用 {@link SqlServer2012PageStrategy}。</p>
+ *
+ * @see SqlServer2012PageStrategy
+ * @see MySqlPageStrategy
+ * @see OraclePageStrategy
  */
 public class SqlServerPageStrategy implements PageStrategy {
 

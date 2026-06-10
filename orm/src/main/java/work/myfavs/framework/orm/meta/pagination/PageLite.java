@@ -4,9 +4,14 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * 简单分页对象
+ * 简单分页对象，包含数据列表、当前页码、每页记录数和是否有下一页的标记。
+ * <p>{@link #hasNext} 通过检查数据列表大小是否等于页面大小来判断（启发式），
+ * 末页恰好填满时可能误判为有下一页。</p>
+ * <p>通过 {@link #create(List, long, long)} 静态工厂方法创建。</p>
  *
- * @param <TModel> 简单分页对象泛型
+ * @param <TModel> 分页数据类型泛型
+ * @see Page
+ * @see PageModel
  */
 public class PageLite<TModel> extends PageBase<TModel> {
 

@@ -65,6 +65,7 @@ public class OrmUpdater {
 
     final ClassMeta classMeta = Metadata.entityMeta(modelClass);
     final Sql sql = this.sqlBuilder.update(classMeta, entity, false);
+    if (null == sql) return 0;
     return executor.execute(sql);
   }
 
@@ -82,6 +83,7 @@ public class OrmUpdater {
 
     final ClassMeta classMeta = Metadata.entityMeta(modelClass);
     final Sql sql = this.sqlBuilder.update(classMeta, entity, true);
+    if (null == sql) return 0;
     return executor.execute(sql);
   }
 
@@ -100,6 +102,7 @@ public class OrmUpdater {
 
     final ClassMeta classMeta = Metadata.entityMeta(modelClass);
     final Sql sql = this.sqlBuilder.update(classMeta, entity, false, columns);
+    if (null == sql) return 0;
     return executor.execute(sql);
   }
 

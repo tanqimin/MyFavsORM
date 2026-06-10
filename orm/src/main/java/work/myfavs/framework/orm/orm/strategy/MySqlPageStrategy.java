@@ -12,7 +12,12 @@ import work.myfavs.framework.orm.util.common.DruidUtil;
 import java.util.Collection;
 
 /**
- * MySQL 分页策略：使用 LIMIT offset, count 语法
+ * MySQL 分页策略：使用 LIMIT offset, count 语法。
+ * <p>适用于 MySQL 5.0+ 和 H2 数据库。</p>
+ *
+ * @see OraclePageStrategy
+ * @see SqlServerPageStrategy
+ * @see SqlServer2012PageStrategy
  */
 public class MySqlPageStrategy implements PageStrategy {
 

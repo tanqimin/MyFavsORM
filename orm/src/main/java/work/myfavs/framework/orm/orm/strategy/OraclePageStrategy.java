@@ -14,7 +14,13 @@ import work.myfavs.framework.orm.util.common.DruidUtil;
 import java.util.Collection;
 
 /**
- * Oracle 分页策略：使用 ROWNUM 双层子查询
+ * Oracle 分页策略：使用 ROWNUM 双层子查询。
+ * <p>通过 Druid AST 构建内层子查询限制最大行号（{@code ROWNUM <= maxRow}），
+ * 外层子查询过滤偏移量（{@code _rn > offset}）。适用于 Oracle 9i+。</p>
+ *
+ * @see MySqlPageStrategy
+ * @see SqlServerPageStrategy
+ * @see SqlServer2012PageStrategy
  */
 public class OraclePageStrategy implements PageStrategy {
 

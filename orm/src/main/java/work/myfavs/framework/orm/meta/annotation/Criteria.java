@@ -4,9 +4,12 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 可重复条件注解的容器，用于在同一字段上聚合多个{@link Criterion}条件.
+ * 可重复条件注解的容器，用于在同一字段上聚合多个 {@link Criterion} 条件。
+ * <p>当需要在同一个字段上定义多个不同运算符的条件时，使用本注解包裹多个 {@code @Criterion}。</p>
+ * <p>通常配合 {@link work.myfavs.framework.orm.meta.clause.Cond#criteria(Object)} 使用。</p>
  *
- * <p>Created by tanqimin on 2015/10/28.
+ * @see Criterion
+ * @see work.myfavs.framework.orm.meta.clause.Cond#criteria(Object)
  */
 @java.lang.annotation.Inherited
 @java.lang.annotation.Target({ElementType.FIELD})

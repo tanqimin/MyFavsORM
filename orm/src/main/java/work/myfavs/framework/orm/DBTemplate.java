@@ -84,11 +84,14 @@ public class DBTemplate {
   }
 
   /**
-   * 注册 PropertyHandler
-   * <p>设计说明：若用户未通过 {@link Builder#mapping(Consumer)} 注册任何自定义处理器（mapper.map 为空），
-   * 则注册框架内置的 23 种默认 {@link PropertyHandler}；若用户已注册自定义处理器，
-   * 则仅使用用户注册的处理器，不再注册默认处理器。
+   * 注册 PropertyHandler。
+   * <p><b>设计说明（全默认 or 全自定义）：</b></p>
+   * <p>若用户未通过 {@link Builder#mapping(Consumer)} 注册任何自定义处理器（{@code mapper.map} 为空），
+   * 则调用 {@link work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory#registerDefault()}
+   * 注册框架内置的 23 种默认 {@link work.myfavs.framework.orm.meta.handler.PropertyHandler PropertyHandler}；</p>
+   * <p>若用户已注册自定义处理器，则<b>仅使用用户注册的处理器</b>，不再注册默认处理器。
    * 即"全默认 or 全自定义"二选一的模式。</p>
+   * <p>详细说明请参见 {@link work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory} 的类注释。</p>
    *
    * @param mapper Mapper
    */

@@ -109,7 +109,14 @@ public class Cond extends Clause {
   }
 
   /**
-   * 创建 = 条件，如 field = param，如果 param 为 null， 且 ignoreNull = false 时，创建 field IS NULL
+   * 创建 = 条件。
+   * <p><b>关于 {@code null} 与空字符串 {@code ""} 的处理差异：</b></p>
+   * <ul>
+   *   <li>参数为 {@code null} 且 {@code ignoreNull = false} 时，生成 {@code field IS NULL}；</li>
+   *   <li>参数为空字符串 {@code ""} 且 {@code ignoreNull = false} 时，仍生成 {@code field = ?}</li>
+   *   （参数值为 {@code ""}，不会转为 {@code IS NULL}）。</li>
+   * </ul>
+   * <p>原因：在数据库中 {@code NULL} 和空字符串 {@code ''} 是两种不同的值，语义不应混淆。</p>
    *
    * @param field      字段
    * @param param      参数值

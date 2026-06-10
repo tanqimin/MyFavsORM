@@ -156,9 +156,8 @@ public abstract class Clause implements Serializable {
     if (isBlankSql())
       return this.concat(clause);
 
-    StringBuilder sqlSb = new StringBuilder(clause);
-    if (Character.isWhitespace(sqlSb.charAt(0)))
-      return this.rtrim().concat(sqlSb);
+    if (Character.isWhitespace(clause.charAt(0)))
+      return this.rtrim().concat(clause);
 
     return this.concat(Constant.SPACE).concat(clause);
   }

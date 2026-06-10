@@ -1,7 +1,12 @@
 package work.myfavs.framework.orm.meta.enumeration;
 
 /**
- * 用于描述@Cond中的Operator
+ * 查询条件运算符枚举，用于 {@link work.myfavs.framework.orm.meta.annotation.Criterion#operator()} 指定条件运算类型。
+ * <p><b>注意：</b>注释中已包含 {@code EXISTS} / {@code NOT_EXISTS} 运算的预留定义（当前被注释），
+ * 可通过 Cond.exists(Sql)/notExists(Sql) 手动构建。</p>
+ *
+ * @see work.myfavs.framework.orm.meta.annotation.Criterion
+ * @see work.myfavs.framework.orm.meta.clause.Cond
  */
 public enum Operator {
   /**

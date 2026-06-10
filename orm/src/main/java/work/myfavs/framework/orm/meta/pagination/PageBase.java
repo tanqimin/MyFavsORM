@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * 分页基类
+ * 分页基类，提供分页数据、页码、每页记录数的通用字段和方法。
+ * <p>{@link Page} 和 {@link PageLite} 均继承此类，共享基础属性。提供受保护的 {@link #convertData(Function)} 方法用于子类转换数据。</p>
  *
- * @author tanqimin
+ * @param <TModel> 分页数据类型泛型
+ * @see Page
+ * @see PageLite
  */
 public abstract class PageBase<TModel> implements Serializable {
 

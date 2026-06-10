@@ -80,7 +80,7 @@ public class OrmSqlBuilder {
 
     if (null != logicDelete) {
       columns.add(DruidUtil.createColumn(logicDelete.getColumnName()));
-      values.add(new SQLIntegerExpr(0));
+      values.add(DruidUtil.createParam());
     }
 
     insertStatement.getColumns().addAll(columns);
@@ -122,6 +122,10 @@ public class OrmSqlBuilder {
       sql.getParams().add(fieldValue);
     }
 
+    if (updateStatement.getItems().isEmpty()) {
+      return null;
+    }
+
     updateStatement.addWhere(createCondition(primaryKey, logicDelete));
 
     sql.append(updateStatement.toUnformattedString());
@@ -160,6 +164,10 @@ public class OrmSqlBuilder {
       updateStatement.addItem(sqlUpdateSetItem);
 
       sql.getParams().add(fieldValue);
+    }
+
+    if (updateStatement.getItems().isEmpty()) {
+      return null;
     }
 
     updateStatement.addWhere(createCondition(primaryKey, logicDelete));

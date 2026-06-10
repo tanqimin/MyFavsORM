@@ -250,10 +250,11 @@ public class Database implements Closeable {
    */
   public <TResult> TResult tx(ThrowingFunction<Orm, TResult, SQLException> func, Runnable callback) {
 
-    try (Database database = this.open()) {
-      Orm     orm    = database.createOrm();
+    this.open();
+    try {
+      Orm     orm    = this.createOrm();
       TResult result = func.apply(orm);
-      database.commit();
+      this.commit();
       return result;
     } catch (SQLException e) {
       try {
@@ -263,6 +264,7 @@ public class Database implements Closeable {
       }
       throw new ConnectionException(e, "执行事务过程中发生异常: %s", e.getMessage());
     } finally {
+      this.close();
       callback.run();
     }
   }
@@ -285,10 +287,11 @@ public class Database implements Closeable {
    */
   public void tx(ThrowingConsumer<Orm, SQLException> consumer, Runnable callback) {
 
-    try (Database database = this.open()) {
-      Orm orm = database.createOrm();
+    this.open();
+    try {
+      Orm orm = this.createOrm();
       consumer.accept(orm);
-      database.commit();
+      this.commit();
     } catch (SQLException e) {
       try {
         this.rollback();
@@ -297,6 +300,7 @@ public class Database implements Closeable {
       }
       throw new ConnectionException(e, "执行事务过程中发生异常: %s", e.getMessage());
     } finally {
+      this.close();
       callback.run();
     }
   }

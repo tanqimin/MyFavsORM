@@ -4,10 +4,13 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * 分页对象
+ * 完整分页对象，包含数据列表、当前页码、每页记录数、总页数和总记录数。
+ * <p>通过 {@link #create(List, long, long, long, long)} 静态工厂方法创建。
+ * 支持通过 {@link #convert(Function)} 方法转换数据类型。</p>
  *
- * @param <TModel> 简单分页对象泛型
- * @author tanqimin
+ * @param <TModel> 分页数据类型泛型
+ * @see PageLite
+ * @see PageModel
  */
 public class Page<TModel> extends PageBase<TModel> {
 

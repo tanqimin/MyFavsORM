@@ -4,7 +4,11 @@ import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.orm.strategy.OraclePageStrategy;
 
 /**
- * Orm Oracle实现
+ * ORM Oracle 实现。
+ * <p>使用 {@link OraclePageStrategy}（ROWNUM 双层子查询）作为分页策略。</p>
+ *
+ * @see OraclePageStrategy
+ * @see MySqlOrm
  */
 public class OracleOrm extends AbstractOrm {
 

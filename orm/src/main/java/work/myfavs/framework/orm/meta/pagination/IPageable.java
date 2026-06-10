@@ -1,7 +1,11 @@
 package work.myfavs.framework.orm.meta.pagination;
 
 /**
- * 分页接口，定义分页查询所需的基本参数
+ * 分页参数接口，定义分页查询所需的基本参数。
+ * <p>实现此接口的对象可作为分页参数传递到 {@code Orm.findPage(...)} 和 {@code Orm.findPageLite(...)} 方法中。</p>
+ *
+ * @see PageableCriteria
+ * @see work.myfavs.framework.orm.orm.Orm
  */
 public interface IPageable {
 

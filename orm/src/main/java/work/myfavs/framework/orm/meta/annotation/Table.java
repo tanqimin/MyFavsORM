@@ -6,11 +6,13 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 用于标记实体名称与数据表名称之间的映射关系
+ * 实体类与数据表的映射注解。
+ * <p>标记在类上，将实体类映射到指定数据表。</p>
+ * <p><b>注意：</b>{@code @Table} 没有 {@code @Inherited} 元注解，子类必须独立标注 {@code @Table} 才能被识别为实体。</p>
  *
- * <p>
- *
- * @author tanqimin
+ * @see Column
+ * @see PrimaryKey
+ * @see GenerationType
  */
 @java.lang.annotation.Target({ElementType.TYPE})
 @java.lang.annotation.Retention(RetentionPolicy.RUNTIME)

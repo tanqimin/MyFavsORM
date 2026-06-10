@@ -25,6 +25,42 @@ public class Record extends LinkedHashMap<String, Object> implements IRecord<Str
   }
 
   /**
+   * 获取属性值，支持大小写不敏感的键名匹配。
+   * <p>优先精确匹配；若未找到且 {@code key} 为字符串类型，则遍历所有键进行大小写不敏感匹配。</p>
+   *
+   * @param key 属性名称
+   * @return 属性值
+   */
+  @Override
+  public Object get(Object key) {
+    Object value = super.get(key);
+    if (null == value && key instanceof String) {
+      String keyStr = (String) key;
+      for (Entry<String, Object> entry : this.entrySet()) {
+        if (entry.getKey().equalsIgnoreCase(keyStr)) {
+          return entry.getValue();
+        }
+      }
+    }
+    return value;
+  }
+
+  /**
+   * 判断是否包含指定键，支持大小写不敏感的键名匹配。
+   */
+  @Override
+  public boolean containsKey(Object key) {
+    if (super.containsKey(key)) return true;
+    if (key instanceof String) {
+      String keyStr = (String) key;
+      for (String k : this.keySet()) {
+        if (k.equalsIgnoreCase(keyStr)) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * 设置属性
    *
    * @param attr  属性名称

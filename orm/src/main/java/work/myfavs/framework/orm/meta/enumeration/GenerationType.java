@@ -4,6 +4,15 @@ import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 /**
  * 主键生成策略，定义实体对象主键值的生成方式。
+ * <p>通过 {@link work.myfavs.framework.orm.meta.annotation.Table#strategy()} 配置到实体类上。</p>
+ * <ul>
+ *   <li>{@link #UUID} — 程序自动生成 UUID 字符串；</li>
+ *   <li>{@link #SNOW_FLAKE} — 雪花算法生成分布式唯一 ID（默认策略）；</li>
+ *   <li>{@link #IDENTITY} — 数据库自增，适用于有自增列的数据库（如 MySQL AUTO_INCREMENT、SQL Server IDENTITY）；</li>
+ *   <li>{@link #ASSIGNED} — 自然主键，由用户在插入前手动赋值。</li>
+ * </ul>
+ *
+ * @see work.myfavs.framework.orm.meta.annotation.Table
  */
 public enum GenerationType {
   /**

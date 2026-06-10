@@ -13,7 +13,14 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@link PropertyHandler} 工厂类，负责注册和管理属性处理器实例
+ * {@link PropertyHandler} 工厂类，负责注册和管理属性处理器实例。
+ * <p><b>注册策略（全默认 or 全自定义）：</b></p>
+ * <p>若用户未通过 {@link work.myfavs.framework.orm.DBTemplate.Builder#mapping(java.util.function.Consumer) DBTemplate.Builder.mapping()}
+ * 注册任何自定义处理器，则框架自动注册 23 种内置默认 {@link PropertyHandler}（调用 {@link #registerDefault()}）；</p>
+ * <p>若用户注册了任意自定义处理器，则<b>仅使用用户注册的处理器</b>，不再注册默认处理器。
+ * 即：一旦 user-custom 介入，框架不再做任何自动注册。</p>
+ * <p>因此，使用自定义注册时，用户需要自行注册所有需要用到的类型（包括基础类型与包装类需分别注册，
+ * 如 {@code long.class} 和 {@code Long.class} 为两个不同的 key）。</p>
  */
 public class PropertyHandlerFactory {
 
@@ -24,7 +31,13 @@ public class PropertyHandlerFactory {
   private PropertyHandlerFactory() {}
 
   /**
-   * 注册默认的PropertyHandler
+   * 注册框架内置的 23 种默认 {@link PropertyHandler}。
+   * <p>包含：String、NVarchar、Date、LocalDateTime、OffsetDateTime、BigDecimal、Boolean(包装类+基础类型)、
+   * Integer(包装类+基础类型)、Long(包装类+基础类型)、UUID、Short(包装类+基础类型)、
+   * Double(包装类+基础类型)、Float(包装类+基础类型)、Byte(包装类+基础类型)、
+   * byte[]、Byte[]、Blob、Clob。</p>
+   * <p>此方法在用户<b>未</b>通过 {@link work.myfavs.framework.orm.DBTemplate.Builder#mapping(java.util.function.Consumer)} 
+   * 注册任何自定义处理器时自动调用。</p>
    */
   public static void registerDefault() {
 
@@ -56,7 +69,11 @@ public class PropertyHandlerFactory {
   }
 
   /**
-   * 注册解析器类型
+   * 注册属性处理器。
+   * <p><b>注意：</b>一旦通过 {@link work.myfavs.framework.orm.DBTemplate.Builder#mapping(java.util.function.Consumer)}
+   * 调用了此方法注册任意处理器，框架内置的 23 种默认处理器将全部失效，
+   * 用户需要自行注册所有需要用到的类型。基础类型与包装类需分别注册
+   * （如 {@code long.class} 与 {@code Long.class} 对应不同的 key）。</p>
    *
    * @param clazz           目标类型
    * @param propertyHandler 属性处理器实例

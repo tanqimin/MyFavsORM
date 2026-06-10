@@ -3,7 +3,12 @@ package work.myfavs.framework.orm.meta.criteria;
 import work.myfavs.framework.orm.meta.pagination.IPageable;
 
 /**
- * 分页查询条件基类
+ * 分页查询条件基类，继承 {@link SortableCriteria} 并实现 {@link IPageable} 接口。
+ * <p>同时支持排序和分页，可直接作为查询参数传递。
+ * 默认启用分页，当前页码为 1，每页记录数为 20。</p>
+ *
+ * @see SortableCriteria
+ * @see IPageable
  */
 public abstract class PageableCriteria extends SortableCriteria implements IPageable {
   private boolean enablePage  = true;

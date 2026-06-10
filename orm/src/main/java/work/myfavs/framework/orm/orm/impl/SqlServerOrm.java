@@ -4,7 +4,12 @@ import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.orm.strategy.SqlServerPageStrategy;
 
 /**
- * Orm SqlServer实现：2005以上，2012或以上版本请使用 {@link SqlServer2012Orm}
+ * ORM SQL Server 2005~2008 实现。
+ * <p>使用 {@link SqlServerPageStrategy}（ROW_NUMBER() OVER 语法）作为分页策略。
+ * 若使用 SQL Server 2012+，请改用 {@link SqlServer2012Orm}。</p>
+ *
+ * @see SqlServerPageStrategy
+ * @see SqlServer2012Orm
  */
 public class SqlServerOrm extends AbstractOrm {
 

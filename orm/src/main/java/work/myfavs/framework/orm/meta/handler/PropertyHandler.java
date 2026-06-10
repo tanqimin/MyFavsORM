@@ -5,9 +5,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * 类型处理接口 此处为了兼容枚举类型
+ * 类型处理器的抽象基类，负责 Java 类型与 JDBC 类型之间的双向转换。
+ * <p>每个 {@link PropertyHandler} 负责一种特定 Java 类型与数据库列的相互转换。
+ * 框架内置 23 种默认处理器（参见 {@link work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory#registerDefault()}），
+ * 用户也可通过 {@link work.myfavs.framework.orm.DBTemplate.Builder#mapping(java.util.function.Consumer)} 注册自定义处理器。</p>
  *
- * <p>Created by tanqimin on 2016/1/29.
+ * @param <T> 处理器处理的 Java 类型
+ * @see PropertyHandlerFactory
+ * @see work.myfavs.framework.orm.meta.schema.Attribute
  */
 public abstract class PropertyHandler<T> {
 

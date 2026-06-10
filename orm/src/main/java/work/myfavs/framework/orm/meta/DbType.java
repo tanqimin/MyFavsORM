@@ -1,9 +1,12 @@
 package work.myfavs.framework.orm.meta;
 
 /**
- * 数据库类型
+ * 数据库类型常量定义。
+ * <p>以字符串常量形式定义框架支持的数据库类型，用于 {@link work.myfavs.framework.orm.DBConfig#setDbType(String)} 配置。</p>
+ * <p>当前支持的数据库：SQL Server（两个版本）、MySQL、PostgreSQL、Oracle、H2。</p>
  *
- * @author tanqi
+ * @see work.myfavs.framework.orm.DBConfig
+ * @see work.myfavs.framework.orm.orm.OrmFactory
  */
 public class DbType {
 
