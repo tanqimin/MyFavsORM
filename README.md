@@ -38,14 +38,14 @@
 <dependency>
     <groupId>work.myfavs.framework</groupId>
     <artifactId>orm</artifactId>
-    <version>1.0.0-260408-1</version>
+    <version>1.0.0-260610-1</version>
 </dependency>
 
 <!-- Spring Boot 集成（可选） -->
 <dependency>
     <groupId>work.myfavs.framework</groupId>
     <artifactId>orm-spring-boot2-starter</artifactId>
-    <version>1.0.0-260408-1</version>
+    <version>1.0.0-260610-1</version>
 </dependency>
 ```
 
@@ -741,14 +741,14 @@ orm/src/test/resources/sql/
 <dependency>
     <groupId>work.myfavs.framework</groupId>
     <artifactId>orm</artifactId>
-    <version>1.0.0-260408-1</version>
+    <version>1.0.0-260610-1</version>
 </dependency>
 
 <!-- Spring Boot Starter（依赖 orm + optional spring-jdbc） -->
 <dependency>
     <groupId>work.myfavs.framework</groupId>
     <artifactId>orm-spring-boot2-starter</artifactId>
-    <version>1.0.0-260408-1</version>
+    <version>1.0.0-260610-1</version>
 </dependency>
 ```
 
