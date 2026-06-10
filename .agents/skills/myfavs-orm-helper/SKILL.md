@@ -1,0 +1,721 @@
+---
+name: myfavs-orm-helper
+description: 帮助理解 MyFavsORM 框架的架构设计、模块结构、核心组件关系和方言体系。当用户询问 MyFavsORM 项目结构、AbstractOrm 组合模式、Orm组件职责、SqlDialect方言扩展、Database/DBTemplate 生命周期、注解行为（@Table/@Column/@PrimaryKey/@LogicDelete）、代码导航或架构解读时使用。
+---
+
+# MyFavsORM 框架架构助手
+
+协助开发者在 MyFavsORM 项目中进行架构解读和代码导航。
+
+## 项目结构概览
+
+MyFavsORM 是一个**多模块 Maven 项目**（groupId: `work.myfavs.framework`），包含 6 个模块：
+
+| 模块 | 路径 | 说明 |
+|------|------|------|
+| `orm` | `orm/` | 核心库，含 ORM 引擎、方言、注解、工具类 |
+| Common Starter | `spring-boot-starter/orm-spring-boot-starter-common/` | Spring 集成公共源码 |
+| SB2 Starter | `spring-boot-starter/orm-spring-boot2-starter/` | 仅 POM，无 Java 源码 |
+| SB3 Starter | `spring-boot-starter/orm-spring-boot3-starter/` | 仅 POM，无 Java 源码 |
+| SB4 Starter | `spring-boot-starter/orm-spring-boot4-starter/` | 仅 POM，无 Java 源码 |
+| Demo | `demos/spring-boot2-demo/` | 多租户参考实现 |
+
+---
+
+## 一、框架架构解读与代码导航
+
+### 核心架构：AbstractOrm 组合模式
+
+`AbstractOrm` 是框架的核心，采用**组合模式**将实体 CRUD 职责委派给 7 个内部组件。各方言子类仅通过构造器传入 `SqlDialect` 注入行为差异，**不再覆写方法**。
+
+```
+AbstractOrm
+ ├── OrmExecutor     → JDBC SQL 执行、PreparedStatement 配置
+ ├── OrmInserter     → INSERT 操作（单体/批量）
+ ├── OrmUpdater      → UPDATE / UPSERT 操作
+ ├── OrmDeleter      → DELETE / TRUNCATE 操作
+ ├── OrmSelector     → SELECT / COUNT / EXISTS / 条件查询
+ ├── OrmPager        → 分页查询（PageLite / Page / Top）
+ └── OrmSqlBuilder   → 通过 Druid AST 构建 INSERT/UPDATE SQL
+```
+
+#### 构造时序
+
+```
+OrmSqlBuilder(sqlDialect) ──→ OrmExecutor(database)
+                                  ↓
+                          OrmInserter(database, dbTemplate, sqlBuilder, executor)
+                                  ↓
+                          OrmUpdater(database, sqlBuilder, executor, inserter)
+                                  ↓
+                          OrmDeleter(database, sqlBuilder, executor)
+                                  ↓
+                          OrmSelector(database, sqlBuilder)
+                                  ↓
+                          OrmPager(selector, sqlBuilder, dbConfig, dialect)
+```
+
+#### 修改 CRUD 行为的原则
+
+- **修改 INSERT/UPDATE SQL 生成** → 修改 `OrmSqlBuilder`，而不是各方言子类
+- **修改分页/UPSERT 行为** → 修改对应 `SqlDialect` 实现
+- **新增数据库支持** → 创建新 `SqlDialect` + 新 `AbstractOrm` 子类
+
+### 方言体系（SqlDialect）
+
+```java
+public interface SqlDialect {
+  DbType getDruidDbType();           // Druid 数据库类型，用于 COUNT 改写
+  Sql applyPageSql(...);             // 生成分页查询 SQL
+  String getUpsertSql(...);          // 生成 UPSERT SQL 模板
+}
+```
+
+| 实现类 | UPSERT 策略 |
+|--------|-------------|
+| `MySqlDialect` | `INSERT ... ON DUPLICATE KEY UPDATE` |
+| `PostgreSqlDialect` | `INSERT ... ON CONFLICT ... DO UPDATE` |
+| `SqlServerDialect` | `MERGE ... WHEN MATCHED ... WHEN NOT MATCHED` |
+| `OracleDialect` | `MERGE INTO ... USING (SELECT ... FROM DUAL)` |
+| `H2Dialect` | 同 MySQL 兼容模式 |
+
+**方言特殊行为**：
+- `SqlServerDialect.getUpsertSql()` 的 `isIdentity` 参数：`true` 时 PK 不参与 INSERT/UPDATE 子句并附加 `OUTPUT INSERTED.pk`
+- `SqlServerDialect` 和 `OracleDialect`：当表仅有 PK 列无其他列时，自动降级为不含 `WHEN MATCHED` 子句的 MERGE
+
+### ORM 实例化与方言映射
+
+`OrmFactory.createOrm(Database)` 根据 `dbType` 创建对应的子类：
+
+| DbType | Orm 子类 |
+|--------|----------|
+| `SQL_SERVER` | `SqlServerOrm` → `SqlServerDialect` |
+| `SQL_SERVER_2012` | `SqlServer2012Orm` → `SqlServer2012Dialect` |
+| `MYSQL` | `MySqlOrm` → `MySqlDialect` |
+| `POSTGRE_SQL` | `PostgreSQLOrm` → `PostgreSqlDialect` |
+| `ORACLE` | `OracleOrm` → `OracleDialect` |
+| `H2` | `H2Orm` → `H2Dialect` |
+
+### Database 生命周期
+
+```
+DBTemplate (单例，静态池 POOL)
+  └── createDatabase() → Database(构造器自动调用 open())
+        ├── createQuery(sql) → Query (单例，每次都重置 PreparedStatement)
+        ├── createOrm() → Orm (OrmFactory.createOrm)
+        ├── tx(func) → 事务中执行，自动 open/commit/rollback/close
+        ├── commit() / rollback()
+        └── close() → 释放连接 (JdbcConnFactory.releaseConnection)
+```
+
+**关键约定**：
+- `Database` 构造器自动调用 `open()`（打开连接），使用时必须配对 `close()`
+- `Database` 持有**单个** `Query` 实例，无法同时执行多个独立查询
+- `JdbcConnFactory.releaseConnection()` 在关闭连接前自动 `commit()`（若 autoCommit=false），fallback 到 `rollback()`
+
+### 代码导航：关键源码文件速查
+
+| 目的 | 文件路径（相对于 `orm/src/main/java/work/myfavs/framework/orm/`） |
+|------|---------------------------------------------------------|
+| CRUD 接口定义 | `orm/Orm.java` |
+| CRUD 组合实现 | `orm/impl/AbstractOrm.java` |
+| SQL 执行 | `orm/component/OrmExecutor.java` |
+| 查询逻辑 | `orm/component/OrmSelector.java` |
+| SQL 构建（Druid AST） | `orm/component/OrmSqlBuilder.java` |
+| 方言接口 | `orm/dialect/SqlDialect.java` |
+| MySQL/PostgreSQL/Oracle/SQL Server 方言 | `orm/dialect/MySqlDialect.java` 等 |
+| 数据库连接管理 | `Database.java` |
+| 配置与构建 | `DBTemplate.java` |
+| 条件构建 | `meta/clause/Cond.java` |
+| SQL 封装 | `meta/clause/Sql.java` |
+| 实体元数据 | `meta/schema/Metadata.java` |
+| PropertyHandler 工厂 | `meta/handler/PropertyHandlerFactory.java` |
+| 分页模型 | `meta/pagination/PageLite.java` / `Page.java` |
+| ID 生成器 | `util/id/PKGenerator.java` |
+| Spring 集成查询器 | `spring-boot-starter/.../repository/Query.java` |
+| Spring 集成仓储 | `spring-boot-starter/.../repository/Repository.java` |
+
+### 代码导航：从需求出发的路径
+
+1. **理解 CRUD 流程** → `AbstractOrm` → 对应组件（`OrmSelector` / `OrmInserter` 等）
+2. **修改 SQL 生成** → `OrmSqlBuilder`
+3. **修改分页/UPSERT 行为** → `SqlDialect` 实现类
+4. **新增数据库方言** → 继承 `SqlDialect` + 继承 `AbstractOrm`
+5. **理解事务** → `Database.tx()` + `JdbcConnFactory.releaseConnection()`
+6. **理解 PropertyHandler** → `PropertyHandlerFactory` + `DBTemplate.registerMapper()`
+7. **理解注解扫描** → `Metadata` / `ClassMeta` / `Attribute` / `Attributes`
+8. **理解分页** → `PageLite` / `Page` / `PageModel` + `PageStrategy`
+9. **理解条件构建** → `Cond` + `Clause` + `Operator` + `FuzzyMode`
+10. **理解 Criteria 查询** → `@Criteria` / `@Criterion` → `FieldVisitor`
+
+---
+
+## 二、实体与注解配置
+
+### @Table — 实体表映射
+
+```java
+@java.lang.annotation.Target({ElementType.TYPE})
+@java.lang.annotation.Retention(RetentionPolicy.RUNTIME)
+// ⚠️ 注意：没有 @Inherited！
+public @interface Table {
+  String value() default "";        // 表名，默认与类名一致
+  GenerationType strategy() default GenerationType.SNOW_FLAKE;  // 主键生成策略
+}
+```
+
+**重要**：`@Table` **没有** `@Inherited` 元注解，子类必须独立标注 `@Table` 才能被识别为实体。
+
+### @Column — 字段映射
+
+```java
+@java.lang.annotation.Inherited   // ✅ 子类继承
+@Target({ElementType.FIELD})
+public @interface Column {
+  String value() default "";       // 列名，默认为空→驼峰转下划线
+  boolean readonly() default false; // 只读字段，不参与 INSERT/UPDATE
+}
+```
+
+**约定**：
+- 若 `value()` 为空，将字段名转换为下划线风格作为列名（如 `userName` → `user_name`）
+- 若 `readonly()` 为 `true`，该字段不会出现在 INSERT 和 UPDATE 语句中
+- 视图映射的实体，非主键字段需设置 `readonly = true`
+- 未标注 `@Column` 的字段不会被 ORM 识别为持久化属性
+
+### @PrimaryKey — 主键标记
+
+```java
+@java.lang.annotation.Inherited   // ✅ 子类继承
+@Target({ElementType.FIELD})
+public @interface PrimaryKey {}
+```
+
+### GenerationType — 主键生成策略
+
+| 策略 | 说明 |
+|------|------|
+| `SNOW_FLAKE`（默认） | 雪花算法生成分布式唯一 ID |
+| `UUID` | 程序自动生成 UUID 字符串 |
+| `IDENTITY` | 数据库自增（如 MySQL AUTO_INCREMENT，SQL Server IDENTITY） |
+| `ASSIGNED` | 自然主键，用户手动赋值 |
+| `COMPOSITE` | 联合主键，用户自定义 |
+
+### @LogicDelete — 逻辑删除标记
+
+```java
+@java.lang.annotation.Inherited   // ✅ 子类继承
+@Target({ElementType.FIELD})
+public @interface LogicDelete {}
+```
+
+**关键约定**：
+- 逻辑删除写入的是**主键值**（不是 0/1 布尔值）
+- 因此逻辑删除字段类型必须与主键字段类型一致
+- 逻辑删除条件生成：`DELETE` 操作变为 `UPDATE SET logic_del_col = pk_value`
+
+### @Criteria / @Criterion — 声明式条件查询
+
+```java
+@java.lang.annotation.Inherited           // ✅ 子类继承
+@Target({ElementType.FIELD})
+@Repeatable(value = Criteria.class)       // 同一字段可定义多个条件
+public @interface Criterion {
+  String value() default "";              // 数据库字段名
+  Operator operator() default Operator.EQUALS;  // 运算符
+  int order() default 1;                  // 条件顺序
+  Class<?> group() default Default.class;  // 条件分组
+}
+```
+
+**Operator 枚举**：`EQUALS` / `EQUALS_INC_NULL` / `NOT_EQUALS` / `NOT_EQUALS_INC_NULL` / `LIKE` / `IS_NULL` / `IS_NOT_NULL` / `GREATER_THAN` / `GREATER_THAN_OR_EQUALS` / `LESS_THAN` / `LESS_THAN_OR_EQUALS` / `BETWEEN_START` / `BETWEEN_END` / `IN` / `IN_INC_EMPTY` / `NOT_IN` / `NOT_IN_INC_EMPTY`
+
+使用方式：
+```java
+// 配合 Cond.criteria() 使用
+Cond cond = Cond.criteria(queryObject);              // 默认组
+Cond cond = Cond.criteria(queryObject, SearchGroup.class);  // 指定组
+```
+
+**实体定义示例**：
+```java
+@Table("tb_user")
+public class User {
+
+  @PrimaryKey
+  @Column
+  private Long id;
+
+  @Column
+  private String userName;
+
+  @Column
+  private String email;
+
+  @Column(readonly = true)   // 只读字段，不参与 INSERT/UPDATE
+  private Date created;
+
+  @LogicDelete              // 逻辑删除字段
+  @Column
+  private Long deleted;
+
+  // getters/setters...
+}
+```
+
+---
+
+## 三、CRUD 操作指南
+
+### DBTemplate 构建
+
+```java
+DBTemplate.build("myDs")
+  .dataSource(dataSource)
+  .config(config -> {
+    config.setDbType(DbType.MYSQL);   // 设置数据库类型
+    config.setWorkerId(1L);
+  })
+  .connectionFactory(JdbcConnFactory.class)
+  .mapping(mapper -> {
+    // ⚠️ 一旦注册任何自定义 Handler，所有 23 种内置 Handler 全部丢失
+    mapper.register(MyType.class, new MyTypeHandler());
+  })
+  .build();
+
+// 全局获取
+DBTemplate dbTemplate = DBTemplate.get("myDs");
+```
+
+### Database 使用
+
+```java
+// 方式一：try-with-resources（推荐）
+try (Database db = dbTemplate.createDatabase()) {
+  Orm orm = db.createOrm();
+  // ... CRUD 操作
+}
+
+// 方式二：事务模式
+dbTemplate.createDatabase().tx(orm -> {
+  orm.create(User.class, user);
+  orm.update(User.class, user);
+  return null;
+});
+
+// 方式三：手动管理
+Database db = dbTemplate.createDatabase();  // 自动 open()
+try {
+  Orm orm = db.createOrm();
+  // ...
+  db.commit();
+} catch (Exception e) {
+  db.rollback();
+  throw e;
+} finally {
+  db.close();
+}
+```
+
+### Cond 条件构建（静态方法）
+
+```java
+// 基础条件
+Cond.eq("field", value)           // =，null 时忽略
+Cond.ne("field", value)           // <>
+Cond.gt("field", value)           // >
+Cond.ge("field", value)           // >=
+Cond.lt("field", value)           // <
+Cond.le("field", value)           // <=
+Cond.isNull("field")              // IS NULL
+Cond.isNotNull("field")           // IS NOT NULL
+
+// 模糊查询
+Cond.like("field", "%keyword%")                // LIKE
+Cond.like("field", "value", FuzzyMode.ALL)     // 指定模糊模式
+// ⚠️ like() 自动检测通配符：无 % 或 _ 时降级为 =
+// ⚠️ 模糊转义字符是 '¦'（Unicode BROKEN BAR），非标准反斜杠
+
+// 范围条件
+Cond.in("field", collection)       // IN，空集合返回 1 > 2（永假）
+Cond.notIn("field", collection)    // NOT IN
+Cond.between("field", start, end)  // BETWEEN，单 null 降级为 >= 或 <=
+
+// 逻辑组合
+Cond.and(cond1, cond2)             // AND
+Cond.or(cond1, cond2)              // OR
+Cond.not(cond)                     // NOT
+
+// Criteria 注解查询
+Cond.criteria(queryObj)            // 根据 @Criterion 注解构建条件
+Cond.criteria(queryObj, Group.class)  // 指定条件分组
+```
+
+### Sql 语句构建（静态方法大写开头）
+
+```java
+// ⚠️ 所有静态方法以大写字母开头（Java 限制）
+Sql.New("SELECT * FROM tb_user WHERE id = ?")
+Sql.Select("id, user_name")        // 构建 SELECT 子句
+  .from("tb_user")
+  .where(Cond.eq("status", 1))
+  .orderBy("id DESC")
+Sql.Insert("tb_user", "id, name")  // 构建 INSERT 语句
+```
+
+### Orm CRUD 操作
+
+```java
+Orm orm = db.createOrm();
+
+// 创建
+orm.create(User.class, user);                    // 单体
+orm.create(User.class, userList);                // 批量
+
+// 更新
+orm.update(User.class, user);                    // 更新所有列
+orm.updateIgnoreNull(User.class, user);          // 忽略 null 字段
+orm.update(User.class, user, new String[]{"name", "email"}); // 指定列
+orm.createOrUpdate(User.class, user);            // UPSERT
+
+// 删除
+orm.delete(User.class, user);                    // 按主键
+orm.deleteById(User.class, 1L);                  // 按 ID
+orm.deleteByIds(User.class, ids);                // 按 ID 集合
+orm.deleteByCond(User.class, Cond.eq("status", 0)); // 按条件
+orm.truncate(User.class);                        // 截断表
+
+// 查询 - 单条
+User user = orm.getById(User.class, 1L);
+User user = orm.getByField(User.class, "email", "test@test.com");
+User user = orm.getByCond(User.class, Cond.eq("name", "Tom"));
+User user = orm.get(User.class, "SELECT * FROM tb_user WHERE id = ?", params);
+
+// 查询 - 多条
+List<User> list = orm.find(User.class, sql, params);
+List<User> list = orm.findByIds(User.class, ids);
+List<User> list = orm.findByField(User.class, "status", 1);
+List<User> list = orm.findByCond(User.class, cond);
+
+// 查询 - Record 类型（无实体映射，通用 Map）
+List<Record> records = orm.findRecords(sql, params);
+Record record = orm.getRecord(sql, params);
+
+// 查询 - Map 结果
+Map<Long, User> map = orm.findMap(User.class, "id", sql, params);
+
+// 查询 - TOP N
+List<User> top10 = orm.findTop(User.class, 10, sql, params);
+
+// 统计 / 存在判断
+long count = orm.count(sql, params);
+boolean exists = orm.exists(sql, params);
+
+// 分页
+PageLite<User> pageLite = orm.findPageLite(User.class, sql, params, true, 1, 20);
+Page<User> page = orm.findPage(User.class, sql, params, true, 1, 20);
+
+// 直接执行
+int rows = orm.execute("UPDATE tb_user SET status = ? WHERE id = ?", params);
+```
+
+### Record 类型
+
+`Record` 继承 `LinkedHashMap<String, Object>`，支持大小写不敏感的键名匹配：
+
+```java
+Record record = orm.getRecord("SELECT * FROM tb_user WHERE id = ?", 1L);
+record.getStr("user_name");        // 获取字符串
+record.getInt("age");              // 获取整数
+record.getLong("id");              // 获取 Long
+record.getBool("active");          // 获取布尔
+record.getDate("created_at");      // 获取日期
+record.toBean(User.class);         // 转换为实体
+```
+
+### PageLite 与 Page
+
+```java
+// PageLite（轻量分页，查询 pageSize + 1 行做 hasNext 判断）
+PageLite<User> pl = orm.findPageLite(User.class, sql, params, true, 1, 20);
+pl.getData();         // 当前页数据
+pl.getCurrentPage();  // 当前页码
+pl.isHasNext();       // 是否有下一页（末页填满时可能误判）
+pl.getCount();        // 总记录数（仅 Page 有）
+
+// Page（完整分页，带总记录数）
+Page<User> page = orm.findPage(User.class, sql, params, true, 1, 20);
+page.getData();        // 当前页数据
+page.getTotalCount();  // 总记录数
+page.getTotalPage();   // 总页数
+```
+
+### PageStrategy 分页策略
+
+通过 `DBConfig` 配置分页策略：
+
+```java
+config.setPageStrategy(PageStrategy.MYSQL);  // LIMIT/OFFSET 方式
+```
+
+---
+
+## 四、Spring Boot 集成
+
+### Starter 层次结构
+
+```
+spring-boot-starter-common/ (含 Java 源码)
+ ├── SpringConnFactory          → 通过 DataSourceUtils 与 Spring 事务集成
+ ├── SimpleRepository           → 持有 DBTemplate 的根基类
+ ├── BaseRepository             → 只读查询快捷方法（find/get/count 等）
+ ├── Query                      → 额外提供 Record 查询和分页
+ ├── Repository<TModel>         → 实体的 CRUD + 泛型推断
+ └── BaseService                → 编程式事务控制（PlatformTransactionManager）
+```
+
+### SpringConnFactory
+
+`SpringConnFactory` 继承 `JdbcConnFactory`，将连接生命周期委托给 Spring：
+
+```java
+public class SpringConnFactory extends JdbcConnFactory {
+  @Override
+  protected Connection createConnection() {
+    return DataSourceUtils.getConnection(super.dataSource);   // Spring 管理
+  }
+
+  @Override
+  protected void releaseConnection(Connection conn) {
+    DataSourceUtils.releaseConnection(conn, super.dataSource); // Spring 释放
+  }
+}
+```
+
+**配合 `@Transactional` 时，`SpringConnFactory` 可确保 ORM 复用同一个连接**。
+
+### 使用 Repository 模式
+
+```java
+@Component
+public class UserRepository extends Repository<User> {
+  // 通过泛型自动推断 modelClass = User.class
+
+  public UserRepository(DBTemplate dbTemplate) {
+    super(dbTemplate);
+  }
+
+  // 自定义查询方法
+  public List<User> findByStatus(int status) {
+    return findByField("status", status);
+  }
+}
+
+// 使用
+@Autowired
+private UserRepository userRepository;
+
+User user = userRepository.getById(1L);
+userRepository.create(newUser);
+userRepository.update(existingUser);
+userRepository.deleteById(1L);
+```
+
+### Repository 继承链
+
+```
+SimpleRepository (abstract, 持有 DBTemplate)
+    ↓
+BaseRepository (abstract, 提供 find/get/count/findMap/findTop 只读方法)
+    ↓
+Query (提供 Record 查询 + 分页方法)
+    ↓
+Repository<TModel> (提供实体 CRUD + 泛型推断)
+```
+
+### Query 与 Orm 的 Query 的区别
+
+| | `repository.Query` | `orm.Query` |
+|------|-------------------|-------------|
+| 所在包 | Starter，Spring 集成 | 核心库 orm 模块 |
+| 父类 | 继承 `BaseRepository` | JDBC PreparedStatement 封装 |
+| 连接管理 | 每个方法自动 `try(Database)` | 由 `Database` 持有和管理 |
+| 用途 | Spring Bean，声明式使用 | 底层 SQL 执行 |
+
+### BaseService 事务控制
+
+```java
+@Service
+public class UserService extends BaseService {
+
+  @Autowired
+  private UserRepository userRepository;
+
+  // 有返回值事务
+  public User createUser(User user) {
+    return tx(status -> {
+      userRepository.create(user);
+      return user;
+    });
+  }
+
+  // 无返回值事务
+  public void batchOperation() {
+    tx(status -> {
+      userRepository.create(user1);
+      userRepository.create(user2);
+    });
+  }
+
+  // 自定义隔离级别和超时
+  public User complexOp(User user) {
+    return tx(status -> {
+      userRepository.create(user);
+      return user;
+    }, Connection.TRANSACTION_READ_COMMITTED, 30, false);
+  }
+}
+```
+
+### Spring Boot 配置 DBTemplate
+
+```java
+@Configuration
+public class OrmConfig {
+
+  @Bean
+  public DBTemplate dbTemplate(DataSource dataSource) {
+    return DBTemplate.build()
+        .dataSource(dataSource)
+        .config(config -> {
+          config.setDbType(DbType.MYSQL);
+          config.setPageStrategy(PageStrategy.MYSQL);
+        })
+        .connectionFactory(SpringConnFactory.class)  // Spring 集成
+        .build();
+  }
+}
+```
+
+---
+
+## 五、构建与测试指南
+
+### Maven 构建命令
+
+```bash
+# 全量构建（跳过测试）
+mvn clean install -DskipTests
+
+# 仅编译核心模块
+mvn compile -pl orm
+
+# 运行纯单元测试（Mockito，不依赖数据库）
+mvn test -pl orm
+
+# 运行单个测试方法
+mvn test -pl orm -Dtest=<TestClassName>#<methodName>
+
+# 运行集成测试（需数据库）
+mvn test -pl orm -P integration -Dtest=<TestClassName>
+```
+
+### 测试分类
+
+- **纯单元测试**（默认 profile `default-unit-tests`）：使用 Mockito 模拟数据库，通过 `@Category(IntegrationTest.class)` 排除集成测试
+- **集成测试**（`-P integration`）：继承 `AbstractTest`，通过 `DatabaseConfigProvider` 读取连接配置
+
+### 数据库配置优先级
+
+```
+系统属性 (db.type/db.url/db.user/db.password)
+  → 环境变量 (DB_TYPE/DB_URL/DB_USER/DB_PASSWORD)
+    → 默认 H2 内存数据库 (jdbc:h2:mem:myfavs_test;MODE=MYSQL)
+```
+
+### 集成测试配置（环境变量方式）
+
+```bash
+# Linux / macOS
+export DB_TYPE=mysql
+export DB_URL="jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false"
+export DB_USER=root
+export DB_PASSWORD=root
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+
+# Windows PowerShell
+$env:DB_TYPE = "mysql"
+$env:DB_URL  = "jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false"
+$env:DB_USER = "root"
+$env:DB_PASSWORD = "root"
+mvn test -pl orm -P integration -Dtest=DatabaseTest
+```
+
+### 测试基础设施
+
+- JUnit 4（不是 5），Mockito 5.23.0
+- `@BeforeClass` 每次根据数据库类型自动选择 DDL 脚本重建表
+- DDL 脚本按数据库分离：`sql/{mssql,mysql,postgresql,h2}/myfavs_master.sql`
+- 测试数据通过接口混入（`implements ISnowflakeTest, IUuidTest, ...`）
+- 默认 H2 模式为 `MODE=MYSQL`（兼容 MySQL 语法）
+- SQL Server DDL 使用 `GO` 分隔批处理，其他数据库使用 `;` 分隔
+
+### 核心组件测试覆盖
+
+| 组件 | 测试文件 | 测试方式 |
+|------|---------|----------|
+| OrmExecutor | `OrmExecutorTest.java` | Mockito |
+| OrmSelector | `OrmSelectorTest.java` | Mockito |
+| OrmInserter | `OrmInserterTest.java` | Mockito |
+| OrmUpdater | `OrmUpdaterTest.java` | Mockito |
+| OrmDeleter | `OrmDeleterTest.java` | Mockito |
+| OrmPager | `OrmPagerTest.java` | Mockito |
+| Cond / Sql | `CondTest.java` / `SqlTest.java` | 纯内存 |
+| PageStrategy | `PageStrategyTest.java` | 纯内存 |
+
+### PropertyHandler 注册
+
+**"全默认 or 全自定义"模式**：
+
+- 若未通过 `.mapping()` 注册任何自定义 Handler，框架自动注册 23 种内置 Handler
+- 若注册了任意自定义 Handler，则**仅使用用户注册的处理器**，所有默认 Handler 全部丢失
+
+**23 种默认 Handler 列表**：`String`、`NVarchar`、`Date`、`LocalDateTime`、`OffsetDateTime`、`BigDecimal`、`boolean/Boolean`、`int/Integer`、`long/Long`、`UUID`、`short/Short`、`double/Double`、`float/Float`、`byte/Byte`、`byte[]`、`Byte[]`、`Blob`、`Clob`
+
+**重要**：基础类型和包装类必须分开注册（`Long.class` vs `long.class`），内部以 `clazz.getName()` 为 key 精确匹配。
+
+---
+
+## 六、代码风格与项目约定
+
+### 编码规范
+
+| 约定 | 说明 |
+|------|------|
+| `this.` 前缀 | 所有类内部方法调用显式使用 `this.` 前缀 |
+| 无 Lombok | 全部 getter/setter/构造器手写 |
+| `@SuppressWarnings("rawtypes")` | `AbstractOrm` 和 `DBTemplate` 使用类级别抑制 |
+| `Constant` 使用 interface 模式 | 不是 class，用于分组静态常量 |
+| 括号规则 | 所有 `if` / `for` / `try-catch-finally` 必须使用括号包裹 |
+
+### 命名与格式
+
+- **版本号格式**：`1.0.0-YYMMDD-N`（如 `1.0.0-260610-1`）
+- **驼峰转下划线**：`customField01` → `custom_field_01`（数字前加下划线）
+- **模糊转义字符**：`¦`（Unicode BROKEN BAR，U+00A6），非标准反斜杠
+- **MANIFEST.MF**：各模块 `META-INF/` 中存在但内容为空
+
+### 非显而易见的核心约定
+
+- **`@Table` 无 `@Inherited`**：子类必须独立标注 `@Table`
+- **`@Column` / `@PrimaryKey` / `@LogicDelete`** 有 `@Inherited`：子类继承
+- **`Sql` 静态方法以大写字母开头**：`Sql.New()`、`Sql.Select()`、`Sql.Insert()`（Java 不允许静态方法与实例方法同名）
+- **`TableAlias` 基于 `ThreadLocal`**：用完必须 `clear()`，推荐使用 `TableAlias.runnable()` / `supplier()` 等便捷方法
+- **逻辑删除写入主键值**：逻辑删除字段类型必须与主键字段类型一致
+- **`PageLite` 查询 `pageSize + 1` 行**：做 hasNext 启发式判断，末页恰好填满时可能误判
+- **`Cond.like()` 自动检测通配符**：无 `%` 或 `_` 时降级为 `=`
+- **`Cond.in()` 空集合默认返回 `1 > 2`**（永假）
+- **`Cond.between()` 单 null 参数降级为 `>=` 或 `<=`**
+- **Druid 是 optional 依赖**：未引入时分页 COUNT 改写、SQL AST 构建会失败
+- **`spring-jdbc` 在 Starter 中也是 optional**：仅 `SpringConnFactory` 需要 `DataSourceUtils`
+- **版本号手动管理**：无 CI/CD 配置，版本号在 `pom.xml` 中手动维护

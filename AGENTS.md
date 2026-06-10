@@ -11,6 +11,20 @@ This file provides guidance to agents when working with code in this repository.
 - **多模块 Maven 项目**（6 个模块）：`orm`（核心库）、`spring-boot-starter/orm-spring-boot-starter-common`（Spring 集成源码）、`spring-boot-starter/orm-spring-boot{2,3,4}-starter`（仅 POM，无 Java 源码）、`demos/spring-boot2-demo`（多租户参考实现）
 - **无 CI/CD**：`.github/modernize/` 仅含迁移脚本，无 CI 工作流配置
 
+## 辅助 Skill
+
+项目提供了 `myfavs-orm-helper` Skill（位于 `.agents/skills/myfavs-orm-helper/`），用于辅助理解和开发 MyFavsORM 框架。Skill 覆盖以下能力：
+
+- **框架架构解读**：`AbstractOrm` 组合模式、7 个内部组件职责、构造时序、修改原则
+- **方言体系**：6 种 `SqlDialect` 实现（MySQL/PostgreSQL/SQL Server/Oracle/H2）、Upsert/分页策略
+- **注解配置**：`@Table`/`@Column`/`@PrimaryKey`/`@LogicDelete`/`@Criteria`/`@Criterion` 的完整行为和继承特性
+- **CRUD API 参考**：`Database` 生命周期、`Orm` 全部方法、`Cond` 条件构建、`Sql` 语句构建、`Record`/`PageLite`/`Page` 使用
+- **Spring Boot 集成**：`SpringConnFactory`、`Repository<TModel>`、`BaseService` 事务控制
+- **构建与测试**：Maven 命令、测试分类、集成测试配置、`PropertyHandler` 注册规则
+- **代码导航**：20 个关键源码文件速查表、10 条从需求出发的代码路径
+
+深 Code CLI 在识别到相关场景时会自动激活此 Skill。详细内容请直接查阅 `.agents/skills/myfavs-orm-helper/SKILL.md`。
+
 ## 架构要点
 
 - **`AbstractOrm` 采用组合模式**：实体 CRUD 委派给 6 个内部组件（`OrmExecutor`、`OrmInserter`、`OrmUpdater`、`OrmDeleter`、`OrmSelector`、`OrmPager`）。各方言子类（`MySqlOrm` 等）通过构造器传入 `SqlDialect` 注入方言行为，不再覆写方法。修改 CRUD 行为应修改对应组件或方言实现而非子类
