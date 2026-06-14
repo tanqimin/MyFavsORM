@@ -199,7 +199,6 @@ public @interface PrimaryKey {}
 | `UUID` | 程序自动生成 UUID 字符串 |
 | `IDENTITY` | 数据库自增（如 MySQL AUTO_INCREMENT，SQL Server IDENTITY） |
 | `ASSIGNED` | 自然主键，用户手动赋值 |
-| `COMPOSITE` | 联合主键，用户自定义 |
 
 ### @LogicDelete — 逻辑删除标记
 
@@ -270,7 +269,7 @@ public class User {
 ### DBTemplate 构建
 
 ```java
-DBTemplate.build("myDs")
+DBTemplate dbTemplate = new DBTemplate.Builder("myDs")
   .dataSource(dataSource)
   .config(config -> {
     config.setDbType(DbType.MYSQL);   // 设置数据库类型
@@ -278,7 +277,7 @@ DBTemplate.build("myDs")
   })
   .connectionFactory(JdbcConnFactory.class)
   .mapping(mapper -> {
-    // ⚠️ 一旦注册任何自定义 Handler，所有 23 种内置 Handler 全部丢失
+    // 框架始终先注册 23 种内置默认 Handler，自定义按类型覆盖同名的默认 Handler
     mapper.register(MyType.class, new MyTypeHandler());
   })
   .build();
@@ -409,7 +408,7 @@ List<User> top10 = orm.findTop(User.class, 10, sql, params);
 
 // 统计 / 存在判断
 long count = orm.count(sql, params);
-boolean exists = orm.exists(sql, params);
+boolean exists = orm.exists(sql, params);          // 直接判断查询是否有结果
 
 // 分页
 PageLite<User> pageLite = orm.findPageLite(User.class, sql, params, true, 1, 20);
@@ -441,22 +440,18 @@ PageLite<User> pl = orm.findPageLite(User.class, sql, params, true, 1, 20);
 pl.getData();         // 当前页数据
 pl.getCurrentPage();  // 当前页码
 pl.isHasNext();       // 是否有下一页（末页填满时可能误判）
-pl.getCount();        // 总记录数（仅 Page 有）
 
 // Page（完整分页，带总记录数）
 Page<User> page = orm.findPage(User.class, sql, params, true, 1, 20);
-page.getData();        // 当前页数据
-page.getTotalCount();  // 总记录数
-page.getTotalPage();   // 总页数
+page.getData();         // 当前页数据
+page.getTotalRecords(); // 总记录数
+page.getTotalPages();   // 总页数
 ```
 
 ### PageStrategy 分页策略
 
-通过 `DBConfig` 配置分页策略：
-
-```java
-config.setPageStrategy(PageStrategy.MYSQL);  // LIMIT/OFFSET 方式
-```
+分页行为由 `SqlDialect` 的实现类提供，框架自动根据 `DbType` 选择分页 SQL 语法。
+各数据库的分页策略通过 `AbstractOrm` 构造时传入的 `SqlDialect` 实例分配。
 
 ---
 
@@ -585,11 +580,10 @@ public class OrmConfig {
 
   @Bean
   public DBTemplate dbTemplate(DataSource dataSource) {
-    return DBTemplate.build()
+    return new DBTemplate.Builder()
         .dataSource(dataSource)
         .config(config -> {
           config.setDbType(DbType.MYSQL);
-          config.setPageStrategy(PageStrategy.MYSQL);
         })
         .connectionFactory(SpringConnFactory.class)  // Spring 集成
         .build();
@@ -671,14 +665,18 @@ mvn test -pl orm -P integration -Dtest=DatabaseTest
 | OrmDeleter | `OrmDeleterTest.java` | Mockito |
 | OrmPager | `OrmPagerTest.java` | Mockito |
 | Cond / Sql | `CondTest.java` / `SqlTest.java` | 纯内存 |
-| PageStrategy | `PageStrategyTest.java` | 纯内存 |
+| Snowflake | `SnowflakeTest.java` | 纯内存 |
+| ReflectUtil | `ReflectUtilTest.java` | 纯内存 |
+| Order | `OrderTest.java` | 纯内存 |
+| TableAlias | `TableAliasTest.java` | 纯内存 |
 
 ### PropertyHandler 注册
 
-**"全默认 or 全自定义"模式**：
+**"默认 + 自定义覆盖"模式**：
 
-- 若未通过 `.mapping()` 注册任何自定义 Handler，框架自动注册 23 种内置 Handler
-- 若注册了任意自定义 Handler，则**仅使用用户注册的处理器**，所有默认 Handler 全部丢失
+- 框架始终先注册全部 23 种内置默认 Handler
+- 用户通过 `.mapping()` 注册的自定义 Handler 按类型覆盖同名的默认 Handler
+- 未覆盖的类型仍使用默认处理器，**不再需要自行注册全部类型**
 
 **23 种默认 Handler 列表**：`String`、`NVarchar`、`Date`、`LocalDateTime`、`OffsetDateTime`、`BigDecimal`、`boolean/Boolean`、`int/Integer`、`long/Long`、`UUID`、`short/Short`、`double/Double`、`float/Float`、`byte/Byte`、`byte[]`、`Byte[]`、`Blob`、`Clob`
 
