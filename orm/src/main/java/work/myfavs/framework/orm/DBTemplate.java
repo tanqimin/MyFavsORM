@@ -85,21 +85,18 @@ public class DBTemplate {
 
   /**
    * 注册 PropertyHandler。
-   * <p><b>设计说明（全默认 or 全自定义）：</b></p>
-   * <p>若用户未通过 {@link Builder#mapping(Consumer)} 注册任何自定义处理器（{@code mapper.map} 为空），
-   * 则调用 {@link work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory#registerDefault()}
-   * 注册框架内置的 23 种默认 {@link work.myfavs.framework.orm.meta.handler.PropertyHandler PropertyHandler}；</p>
-   * <p>若用户已注册自定义处理器，则<b>仅使用用户注册的处理器</b>，不再注册默认处理器。
-   * 即"全默认 or 全自定义"二选一的模式。</p>
+   * <p><b>设计说明（默认 + 自定义覆盖）：</b></p>
+   * <p>始终先调用 {@link work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory#registerDefault()}
+   * 注册框架内置的 23 种默认 {@link work.myfavs.framework.orm.meta.handler.PropertyHandler PropertyHandler}，
+   * 再应用用户通过 {@link Builder#mapping(Consumer)} 注册的自定义处理器。
+   * 自定义处理器会按类型覆盖同类型的默认处理器，未覆盖的类型仍使用默认处理器。</p>
+   * <p>即从"全默认 or 全自定义"二选一模式变更为"默认 + 自定义覆盖"的增量模式。</p>
    * <p>详细说明请参见 {@link work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory} 的类注释。</p>
    *
    * @param mapper Mapper
    */
   private void registerMapper(Mapper mapper) {
-    if (mapper.map.isEmpty()) {
-      PropertyHandlerFactory.registerDefault();
-      return;
-    }
+    PropertyHandlerFactory.registerDefault();
     mapper.map.forEach(PropertyHandlerFactory::register);
   }
   // endregion
