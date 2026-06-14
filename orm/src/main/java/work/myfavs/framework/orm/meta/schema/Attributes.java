@@ -6,9 +6,6 @@ import work.myfavs.framework.orm.util.common.StringUtil;
 import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 
 /**
@@ -19,9 +16,6 @@ import java.util.function.BiConsumer;
 public class Attributes {
 
   private final Map<String /* columnName */, Attribute> map = new LinkedHashMap<>();
-
-  private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-  private final Lock          writeLock     = readWriteLock.writeLock();
 
   /**
    * 根据数据库字段名获取Attribute
@@ -85,13 +79,7 @@ public class Attributes {
 
     Objects.requireNonNull(value);
 
-    final String key = columnName.toUpperCase();
-    writeLock.lock();
-    try {
-      return map.put(key, value);
-    } finally {
-      writeLock.unlock();
-    }
+    return map.put(columnName.toUpperCase(), value);
   }
 
   /**

@@ -23,9 +23,10 @@ public interface Constant {
   String DATE_FORMAT_STR = "yyyy-MM-dd HH:mm:ss.SSS";
 
   /**
-   * 默认日期格式器
+   * 默认日期格式器（ThreadLocal 确保线程安全）
    */
-  SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_STR);
+  ThreadLocal<SimpleDateFormat> DATE_FORMATTER = ThreadLocal.withInitial(
+      () -> new SimpleDateFormat(DATE_FORMAT_STR));
 
   /**
    * 原始类型列表

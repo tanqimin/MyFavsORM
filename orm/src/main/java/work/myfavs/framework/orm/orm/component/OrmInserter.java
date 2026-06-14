@@ -1,6 +1,10 @@
 package work.myfavs.framework.orm.orm.component;
 
-import work.myfavs.framework.orm.*;
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
+import work.myfavs.framework.orm.DBTemplate;
+import work.myfavs.framework.orm.Database;
+import work.myfavs.framework.orm.Query;
 import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.enumeration.GenerationType;
@@ -12,10 +16,10 @@ import work.myfavs.framework.orm.util.common.DruidUtil;
 import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 import work.myfavs.framework.orm.util.id.PKGenerator;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 实体插入器，处理实体创建和批量创建逻辑。
@@ -256,7 +260,8 @@ public class OrmInserter {
       for (Collection<?> batchParams : paramsList) {
         query.addParameters(batchParams).addBatch();
       }
-      return query.executeBatch(rs -> primaryKey.setPrimaryKeys(entities, rs)).length;
+      query.executeBatch(rs -> primaryKey.setPrimaryKeys(entities, rs));
+      return entities.size();
     }
   }
 

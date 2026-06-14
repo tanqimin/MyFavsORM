@@ -244,7 +244,7 @@ public class SqlLog {
     private String format(Object param) {
         if (null == param) return "null";
         if (param instanceof Number) return param.toString();
-        if (param instanceof Date) return "'" + Constant.DATE_FORMATTER.format(param) + "'";
+        if (param instanceof Date) return "'" + Constant.DATE_FORMATTER.get().format(param) + "'";
         if (param instanceof Parameters)
             return CollectionUtil.join(((Parameters) param).getParameters().values(), Constant.SYMBOL_COMMA, this::format);
         return "'" + param + "'";
@@ -262,7 +262,7 @@ public class SqlLog {
         if (value instanceof Number) {
             str = value.toString();
         } else if (value instanceof Date) {
-            str = Constant.DATE_FORMATTER.format(value);
+            str = Constant.DATE_FORMATTER.get().format(value);
         } else {
             str = value.toString();
         }

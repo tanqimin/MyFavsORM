@@ -7,7 +7,7 @@ import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
  */
 public class SqlUtil {
   @SuppressWarnings("RegExpRedundantEscape")
-  private static final String SQL_PATTERN = "[\\w\\p{IsIdeographic}\\ \\,\\.]+";
+  private static final String SQL_PATTERN = "[\\w\\p{IsIdeographic}\\ \\,\\.\\$`]+";
 
   /**
    * 检查传入语句是否存在注入风险
