@@ -135,7 +135,7 @@ public class Repository<TModel> extends Query {
    * @return 以主键值为键的实体映射
    */
   public <TKey> Map<TKey, TModel> findMap(String sql, Collection<?> params) {
-    final String fieldName = Metadata.classMeta(modelClass).getPrimaryKey().getFieldVisitor().getName();
+    final String fieldName = Metadata.classMeta(modelClass).checkPrimaryKey().getFieldVisitor().getName();
     return findMap(modelClass, fieldName, sql, params);
   }
 
