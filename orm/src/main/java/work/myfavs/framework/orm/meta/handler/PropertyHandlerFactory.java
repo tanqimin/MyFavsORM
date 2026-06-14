@@ -91,11 +91,11 @@ public class PropertyHandlerFactory {
    * @param clazz 目标类型
    * @return {@link PropertyHandler} 实例
    */
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings({"rawtypes"})
   public static PropertyHandler getInstance(Class<?> clazz) {
 
-    return HANDLER_MAP.computeIfAbsent(clazz.getName(), key ->
-        clazz.isEnum() ? ENUM_PROPERTY_HANDLER : OBJECT_PROPERTY_HANDLER
-    );
+    PropertyHandler<?> handler = HANDLER_MAP.get(clazz.getName());
+    if (null != handler) return handler;
+    return clazz.isEnum() ? ENUM_PROPERTY_HANDLER : OBJECT_PROPERTY_HANDLER;
   }
 }

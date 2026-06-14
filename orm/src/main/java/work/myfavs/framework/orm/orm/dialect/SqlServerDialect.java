@@ -4,7 +4,10 @@ import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLOrderBy;
 import com.alibaba.druid.sql.ast.SQLOver;
 import com.alibaba.druid.sql.ast.expr.*;
-import com.alibaba.druid.sql.ast.statement.*;
+import com.alibaba.druid.sql.ast.statement.SQLSelect;
+import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.ast.statement.SQLSubqueryTableSource;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.SQLServerSelectQueryBlock;
 import com.alibaba.druid.util.JdbcConstants;
 import work.myfavs.framework.orm.meta.clause.Sql;
@@ -18,6 +21,12 @@ import java.util.List;
  * SQL Server 2005~2008 方言实现。
  * <p>分页使用 ROW_NUMBER() OVER 语法；
  * UPSERT 使用 MERGE INTO ... USING (VALUES ...) AS source ... 语法。</p>
+ *
+ * <p><b>关于 ORDER BY 的约束：</b></p>
+ * <p>SQL Server 的 {@code ROW_NUMBER()} 函数必须带 {@code ORDER BY} 子句。
+ * 如果原始查询没有 {@code ORDER BY}，框架会回退使用 {@code ORDER BY CURRENT_TIMESTAMP} 使 SQL 合法，
+ * 但此时结果的<em>排序顺序是非确定性的</em>（多次执行同一查询可能返回不同顺序）。
+ * 建议分页查询始终提供确定的 {@code ORDER BY} 子句。</p>
  */
 public class SqlServerDialect implements SqlDialect {
 

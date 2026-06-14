@@ -128,13 +128,13 @@ public class Cond extends Clause {
     if (null == param) {
       return ignoreNull ? create() : isNull(field);
     }
-    Cond cond = create(field).append("= ?", param);
 
+    // 空字符串：先检查再构造，避免创建无用中间对象
     if (param instanceof String && StringUtil.length(param) == 0) {
-      return ignoreNull ? create() : cond;
+      if (ignoreNull) return create();
     }
 
-    return cond;
+    return create(field).append("= ?", param);
   }
 
   /**

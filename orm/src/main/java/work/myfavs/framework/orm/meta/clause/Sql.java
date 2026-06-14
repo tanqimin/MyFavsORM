@@ -785,14 +785,17 @@ public class Sql extends Clause implements Serializable {
   }
 
   /**
-   * 拼接 LIMIT {offset} {row} 语句
+   * 拼接 LIMIT {row} OFFSET {offset} 语句
+   * <p>使用标准的 LIMIT/OFFSET 语法，兼容 MySQL、PostgreSQL、H2、SQLite 等数据库。
+   * SQL Server 和 Oracle 请使用 {@link work.myfavs.framework.orm.orm.dialect.SqlDialect} 进行分页。</p>
    *
    * @param offset 起始记录偏移量
    * @param row    返回行数
    * @return {@link Sql}
    */
   public Sql limit(int offset, int row) {
-    return this.append("LIMIT").append(StringUtil.toStr(offset)).append(Constant.SYMBOL_COMMA).append(StringUtil.toStr(row));
+    return this.append("LIMIT").append(StringUtil.toStr(row))
+               .append("OFFSET").append(StringUtil.toStr(offset));
   }
 
   /**

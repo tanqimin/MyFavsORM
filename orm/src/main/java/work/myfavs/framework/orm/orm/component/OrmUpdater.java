@@ -1,18 +1,8 @@
 package work.myfavs.framework.orm.orm.component;
 
-import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
-import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
-import com.alibaba.druid.sql.ast.expr.SQLCaseExpr;
-import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
-import com.alibaba.druid.sql.ast.expr.SQLInListExpr;
-import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
-import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
+import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import work.myfavs.framework.orm.Database;
 import work.myfavs.framework.orm.Query;
 import work.myfavs.framework.orm.meta.DbType;
@@ -25,6 +15,11 @@ import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.common.DruidUtil;
 import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 import work.myfavs.framework.orm.util.id.PKGenerator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 实体更新器，处理实体更新逻辑。
@@ -214,8 +209,15 @@ public class OrmUpdater {
     for (List<TModel> entityList : batchList) {
       final Sql sql = new Sql();
 
+      // 提前读取一遍主键值，避免在 CASE WHEN 和 WHERE IN 中各反射一次
+      final List<Object> pkValues = new ArrayList<>(entityList.size());
+      for (TModel model : entityList) {
+        pkValues.add(primaryKey.getValue(model));
+      }
+
       final SQLUpdateStatement updateStatement = DruidUtil.createSQLUpdateStatement(tableName);
 
+      int idx = 0;
       for (Attribute updateAttribute : updAttrs) {
         final SQLCaseExpr caseExpr = new SQLCaseExpr();
         for (TModel model : entityList) {
@@ -228,9 +230,10 @@ public class OrmUpdater {
               new SQLVariantRefExpr("?")
           );
 
-          sql.getParams().add(primaryKey.getValue(model));
+          sql.getParams().add(pkValues.get(idx++));
           sql.getParams().add(updateAttribute.getValue(model));
         }
+        idx = 0;
 
         final SQLUpdateSetItem sqlUpdateSetItem = new SQLUpdateSetItem();
         sqlUpdateSetItem.setColumn(new SQLIdentifierExpr(updateAttribute.getColumnName()));
@@ -240,9 +243,9 @@ public class OrmUpdater {
 
       final SQLInListExpr condition = new SQLInListExpr();
       condition.setExpr(new SQLIdentifierExpr(primaryKey.getColumnName()));
-      for (TModel model : entityList) {
+      for (Object pkVal : pkValues) {
         condition.addTarget(new SQLVariantRefExpr("?"));
-        sql.getParams().add(primaryKey.getValue(model));
+        sql.getParams().add(pkVal);
       }
 
       if (null == logicDelete) {

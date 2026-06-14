@@ -1,11 +1,12 @@
 package work.myfavs.framework.orm.meta.clause;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.List;
 import org.junit.Test;
 import work.myfavs.framework.orm.util.common.Constant;
+
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class SqlTest {
 
@@ -351,7 +352,7 @@ public class SqlTest {
   @Test
   public void testLimit() {
     Sql sql = Sql.SelectAll().from("user").limit(1, 2);
-    assertEquals("SELECT * FROM user LIMIT 1 , 2", sql.toString());
+    assertEquals("SELECT * FROM user LIMIT 2 OFFSET 1", sql.toString());
   }
 
   @Test

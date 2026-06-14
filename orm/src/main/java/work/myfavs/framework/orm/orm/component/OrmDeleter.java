@@ -38,7 +38,7 @@ public class OrmDeleter {
     if (null == entity) return 0;
 
     final ClassMeta classMeta = Metadata.entityMeta(modelClass);
-    final Object pkVal = classMeta.getPrimaryKey().getValue(entity);
+    final Object    pkVal     = classMeta.checkPrimaryKey().getValue(entity);
 
     return deleteById(classMeta, pkVal);
   }
@@ -50,7 +50,7 @@ public class OrmDeleter {
 
     if (CollectionUtil.isEmpty(entities)) return 0;
 
-    final Attribute primaryKey = Metadata.classMeta(modelClass).getPrimaryKey();
+    final Attribute primaryKey = Metadata.entityMeta(modelClass).checkPrimaryKey();
     final List<Object> ids = new ArrayList<>();
 
     for (TModel entity : entities) {

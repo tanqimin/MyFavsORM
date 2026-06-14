@@ -98,9 +98,9 @@ public class JdbcConnFactory extends ConnFactory {
     if (null == conn) return;
 
     try {
-      if (withoutCommit(conn)) return;
-
-      conn.commit();
+      if (!withoutCommit(conn)) {
+        conn.commit();
+      }
     } catch (SQLException e) {
       throw new ConnectionException(e, "提交事务时发生异常: %s", e.getMessage());
     } finally {

@@ -1,7 +1,6 @@
 package work.myfavs.framework.orm.orm.component;
 
 import work.myfavs.framework.orm.DBConfig;
-import work.myfavs.framework.orm.meta.Record;
 import work.myfavs.framework.orm.meta.clause.Sql;
 import work.myfavs.framework.orm.meta.pagination.IPageable;
 import work.myfavs.framework.orm.meta.pagination.Page;
@@ -116,7 +115,7 @@ public class OrmPager {
   private Sql selectPage(boolean enablePage, String sql, Collection<?> params, int currentPage, int pageSize) {
     if (!enablePage) {
       int maxPageSize = this.dbConfig.getMaxPageSize();
-      if (maxPageSize <= 0L) {
+      if (maxPageSize <= 0) {
         return new Sql(sql, params);
       } else {
         return this.dialect.applyPageSql(sql, params, 1, maxPageSize);
@@ -131,7 +130,7 @@ public class OrmPager {
     }
 
     int maxPageSize = this.dbConfig.getMaxPageSize();
-    if (maxPageSize > 0L && pageSize > maxPageSize) {
+    if (maxPageSize > 0 && pageSize > maxPageSize) {
       throw new PaginationException("每页记录数不能超出系统设置的最大记录数 %d", maxPageSize);
     }
 
