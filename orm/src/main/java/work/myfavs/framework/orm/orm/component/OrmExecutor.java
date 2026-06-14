@@ -8,7 +8,9 @@ import work.myfavs.framework.orm.util.func.ThrowingConsumer;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * SQL 执行器，封装 JDBC 执行逻辑。
@@ -112,6 +114,7 @@ public class OrmExecutor {
    * @return 影响行数数组
    */
   public int[] execute(List<Sql> sqlList, int timeout) {
+    if (CollectionUtil.isEmpty(sqlList)) return new int[0];
     return this.execute(sqlList, ps -> ps.setQueryTimeout(timeout));
   }
 
@@ -124,7 +127,7 @@ public class OrmExecutor {
    * @return 影响行数数组
    */
   public int[] execute(List<Sql> sqlList, ThrowingConsumer<PreparedStatement, SQLException> configConsumer) {
-    final int sqlCnt = sqlList.size();
+    final int sqlCnt = sqlList == null ? 0 : sqlList.size();
     final int[] results = new int[sqlCnt];
 
     if (CollectionUtil.isEmpty(sqlList)) return results;

@@ -94,7 +94,7 @@ public class Snowflake implements Serializable {
 
 
   private static long checkBetween(long value, long min, long max) {
-    if (value > min && value < max) return value;
+    if (value >= min && value <= max) return value;
     throw new InvalidDataAccessException("值必须在 %d 和 %d 的范围内. ", min, max);
   }
 

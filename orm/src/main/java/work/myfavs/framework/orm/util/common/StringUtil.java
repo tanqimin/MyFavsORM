@@ -441,8 +441,7 @@ public class StringUtil {
   public static String leftPad(String str, String placeholder, int length) {
     if (str.length() > length)
       throw new IllegalArgumentException(String.format("参数 [%s] 的长度必须大于 %d ", str, length));
-    String prefix = placeholder.repeat(length).concat(str);
-    return prefix.concat(str).substring(prefix.length() - length, prefix.length());
+    return placeholder.repeat(length - str.length()).concat(str);
   }
 
 
