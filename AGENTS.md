@@ -38,7 +38,7 @@ This file provides guidance to agents when working with code in this repository.
 
 - **`@Column`、`@PrimaryKey`、`@LogicDelete`** 使用 `@Inherited`，子类会继承父类字段注解；但 **`@Table` 没有 `@Inherited`**，子类必须独立标注 `@Table` 才能被识别为实体
 - **`Sql` 静态方法以大写字母开头**（`Sql.New()`、`Sql.Select()`、`Sql.Insert()`），因 Java 不允许静态方法与实例方法同名
-- **PropertyHandler 注册是"全默认 or 全自定义"模式**：一旦通过 `.mapping()` 注册了任何自定义 Handler，所有 23 种内置 Handler 全部丢失，需自行注册全部所需类型
+- **PropertyHandler 注册改为「默认 + 自定义覆盖」模式**：框架始终先注册 23 种内置默认 Handler，用户通过 `.mapping()` 注册的自定义 Handler 按类型覆盖同名的默认 Handler。不再需要自行注册全部类型
 - **基础类型和包装类必须分开注册**（`Long.class` vs `long.class`），内部以 `clazz.getName()` 为 key 精确匹配
 - **Starter 的 `repository.Query` 与核心 `orm.Query` 是完全不同的类**：前者是 Spring 抽象基类（继承 `BaseRepository`），每个方法自动 `try(Database db = ...)` 管理连接；后者是低层 JDBC 封装
 - **`Database` 构造器自动调用 `open()`**（打开连接），使用时必须配对 `close()`，可用 `try-with-resources` 或 `tx()` 自动管理
@@ -74,7 +74,7 @@ mvn test -pl orm -Dtest=<TestClassName>#<methodName>
 
 ### 测试分类
 
-- **纯单元测试**（默认）：使用 Mockito 模拟数据库，无需真实数据库连接。通过 `@Category(IntegrationTest.class)` 排除集成测试
+- 纯单元测试已完成 **333 个**（使用 Mockito 模拟数据库），无需真实数据库连接。通过 `@Category(IntegrationTest.class)` 排除集成测试
 - **集成测试**（需指定数据库）：继承 `AbstractTest` 的类，通过 `DatabaseConfigProvider` 读取连接配置
 
 ### 运行集成测试
@@ -152,7 +152,10 @@ mvn test -pl orm -P integration -Dtest=DatabaseTest
 | OrmDeleter | `OrmDeleterTest.java` | Mockito |
 | OrmPager | `OrmPagerTest.java` | Mockito |
 | Cond / Sql | `CondTest.java` / `SqlTest.java` | 纯内存 |
-| PageStrategy | `PageStrategyTest.java` | 纯内存 |
+| Snowflake | `SnowflakeTest.java` | 纯内存 |
+| ReflectUtil | `ReflectUtilTest.java` | 纯内存 |
+| Order | `OrderTest.java` | 纯内存 |
+| TableAlias | `TableAliasTest.java` | 纯内存 |
 
 ## 代码风格（非标准约定）
 

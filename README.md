@@ -124,8 +124,8 @@ DBTemplate dbTemplate = new DBTemplate.Builder()
 | `fetchSize` | `1000` | ResultSet 每次抓取行数 |
 | `queryTimeout` | `60` | 查询超时秒数 |
 | `maxPageSize` | `-1`（不限制）| 分页每页最大记录数 |
-| `workerId` | `1` | 雪花算法 Worker ID（1-30） |
-| `dataCenterId` | `1` | 雪花算法数据中心 ID（1-30） |
+| `workerId` | `1` | 雪花算法 Worker ID（0-31） |
+| `dataCenterId` | `1` | 雪花算法数据中心 ID（0-31） |
 
 ---
 
@@ -560,6 +560,8 @@ new DBTemplate.Builder()
     .build();
 ```
 
+> **注册策略**：框架始终先注册全部 23 种内置默认处理器。用户通过 `.mapping()` 注册的自定义处理器会按类型覆盖同名的默认处理器，未覆盖的类型仍使用默认处理器（**"默认 + 自定义覆盖"** 模式）。
+>
 > **注意**：基础类型（`int.class`）和包装类（`Integer.class`）必须分开注册，因为 `PropertyHandlerFactory` 以 Class 对象精确匹配 key。
 
 ### 主键策略
@@ -617,7 +619,7 @@ mvn test -pl orm -Dtest=CondTest#eq
 **纯单元测试**（默认 `mvn test`）：
 - 使用 Mockito 模拟数据库，**无需真实数据库连接**
 - `@Category(IntegrationTest.class)` 标记的类被自动排除
-- 包含 305+ 个测试用例，覆盖 `OrmExecutor`、`OrmSelector`、`OrmInserter`、`OrmUpdater`、`OrmDeleter`、`OrmPager` 六大组件
+- 包含 **333+** 个测试用例，覆盖 `OrmExecutor`、`OrmSelector`、`OrmInserter`、`OrmUpdater`、`OrmDeleter`、`OrmPager`、`Snowflake`、`ReflectUtil`、`Order`、`TableAlias` 等核心组件
 
 **集成测试**（需指定数据库）：
 - 通过 `DatabaseConfigProvider` 按优先级读取：系统属性 → 环境变量 → 默认值
@@ -763,6 +765,17 @@ orm/src/test/resources/sql/
     </repository>
 </repositories>
 ```
+
+---
+
+## 开发者参考
+
+如需深入理解框架源码、调试或二次开发，请参阅 [`CODE_WIKI.md`](CODE_WIKI.md)，涵盖：
+
+- **包结构总览**与核心类职责
+- **22 个章节**：DBTemplate、Database、ConnFactory、Query、Orm/AbstractOrm、SQL 构建、元数据、PropertyHandler、分页、Spring Boot 集成等
+- **数据流与关键路径**：事务内查询、分页查询、实体更新、批量插入的完整调用链路
+- **6 大组件职责表**与 SQL Server（2100 参数限制）特殊处理
 
 ---
 

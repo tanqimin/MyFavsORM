@@ -193,9 +193,7 @@ public static class Builder {
 **关键执行顺序：**
 
 1. `DBTemplate` 构造函数调用 `createConnFactory()` — 反射实例化 `ConnFactory`（构造函数签名为 `(DataSource)`）
-2. `registerMapper()` — 判断 `mapper.map.isEmpty()`：
-   - 空 → 调用 `PropertyHandlerFactory.registerDefault()` 注册所有内置 Handler
-   - 非空 → 仅注册用户自定义的 Handler（**"全默认 or 全自定义"** 模式）
+2. `registerMapper()` — 始终先调用 `PropertyHandlerFactory.registerDefault()` 注册 23 种内置默认 Handler，再通过 `mapper.map.forEach()` 应用用户自定义的 Handler（自定义按类型覆盖默认，**"默认 + 自定义覆盖"** 模式）
 3. `build()` 最后调用 `POOL.put(dsName, this)`
 
 ### 多数据源
@@ -874,10 +872,9 @@ private static final ObjectPropertyHandler OBJECT_HANDLER = new ObjectPropertyHa
 
 ```java
 public static PropertyHandler getInstance(Class<?> clazz) {
-    return HANDLER_MAP.computeIfAbsent(clazz.getName(), key -> {
-        if (clazz.isEnum()) return ENUM_HANDLER;
-        return OBJECT_HANDLER;  // 兜底
-    });
+    PropertyHandler<?> handler = HANDLER_MAP.get(clazz.getName());
+    if (null != handler) return handler;
+    return clazz.isEnum() ? ENUM_PROPERTY_HANDLER : OBJECT_PROPERTY_HANDLER;
 }
 ```
 
