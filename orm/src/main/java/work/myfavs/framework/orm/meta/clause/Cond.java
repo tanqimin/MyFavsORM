@@ -14,6 +14,7 @@ import work.myfavs.framework.orm.util.reflection.ReflectUtil;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import static work.myfavs.framework.orm.util.common.Constant.*;
 
@@ -21,6 +22,8 @@ import static work.myfavs.framework.orm.util.common.Constant.*;
  * SQL 条件构建
  */
 public class Cond extends Clause {
+
+  private static final Pattern COMMA_PATTERN = Pattern.compile(",");
 
   private Cond() {}
 
@@ -635,7 +638,7 @@ public class Cond extends Clause {
     String   fieldName = conditionMatcher.fieldName;
     Object   paramVal  = conditionMatcher.fieldValue;
 
-    List<String> fieldNames = StringUtil.split(fieldName, ",");
+    List<String> fieldNames = Arrays.asList(COMMA_PATTERN.split(fieldName));
     if (fieldNames.size() > 1) {
       Iterator<String> iterator = fieldNames.iterator();
       Cond             cond     = createCond(operator, iterator.next(), paramVal);

@@ -5,7 +5,6 @@ import work.myfavs.framework.orm.util.lang.NVarchar;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,9 +31,12 @@ public class PropertyHandlerFactory {
   /**
    * 注册框架内置的 23 种默认 {@link PropertyHandler}。
    * <p>包含：String、NVarchar、Date、LocalDateTime、OffsetDateTime、BigDecimal、Boolean(包装类+基础类型)、
-   * Integer(包装类+基础类型)、Long(包装类+基础类型)、UUID。</p>
-   * <p>此方法在用户<b>未</b>通过 {@link work.myfavs.framework.orm.DBTemplate.Builder#mapping(java.util.function.Consumer)} 
-   * 注册任何自定义处理器时自动调用。</p>
+   * Integer(包装类+基础类型)、Long(包装类+基础类型)、UUID、
+   * Short(包装类+基础类型)、Double(包装类+基础类型)、Float(包装类+基础类型)、Byte(包装类+基础类型)、
+   * byte[]、Byte[]、Blob、Clob。</p>
+   * <p>每次创建 {@link work.myfavs.framework.orm.DBTemplate DBTemplate} 时自动调用。
+   * 用户通过 {@link work.myfavs.framework.orm.DBTemplate.Builder#mapping(java.util.function.Consumer)}
+   * 注册的自定义处理器会按类型覆盖同名的默认处理器。</p>
    */
   public static void registerDefault() {
     if (defaultsRegistered) return;
@@ -44,7 +46,6 @@ public class PropertyHandlerFactory {
     register(NVarchar.class, new NVarcharPropertyHandler());
     register(java.util.Date.class, new DatePropertyHandler());
     register(LocalDateTime.class, new LocalDateTimePropertyHandler());
-    register(OffsetDateTime.class, new OffsetDateTimePropertyHandler());
     register(BigDecimal.class, new BigDecimalPropertyHandler());
     register(boolean.class, new BooleanPropertyHandler(true));
     register(Boolean.class, new BooleanPropertyHandler());
@@ -57,10 +58,8 @@ public class PropertyHandlerFactory {
 
   /**
    * 注册属性处理器。
-   * <p><b>注意：</b>一旦通过 {@link work.myfavs.framework.orm.DBTemplate.Builder#mapping(java.util.function.Consumer)}
-   * 调用了此方法注册任意处理器，框架内置的 23 种默认处理器将全部失效，
-   * 用户需要自行注册所有需要用到的类型。基础类型与包装类需分别注册
-   * （如 {@code long.class} 与 {@code Long.class} 对应不同的 key）。</p>
+   * <p>基础类型与包装类需分别注册（如 {@code long.class} 与 {@code Long.class} 对应不同的 key）。</p>
+   * <p>自定义处理器会覆盖同类型的默认处理器，未覆盖的类型仍使用默认处理器。</p>
    *
    * @param clazz           目标类型
    * @param propertyHandler 属性处理器实例

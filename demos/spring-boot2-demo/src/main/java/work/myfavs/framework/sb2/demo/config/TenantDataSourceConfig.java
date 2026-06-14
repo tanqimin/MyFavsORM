@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Configuration
 /**
  * 多租户数据源配置，初始化主数据源并加载各租户的动态数据源.
  */
+@Configuration
 public class TenantDataSourceConfig {
   private static final Logger logger = LoggerFactory.getLogger(TenantDataSourceConfig.class);
 
@@ -69,12 +69,12 @@ public class TenantDataSourceConfig {
 
     Map<Object, Object> customDataSources = new HashMap<>();
 
-    if (null == DynamicDataSource.connectProperties)
-      DynamicDataSource.connectProperties = primaryDataSource.getConnectProperties();
+    if (null == DynamicDataSource.getConnectProperties())
+      DynamicDataSource.setConnectProperties(primaryDataSource.getConnectProperties());
 
     for (Tenant tenant : tenants) {
       DruidDataSource ds = new DruidDataSource();
-      ds.setConnectProperties(DynamicDataSource.connectProperties);
+      ds.setConnectProperties(DynamicDataSource.getConnectProperties());
       ds.setDriverClassName(tenant.getJdbcClass());
       ds.setUrl(tenant.getJdbcUrl());
       ds.setUsername(tenant.getJdbcUser());

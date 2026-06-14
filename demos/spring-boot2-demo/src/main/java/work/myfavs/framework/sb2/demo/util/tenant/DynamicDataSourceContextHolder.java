@@ -17,9 +17,10 @@ public class DynamicDataSourceContextHolder {
   private static final ThreadLocal<String> contextHolder = new ThreadLocal<>();
 
   /**
-   * 数据源使用顺序标识
+   * 数据源使用顺序标识（仅首次设置时记录，用于 trace/调试）
    */
-  public final static LinkedList<String> dataSourceIds = new LinkedList<>();
+  private static final ThreadLocal<LinkedList<String>> dataSourceIds =
+      ThreadLocal.withInitial(LinkedList::new);
 
   /**
    * 设置数据源
@@ -28,7 +29,7 @@ public class DynamicDataSourceContextHolder {
    */
   public static void setDataSource(String dataSourceName) {
     contextHolder.set(dataSourceName);
-    dataSourceIds.add(dataSourceName);
+    dataSourceIds.get().add(dataSourceName);
   }
 
   /**
@@ -38,7 +39,7 @@ public class DynamicDataSourceContextHolder {
     if (null == contextHolder.get()) {
       logger.debug("数据源标识为空，使用默认的数据源");
     } else {
-      logger.debug("使用数据源:" + contextHolder.get() + " 如果数据源不存在将使用默认数据源.");
+      logger.debug("使用数据源: {} 如果数据源不存在将使用默认数据源.", contextHolder.get());
     }
     return contextHolder.get();
   }
@@ -48,14 +49,20 @@ public class DynamicDataSourceContextHolder {
    */
   public static void clearDataSource() {
     contextHolder.remove();
-    dataSourceIds.clear();
+    dataSourceIds.remove();
   }
 
   /**
    * 返回上一次使用的数据源.
+   * <p>若当前数据源层级为空，则清除上下文，由 {@link AbstractRoutingDataSource} 使用默认数据源。</p>
    */
   public static void returnDataSource() {
-    dataSourceIds.removeLast();
-    setDataSource(dataSourceIds.getLast());
+    LinkedList<String> ids = dataSourceIds.get();
+    if (ids.size() <= 1) {
+      clearDataSource();
+      return;
+    }
+    ids.removeLast();
+    setDataSource(ids.getLast());
   }
 }

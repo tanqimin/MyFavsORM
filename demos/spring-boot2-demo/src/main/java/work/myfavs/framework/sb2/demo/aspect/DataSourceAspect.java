@@ -15,12 +15,12 @@ import work.myfavs.framework.sb2.demo.util.tenant.DynamicDataSourceContextHolder
 
 import javax.servlet.http.HttpServletRequest;
 
-@Component
-@Aspect
-@Order(1)
 /**
  * 数据源切面，根据请求头 {@code tenant-name} 动态切换数据源.
  */
+@Component
+@Aspect
+@Order(1)
 public class DataSourceAspect {
 
   private static final Logger logger = LoggerFactory.getLogger(DataSourceAspect.class);
