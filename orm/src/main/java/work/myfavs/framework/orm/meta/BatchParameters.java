@@ -1,11 +1,14 @@
 package work.myfavs.framework.orm.meta;
 
+import work.myfavs.framework.orm.util.common.ArrayUtil;
 import work.myfavs.framework.orm.util.exception.DataRetrievalException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,8 +77,10 @@ public class BatchParameters {
    *
    * @param statement {@link PreparedStatement} 实例
    * @param batchSize 每执行多少批次后执行一次 {@link PreparedStatement#executeBatch()}，小于等于 0 表示最后统一执行
+   * @return 合并后的 int 数组，包含中间刷新和最终 executeBatch() 的结果
    */
-  public void applyBatchParameters(PreparedStatement statement, int batchSize) {
+  public int[] applyBatchParameters(PreparedStatement statement, int batchSize) {
+    List<int[]> partialResults = new ArrayList<>();
     try {
       for (Map.Entry<Integer, Parameters> entry : batchParameters.entrySet()) {
         Parameters parameters = entry.getValue();
@@ -84,12 +89,20 @@ public class BatchParameters {
         parameters.applyParameters(statement);
         statement.addBatch();
 
-        if (batchSize > 0 && entry.getKey() % batchSize == 0)
-          statement.executeBatch();
+        if (batchSize > 0 && entry.getKey() % batchSize == 0) {
+          partialResults.add(statement.executeBatch());
+        }
       }
     } catch (SQLException ex) {
       throw new DataRetrievalException(ex, "设置批量参数时发生异常: %s", ex.getMessage());
     }
+
+    if (partialResults.isEmpty()) return new int[0];
+    int[] merged = partialResults.get(0);
+    for (int i = 1; i < partialResults.size(); i++) {
+      merged = ArrayUtil.concat(merged, partialResults.get(i));
+    }
+    return merged;
   }
 
   /**

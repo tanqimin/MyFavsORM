@@ -2,6 +2,7 @@ package work.myfavs.framework.orm;
 
 import work.myfavs.framework.orm.meta.BatchParameters;
 import work.myfavs.framework.orm.meta.SqlLog;
+import work.myfavs.framework.orm.util.common.ArrayUtil;
 import work.myfavs.framework.orm.util.common.CollectionUtil;
 import work.myfavs.framework.orm.util.convert.DBConvert;
 import work.myfavs.framework.orm.util.exception.DataRetrievalException;
@@ -257,11 +258,13 @@ public class Query implements Closeable {
     final PreparedStatement preparedStatement = createPreparedStatement();
 
     try {
-      this.applyBatchParameters(preparedStatement);
+      final int[] intermediateResults = this.applyBatchParameters(preparedStatement);
       this.showParameters();
 
       final long start = System.nanoTime();
-      final int[] result = preparedStatement.executeBatch();
+      final int[] finalResults = preparedStatement.executeBatch();
+
+      final int[] result = ArrayUtil.concat(intermediateResults, finalResults);
 
       this.sqlLog.showAffectedRows(result.length, (System.nanoTime() - start) / 1_000_000);
       this.generatedKeys(preparedStatement, keysConsumer);
@@ -407,10 +410,11 @@ public class Query implements Closeable {
    * 把批量参数应用到 {@link PreparedStatement} 中
    *
    * @param preparedStatement {@link PreparedStatement}
+   * @return 合并后的 int 数组，包含中间刷新和最终 executeBatch() 的结果
    */
-  private void applyBatchParameters(PreparedStatement preparedStatement) {
+  private int[] applyBatchParameters(PreparedStatement preparedStatement) {
 
-    this.batchParameters.applyBatchParameters(preparedStatement, this.batchSize);
+    return this.batchParameters.applyBatchParameters(preparedStatement, this.batchSize);
   }
 
   /**

@@ -36,4 +36,22 @@ public class ArrayUtil {
   public static <T> boolean isNotEmpty(T[] array) {
     return !isEmpty(array);
   }
+
+  /**
+   * 按顺序合并两个 int 数组，返回新数组。
+   * 任意参数为 null 时当作空数组处理。
+   *
+   * @param a 第一个数组
+   * @param b 第二个数组
+   * @return 合并后的新数组
+   */
+  public static int[] concat(int[] a, int[] b) {
+    if (a == null && b == null) return new int[0];
+    if (a == null) return b.clone();
+    if (b == null) return a.clone();
+    int[] result = new int[a.length + b.length];
+    System.arraycopy(a, 0, result, 0, a.length);
+    System.arraycopy(b, 0, result, a.length, b.length);
+    return result;
+  }
 }
