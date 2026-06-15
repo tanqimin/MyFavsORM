@@ -612,6 +612,15 @@ mvn test -pl orm -Dtest=CondTest
 
 # 运行单个测试方法
 mvn test -pl orm -Dtest=CondTest#eq
+
+# 查看可用依赖更新
+mvn versions:display-dependency-updates
+
+# 查看可用插件更新
+mvn versions:display-plugin-updates
+
+# 变更版本号（格式：1.0.0-YYMMDD-N）
+mvn versions:set -DnewVersion=1.0.0-260710-1
 ```
 
 ### 测试说明
@@ -637,7 +646,7 @@ mvn test -pl orm -P integration -Dtest=DatabaseTest
 
 # MySQL
 export DB_TYPE=mysql
-export DB_URL="jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8"
+export DB_URL="jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8"
 export DB_USER=root
 export DB_PASSWORD=root
 mvn test -pl orm -P integration -Dtest=DatabaseTest
@@ -667,7 +676,7 @@ mvn test -pl orm -P integration -Dtest=DatabaseTest
 
 # MySQL
 $env:DB_TYPE = "mysql"
-$env:DB_URL  = "jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8"
+$env:DB_URL  = "jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8"
 $env:DB_USER = "root"
 $env:DB_PASSWORD = "root"
 mvn test -pl orm -P integration -Dtest=DatabaseTest
@@ -697,7 +706,7 @@ mvn test -pl orm -P integration -Dtest=DatabaseTest
 
 REM MySQL
 set DB_TYPE=mysql
-set DB_URL=jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8^^^^useSSL=false^^^^serverTimezone=GMT%%2B8
+set DB_URL=jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8^^^^useSSL=false^^^^allowPublicKeyRetrieval=true^^^^serverTimezone=GMT%%2B8
 set DB_USER=root
 set DB_PASSWORD=root
 mvn test -pl orm -P integration -Dtest=DatabaseTest

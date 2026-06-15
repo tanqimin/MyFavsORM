@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs.framework</groupId>
   <artifactId>pom</artifactId>
-  <version>1.0.0-260610-1</version>
+  <version>1.0.0-260615-1</version>
   <packaging>pom</packaging>
 
   <name>${project.groupId}.${project.artifactId}</name>
@@ -53,7 +53,7 @@
     <mockito.version>5.23.0</mockito.version>
 
     <druid.version>1.2.28</druid.version>
-    <HikariCP.version>7.0.2</HikariCP.version>
+    <HikariCP.version>7.1.0</HikariCP.version>
     <mysql-connector-j.version>9.7.0</mysql-connector-j.version>
     <mssql-jdbc.version>13.4.0.jre11</mssql-jdbc.version>
     <h2.version>2.4.240</h2.version>
@@ -68,6 +68,7 @@
     <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
     <central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
     <versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>
+    <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
   </properties>
 
   <modules>
@@ -287,6 +288,28 @@
         <configuration>
           <generateBackupPoms>false</generateBackupPoms>
         </configuration>
+      </plugin>
+
+      <!-- 为 versions-maven-plugin display-plugin-updates 提供最小 Maven 版本信息 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${maven-enforcer-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>enforce-maven-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[3.6.3,)</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

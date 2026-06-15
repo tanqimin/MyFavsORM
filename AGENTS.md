@@ -65,7 +65,16 @@ mvn compile -pl orm
 mvn test -pl orm
 
 # 运行单个测试方法
-mvn test -pl orm -Dtest=<TestClassName>#<methodName>
+mvn test -pl orm -Dtest=CondTest#eq
+
+# 查看可用依赖更新
+mvn versions:display-dependency-updates
+
+# 查看可用插件更新
+mvn versions:display-plugin-updates
+
+# 变更版本号（格式：1.0.0-YYMMDD-N）
+mvn versions:set -DnewVersion=1.0.0-260710-1
 ```
 
 > 无 lint / format / Checkstyle / CI 配置，无需运行相关命令。
@@ -89,7 +98,7 @@ mvn test -pl orm -Dtest=<TestClassName>#<methodName>
 
 ```bash
 export DB_TYPE=mysql
-export DB_URL="jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false"
+export DB_URL="jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true"
 export DB_USER=root
 export DB_PASSWORD=root
 mvn test -pl orm -P integration -Dtest=DatabaseTest
@@ -101,7 +110,7 @@ mvn test -pl orm -P integration -Dtest=DatabaseTest
 
 ```powershell
 $env:DB_TYPE = "mysql"
-$env:DB_URL  = "jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false"
+$env:DB_URL  = "jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true"
 $env:DB_USER = "root"
 $env:DB_PASSWORD = "root"
 mvn test -pl orm -P integration -Dtest=DatabaseTest
@@ -113,7 +122,7 @@ mvn test -pl orm -P integration -Dtest=DatabaseTest
 
 ```cmd
 set DB_TYPE=mysql
-set DB_URL=jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8^^^^useSSL=false
+set DB_URL=jdbc:mysql://localhost:3306/myfavs_master?characterEncoding=utf-8^^^^useSSL=false^^^^allowPublicKeyRetrieval=true
 set DB_USER=root
 set DB_PASSWORD=root
 mvn test -pl orm -P integration -Dtest=DatabaseTest
