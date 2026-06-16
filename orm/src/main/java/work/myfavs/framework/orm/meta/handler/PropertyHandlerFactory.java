@@ -24,7 +24,7 @@ public class PropertyHandlerFactory {
   private static final Map<String, PropertyHandler<?>> HANDLER_MAP             = new ConcurrentHashMap<>();
   private static final EnumPropertyHandler             ENUM_PROPERTY_HANDLER   = new EnumPropertyHandler();
   private static final ObjectPropertyHandler           OBJECT_PROPERTY_HANDLER = new ObjectPropertyHandler();
-  private static boolean                               defaultsRegistered      = false;
+  private static volatile boolean                      defaultsRegistered      = false;
 
   private PropertyHandlerFactory() {}
 
