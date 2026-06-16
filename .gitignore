@@ -9,5 +9,6 @@ target/
 .kilo/
 .kilocode/
 .opencode/
+.hermes/
 #忽略.github目录
 .github/

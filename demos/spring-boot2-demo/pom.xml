@@ -9,7 +9,7 @@
   <parent>
     <groupId>work.myfavs.framework</groupId>
     <artifactId>pom</artifactId>
-    <version>1.0.0-260615-1</version>
+    <version>1.0.0-260616-1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
