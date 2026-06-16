@@ -21,6 +21,7 @@ This file provides guidance to agents when working with code in this repository.
 - **`AbstractOrm` 采用组合模式**：实体 CRUD 委派给 6 个内部组件（`OrmExecutor`、`OrmInserter`、`OrmUpdater`、`OrmDeleter`、`OrmSelector`、`OrmPager`）。各方言子类通过构造器传入 `SqlDialect` 注入方言行为，不再覆写方法。修改 CRUD 行为应修改对应组件或方言实现而非子类
 - **`OrmSqlBuilder` 依赖 Druid AST**：INSERT/UPDATE SQL 通过 Druid 的 `SQLInsertStatement`/`SQLUpdateStatement` 构建；未引入 Druid 时 INSERT/UPDATE 操作会失败（分页 COUNT 同样依赖 Druid）。Druid 是 optional 依赖
 - **`Database` 持有单个 `Query` 实例**：`createQuery()` 返回同一对象（通过 `query.createQuery()` 重置 PreparedStatement），无法同时执行多个独立查询
+- **`Database.createOrm()` 缓存 Orm 实例**：首次调用创建后缓存，后续调用返回同一实例；`close()` 时将 `this.orm` 置为 `null`，下次 `createOrm()` 重新创建
 - **SqlServerDialect 和 OracleDialect 处理无更新列边界**：当表仅有 PK 列无其他列时，自动降级为不含 `WHEN MATCHED` 子句的 MERGE
 
 ## 项目非显而易见的核心约定
@@ -72,7 +73,7 @@ mvn versions:set -DnewVersion="1.0.0-260710-1"
 
 ### 测试分类
 
-- 纯单元测试已完成 **390 个**（使用 Mockito 模拟数据库），无需真实数据库连接。通过 `@Category(IntegrationTest.class)` 排除集成测试
+- 纯单元测试已完成 **465 个**（使用 Mockito 模拟数据库），无需真实数据库连接。通过 `@Category(IntegrationTest.class)` 排除集成测试
 - **集成测试**（需指定数据库）：继承 `AbstractTest` 的类，通过 `DatabaseConfigProvider` 读取连接配置
 
 ### 运行集成测试

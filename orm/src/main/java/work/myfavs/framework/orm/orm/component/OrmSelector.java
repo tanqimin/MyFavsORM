@@ -24,6 +24,12 @@ public class OrmSelector {
   private final Database database;
   private final OrmSqlBuilder sqlBuilder;
 
+  /**
+   * 构造 OrmSelector 实例.
+   *
+   * @param database   {@link Database} 实例
+   * @param sqlBuilder {@link OrmSqlBuilder} 实例
+   */
   public OrmSelector(Database database, OrmSqlBuilder sqlBuilder) {
     this.database = database;
     this.sqlBuilder = sqlBuilder;

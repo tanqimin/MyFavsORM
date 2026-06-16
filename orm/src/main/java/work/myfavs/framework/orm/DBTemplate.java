@@ -22,6 +22,13 @@ import java.util.function.Consumer;
 public class DBTemplate {
   private static final Map<String/* dsName */, DBTemplate> POOL = new ConcurrentHashMap<>();
 
+  /**
+   * 从静态池中获取指定名称的 {@link DBTemplate} 实例。
+   *
+   * @param dsName 数据源名称
+   * @return {@link DBTemplate}
+   * @throws InvalidDataAccessException 如果指定名称的数据源不存在
+   */
   public static DBTemplate get(String dsName) {
     if (POOL.containsKey(dsName)) {
       return POOL.get(dsName);

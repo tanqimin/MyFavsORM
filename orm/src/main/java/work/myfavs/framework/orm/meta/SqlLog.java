@@ -171,6 +171,11 @@ public class SqlLog {
         log.debug(format, arguments);
     }
 
+    /**
+     * 判断是否启用了结果输出。
+     *
+     * @return 如果启用了结果输出返回 {@code true}，否则返回 {@code false}
+     */
     public boolean isShowResultEnabled() {
         return this.showResult;
     }

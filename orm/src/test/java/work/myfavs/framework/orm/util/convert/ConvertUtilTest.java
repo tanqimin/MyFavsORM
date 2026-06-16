@@ -416,6 +416,31 @@ public class ConvertUtilTest {
   }
 
   @Test
+  public void toDateWithTypedSubclass() {
+    long millis = System.currentTimeMillis();
+    java.sql.Date result = ConvertUtil.toDate(java.sql.Date.class, millis, java.sql.Date::new);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(millis, result.getTime());
+  }
+
+  @Test
+  public void toDateWithTypedDateInput() {
+    Date now = new Date();
+    Date result = ConvertUtil.toDate(Date.class, now, Date::new);
+    Assert.assertSame(now, result);
+  }
+
+  @Test
+  public void toDateWithTypedNull() {
+    Assert.assertNull(ConvertUtil.toDate(Date.class, null, Date::new));
+  }
+
+  @Test(expected = InvalidDataAccessException.class)
+  public void toDateWithTypedInvalidType() {
+    ConvertUtil.toDate(Date.class, new StringBuilder(), Date::new);
+  }
+
+  @Test
   public void toUuidWithUuidInput() {
     UUID input = UUID.randomUUID();
     Assert.assertSame(input, ConvertUtil.toUUID(input));
@@ -435,5 +460,43 @@ public class ConvertUtilTest {
   @Test(expected = IllegalArgumentException.class)
   public void toUuidWithInvalidString() {
     ConvertUtil.toUUID("not-a-uuid");
+  }
+
+  @Test
+  public void toUuidWithEmptyString_ShouldReturnNull() {
+    Assert.assertNull(ConvertUtil.toUUID(""));
+  }
+
+  @Test
+  public void toBoolWithCharacterOtherThanYTJ_ShouldReturnFalse() {
+    Assert.assertFalse(ConvertUtil.toBool('N', false));
+    Assert.assertFalse(ConvertUtil.toBool('F', false));
+    Assert.assertFalse(ConvertUtil.toBool('X', false));
+  }
+
+  @Test
+  public void toStrWithNull_ShouldReturnNull() {
+    Assert.assertNull(ConvertUtil.toStr(null));
+  }
+
+  @Test
+  public void toStrWithObject_ShouldReturnToString() {
+    Assert.assertEquals("hello", ConvertUtil.toStr("hello"));
+    Assert.assertEquals("42", ConvertUtil.toStr(42));
+  }
+
+  @Test
+  public void toEnumWithNonStringObject() {
+    Assert.assertEquals(TestEnum.VALUE_B, ConvertUtil.toEnum(TestEnum.class, new StringBuilder("VALUE_B")));
+  }
+
+  @Test
+  public void toEnumWithEmptyString_ShouldReturnNull() {
+    Assert.assertNull(ConvertUtil.toEnum(TestEnum.class, ""));
+  }
+
+  @Test
+  public void toIntWithLongValue_ShouldTruncateToInt() {
+    Assert.assertEquals(Integer.valueOf(42), ConvertUtil.toInt(42L));
   }
 }

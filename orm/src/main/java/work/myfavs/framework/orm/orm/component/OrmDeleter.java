@@ -24,6 +24,13 @@ public class OrmDeleter {
   private final OrmSqlBuilder sqlBuilder;
   private final OrmExecutor executor;
 
+  /**
+   * 构造 OrmDeleter 实例.
+   *
+   * @param database   {@link Database} 实例
+   * @param sqlBuilder {@link OrmSqlBuilder} 实例
+   * @param executor   {@link OrmExecutor} 实例
+   */
   public OrmDeleter(Database database, OrmSqlBuilder sqlBuilder, OrmExecutor executor) {
     this.database = database;
     this.sqlBuilder = sqlBuilder;

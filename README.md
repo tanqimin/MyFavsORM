@@ -628,7 +628,7 @@ mvn versions:set -DnewVersion="1.0.0-260710-1"
 **纯单元测试**（默认 `mvn test`）：
 - 使用 Mockito 模拟数据库，**无需真实数据库连接**
 - `@Category(IntegrationTest.class)` 标记的类被自动排除
-- 包含 **333+** 个测试用例，覆盖 `OrmExecutor`、`OrmSelector`、`OrmInserter`、`OrmUpdater`、`OrmDeleter`、`OrmPager`、`Snowflake`、`ReflectUtil`、`Order`、`TableAlias` 等核心组件
+- 包含 **465+** 个测试用例，覆盖 `OrmExecutor`、`OrmSelector`、`OrmInserter`、`OrmUpdater`、`OrmDeleter`、`OrmPager`、`Snowflake`、`ReflectUtil`、`Order`、`TableAlias` 等核心组件
 
 **集成测试**（需指定数据库）：
 - 通过 `DatabaseConfigProvider` 按优先级读取：系统属性 → 环境变量 → 默认值

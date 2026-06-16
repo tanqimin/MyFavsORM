@@ -16,6 +16,11 @@ public class JdbcConnFactory extends ConnFactory {
   private final ThreadLocal<Connection> connectionHolder     = new ThreadLocal<>();
   private final ThreadLocal<Integer>    connectionDeepHolder = new ThreadLocal<>();
 
+  /**
+   * 构造 JDBC 连接工厂实例.
+   *
+   * @param dataSource 数据源
+   */
   public JdbcConnFactory(DataSource dataSource) {
 
     super(dataSource);
