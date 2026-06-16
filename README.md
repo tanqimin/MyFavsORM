@@ -620,7 +620,7 @@ mvn versions:display-dependency-updates
 mvn versions:display-plugin-updates
 
 # 变更版本号（格式：1.0.0-YYMMDD-N）
-mvn versions:set -DnewVersion=1.0.0-260710-1
+mvn versions:set -DnewVersion="1.0.0-260710-1"
 ```
 
 ### 测试说明

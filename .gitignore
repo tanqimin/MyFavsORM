@@ -8,5 +8,6 @@ target/
 .crush/
 .kilo/
 .kilocode/
+.opencode/
 #忽略.github目录
 .github/
