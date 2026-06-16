@@ -60,7 +60,7 @@ public class JdbcConnFactory extends ConnFactory {
   @Override
   public void closeConnection(Connection connection) {
     final Integer connDeep = connectionDeepHolder.get();
-    if (connDeep > 1) {
+    if (connDeep != null && connDeep > 1) {
       connectionDeepHolder.set(connDeep - 1);
       return;
     }
