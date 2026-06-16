@@ -29,11 +29,11 @@ public class PropertyHandlerFactory {
   private PropertyHandlerFactory() {}
 
   /**
-   * 注册框架内置的 23 种默认 {@link PropertyHandler}。
-   * <p>包含：String、NVarchar、Date、LocalDateTime、OffsetDateTime、BigDecimal、Boolean(包装类+基础类型)、
-   * Integer(包装类+基础类型)、Long(包装类+基础类型)、UUID、
-   * Short(包装类+基础类型)、Double(包装类+基础类型)、Float(包装类+基础类型)、Byte(包装类+基础类型)、
-   * byte[]、Byte[]、Blob、Clob。</p>
+   * 注册框架内置的 12 种默认 {@link PropertyHandler}。
+   * <p>包含：String、NVarchar、Date、LocalDateTime、BigDecimal、Boolean（包装类+基础类型）、
+   * Integer（包装类+基础类型）、Long（包装类+基础类型）、UUID。</p>
+   * <p>未注册的类型在 {@link #getInstance(Class)} 中走兜底逻辑：
+   * 枚举类型返回 {@link EnumPropertyHandler}，其他类型返回 {@link ObjectPropertyHandler}。</p>
    * <p>每次创建 {@link work.myfavs.framework.orm.DBTemplate DBTemplate} 时自动调用。
    * 用户通过 {@link work.myfavs.framework.orm.DBTemplate.Builder#mapping(java.util.function.Consumer)}
    * 注册的自定义处理器会按类型覆盖同名的默认处理器。</p>

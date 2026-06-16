@@ -513,7 +513,7 @@ public class ProductService extends BaseService {
 
 ### PropertyHandler 类型处理器
 
-`PropertyHandler<T>` 负责 Java 类型与 JDBC 类型的双向转换。内置支持 23 种类型：
+`PropertyHandler<T>` 负责 Java 类型与 JDBC 类型的双向转换。框架默认注册 12 种类型处理器，其余类型通过 `ObjectPropertyHandler` 兜底：
 
 ```
 PropertyHandler<T>
@@ -560,7 +560,7 @@ new DBTemplate.Builder()
     .build();
 ```
 
-> **注册策略**：框架始终先注册全部 23 种内置默认处理器。用户通过 `.mapping()` 注册的自定义处理器会按类型覆盖同名的默认处理器，未覆盖的类型仍使用默认处理器（**"默认 + 自定义覆盖"** 模式）。
+> **注册策略**：框架始终先注册 12 种内置默认处理器。用户通过 `.mapping()` 注册的自定义处理器会按类型覆盖同名的默认处理器，未覆盖的类型仍使用默认处理器（**"默认 + 自定义覆盖"** 模式）。未注册的类型走兜底逻辑：枚举类型返回 `EnumPropertyHandler`，其他类型返回 `ObjectPropertyHandler`。
 >
 > **注意**：基础类型（`int.class`）和包装类（`Integer.class`）必须分开注册，因为 `PropertyHandlerFactory` 以 Class 对象精确匹配 key。
 

@@ -88,7 +88,7 @@ work.myfavs.framework.orm/
 │   │   └── Cond.java
 │   ├── handler/              # 类型处理器
 │   │   ├── PropertyHandler.java
-│   │   └── impls/ (23 个实现)
+│   │   └── impls/ (12 个默认注册 + 兜底处理器)
 │   ├── pagination/           # 分页
 │   │   ├── Page.java, PageLite.java, PageBase.java
 │   │   ├── IPageable.java, ISortable.java
@@ -193,7 +193,7 @@ public static class Builder {
 **关键执行顺序：**
 
 1. `DBTemplate` 构造函数调用 `createConnFactory()` — 反射实例化 `ConnFactory`（构造函数签名为 `(DataSource)`）
-2. `registerMapper()` — 始终先调用 `PropertyHandlerFactory.registerDefault()` 注册 23 种内置默认 Handler，再通过 `mapper.map.forEach()` 应用用户自定义的 Handler（自定义按类型覆盖默认，**"默认 + 自定义覆盖"** 模式）
+2. `registerMapper()` — 始终先调用 `PropertyHandlerFactory.registerDefault()` 注册 12 种内置默认 Handler，再通过 `mapper.map.forEach()` 应用用户自定义的 Handler（自定义按类型覆盖默认，**"默认 + 自定义覆盖"** 模式）。未注册的类型走兜底逻辑：枚举类型返回 `EnumPropertyHandler`，其他类型返回 `ObjectPropertyHandler`
 3. `build()` 最后调用 `POOL.put(dsName, this)`
 
 ### 多数据源

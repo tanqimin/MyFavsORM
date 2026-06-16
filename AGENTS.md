@@ -38,7 +38,7 @@ This file provides guidance to agents when working with code in this repository.
 
 - **`@Column`、`@PrimaryKey`、`@LogicDelete`** 使用 `@Inherited`，子类会继承父类字段注解；但 **`@Table` 没有 `@Inherited`**，子类必须独立标注 `@Table` 才能被识别为实体
 - **`Sql` 静态方法以大写字母开头**（`Sql.New()`、`Sql.Select()`、`Sql.Insert()`），因 Java 不允许静态方法与实例方法同名
-- **PropertyHandler 注册改为「默认 + 自定义覆盖」模式**：框架始终先注册 23 种内置默认 Handler，用户通过 `.mapping()` 注册的自定义 Handler 按类型覆盖同名的默认 Handler。不再需要自行注册全部类型
+- **PropertyHandler 注册改为「默认 + 自定义覆盖」模式**：框架始终先注册 12 种内置默认 Handler，用户通过 `.mapping()` 注册的自定义 Handler 按类型覆盖同名的默认 Handler。未注册的类型（如 Short、Double、Float、Byte、Blob 等）走兜底逻辑：枚举类型返回 `EnumPropertyHandler`，其他类型返回 `ObjectPropertyHandler`
 - **基础类型和包装类必须分开注册**（`Long.class` vs `long.class`），内部以 `clazz.getName()` 为 key 精确匹配
 - **Starter 的 `repository.Query` 与核心 `orm.Query` 是完全不同的类**：前者是 Spring 抽象基类（继承 `BaseRepository`），每个方法自动 `try(Database db = ...)` 管理连接；后者是低层 JDBC 封装
 - **`Database` 构造器自动调用 `open()`**（打开连接），使用时必须配对 `close()`，可用 `try-with-resources` 或 `tx()` 自动管理
