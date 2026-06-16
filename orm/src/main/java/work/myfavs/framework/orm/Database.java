@@ -45,6 +45,7 @@ public class Database implements Closeable {
 
   /**
    * 判断当前是否使用 SQL Server 数据库
+   * <p>每次调用都会从配置中读取数据库类型进行判断，结果不缓存</p>
    *
    * @return 如果是返回 {@code true}，否则返回 {@code false}
    */
@@ -95,7 +96,8 @@ public class Database implements Closeable {
   /**
    * 释放数据库资源，与 {@link #open()} 配对使用 <br/>
    * 如果数据库连接打开次数 {@code > 1} ，则记录数据库连接次数 {@code -1} <br/>
-   * 如果数据库连接打开次数 {@code = 1} ，则关闭数据库连接
+   * 如果数据库连接打开次数 {@code = 1} ，则关闭数据库连接 <br/>
+   * 即使关闭 Query 时发生异常，也会通过 try-finally 确保释放数据库连接
    */
   @Override
   public void close() {
@@ -147,7 +149,7 @@ public class Database implements Closeable {
    * 设置保存点（无名称）
    *
    * @return {@link Savepoint}
-   * @throws ConnectionException 设置保存点时发生异常
+   * @throws ConnectionException 当前未获取到数据库连接或设置保存点时发生异常
    */
   public Savepoint setSavepoint() {
     try {
@@ -166,7 +168,7 @@ public class Database implements Closeable {
    *
    * @param name 保存点名称
    * @return {@link Savepoint}
-   * @throws ConnectionException 设置保存点时发生异常
+   * @throws ConnectionException 当前未获取到数据库连接或设置保存点时发生异常
    */
   public Savepoint setSavepoint(String name) {
     try {
