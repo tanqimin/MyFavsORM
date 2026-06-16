@@ -22,6 +22,7 @@ public class Database implements Closeable {
   protected final ConnFactory connFactory;
 
   private Query query;
+  private Orm   orm;
 
   /**
    * 获取 {@link DBTemplate}
@@ -50,7 +51,7 @@ public class Database implements Closeable {
    * @return 如果是返回 {@code true}，否则返回 {@code false}
    */
   public boolean isSqlServer() {
-    final String dbType = getDbConfig().getDbType();
+    final String dbType = getDbType();
     return StringUtil.equals(dbType, DbType.SQL_SERVER)
         || StringUtil.equals(dbType, DbType.SQL_SERVER_2012);
   }
@@ -61,7 +62,7 @@ public class Database implements Closeable {
    * @return 如果是返回 {@code true}，否则返回 {@code false}
    */
   public boolean isMySql() {
-    return StringUtil.equals(getDbConfig().getDbType(), DbType.MYSQL);
+    return StringUtil.equals(getDbType(), DbType.MYSQL);
   }
 
   /**
@@ -71,6 +72,10 @@ public class Database implements Closeable {
    */
   public DBConfig getDbConfig() {
     return this.dbTemplate.getDbConfig();
+  }
+
+  private String getDbType() {
+    return getDbConfig().getDbType();
   }
 
   /**
@@ -108,6 +113,7 @@ public class Database implements Closeable {
     } finally {
       this.connFactory.closeConnection(getConnection());
       this.query = null;
+      this.orm   = null;
     }
   }
 
@@ -141,7 +147,10 @@ public class Database implements Closeable {
    * @return {@link Orm}
    */
   public Orm createOrm() {
-    return OrmFactory.createOrm(this);
+    if (null == this.orm) {
+      this.orm = OrmFactory.createOrm(this);
+    }
+    return this.orm;
   }
 
 

@@ -212,15 +212,15 @@ public class Query implements Closeable {
     this.applyParameters(preparedStatement);
     this.showParameters();
 
-    final long queryStart = System.nanoTime();
+    final long queryStart = this.sqlLog.isShowResultEnabled() ? System.nanoTime() : 0L;
     try (final ResultSet resultSet = this.execQuery(preparedStatement)) {
-      final long queryElapsed = (System.nanoTime() - queryStart) / 1_000_000;
-
-      final long convertStart = System.nanoTime();
+      final long convertStart = this.sqlLog.isShowResultEnabled() ? System.nanoTime() : 0L;
       List<TModel> result = this.convertToList(modelClass, resultSet);
-      final long convertElapsed = (System.nanoTime() - convertStart) / 1_000_000;
-
-      this.sqlLog.showResult(modelClass, result, queryElapsed, convertElapsed);
+      if (this.sqlLog.isShowResultEnabled()) {
+        final long queryElapsed   = (System.nanoTime() - queryStart) / 1_000_000;
+        final long convertElapsed = (System.nanoTime() - convertStart) / 1_000_000;
+        this.sqlLog.showResult(modelClass, result, queryElapsed, convertElapsed);
+      }
       return result;
     } catch (SQLException ex) {
       throw new DataRetrievalException(ex, "执行 executeQuery 查询时发生异常: %s", ex.getMessage());

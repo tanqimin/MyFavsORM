@@ -171,6 +171,10 @@ public class SqlLog {
         log.debug(format, arguments);
     }
 
+    public boolean isShowResultEnabled() {
+        return this.showResult;
+    }
+
     private <TView> void showEntities(Class<TView> viewClass, List<TView> result) {
         if (result.isEmpty()) return;
 
