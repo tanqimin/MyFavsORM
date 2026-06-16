@@ -365,11 +365,10 @@ public class Query implements Closeable {
    */
   private ResultSet getGeneratedKeys(PreparedStatement preparedStatement) throws SQLException {
 
-    final long start     = System.currentTimeMillis();
+    final long start     = System.nanoTime();
     ResultSet  resultSet = preparedStatement.getGeneratedKeys();
-    final long end       = System.currentTimeMillis();
 
-    this.sqlLog.showResult("生成主键消耗时间: {} ms", end - start);
+    this.sqlLog.showResult("生成主键消耗时间: {} ms", (System.nanoTime() - start) / 1_000_000);
     return resultSet;
   }
 
@@ -383,9 +382,8 @@ public class Query implements Closeable {
 
     final long start = System.currentTimeMillis();
     runnable.run();
-    final long end = System.currentTimeMillis();
 
-    this.sqlLog.showResult("主键 ResultSet 转换消耗时间: {} ms", end - start);
+    this.sqlLog.showResult("主键 ResultSet 转换消耗时间: {} ms", (System.nanoTime() - start) / 1_000_000);
   }
 
   /**
