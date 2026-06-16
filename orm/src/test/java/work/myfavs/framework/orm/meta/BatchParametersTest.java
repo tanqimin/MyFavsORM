@@ -1,7 +1,9 @@
 package work.myfavs.framework.orm.meta;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -13,6 +15,11 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class BatchParametersTest {
+
+  @BeforeClass
+  public static void beforeClass() {
+    PropertyHandlerFactory.registerDefault();
+  }
 
   final BatchParameters batchParameters = new BatchParameters();
 
@@ -107,8 +114,8 @@ public class BatchParametersTest {
     PreparedStatement ps = mock(PreparedStatement.class);
     batchParameters.addParameter(1, "hello");
     batchParameters.applyParameters(ps);
-    // Uses PropertyHandlerFactory internally, which delegates to ObjectPropertyHandler -> setObject
-    verify(ps).setObject(1, "hello");
+    // StringPropertyHandler is registered by registerDefault()
+    verify(ps).setString(1, "hello");
   }
 
   @Test

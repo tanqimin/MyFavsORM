@@ -1,7 +1,9 @@
 package work.myfavs.framework.orm.meta;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import work.myfavs.framework.orm.meta.handler.PropertyHandlerFactory;
 import work.myfavs.framework.orm.util.exception.InvalidDataAccessException;
 
 import java.sql.PreparedStatement;
@@ -12,6 +14,11 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class ParametersUnitTest {
+
+  @BeforeClass
+  public static void beforeClass() {
+    PropertyHandlerFactory.registerDefault();
+  }
 
   private Parameters parameters;
 
@@ -171,8 +178,8 @@ public class ParametersUnitTest {
     PreparedStatement ps = mock(PreparedStatement.class);
     parameters.addParameter(1, "hello");
     parameters.applyParameters(ps);
-    // Default handler is ObjectPropertyHandler which uses setObject
-    verify(ps).setObject(1, "hello");
+    // StringPropertyHandler is registered by registerDefault()
+    verify(ps).setString(1, "hello");
   }
 
   @Test
@@ -180,7 +187,8 @@ public class ParametersUnitTest {
     PreparedStatement ps = mock(PreparedStatement.class);
     parameters.addParameter(1, 42);
     parameters.applyParameters(ps);
-    verify(ps).setObject(1, 42);
+    // IntegerPropertyHandler is registered by registerDefault()
+    verify(ps).setInt(1, 42);
   }
 
   @Test
@@ -188,7 +196,8 @@ public class ParametersUnitTest {
     PreparedStatement ps = mock(PreparedStatement.class);
     parameters.addParameter(1, 99L);
     parameters.applyParameters(ps);
-    verify(ps).setObject(1, 99L);
+    // LongPropertyHandler is registered by registerDefault()
+    verify(ps).setLong(1, 99L);
   }
 
   @Test
@@ -196,7 +205,8 @@ public class ParametersUnitTest {
     PreparedStatement ps = mock(PreparedStatement.class);
     parameters.addParameter(1, true);
     parameters.applyParameters(ps);
-    verify(ps).setObject(1, true);
+    // BooleanPropertyHandler is registered by registerDefault()
+    verify(ps).setBoolean(1, true);
   }
 
   @Test
@@ -206,8 +216,9 @@ public class ParametersUnitTest {
     parameters.addParameter(2, 42);
     parameters.addParameter(3, null);
     parameters.applyParameters(ps);
-    verify(ps).setObject(1, "a");
-    verify(ps).setObject(2, 42);
+    // Each type uses its registered PropertyHandler; null falls back to setObject
+    verify(ps).setString(1, "a");
+    verify(ps).setInt(2, 42);
     verify(ps).setObject(3, null);
   }
 

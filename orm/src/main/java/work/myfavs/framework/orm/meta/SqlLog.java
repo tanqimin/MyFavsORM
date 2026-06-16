@@ -20,9 +20,9 @@ public class SqlLog {
 
     private static final Logger log = LoggerFactory.getLogger(SqlLog.class);
 
-    private static final String TITLE_SQL = "---------------------- SQL语句 ----------------------";
-    private static final String TITLE_PAR = "---------------------- SQL参数 ----------------------";
-    private static final String TITLE_RES = "---------------------- 查询结果 ----------------------";
+    private static final String TITLE_SQL = "--- SQL ---";
+    private static final String TITLE_PAR = "--- SQL参数 ---";
+    private static final String TITLE_RES = "--- 查询结果 ---";
 
     private final boolean showSql;
     private final boolean showResult;
