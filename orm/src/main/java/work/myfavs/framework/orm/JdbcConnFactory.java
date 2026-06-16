@@ -114,9 +114,6 @@ public class JdbcConnFactory extends ConnFactory {
 
   private static void closeConn(Connection conn) {
     try {
-      if (!withoutCommit(conn)) {
-        conn.rollback();
-      }
       conn.close();
     } catch (SQLException e) {
       throw new ConnectionException(e, "关闭数据库连接时发生异常: %s", e.getMessage());
