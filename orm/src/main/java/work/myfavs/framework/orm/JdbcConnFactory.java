@@ -16,6 +16,11 @@ public class JdbcConnFactory extends ConnFactory {
   private final ThreadLocal<Connection> connectionHolder     = new ThreadLocal<>();
   private final ThreadLocal<Integer>    connectionDeepHolder = new ThreadLocal<>();
 
+  /**
+   * 构造 JDBC 连接工厂实例.
+   *
+   * @param dataSource 数据源
+   */
   public JdbcConnFactory(DataSource dataSource) {
 
     super(dataSource);
@@ -60,7 +65,7 @@ public class JdbcConnFactory extends ConnFactory {
   @Override
   public void closeConnection(Connection connection) {
     final Integer connDeep = connectionDeepHolder.get();
-    if (connDeep > 1) {
+    if (connDeep != null && connDeep > 1) {
       connectionDeepHolder.set(connDeep - 1);
       return;
     }
@@ -114,9 +119,6 @@ public class JdbcConnFactory extends ConnFactory {
 
   private static void closeConn(Connection conn) {
     try {
-      if (!withoutCommit(conn)) {
-        conn.rollback();
-      }
       conn.close();
     } catch (SQLException e) {
       throw new ConnectionException(e, "关闭数据库连接时发生异常: %s", e.getMessage());

@@ -29,6 +29,16 @@ public class DBException extends RuntimeException {
   }
 
   /**
+   * 构造一个带消息和原因的新异常。
+   *
+   * @param message 异常消息
+   * @param cause   导致此异常的原因
+   */
+  public DBException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  /**
    * 构造一个带格式化消息和原因的新异常。
    *
    * @param cause   导致此异常的原因

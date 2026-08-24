@@ -149,6 +149,8 @@ public class DatabaseConfigProvider {
         return "jdbc:sqlserver://192.168.8.246:1433;DatabaseName=myfavs_master;sendStringParametersAsUnicode=false;encrypt=false";
       case DbType.POSTGRE_SQL:
         return "jdbc:postgresql://localhost:5432/myfavs_master";
+      case DbType.ORACLE:
+        return "jdbc:oracle:thin:@localhost:1521:xe";
       case DbType.H2:
       default:
         return H2_JDBC_URL;
@@ -184,6 +186,8 @@ public class DatabaseConfigProvider {
         return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
       case DbType.POSTGRE_SQL:
         return "org.postgresql.Driver";
+      case DbType.ORACLE:
+        return "oracle.jdbc.OracleDriver";
       case DbType.H2:
       default:
         return "org.h2.Driver";

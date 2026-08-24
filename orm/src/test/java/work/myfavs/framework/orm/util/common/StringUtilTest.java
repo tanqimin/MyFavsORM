@@ -150,4 +150,138 @@ public class StringUtilTest {
     String pad = StringUtil.leftPad("001", "0", 10);
     assertEquals(pad, "0000000001");
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void leftPad_ShouldThrow_WhenStringTooLong() {
+    StringUtil.leftPad("too long", "0", 3);
+  }
+
+  @Test
+  public void equals_WithBothNull_ShouldReturnTrue() {
+    assertTrue(StringUtil.equals(null, null));
+  }
+
+  @Test
+  public void equals_WithFirstNull_ShouldReturnFalse() {
+    assertFalse(StringUtil.equals(null, "ABC"));
+  }
+
+  @Test
+  public void equals_WithSecondNull_ShouldReturnFalse() {
+    assertFalse(StringUtil.equals("ABC", null));
+  }
+
+  @Test
+  public void equalsIgnoreCase_WithBothNull_ShouldReturnTrue() {
+    assertTrue(StringUtil.equalsIgnoreCase(null, null));
+  }
+
+  @Test
+  public void equalsIgnoreCase_WithFirstNull_ShouldReturnFalse() {
+    assertFalse(StringUtil.equalsIgnoreCase(null, "ABC"));
+  }
+
+  @Test
+  public void equalsAny_WithMatchingChar_ShouldReturnTrue() {
+    assertTrue(StringUtil.equalsAny('a', 'a', 'b', 'c'));
+  }
+
+  @Test
+  public void equalsAny_WithNoMatch_ShouldReturnFalse() {
+    assertFalse(StringUtil.equalsAny('x', 'a', 'b', 'c'));
+  }
+
+  @Test
+  public void equalsAny_WithNullArray_ShouldReturnFalse() {
+    assertFalse(StringUtil.equalsAny('a', (char[]) null));
+  }
+
+  @Test
+  public void onlyMatchAny_ShouldReturnTrue_WhenAllCharsMatch() {
+    assertTrue(StringUtil.onlyMatchAny("abc", 'a', 'b', 'c'));
+  }
+
+  @Test
+  public void onlyMatchAny_ShouldReturnFalse_WhenAnyCharDoesNotMatch() {
+    assertFalse(StringUtil.onlyMatchAny("abc", 'a', 'b'));
+  }
+
+  @Test
+  public void capitalize_WithEmptyString_ShouldReturnEmpty() {
+    assertEquals("", StringUtil.capitalize(""));
+  }
+
+  @Test
+  public void capitalize_WithAlreadyUpperCase_ShouldNotChange() {
+    assertEquals("ABC", StringUtil.capitalize("ABC"));
+  }
+
+  @Test
+  public void capitalize_WithSingleCharacter_ShouldUpperCase() {
+    assertEquals("A", StringUtil.capitalize("a"));
+  }
+
+  @Test
+  public void toStr_WithNonNull_ShouldReturnToString() {
+    assertEquals("123", StringUtil.toStr(123));
+  }
+
+  @Test
+  public void split_ShouldReturnTrimmedParts() {
+    java.util.List<String> parts = StringUtil.split("a, b ,c", ",");
+    assertEquals(3, parts.size());
+    assertEquals("a", parts.get(0));
+    assertEquals("b", parts.get(1));
+    assertEquals("c", parts.get(2));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void split_WithNull_ShouldThrow() {
+    StringUtil.split(null, ",");
+  }
+
+  @Test
+  public void length_ShouldReturnStringLength() {
+    assertEquals(3, StringUtil.length("ABC"));
+  }
+
+  @Test
+  public void length_WithNull_ShouldReturnZero() {
+    assertEquals(0, StringUtil.length(null));
+  }
+
+  @Test
+  public void toUnderlineCase_WithSpaces_ShouldConvertToUnderscores() {
+    assertEquals("hello_world", StringUtil.toUnderlineCase("hello world"));
+  }
+
+  @Test
+  public void toUnderlineCase_WithHyphens_ShouldConvertToUnderscores() {
+    assertEquals("hello_world", StringUtil.toUnderlineCase("hello-world"));
+  }
+
+  @Test
+  public void toUnderlineCase_WithDots_ShouldConvertToUnderscores() {
+    assertEquals("hello_world", StringUtil.toUnderlineCase("hello.world"));
+  }
+
+  @Test
+  public void toUnderlineCase_WithConsecutiveSeparators_ShouldCollapse() {
+    assertEquals("hello_world", StringUtil.toUnderlineCase("hello___world"));
+  }
+
+  @Test
+  public void removePrefix_ShouldReturnOriginal_WhenPrefixDoesNotMatch() {
+    assertEquals("TB_USER", StringUtil.removePrefix("TB_USER", "TA_"));
+  }
+
+  @Test
+  public void removePrefix_WithEmptyPrefix_ShouldReturnOriginal() {
+    assertEquals("TB_USER", StringUtil.removePrefix("TB_USER", ""));
+  }
+
+  @Test
+  public void removePrefix_WithEmptyString_ShouldReturnEmpty() {
+    assertEquals("", StringUtil.removePrefix("", "TB_"));
+  }
 }

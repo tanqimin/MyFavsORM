@@ -20,9 +20,9 @@ public class SqlLog {
 
     private static final Logger log = LoggerFactory.getLogger(SqlLog.class);
 
-    private static final String TITLE_SQL = "---------------------- SQL语句 ----------------------";
-    private static final String TITLE_PAR = "---------------------- SQL参数 ----------------------";
-    private static final String TITLE_RES = "---------------------- 查询结果 ----------------------";
+    private static final String TITLE_SQL = "--- SQL ---";
+    private static final String TITLE_PAR = "--- SQL参数 ---";
+    private static final String TITLE_RES = "--- 查询结果 ---";
 
     private final boolean showSql;
     private final boolean showResult;
@@ -169,6 +169,15 @@ public class SqlLog {
     public void showResult(String format, Object... arguments) {
         if (!this.showResult) return;
         log.debug(format, arguments);
+    }
+
+    /**
+     * 判断是否启用了结果输出。
+     *
+     * @return 如果启用了结果输出返回 {@code true}，否则返回 {@code false}
+     */
+    public boolean isShowResultEnabled() {
+        return this.showResult;
     }
 
     private <TView> void showEntities(Class<TView> viewClass, List<TView> result) {

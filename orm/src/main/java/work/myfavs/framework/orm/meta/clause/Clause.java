@@ -78,7 +78,9 @@ public abstract class Clause implements Serializable {
     if (isBlankSql() || StringUtil.isEmpty(str))
       return this;
 
-    this.sql.deleteCharAt(this.sql.lastIndexOf(str));
+    final int lastIndex = this.sql.lastIndexOf(str);
+    if (lastIndex < 0) return this;
+    this.sql.deleteCharAt(lastIndex);
     while (Character.isWhitespace(this.sql.charAt(this.sql.length() - 1)))
       this.sql.deleteCharAt(this.sql.length() - 1);
     return this;

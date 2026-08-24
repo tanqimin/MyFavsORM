@@ -129,6 +129,28 @@ public class OrmUpdaterTest {
     assertEquals(1, result);
   }
 
+
+  @Test
+  public void shouldReturnCorrectAffectedRowsForJdbcBatch() {
+    DBConfig sqlServerConfig = new DBConfig();
+    sqlServerConfig.setDbType(DbType.SQL_SERVER);
+    when(database.getDbConfig()).thenReturn(sqlServerConfig);
+
+    when(database.isSqlServer()).thenReturn(true);
+    when(query.executeBatch()).thenReturn(new int[3]);
+
+    SnowflakeExample e1 = new SnowflakeExample();
+    e1.setId(1L); e1.setName("A");
+    SnowflakeExample e2 = new SnowflakeExample();
+    e2.setId(2L); e2.setName("B");
+    SnowflakeExample e3 = new SnowflakeExample();
+    e3.setId(3L); e3.setName("C");
+
+    int result = updater.update(SnowflakeExample.class, List.of(e1, e2, e3));
+
+    assertEquals(3, result);
+    verify(query, times(3)).addBatch();
+  }
   // ======================== createOrUpdate ========================
 
   @Test

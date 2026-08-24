@@ -22,6 +22,14 @@ public class OrmPager {
   private final DBConfig dbConfig;
   private final SqlDialect dialect;
 
+  /**
+   * 构造 OrmPager 实例.
+   *
+   * @param selector   {@link OrmSelector} 实例
+   * @param sqlBuilder {@link OrmSqlBuilder} 实例
+   * @param dbConfig   {@link DBConfig} 实例
+   * @param dialect    {@link SqlDialect} 方言实例
+   */
   public OrmPager(OrmSelector selector, OrmSqlBuilder sqlBuilder, DBConfig dbConfig, SqlDialect dialect) {
     this.selector = selector;
     this.sqlBuilder = sqlBuilder;
@@ -29,6 +37,18 @@ public class OrmPager {
     this.dialect = dialect;
   }
 
+  /**
+   * 执行 SQL 语句，返回 {@link PageLite} 简单分页结果集.
+   *
+   * @param viewClass   返回的数据类型
+   * @param sql         SQL 语句
+   * @param params      参数
+   * @param enablePage  是否启用分页
+   * @param currentPage 当前页码
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
+   * @return {@link PageLite} 简单分页结果集
+   */
   public <TView> PageLite<TView> findPageLite(
       Class<TView> viewClass,
       String sql,
@@ -42,22 +62,64 @@ public class OrmPager {
     return PageLite.create(data, currentPage, pageSize);
   }
 
+  /**
+   * 执行 {@link Sql} 语句，返回 {@link PageLite} 简单分页结果集.
+   *
+   * @param viewClass   返回的数据类型
+   * @param sql         {@link Sql}
+   * @param enablePage  是否启用分页
+   * @param currentPage 当前页码
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
+   * @return {@link PageLite} 简单分页结果集
+   */
   public <TView> PageLite<TView> findPageLite(
       Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
     return this.findPageLite(viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
+  /**
+   * 执行 SQL 语句，返回 {@link PageLite} 简单分页结果集.
+   *
+   * @param viewClass 返回的数据类型
+   * @param sql       SQL 语句
+   * @param params    参数
+   * @param pageable  {@link IPageable} 对象
+   * @param <TView>   结果类型泛型
+   * @return {@link PageLite} 简单分页结果集
+   */
   public <TView> PageLite<TView> findPageLite(
       Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
     Objects.requireNonNull(pageable);
     return this.findPageLite(viewClass, sql, params, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
 
+  /**
+   * 执行 {@link Sql} 语句，返回 {@link PageLite} 简单分页结果集.
+   *
+   * @param viewClass 返回的数据类型
+   * @param sql       {@link Sql}
+   * @param pageable  {@link IPageable} 对象
+   * @param <TView>   结果类型泛型
+   * @return {@link PageLite} 简单分页结果集
+   */
   public <TView> PageLite<TView> findPageLite(Class<TView> viewClass, Sql sql, IPageable pageable) {
     Objects.requireNonNull(pageable);
     return this.findPageLite(viewClass, sql.toString(), sql.getParams(), pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
 
+  /**
+   * 执行 SQL 语句，返回 {@link Page} 分页结果集（含总记录数）.
+   *
+   * @param viewClass   返回的数据类型
+   * @param sql         SQL 语句
+   * @param params      参数
+   * @param enablePage  是否启用分页
+   * @param currentPage 当前页码
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
+   * @return {@link Page} 分页结果集
+   */
   public <TView> Page<TView> findPage(
       Class<TView> viewClass,
       String sql,
@@ -86,28 +148,77 @@ public class OrmPager {
     return Page.create(data, currentPage, pageSize, totalPages, totalRecords);
   }
 
+  /**
+   * 执行 {@link Sql} 语句，返回 {@link Page} 分页结果集（含总记录数）.
+   *
+   * @param viewClass   返回的数据类型
+   * @param sql         {@link Sql}
+   * @param enablePage  是否启用分页
+   * @param currentPage 当前页码
+   * @param pageSize    每页记录数
+   * @param <TView>     结果类型泛型
+   * @return {@link Page} 分页结果集
+   */
   public <TView> Page<TView> findPage(
       Class<TView> viewClass, Sql sql, boolean enablePage, int currentPage, int pageSize) {
     return findPage(viewClass, sql.toString(), sql.getParams(), enablePage, currentPage, pageSize);
   }
 
+  /**
+   * 执行 SQL 语句，返回 {@link Page} 分页结果集（含总记录数）.
+   *
+   * @param viewClass 返回的数据类型
+   * @param sql       SQL 语句
+   * @param params    参数
+   * @param pageable  {@link IPageable} 对象
+   * @param <TView>   结果类型泛型
+   * @return {@link Page} 分页结果集
+   */
   public <TView> Page<TView> findPage(
       Class<TView> viewClass, String sql, Collection<?> params, IPageable pageable) {
     Objects.requireNonNull(pageable);
     return findPage(viewClass, sql, params, pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
 
+  /**
+   * 执行 {@link Sql} 语句，返回 {@link Page} 分页结果集（含总记录数）.
+   *
+   * @param viewClass 返回的数据类型
+   * @param sql       {@link Sql}
+   * @param pageable  {@link IPageable} 对象
+   * @param <TView>   结果类型泛型
+   * @return {@link Page} 分页结果集
+   */
   public <TView> Page<TView> findPage(Class<TView> viewClass, Sql sql, IPageable pageable) {
     Objects.requireNonNull(pageable);
     return findPage(viewClass, sql.toString(), sql.getParams(), pageable.getEnablePage(), pageable.getCurrentPage(), pageable.getPageSize());
   }
 
+  /**
+   * 执行 SQL 语句，返回指定行数的结果集.
+   *
+   * @param viewClass 返回的数据类型
+   * @param top       行数
+   * @param sql       SQL 语句
+   * @param params    参数
+   * @param <TView>   结果类型泛型
+   * @return 结果集
+   */
   public <TView> List<TView> findTop(
       Class<TView> viewClass, int top, String sql, Collection<?> params) {
     final Sql querySql = this.selectPage(true, sql, params, 1, top);
     return this.selector.find(viewClass, querySql);
   }
 
+  /**
+   * 执行 {@link Sql} 语句，返回指定行数的结果集.
+   *
+   * @param viewClass 返回的数据类型
+   * @param top       行数
+   * @param sql       {@link Sql}
+   * @param <TView>   结果类型泛型
+   * @return 结果集
+   */
   public <TView> List<TView> findTop(Class<TView> viewClass, int top, Sql sql) {
     return this.findTop(viewClass, top, sql.toString(), sql.getParams());
   }

@@ -88,62 +88,137 @@ public class DBConfig {
    */
   private String pageHasNextField = "hasNext";
 
+  /**
+   * 获取数据库类型
+   *
+   * @return 数据库类型
+   */
   public String getDbType() {
     return dbType;
   }
 
+  /**
+   * 获取批处理大小
+   *
+   * @return 批处理大小
+   */
   public int getBatchSize() {
     return batchSize;
   }
 
+  /**
+   * 获取抓取数据大小
+   *
+   * @return 抓取数据大小
+   */
   public int getFetchSize() {
     return fetchSize;
   }
 
+  /**
+   * 获取是否显示SQL（日志级别INFO）
+   *
+   * @return 是否显示SQL
+   */
   public boolean getShowSql() {
     return showSql;
   }
 
+  /**
+   * 获取是否显示查询结果（日志级别INFO）
+   *
+   * @return 是否显示查询结果
+   */
   public boolean getShowResult() {
     return showResult;
   }
 
+  /**
+   * 获取分页时每页最大记录数
+   *
+   * @return 每页最大记录数（小于 0 为不限制）
+   */
   public int getMaxPageSize() {
     return maxPageSize;
   }
 
+  /**
+   * 获取默认事务隔离级别
+   *
+   * @return 事务隔离级别
+   */
   public int getDefaultIsolation() {
     return defaultIsolation;
   }
 
+  /**
+   * 获取终端ID
+   *
+   * @return 终端ID
+   */
   public long getWorkerId() {
     return workerId;
   }
 
+  /**
+   * 获取数据中心ID
+   *
+   * @return 数据中心ID
+   */
   public long getDataCenterId() {
     return dataCenterId;
   }
 
+  /**
+   * 获取分页查询结果数据集合字段名称
+   *
+   * @return 分页查询结果数据集合字段名称
+   */
   public String getPageDataField() {
     return pageDataField;
   }
 
+  /**
+   * 获取分页查询结果当前页码字段名称
+   *
+   * @return 分页查询结果当前页码字段名称
+   */
   public String getPageCurrentField() {
     return pageCurrentField;
   }
 
+  /**
+   * 获取分页查询结果每页记录数字段名称
+   *
+   * @return 分页查询结果每页记录数字段名称
+   */
   public String getPageSizeField() {
     return pageSizeField;
   }
 
+  /**
+   * 获取分页查询结果总页数字段名称
+   *
+   * @return 分页查询结果总页数字段名称
+   */
   public String getPageTotalPageField() {
     return pageTotalPageField;
   }
 
+  /**
+   * 获取分页查询结果总记录数字段名称
+   *
+   * @return 分页查询结果总记录数字段名称
+   */
   public String getPageTotalRecordField() {
     return pageTotalRecordField;
   }
 
+  /**
+   * 获取分页查询结果是否存在下一页字段名称
+   *
+   * @return 分页查询结果是否存在下一页字段名称
+   */
   public String getPageHasNextField() {
     return pageHasNextField;
   }
