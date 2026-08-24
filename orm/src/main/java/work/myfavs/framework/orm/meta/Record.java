@@ -36,7 +36,7 @@ public class Record extends LinkedHashMap<String, Object> implements IRecord<Str
     Object value = super.get(key);
     if (null == value && key instanceof String) {
       String keyStr = (String) key;
-      for (Entry<String, Object> entry : this.entrySet()) {
+      for (Map.Entry<String, Object> entry : this.entrySet()) {
         if (entry.getKey().equalsIgnoreCase(keyStr)) {
           return entry.getValue();
         }

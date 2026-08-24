@@ -6,7 +6,7 @@
 
   <groupId>work.myfavs.framework</groupId>
   <artifactId>pom</artifactId>
-  <version>1.0.0-260616-1</version>
+  <version>1.0.0-260824-1</version>
   <packaging>pom</packaging>
 
   <name>${project.groupId}.${project.artifactId}</name>
