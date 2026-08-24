@@ -146,3 +146,17 @@ mvn test -pl orm -P integration -Dtest=DatabaseTest
 - **版本号格式**：`1.0.0-YYMMDD-N`
 - **`MANIFEST.MF`** 存在于各模块 `META-INF/` 但内容为空
 - 驼峰转下划线：`customField01` → `custom_field_01`（数字前加下划线）
+
+## Agent skills
+
+### Issue tracker
+
+本仓库的 issue 与 spec 存于 GitHub Issues，使用 `gh` CLI 操作。参见 `docs/agents/issue-tracker.md`。
+
+### Triage labels
+
+使用默认五角色标签：`needs-triage` / `needs-info` / `ready-for-agent` / `ready-for-human` / `wontfix`。参见 `docs/agents/triage-labels.md`。
+
+### Domain docs
+
+single-context：仓库根目录 `CONTEXT.md` + `docs/adr/`。参见 `docs/agents/domain.md`。
